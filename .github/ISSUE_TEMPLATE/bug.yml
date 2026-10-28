@@ -1,0 +1,27 @@
+name: Bug
+description: A bug in an app or in the toolbox snapshot.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: app
+    attributes:
+      label: App slug
+      description: Directory under apps/, or "toolbox", or "template".
+      placeholder: tip-split
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what the page did.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps
+      description: Steps another person can follow. Include the manifest path if the bug is in lacuna.app.json.
+    validations:
+      required: true

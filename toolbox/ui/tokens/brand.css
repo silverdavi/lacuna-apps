@@ -1,0 +1,75 @@
+/**
+ * Lacuna brand tokens — canonical --lacuna-* palette.
+ * Source of truth for brand surfaces, deck chrome, and logo-adjacent color.
+ * Product UI maps from these in ../tokens.css (unprefixed --ink / --paper / …).
+ * Docs: brand/TOKENS.md · brand/guidelines/BRAND-GUIDELINES.md
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap");
+
+:root {
+  /* Logo / brand color */
+  --lacuna-coral: #f06449;
+  --lacuna-amber: #f2a33c;
+  --lacuna-teal: #2eb8a6;
+  --lacuna-violet: #7c6fe8;
+  --lacuna-ink: #1a1a1a;
+  --lacuna-paper: #ede7da;
+  --lacuna-paper-bright: #f2ebdd;
+  --lacuna-rust: #b5502a;
+  --lacuna-ground: #fdfbf6;
+  --lacuna-ground-2: #f4efe6;
+  --lacuna-ground-dark: #211d1a;
+
+  /* Deck / document surfaces */
+  --lacuna-paper-2: #f4efe6;
+  --lacuna-soft: #3d4a45;
+  --lacuna-muted: #6b7a72;
+  --lacuna-hair: #d4cbb8;
+  --lacuna-white: #ffffff;
+  --lacuna-deep: #211d1a;
+  --lacuna-on-deep: #ede7da;
+  --lacuna-on-deep-soft: #c9c2b2;
+  --lacuna-on-deep-muted: #9a9284;
+
+  /* Type families */
+  --lacuna-font-display: "Newsreader", Georgia, serif;
+  --lacuna-font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --lacuna-font-mono: "Spline Sans Mono", "SF Mono", Menlo, monospace;
+
+  /* Type scale (16:9 deck @ 1280) */
+  --lacuna-text-brand: 72px;
+  --lacuna-text-cover: 40px;
+  --lacuna-text-h2: 28px;
+  --lacuna-text-lede: 16px;
+  --lacuna-text-body: 14px;
+  --lacuna-text-eyebrow: 11px;
+  --lacuna-text-meta: 10px;
+  --lacuna-text-kpi: 32px;
+
+  /* Space */
+  --lacuna-space-1: 4px;
+  --lacuna-space-2: 8px;
+  --lacuna-space-3: 12px;
+  --lacuna-space-4: 16px;
+  --lacuna-space-5: 24px;
+  --lacuna-space-6: 32px;
+  --lacuna-space-7: 48px;
+  --lacuna-space-8: 64px;
+  --lacuna-page-gutter: 56px;
+  --lacuna-radius: 2px;
+  --lacuna-radius-panel: 4px;
+
+  /* Motion */
+  --lacuna-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lacuna-duration-fast: 150ms;
+  --lacuna-duration: 280ms;
+  --lacuna-duration-slow: 480ms;
+
+  /* Edge (prefer hairline over shadow) */
+  --lacuna-shadow: 0 8px 24px rgba(26, 26, 26, 0.06);
+  --lacuna-hairline: 0 1px 0 var(--lacuna-hair);
+
+  /* Atmosphere */
+  --lacuna-bg: linear-gradient(165deg, var(--lacuna-ground) 0%, var(--lacuna-paper) 55%, var(--lacuna-paper-2) 100%);
+}

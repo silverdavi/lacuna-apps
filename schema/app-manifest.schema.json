@@ -1,0 +1,339 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lacunaos.com/schema/app-manifest/1.json",
+  "title": "Lacuna app manifest",
+  "description": "One descriptor per app version. Authored as lacuna.app.json in the app's repository; each published version is appended as one line to platform/registry/apps.jsonl. Shape only: store policy (restricted data classes, reserved id namespace, icon family, naming register) is checked by platform/schema/validate.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion", "id", "name", "version", "summary", "description", "category",
+    "icon", "relationship", "maintainer", "pricing", "maturity", "entry",
+    "requires", "capabilities", "permissions", "sharing"
+  ],
+  "properties": {
+    "manifestVersion": { "const": 1 },
+
+    "id": {
+      "description": "Stable reverse-DNS id. lacuna.* is reserved for first-party apps. Never reused after an app is pulled.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9][a-z0-9-]*)+$",
+      "maxLength": 80
+    },
+    "name": {
+      "description": "Launcher label. Naming register: a noun or verb phrase of at most four words, no colon, no leading article, no self-narration.",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 32,
+      "pattern": "^(?!(A|An|The) )[^:]+$"
+    },
+    "version": { "$ref": "#/$defs/semver" },
+    "summary": {
+      "description": "One quiet sentence for the store listing.",
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 140
+    },
+    "description": { "type": "string", "minLength": 40, "maxLength": 4000 },
+    "category": {
+      "description": "One of the eight catalog suites in the product thesis.",
+      "enum": ["foundation", "communication", "productivity", "personal", "business", "legal-gov", "healthcare", "industry"]
+    },
+    "tags": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9-]+$" }, "uniqueItems": true, "maxItems": 12 },
+    "icon": {
+      "description": "Glyph name from the ICONS family in app/packages/ui/src/icons.tsx. The plate hue comes from the category; apps do not pick colors.",
+      "type": "string",
+      "pattern": "^[a-z][a-z-]*$"
+    },
+
+    "relationship": {
+      "description": "standalone: its own tile and listing. family-member: joins the app family (umbrella) anchored by parent; shown inside the parent's window and store page. iteration-of: a variant of parent for a different audience or configuration; shares the parent's record kinds and is listed as a variant on the parent's page. 'Family' is not the catalog 'suite' (see category).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["standalone", "family-member", "iteration-of"] },
+        "parent": { "$ref": "#/$defs/appId" },
+        "differences": {
+          "description": "iteration-of only: what this variant changes relative to the parent.",
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 400
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "enum": ["family-member", "iteration-of"] } } },
+          "then": { "required": ["parent"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "iteration-of" } } },
+          "then": { "required": ["parent", "differences"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "standalone" } } },
+          "then": { "not": { "required": ["parent"] } }
+        }
+      ]
+    },
+
+    "maintainer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "name"],
+      "properties": {
+        "type": { "enum": ["first-party", "third-party"] },
+        "name": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "contact": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
+        "url": { "type": "string", "pattern": "^https://" }
+      }
+    },
+    "source": {
+      "description": "The repository Lacuna builds the shipped bundle from. Required for third-party apps by store rules; Lacuna does not accept prebuilt bundles.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "pattern": "^https://" },
+        "license": { "type": "string", "maxLength": 40 }
+      }
+    },
+
+    "pricing": {
+      "description": "Free only at launch: no price, no in-app purchases, no ads. Paid apps and the store take arrive in a later manifest version.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model"],
+      "properties": {
+        "model": { "const": "free" },
+        "inAppPurchases": { "const": false },
+        "ads": { "const": false }
+      }
+    },
+
+    "maturity": {
+      "description": "demo-working: store-backed mutable surface in the current browser demo. demo-guided: guided scenario or generic record view only. planned: manifest written, no code. beta and stable: reviewed production releases.",
+      "enum": ["demo-working", "demo-guided", "planned", "beta", "stable"]
+    },
+
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "route"],
+      "properties": {
+        "type": {
+          "description": "builtin: compiled into the host (first-party). bundle: third-party app that Lacuna builds from source and serves from a separate app domain, loaded into a cross-origin sandboxed iframe that reaches Lacuna only through the host API.",
+          "enum": ["builtin", "bundle"]
+        },
+        "route": { "type": "string", "pattern": "^/app/[a-z0-9-]+$" },
+        "bundle": { "type": "string", "maxLength": 200 },
+        "demoFlows": {
+          "description": "Guided scenario ids in app/apps/demo/src/flows that currently resolve to this app.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "bundle" } } }, "then": { "required": ["bundle"] } }
+      ]
+    },
+
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modules"],
+      "properties": {
+        "hostApi": {
+          "description": "Range of the host API (records, grants, boxes, file picker) the app calls. Planned; first version will be 1.0.0.",
+          "$ref": "#/$defs/range"
+        },
+        "modules": {
+          "description": "Toolbox modules (platform/toolbox/modules.json) and compatible version ranges. The host resolves each range to the newest compatible release at load time.",
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^@lacuna/[a-z0-9-]+$" },
+          "additionalProperties": { "$ref": "#/$defs/range" }
+        }
+      }
+    },
+
+    "capabilities": {
+      "description": "What the app can do, as verb:format or verb:from->to. Drives store search ('apps that open DOCX'), Open with, and the reuse map.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(view|edit|create|fill|sign|redact|annotate|compile|render|import|export|convert):[a-z0-9-]+(->[a-z0-9-]+)?$"
+      }
+    },
+
+    "permissions": {
+      "description": "Declared ceiling. At runtime the effective permission is the intersection of this declaration, the acting profile's grants, and the space administrator's app policy. An app never receives authority the person lacks.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["records", "platform", "network", "dataClasses", "availability"],
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "access", "purpose"],
+            "properties": {
+              "kind": { "$ref": "#/$defs/recordKind" },
+              "access": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "enum": ["read", "comment", "write", "create", "delete", "share"] }
+              },
+              "purpose": { "type": "string", "minLength": 10, "maxLength": 200 }
+            }
+          }
+        },
+        "platform": {
+          "description": "Host services the app may call.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "identity.profile.read",
+              "spaces.active.read",
+              "people.lookup",
+              "files.pick",
+              "files.save",
+              "boxes.post",
+              "events.emit",
+              "calendar.write",
+              "notifications.send",
+              "clipboard.write",
+              "print"
+            ]
+          }
+        },
+        "network": {
+          "description": "Outbound origins. Empty means no network beyond the host API.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["origins"],
+          "properties": {
+            "origins": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^https://[a-z0-9.-]+(:[0-9]+)?$" }
+            },
+            "justification": { "type": "string", "maxLength": 400 }
+          }
+        },
+        "dataClasses": {
+          "description": "Sensitive classes the app can touch. Drives review tier.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["financial", "health", "child", "legal-privileged", "government-id", "biometric", "location", "employment"] }
+        },
+        "availability": {
+          "description": "Where the launcher offers the app ('release as needed').",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["spaceTypes"],
+          "properties": {
+            "spaceTypes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "enum": ["personal", "family", "employer", "business", "clinic", "school", "matter", "agency", "nonprofit", "project", "any"] }
+            },
+            "minimumAge": { "type": "integer", "minimum": 0, "maximum": 21 }
+          }
+        }
+      }
+    },
+
+    "sharing": {
+      "description": "What this app shares with other apps. Records are shared by reference and grant, never by copy.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owns", "reads", "handoffs"],
+      "properties": {
+        "owns": {
+          "description": "Record kinds this app defines and migrates. Other apps may read or edit them through grants.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/recordKind" }
+        },
+        "reads": {
+          "description": "Record kinds owned by other apps that this app opens.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind"],
+            "properties": {
+              "kind": { "$ref": "#/$defs/recordKind" },
+              "owner": { "$ref": "#/$defs/appId" }
+            }
+          }
+        },
+        "handoffs": {
+          "description": "Capabilities of other apps this app sends a record to (e.g. sign:doc). Resolved by the host, not by hard-coded app ids.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["capability", "purpose"],
+            "properties": {
+              "capability": { "type": "string", "pattern": "^[a-z]+:[a-z0-9-]+(->[a-z0-9-]+)?$" },
+              "purpose": { "type": "string", "minLength": 10, "maxLength": 200 }
+            }
+          }
+        },
+        "emits": {
+          "description": "Domain event types the app appends (app-kind.noun.verb).",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+(\\.[a-z0-9-]+)*$" }
+        }
+      }
+    },
+
+    "quality": {
+      "description": "Evidence the submission ships with. Required for third-party submissions by store rules.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tests": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "themeMatrix": { "description": "Passes light/dark x compact/normal/full x type scale s..3xl in the theme lab.", "type": "boolean" },
+        "keyboardOnly": { "type": "boolean" },
+        "accessibilityScan": { "enum": ["axe", "other", "none"] },
+        "worksWithoutNetwork": { "type": "boolean" }
+      }
+    },
+
+    "notes": {
+      "description": "Free-text reviewer or registry notes (e.g. known demo wiring gaps).",
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?$"
+    },
+    "range": {
+      "description": "Caret, tilde, exact, or a >=x.y.z <x.y.z pair.",
+      "type": "string",
+      "pattern": "^((\\^|~)?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?|>=(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*) <(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*))$"
+    },
+    "appId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9][a-z0-9-]*)+$"
+    },
+    "recordKind": {
+      "description": "Record kind. Existing kinds come from RecordKind in app/apps/demo/src/store/types.ts; new kinds are namespaced by the owning app.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    }
+  }
+}

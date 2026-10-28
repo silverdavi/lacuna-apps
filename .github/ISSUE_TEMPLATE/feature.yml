@@ -1,0 +1,28 @@
+name: Feature
+description: A feature request with a LaCoin cost.
+title: "[feature] "
+labels: ["feature"]
+body:
+  - type: textarea
+    id: request
+    attributes:
+      label: Request
+      description: What the app or the toolbox should do, and who else can use it.
+    validations:
+      required: true
+  - type: input
+    id: lacoin_cost
+    attributes:
+      label: LaCoin cost
+      description: Suggested cost. A universal fix is 0. A universal feature is 10. A personal or heavy feature is 50 to 200.
+      placeholder: "10"
+    validations:
+      required: true
+  - type: input
+    id: app
+    attributes:
+      label: App slug
+      description: Leave blank if this is about the toolbox or the shelf.
+      placeholder: receipt-packet
+    validations:
+      required: false

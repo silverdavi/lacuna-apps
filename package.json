@@ -1,0 +1,9 @@
+{
+  "name": "lacuna-apps",
+  "private": true,
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "check": "node schema/validate.mjs && node scripts/forbid-network.mjs && pnpm -r --if-present check",
+    "build": "pnpm --filter \"./apps/*\" --filter \"./template\" build"
+  }
+}

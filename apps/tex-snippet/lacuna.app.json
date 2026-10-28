@@ -1,0 +1,80 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.tex-snippet",
+  "name": "TeX snippet",
+  "version": "0.1.0",
+  "summary": "Keep a TeX math fragment next to a plain reading of the same line.",
+  "description": "A single TeX math fragment, edited as source. The math module is the one that will render it. This page stores the fragment and shows the characters you typed.",
+  "category": "productivity",
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/tex-snippet"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/math": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:latex-math"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "tex-snippet",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the TeX source for one math fragment"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "tex-snippet"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "tags": [
+    "latex-math"
+  ]
+}

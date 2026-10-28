@@ -1,0 +1,734 @@
+{
+  "catalogVersion": 1,
+  "note": "Toolbox modules an app can depend on. status: exists = a workspace package under app/packages with its own version; partial = the package exists but part of the module still lives inside another package or the demo app, or only the code exists elsewhere; planned = no code yet. 'today' lists the real source paths (relative to the lacuna repo root).",
+  "layers": {
+    "0": "Design tokens",
+    "1": "UI primitives and shell",
+    "2": "Composite components",
+    "3": "Capability modules (formats and editors)",
+    "4": "Platform services (substrate)"
+  },
+  "modules": [
+    {
+      "id": "@lacuna/tokens",
+      "layer": 0,
+      "status": "partial",
+      "version": null,
+      "summary": "Semantic color, type-ramp, spacing, radius, shadow, and motion tokens plus the theme knobs (appearance, type scale, density, font set, layout, colorway, contrast, motion).",
+      "today": [
+        "app/packages/ui/src/tokens.css",
+        "app/packages/ui/src/theme.tsx",
+        "brand/tokens.css",
+        "brand/tokens/tokens.css"
+      ],
+      "gap": "Two token sets with different prefixes (--lacuna-* in brand/, --ink/--paper in packages/ui) mirrored by hand.",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "theme",
+        "color",
+        "dark mode",
+        "density",
+        "typography"
+      ]
+    },
+    {
+      "id": "@lacuna/ui",
+      "layer": 1,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Presentation primitives: Title, Body, MonoLabel, Button, Card, Chip, Tag, Pills, Tabs, Table, Kpi, Avatar, layout helpers (Cols, Stack, Spread), ResizablePanel, and the ICONS family.",
+      "today": [
+        "app/packages/ui/src/index.tsx",
+        "app/packages/ui/src/layout.tsx",
+        "app/packages/ui/src/icons.tsx",
+        "app/packages/ui/src/ui.css"
+      ],
+      "gap": "Also contains composites and all editors; one package, one version for everything.",
+      "dependsOn": [
+        "@lacuna/tokens"
+      ],
+      "formats": [],
+      "keywords": [
+        "button",
+        "card",
+        "table",
+        "tabs",
+        "icon"
+      ]
+    },
+    {
+      "id": "@lacuna/shell",
+      "layer": 1,
+      "status": "partial",
+      "version": null,
+      "summary": "Host chrome every app opens inside: desktop, app bar with plate and back control, breadcrumbs, file rail, context panel, command palette, settings, profile switcher.",
+      "today": [
+        "app/packages/ui/src/index.tsx (Shell, TopBar, SpacesRail, BottomNav)",
+        "app/apps/demo/src/AppView.tsx",
+        "app/apps/demo/src/chrome.tsx",
+        "app/apps/demo/src/geo.tsx (Plate, hueFor)",
+        "app/apps/demo/src/Palette.tsx",
+        "app/apps/demo/src/ShellExtras.tsx"
+      ],
+      "gap": "App window chrome lives in the demo app; apps are hard-wired into AppView through bodyForDoc() instead of registering a surface.",
+      "dependsOn": [
+        "@lacuna/ui",
+        "@lacuna/model"
+      ],
+      "formats": [],
+      "keywords": [
+        "window",
+        "app bar",
+        "breadcrumbs",
+        "palette"
+      ]
+    },
+    {
+      "id": "@lacuna/governance-ui",
+      "layer": 2,
+      "status": "partial",
+      "version": null,
+      "summary": "Envelope, access, and explanation surfaces: AccessPanel, WhyPanel, EnvelopePanel, Timeline.",
+      "today": [
+        "app/packages/ui/src/index.tsx (AccessPanel, WhyPanel, EnvelopePanel, Timeline)"
+      ],
+      "gap": "Exported from @lacuna/ui; renders precomputed decisions only.",
+      "dependsOn": [
+        "@lacuna/ui",
+        "@lacuna/model"
+      ],
+      "formats": [],
+      "keywords": [
+        "access",
+        "permissions",
+        "audit",
+        "history",
+        "why"
+      ]
+    },
+    {
+      "id": "@lacuna/editor-kit",
+      "layer": 2,
+      "status": "partial",
+      "version": null,
+      "summary": "Shared editor chrome: Toolbar, Tool, ToolSep, StatusBar, save-state flash, history drawer.",
+      "today": [
+        "app/packages/ui/src/editors.tsx (Toolbar, Tool, ToolSep, StatusBar; not exported)",
+        "app/packages/ui/src/editors.css"
+      ],
+      "gap": "Private helpers; LiveNotes in the demo re-creates toolbar markup by hand.",
+      "dependsOn": [
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "toolbar",
+        "editor",
+        "status bar",
+        "undo"
+      ]
+    },
+    {
+      "id": "@lacuna/doc",
+      "layer": 3,
+      "status": "partial",
+      "version": "0.1.0",
+      "summary": "Document model (title, body, comments, revisions), DocsEditor, read-only DocSurface, and the import/export interface every document format plugs into.",
+      "today": [
+        "app/packages/doc/src (DocModel, DocComment, DocRevision, appendRevision, paragraphsToHtml, sanitizeHtml, DocImporter/DocExporter registry, HTML importer and exporter; FormatId, Result, and ConversionWarning come from @lacuna/formats)",
+        "app/packages/ui/src/editors.tsx (DocsEditor)",
+        "app/packages/ui/src/index.tsx (DocSurface)"
+      ],
+      "gap": "DocsEditor and DocSurface still live in @lacuna/ui and move once editor-kit exports Toolbar, Tool, and StatusBar. The body is still edited through contentEditable/execCommand. Importers: HTML (built in) and DOCX (@lacuna/docx). Exporters: HTML only.",
+      "dependsOn": [
+        "@lacuna/editor-kit",
+        "@lacuna/formats"
+      ],
+      "formats": [
+        "html"
+      ],
+      "keywords": [
+        "document",
+        "word processor",
+        "comments",
+        "revisions",
+        "docs"
+      ]
+    },
+    {
+      "id": "@lacuna/formats",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Format table (PDF, DOCX, PNG, JPEG, GIF, WebP, SVG, ZIP, HTML, text, TeX) and detect(bytes, filename): magic bytes decide, the extension only names unsigned formats or explains a mismatch. Typed FormatError (corrupt, encrypted, unsupported, too-large, empty) and the Result/ConversionWarning types converters report through.",
+      "today": [
+        "app/packages/formats/src/index.ts"
+      ],
+      "gap": "Converter route(A, B) inside formats is still planned; @lacuna/convert already holds a separate registerConverter/convert registry with text↔document built-ins. FileRec.kind in app/apps/demo/src/store/types.ts is still a free-text label.",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "file type",
+        "mime",
+        "convert",
+        "open with",
+        "format"
+      ]
+    },
+    {
+      "id": "@lacuna/convert",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Conversion registry: converters register { from, to, convert }; apps call convert(from, to, input). Built-in text ↔ PlainDocument. DOCX → document registers from @lacuna/docx. Convert app is the first consumer.",
+      "today": [
+        "app/packages/convert/src/index.ts",
+        "app/packages/convert/src/registry.ts",
+        "app/packages/convert/src/text.ts",
+        "app/packages/docx/src/convert.ts"
+      ],
+      "gap": "No route() for multi-hop chains yet. PDF, HTML, and TeX converters are not registered.",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "convert",
+        "converter",
+        "round-trip",
+        "export",
+        "import"
+      ]
+    },
+    {
+      "id": "@lacuna/units",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Unit conversion registry: length, mass, temperature (offset), volume, time, and data (1000 vs 1024). Apps call categories(), units(), convert() — never throw past the API.",
+      "today": [
+        "app/packages/units/src/index.ts",
+        "app/packages/units/src/convert.ts",
+        "app/packages/units/src/registry.ts"
+      ],
+      "gap": "No currency or compound units yet. Sheets column formatting does not call this module yet.",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "units",
+        "convert",
+        "temperature",
+        "metric",
+        "imperial",
+        "kibibyte"
+      ]
+    },
+    {
+      "id": "@lacuna/preview",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Viewer registry and FilePreview: reads a local file, detects it through @lacuna/formats, refuses oversized files before reading them, lazy-loads the registered viewer, and shows conversion notes and unreadable, locked, unsupported, empty, and too-large states. FileDrop is the matching drop area and picker.",
+      "today": [
+        "app/packages/preview/src/index.tsx",
+        "app/packages/preview/src/preview.css"
+      ],
+      "gap": "Previews local files only; no 'Open with' menu over stored records yet, and nothing opened is saved.",
+      "dependsOn": [
+        "@lacuna/formats",
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "preview",
+        "open with",
+        "viewer",
+        "drop",
+        "file picker"
+      ]
+    },
+    {
+      "id": "@lacuna/docx",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "docxImporter (DOCX to sanitized DocModel) and docxViewer for FilePreview; docxToDocument registers on @lacuna/convert. mammoth loads only when a DOCX is opened. Planned: docxExporter, readFields, fillFields.",
+      "today": [
+        "app/packages/docx/src/importer.ts",
+        "app/packages/docx/src/convert.ts",
+        "app/packages/docx/src/index.ts",
+        "app/packages/docx/src/view.tsx"
+      ],
+      "gap": "Import and convert-to-document only. Images are counted and omitted (DocModel has no image block); page layout, headers, footers, footnotes, and comments are not carried. No export, no field read or fill.",
+      "dependsOn": [
+        "@lacuna/doc",
+        "@lacuna/formats",
+        "@lacuna/preview",
+        "@lacuna/ui"
+      ],
+      "formats": [
+        "docx"
+      ],
+      "keywords": [
+        "docx",
+        ".docx",
+        "microsoft word",
+        "word document"
+      ]
+    },
+    {
+      "id": "@lacuna/pdf",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "openPdf (page count, page sizes, draw a page to a canvas) on pdf.js, and pdfViewer for FilePreview with pages drawn as they scroll into view. pdf.js and its worker load only when a PDF is opened. Reports embedded scripts (never run) and form fields. Planned: text layer, export from @lacuna/doc, AcroForm fill, stamping, true redaction.",
+      "today": [
+        "app/packages/pdf/src/engine.ts",
+        "app/packages/pdf/src/index.ts",
+        "app/packages/pdf/src/view.tsx"
+      ],
+      "gap": "Render only: no text layer or search, no annotation or link layer, password-protected PDFs refused. Standard-font, CMap, and wasm assets are not shipped, so non-embedded fonts fall back to system fonts and JPEG 2000 images may not draw.",
+      "dependsOn": [
+        "@lacuna/formats",
+        "@lacuna/preview"
+      ],
+      "formats": [
+        "pdf"
+      ],
+      "keywords": [
+        "pdf",
+        "acrobat",
+        "redact",
+        "redaction"
+      ]
+    },
+    {
+      "id": "@lacuna/image",
+      "layer": 3,
+      "status": "partial",
+      "version": "0.1.0",
+      "summary": "Image decode and preview (app/packages/image): validates and measures PNG, JPEG, GIF, WebP, and SVG with the browser's decoders, refuses oversized canvases from the header before decoding, shows SVG only through an img element. The raster canvas editor (brush/eraser/shape tools, undo, PNG export) is PaintEditor. Planned: layer model, crop/resize, encode.",
+      "today": [
+        "app/packages/image/src/index.ts",
+        "app/packages/image/src/view.tsx",
+        "app/packages/ui/src/editors.tsx (PaintEditor)",
+        "app/apps/demo/src/store/types.ts (PaintData)"
+      ],
+      "gap": "PaintEditor still lives in @lacuna/ui; its stored state is one flattened PNG data URL and the layer rail is visual only. No encode, crop, or resize.",
+      "dependsOn": [
+        "@lacuna/editor-kit",
+        "@lacuna/formats",
+        "@lacuna/preview"
+      ],
+      "formats": [
+        "png",
+        "jpeg",
+        "gif",
+        "webp",
+        "svg"
+      ],
+      "keywords": [
+        "image",
+        "photo",
+        "png",
+        "jpeg",
+        "jpg",
+        "webp",
+        "paint",
+        "draw",
+        "raster",
+        "picture",
+        "gif",
+        "svg"
+      ]
+    },
+    {
+      "id": "@lacuna/video",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Local-file probe, trim, crop, mute/replace audio, and burn-in subtitle cues via video/canvas/WebAudio/MediaRecorder. No ffmpeg.wasm.",
+      "today": [
+        "app/packages/video/src/index.ts",
+        "app/packages/video/src/probe.ts",
+        "app/packages/video/src/export.ts",
+        "app/packages/video/src/crop.ts",
+        "app/packages/video/src/trim.ts",
+        "app/packages/video/src/srt.ts"
+      ],
+      "gap": "WebM MediaRecorder re-encode only — no MP4 remux, no frame-accurate keyframe cut, no lossless stream copy. Meetings guided flow is separate.",
+      "dependsOn": [],
+      "formats": [
+        "mp4",
+        "webm"
+      ],
+      "keywords": [
+        "video",
+        "mp4",
+        "webm",
+        "trim",
+        "crop",
+        "subtitle",
+        "recording",
+        "movie"
+      ]
+    },
+    {
+      "id": "@lacuna/math",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "TeX-math subset parser to accessible HTML (Equation record: source, mode, html, plain). For Equation Editor, TeX math fragments, Docs/Slides blocks. Not a full LaTeX compiler.",
+      "today": [
+        "app/packages/math/src"
+      ],
+      "gap": "Subset only (frac, scripts, roots, Greek, sum/prod/int, simple matrices). Equation app consumes parseEquation. No KaTeX/MathJax, no document compile (that is @lacuna/tex).",
+      "dependsOn": [
+        "@lacuna/ui"
+      ],
+      "formats": [
+        "latex-math"
+      ],
+      "keywords": [
+        "equation",
+        "math",
+        "latex math",
+        "katex",
+        "mathjax"
+      ]
+    },
+    {
+      "id": "@lacuna/calc",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Real expression evaluator and y=f(x) graph sampler. Shared by Graphic Calculator and later math surfaces. Never throws past evaluate/graph.",
+      "today": [
+        "app/packages/calc/src"
+      ],
+      "gap": "No complex numbers, no CAS, no symbolic differentiation. Degree mode covers sin/cos/tan only.",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "calculator",
+        "graph",
+        "expression",
+        "trigonometry",
+        "plot"
+      ]
+    },
+    {
+      "id": "@lacuna/tex",
+      "layer": 3,
+      "status": "planned",
+      "version": null,
+      "summary": "LaTeX project model (files, bibliography, assets), in-browser compile to PDF, error mapping to source lines, and LaTeX to @lacuna/doc conversion.",
+      "today": [],
+      "gap": "No TeX code; engine choice is an open decision.",
+      "dependsOn": [
+        "@lacuna/math",
+        "@lacuna/pdf",
+        "@lacuna/doc",
+        "@lacuna/formats"
+      ],
+      "formats": [
+        "tex",
+        "bib"
+      ],
+      "keywords": [
+        "tex",
+        "latex",
+        "overleaf",
+        "bibtex",
+        "thesis"
+      ]
+    },
+    {
+      "id": "@lacuna/sheet",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Grid editor with formula bar over string cells.",
+      "today": [
+        "app/packages/ui/src/editors.tsx (SheetsEditor)",
+        "app/apps/demo/src/store/types.ts (SheetData)"
+      ],
+      "gap": "No formulas engine or XLSX/CSV import.",
+      "dependsOn": [
+        "@lacuna/editor-kit"
+      ],
+      "formats": [],
+      "keywords": [
+        "spreadsheet",
+        "csv",
+        "xlsx"
+      ]
+    },
+    {
+      "id": "@lacuna/slides",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Slide rail and canvas with title and bullets.",
+      "today": [
+        "app/packages/ui/src/editors.tsx (SlidesEditor, SlideSpec)",
+        "app/apps/demo/src/store/types.ts (SlidesData)"
+      ],
+      "gap": "SlideSpec is duplicated between the ui package and the demo store.",
+      "dependsOn": [
+        "@lacuna/editor-kit"
+      ],
+      "formats": [],
+      "keywords": [
+        "slides",
+        "deck",
+        "presentation",
+        "pptx"
+      ]
+    },
+    {
+      "id": "@lacuna/design",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Artboard with layer list and templates.",
+      "today": [
+        "app/packages/ui/src/editors.tsx (DesignStudio, DesignLayer)"
+      ],
+      "gap": "Presentation over a fixed artboard; no layout engine.",
+      "dependsOn": [
+        "@lacuna/editor-kit",
+        "@lacuna/image"
+      ],
+      "formats": [],
+      "keywords": [
+        "flyer",
+        "poster",
+        "artboard"
+      ]
+    },
+    {
+      "id": "@lacuna/whiteboard",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Sticky-note board with drag and edit.",
+      "today": [
+        "app/packages/ui/src/editors.tsx (Whiteboard, Sticky)"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/editor-kit"
+      ],
+      "formats": [],
+      "keywords": [
+        "whiteboard",
+        "sticky",
+        "retro",
+        "brainstorm"
+      ]
+    },
+    {
+      "id": "@lacuna/database",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Object/table browser and form view over typed columns.",
+      "today": [
+        "app/packages/ui/src/editors.tsx (DatabaseStudio, DbFormView)",
+        "app/apps/demo/src/live.tsx (LiveDatabase)"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/editor-kit"
+      ],
+      "formats": [],
+      "keywords": [
+        "database",
+        "inventory"
+      ]
+    },
+    {
+      "id": "@lacuna/calendar",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Week view of events across spaces.",
+      "today": [
+        "app/packages/ui/src/index.tsx (CalendarWeek)",
+        "app/apps/demo/src/live.tsx (LiveCalendar)"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "calendar",
+        "schedule",
+        "appointment",
+        "booking"
+      ]
+    },
+    {
+      "id": "@lacuna/forms",
+      "layer": 3,
+      "status": "partial",
+      "version": "0.1.0",
+      "summary": "Form schema (fields, types, validation), fill surface with prefill provenance ('from identity wallet'), response record.",
+      "today": [
+        "app/packages/forms/src (DocumentField, fill)",
+        "app/packages/ui/src/index.tsx (Field)",
+        "app/packages/ui/src/editors.tsx (DbFormView)"
+      ],
+      "gap": "Field model and fill() exist in @lacuna/forms; Form Filler app consumes fill(). UI Field is still a read-only display input; DOCX/PDF field I/O not connected.",
+      "dependsOn": [
+        "@lacuna/ui",
+        "@lacuna/records"
+      ],
+      "formats": [],
+      "keywords": [
+        "form",
+        "fill",
+        "intake",
+        "questionnaire",
+        "prefill"
+      ]
+    },
+    {
+      "id": "@lacuna/signature",
+      "layer": 3,
+      "status": "partial",
+      "version": null,
+      "summary": "Signature request state machine (draft, sent, signed, declined, expired, voided), ordered signers, audit events, SignatureBlock UI.",
+      "today": [
+        "app/apps/demo/src/store/types.ts (SignatureData, SignatureSigner, SignatureAuditEvent)",
+        "app/apps/demo/src/live.tsx (LiveSignature)",
+        "app/packages/ui/src/index.tsx (SignatureBlock)"
+      ],
+      "gap": "Fictional, browser-only; no evidence package or cryptography.",
+      "dependsOn": [
+        "@lacuna/records",
+        "@lacuna/governance-ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "sign",
+        "signature",
+        "e-sign",
+        "esign",
+        "docusign",
+        "countersign"
+      ]
+    },
+    {
+      "id": "@lacuna/model",
+      "layer": 4,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Person, profile, space, relationship, authority, and record-envelope types; explainable access helpers (explainRelationship, decision, denial); fictional demo world.",
+      "today": [
+        "app/packages/model/src/types.ts",
+        "app/packages/model/src/access.ts",
+        "app/packages/model/src/world.ts"
+      ],
+      "gap": "Decisions are precomputed from fixtures; no policy engine.",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "identity",
+        "profile",
+        "space",
+        "grant",
+        "relationship"
+      ]
+    },
+    {
+      "id": "@lacuna/records",
+      "layer": 4,
+      "status": "partial",
+      "version": null,
+      "summary": "Record read/write API (getRecord, setRecord, updateRecord, useRecord) with record kinds.",
+      "today": [
+        "app/apps/demo/src/store/index.ts",
+        "app/apps/demo/src/store/types.ts (RecordKind, StoredRecord)",
+        "app/apps/demo/src/store/seed.ts"
+      ],
+      "gap": "localStorage snapshot keyed by flow id; no envelope, versions, or events.",
+      "dependsOn": [
+        "@lacuna/model"
+      ],
+      "formats": [],
+      "keywords": [
+        "save",
+        "persist",
+        "record",
+        "storage"
+      ]
+    },
+    {
+      "id": "@lacuna/boxes",
+      "layer": 4,
+      "status": "partial",
+      "version": null,
+      "summary": "Post a structured item (approval, bill, signature, form due) into a person's Inbox box with routing rules and aliases.",
+      "today": [
+        "app/apps/demo/src/live.tsx (LiveInboxList, LiveInboxRoutes, LiveInboxAliases)",
+        "app/apps/demo/src/store/types.ts (InboxData, InboxRoute, InboxAlias)",
+        "app/packages/ui/src/index.tsx (InboxItem)"
+      ],
+      "gap": "Inbox is one demo record; no API for other apps to post items.",
+      "dependsOn": [
+        "@lacuna/records",
+        "@lacuna/model"
+      ],
+      "formats": [],
+      "keywords": [
+        "inbox",
+        "notify",
+        "approval",
+        "route",
+        "box"
+      ]
+    },
+    {
+      "id": "@lacuna/events",
+      "layer": 4,
+      "status": "planned",
+      "version": null,
+      "summary": "Append-only domain events (actor, profile, space, record, payload version) that feed audit, Inbox, and search.",
+      "today": [],
+      "gap": "Mutations overwrite local snapshots; only E-Sign keeps an audit list.",
+      "dependsOn": [
+        "@lacuna/model"
+      ],
+      "formats": [],
+      "keywords": [
+        "audit",
+        "event",
+        "history",
+        "log"
+      ]
+    },
+    {
+      "id": "@lacuna/auth",
+      "layer": 4,
+      "status": "partial",
+      "version": null,
+      "summary": "Session: who is signed in and which profile is active.",
+      "today": [
+        "app/apps/demo/src/auth.ts",
+        "app/apps/demo/src/profiles.ts"
+      ],
+      "gap": "Guest or simulated magic-link session in localStorage.",
+      "dependsOn": [
+        "@lacuna/model"
+      ],
+      "formats": [],
+      "keywords": [
+        "login",
+        "session",
+        "sign in"
+      ]
+    }
+  ]
+}

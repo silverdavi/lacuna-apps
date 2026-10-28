@@ -1,0 +1,98 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.receipt-packet",
+  "name": "Receipt Packet",
+  "version": "0.1.0",
+  "summary": "Turn receipt photos into one PDF packet with a cover sheet and send it to your expenses app.",
+  "description": "Turn phone photos of receipts (JPEG or PNG) into one PDF packet with a cover sheet listing each receipt's date and amount, then hand the packet to whichever app handles expenses. Receipts are cropped and straightened before they go into the packet.",
+  "category": "business",
+  "icon": "invoice",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/receipt-packet"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/editor-kit": "^0.1.0",
+      "@lacuna/formats": "^0.1.0",
+      "@lacuna/image": "^0.1.0",
+      "@lacuna/pdf": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "import:jpeg",
+    "import:png",
+    "convert:jpeg->pdf",
+    "convert:png->pdf",
+    "export:pdf"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "receipt-packet",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the packet: receipt images, crop settings, cover-sheet rows, and the exported PDF"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [
+      "financial"
+    ],
+    "availability": {
+      "spaceTypes": [
+        "personal",
+        "business",
+        "employer"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "receipt-packet"
+    ],
+    "reads": [],
+    "handoffs": [
+      {
+        "capability": "import:receipt-packet",
+        "purpose": "Give the finished packet to the person's expenses app as one record"
+      }
+    ]
+  },
+  "tags": [
+    "jpeg",
+    "png",
+    "pdf"
+  ]
+}

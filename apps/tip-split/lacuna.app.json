@@ -1,0 +1,78 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.tip-split",
+  "name": "Tip split",
+  "version": "0.1.0",
+  "summary": "Split a bill and a tip across the people at the table.",
+  "description": "Enter the bill, the tip percent, and how many people are paying. The page divides the total so each person owes the same share.",
+  "category": "personal",
+  "icon": "wallet",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/tip-split"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:split"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "tip-split",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the bill, the tip percent, and each person's share"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [
+      "financial"
+    ],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "tip-split"
+    ],
+    "reads": [],
+    "handoffs": []
+  }
+}

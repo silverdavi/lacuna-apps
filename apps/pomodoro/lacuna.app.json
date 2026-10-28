@@ -1,0 +1,76 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.pomodoro",
+  "name": "Pomodoro",
+  "version": "0.1.0",
+  "summary": "Run a 25-minute work interval, then a 5-minute break.",
+  "description": "A work interval of 25 minutes and a break of 5 minutes. Start, pause, and switch on this page. The interval is the record. Nothing leaves the browser.",
+  "category": "productivity",
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/pomodoro"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:interval"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "pomodoro",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the work interval and the break that follows it"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "pomodoro"
+    ],
+    "reads": [],
+    "handoffs": []
+  }
+}
