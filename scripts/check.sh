@@ -13,7 +13,7 @@ fail=0
 step() { echo "== $*"; }
 bad() { echo "FAIL: $*"; fail=1; }
 
-base=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+base=$(bash scripts/gate-base.sh) || { bad "BASE_REF must be origin/main or agent/shelf"; base=$(git merge-base HEAD origin/main 2>/dev/null || echo ""); }
 changed_files() {
   { [ -n "$base" ] && git diff --name-only "$base"; git ls-files --others --exclude-standard; } | sort -u
 }
