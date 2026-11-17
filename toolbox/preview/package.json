@@ -1,0 +1,25 @@
+{
+  "name": "@lacuna/preview",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Lacuna file preview: the viewer registry and FilePreview, which reads a local file, detects its format through @lacuna/formats, refuses oversized files before reading them, lazy-loads the registered viewer, and shows conversion notes and error states. Format modules (docx, pdf, image) register viewers; hosts (Files, later Convert, E-Sign, PDF Studio) render FilePreview.",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "dependencies": {
+    "@lacuna/formats": "workspace:*",
+    "@lacuna/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18"
+  },
+  "lacunaSync": {
+    "from": "app/packages/preview",
+    "commit": "e002c33"
+  }
+}

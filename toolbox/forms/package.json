@@ -1,0 +1,15 @@
+{
+  "name": "@lacuna/forms",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Lacuna format-agnostic form field model: typed fields (text, checkbox, choice, date, signature placeholder), optional page/rect placement, and fill() that applies values and lists missing required fields. No PDF or DOCX I/O; format modules and apps (Form Filler, Docs, PDF, E-Sign) map their fields into this shape.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaSync": {
+    "from": "app/packages/forms",
+    "commit": "e002c33"
+  }
+}

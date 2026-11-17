@@ -1,0 +1,15 @@
+{
+  "name": "@lacuna/formats",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Lacuna file formats: the format table, detection by magic bytes and extension, typed format errors, and the Result and ConversionWarning types every converter reports through. Pure TypeScript, no dependencies, no DOM.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaSync": {
+    "from": "app/packages/formats",
+    "commit": "e002c33"
+  }
+}

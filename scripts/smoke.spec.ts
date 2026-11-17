@@ -6,19 +6,14 @@ import AxeBuilder from '@axe-core/playwright'
 const app = process.env.APP!
 const shots = `artifacts/${app}`
 const local = (url: string) => url.startsWith('http://127.0.0.1')
-// toolbox/ui/tokens.css imports these fonts; tests block them without failing the app.
-const toolboxFonts = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//
-const allowed = (url: string) => local(url) || toolboxFonts.test(url)
 
 function watch(page: Page) {
   const problems: string[] = []
   page.on('console', (m) => {
-    if (m.type() === 'error' && !toolboxFonts.test(m.location().url)) problems.push(`console error: ${m.text()}`)
+    if (m.type() === 'error') problems.push(`console error: ${m.text()}`)
   })
   page.on('pageerror', (e) => problems.push(`uncaught: ${e.message}`))
-  page.on('requestfailed', (r) => {
-    if (!allowed(r.url())) problems.push(`request failed: ${r.url()}`)
-  })
+  page.on('requestfailed', (r) => problems.push(`request failed: ${r.url()}`))
   return problems
 }
 
@@ -36,7 +31,7 @@ test('renders without errors or outside requests', async ({ page }) => {
   const problems = watch(page)
   const outside: string[] = []
   page.on('request', (r) => {
-    if (!allowed(r.url())) outside.push(r.url())
+    if (!local(r.url())) outside.push(r.url())
   })
   await open(page)
   const text = (await page.locator('#root').innerText()).trim()

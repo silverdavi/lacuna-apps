@@ -1,0 +1,56 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+   Mirrored from the Lacuna monorepo by scripts/sync-toolbox.sh; local edits are overwritten on the next sync. */
+/* FilePreview frame. Tokens only; type on the ramp (times --tf), spacing on 4/8/16 (times --sf). */
+.lc-fp .lc-fp-name { font-family: var(--serif); overflow-wrap: anywhere; }
+.lc-fp-body { display: flex; flex-direction: column; gap: calc(8px * var(--sf)); min-height: 120px; }
+
+.lc-fp-error {
+  display: flex; flex-direction: column; align-items: flex-start; gap: calc(8px * var(--sf));
+  padding: calc(16px * var(--sf)); border: 1px dashed var(--ui-line2); background: var(--paper);
+}
+.lc-fp-error strong { font-family: var(--serif); font-weight: 500; font-size: calc(15px * var(--tf)); color: var(--ink); }
+.lc-fp-error p { margin: 0; font-size: calc(12px * var(--tf)); line-height: 1.6; color: var(--ink-80); max-width: 60ch; }
+
+.lc-fp-warnings {
+  margin: 0; padding: calc(8px * var(--sf)) calc(16px * var(--sf)) calc(8px * var(--sf)) calc(32px * var(--sf));
+  border-left: 2px solid var(--accent); background: var(--paper);
+  font-size: calc(12px * var(--tf)); line-height: 1.6; color: var(--ink-80);
+}
+
+/* Document previews reuse the Docs page; imported structure needs a few more rules than the editor's own output. */
+.lc-fp-doc .lc-ed { min-height: 0; }
+.lc-fp-doc .lc-ed-docmain { max-height: 70vh; }
+.lc-fp-doc .lc-ed-docbody { min-height: 0; }
+.lc-fp-doc .lc-ed-docbody h1 { font-family: var(--serif); font-weight: 500; font-size: calc(22px * var(--tf)); color: var(--ink); margin: calc(16px * var(--sf)) 0 calc(8px * var(--sf)); }
+.lc-fp-doc .lc-ed-docbody h2 { font-family: var(--serif); font-weight: 500; font-size: calc(18px * var(--tf)); color: var(--ink); margin: calc(16px * var(--sf)) 0 calc(8px * var(--sf)); }
+.lc-fp-doc .lc-ed-docbody h3,
+.lc-fp-doc .lc-ed-docbody h4 { font-family: var(--serif); font-weight: 500; font-size: calc(15px * var(--tf)); color: var(--ink); margin: calc(16px * var(--sf)) 0 calc(4px * var(--sf)); }
+.lc-fp-doc .lc-ed-docbody ul,
+.lc-fp-doc .lc-ed-docbody ol { margin: 0 0 calc(8px * var(--sf)); padding-left: calc(16px * var(--sf) + 8px); }
+.lc-fp-doc .lc-ed-docbody li { margin: 0 0 calc(4px * var(--sf)); }
+.lc-fp-doc .lc-ed-docbody li > p { margin: 0; }
+.lc-fp-doc .lc-ed-docbody table { border-collapse: collapse; width: 100%; margin: 0 0 calc(16px * var(--sf)); font-size: calc(12px * var(--tf)); }
+.lc-fp-doc .lc-ed-docbody th,
+.lc-fp-doc .lc-ed-docbody td { border: 1px solid var(--ui-line2); padding: calc(4px * var(--sf)) calc(8px * var(--sf)); text-align: left; vertical-align: top; }
+.lc-fp-doc .lc-ed-docbody th { font-family: var(--mono); font-weight: 500; font-size: calc(10.5px * var(--tf)); letter-spacing: 0.6px; color: var(--ink-60); }
+.lc-fp-doc .lc-ed-docbody td p { margin: 0; }
+.lc-fp-doc .lc-ed-docbody blockquote { margin: 0 0 calc(8px * var(--sf)); padding-left: calc(16px * var(--sf)); border-left: 2px solid var(--ui-line2); }
+
+/* PDF pages */
+.lc-fp-pdf { display: flex; flex-direction: column; align-items: center; gap: calc(16px * var(--sf)); max-height: 72vh; overflow-y: auto; padding: calc(16px * var(--sf)); background: var(--paper-deep); }
+.lc-fp-page { position: relative; background: var(--ui-bright); border: 1px solid var(--ui-line2); box-shadow: var(--shadow); max-width: 100%; }
+.lc-fp-page canvas { display: block; width: 100%; height: auto; }
+.lc-fp-page-no { position: absolute; right: calc(8px * var(--sf)); bottom: calc(4px * var(--sf)); font-family: var(--mono); font-size: calc(9px * var(--tf)); letter-spacing: 0.8px; color: var(--ink-40); }
+
+.lc-fp-image { display: flex; justify-content: center; align-items: center; padding: calc(16px * var(--sf)); background: var(--paper-deep); max-height: 72vh; overflow: auto; }
+.lc-fp-image img { display: block; width: auto; height: auto; max-width: 100%; max-height: calc(72vh - 32px); object-fit: contain; border: 1px solid var(--ui-line2); background: var(--ui-bright); }
+
+/* Drop target hosts place around FilePreview */
+.lc-fp-drop {
+  display: flex; align-items: center; justify-content: space-between; gap: calc(16px * var(--sf)); flex-wrap: wrap;
+  padding: calc(16px * var(--sf)); border: 1px dashed var(--ui-line2); background: var(--paper);
+  font-size: calc(12px * var(--tf)); color: var(--ink-60);
+}
+.lc-fp-drop.over { border-color: var(--accent); color: var(--ink); }
+.lc-fp-drop strong { font-family: var(--serif); font-weight: 500; font-size: calc(13.5px * var(--tf)); color: var(--ink); display: block; }
+.lc-fp-meta { display: flex; gap: calc(16px * var(--sf)); flex-wrap: wrap; }

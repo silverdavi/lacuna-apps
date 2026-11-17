@@ -1,0 +1,19 @@
+{
+  "name": "@lacuna/doc",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Lacuna document model: DocModel, comments, revisions, HTML sanitizing, and the importer/exporter interface format modules (DOCX, PDF, TeX) convert through. No React components yet; DocsEditor and DocSurface still live in @lacuna/ui.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/formats": "workspace:*",
+    "dompurify": "^3.2.0"
+  },
+  "lacunaSync": {
+    "from": "app/packages/doc",
+    "commit": "e002c33"
+  }
+}

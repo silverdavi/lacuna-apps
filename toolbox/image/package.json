@@ -1,0 +1,26 @@
+{
+  "name": "@lacuna/image",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Lacuna image module: decodeImage, canvas transcode (PNG/JPEG/WebP, SVG→PNG), and imageViewer. SVG is never an output. No libraries.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/convert": "workspace:*",
+    "@lacuna/formats": "workspace:*",
+    "@lacuna/preview": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18"
+  },
+  "lacunaSync": {
+    "from": "app/packages/image",
+    "commit": "e002c33"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "catalogVersion": 1,
-  "note": "Toolbox modules an app can depend on. status: exists = a workspace package under app/packages with its own version; partial = the package exists but part of the module still lives inside another package or the demo app, or only the code exists elsewhere; planned = no code yet. 'today' lists the real source paths (relative to the lacuna repo root).",
+  "note": "Toolbox modules an app can depend on. status: exists = a workspace package under app/packages with its own version; partial = the package exists but part of the module still lives inside another package or the demo app, or only the code exists elsewhere; planned = no code yet. 'today' lists the real source paths (relative to the lacuna repo root). public = the folder in this repository that holds the module; modules without it are not published here yet. toolbox/ui is a hand-vendored subset; the other folders are mirrored from the monorepo by scripts/sync-toolbox.sh.",
   "layers": {
     "0": "Design tokens",
     "1": "UI primitives and shell",
@@ -55,7 +55,8 @@
         "table",
         "tabs",
         "icon"
-      ]
+      ],
+      "public": "toolbox/ui"
     },
     {
       "id": "@lacuna/shell",
@@ -154,7 +155,8 @@
         "comments",
         "revisions",
         "docs"
-      ]
+      ],
+      "public": "toolbox/doc"
     },
     {
       "id": "@lacuna/formats",
@@ -174,7 +176,8 @@
         "convert",
         "open with",
         "format"
-      ]
+      ],
+      "public": "toolbox/formats"
     },
     {
       "id": "@lacuna/convert",
@@ -197,7 +200,8 @@
         "round-trip",
         "export",
         "import"
-      ]
+      ],
+      "public": "toolbox/convert"
     },
     {
       "id": "@lacuna/units",
@@ -244,7 +248,8 @@
         "viewer",
         "drop",
         "file picker"
-      ]
+      ],
+      "public": "toolbox/preview"
     },
     {
       "id": "@lacuna/docx",
@@ -299,7 +304,8 @@
         "acrobat",
         "redact",
         "redaction"
-      ]
+      ],
+      "public": "toolbox/pdf"
     },
     {
       "id": "@lacuna/image",
@@ -339,7 +345,8 @@
         "picture",
         "gif",
         "svg"
-      ]
+      ],
+      "public": "toolbox/image"
     },
     {
       "id": "@lacuna/video",
@@ -414,7 +421,8 @@
         "expression",
         "trigonometry",
         "plot"
-      ]
+      ],
+      "public": "toolbox/calc"
     },
     {
       "id": "@lacuna/tex",
@@ -592,7 +600,8 @@
         "intake",
         "questionnaire",
         "prefill"
-      ]
+      ],
+      "public": "toolbox/forms"
     },
     {
       "id": "@lacuna/signature",

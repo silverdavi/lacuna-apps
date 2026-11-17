@@ -1,4 +1,4 @@
 packages:
-  - toolbox
+  - toolbox/*
   - template
   - apps/*

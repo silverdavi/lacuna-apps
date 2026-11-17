@@ -1,0 +1,13 @@
+# Reviewed false positives for scripts/sync-toolbox.sh.
+# One per line: <package>/<path> <rule> <text the line must contain>
+# The finding still shows in the report, marked allowlisted, and stops blocking.
+
+# Icon keyword table: "deck" means a slide deck, "brand" is a design-app keyword.
+ui/src/icons.tsx private-word /slide|present|deck/i
+ui/src/icons.tsx private-repo-file /slide|present|deck/i
+ui/src/icons.tsx private-repo-file /design studio|brand/i
+# Example document names in the design guidelines.
+ui/DESIGN-GUIDELINES.md private-word Rebrand deck v3
+# "pitch" is the dot-grid spacing.
+ui/SHELL-SPEC.md private-word pitch
+ui/VISUAL-SYSTEM.md private-word px** pitch

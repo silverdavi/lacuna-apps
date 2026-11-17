@@ -1,0 +1,26 @@
+{
+  "name": "@lacuna/pdf",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Lacuna PDF module: openPdf (page count, page sizes, render a page to a canvas) and pdfViewer for FilePreview. pdf.js and its worker are loaded only when a PDF is opened. Text extraction, AcroForm fill, redaction, and stamping are planned.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/formats": "workspace:*",
+    "@lacuna/preview": "workspace:*",
+    "pdfjs-dist": "6.3.289"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18"
+  },
+  "lacunaSync": {
+    "from": "app/packages/pdf",
+    "commit": "e002c33"
+  }
+}
