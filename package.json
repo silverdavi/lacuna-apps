@@ -5,5 +5,9 @@
   "scripts": {
     "check": "node schema/validate.mjs && node scripts/forbid-network.mjs && pnpm -r --if-present check",
     "build": "pnpm --filter \"./apps/*\" --filter \"./template\" build"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4",
+    "@playwright/test": "^1"
   }
 }
