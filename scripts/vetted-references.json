@@ -422,11 +422,6 @@
    "spdx": "MIT"
   },
   {
-   "repo": "IITH/aims-gpa-calculator",
-   "sha": "be8f3ba3ffac1dc56e13c715cdd698fc15247f68",
-   "spdx": "MIT"
-  },
-  {
    "repo": "ikr/money-math",
    "sha": "af683318ee28f837b7bfe5fa569cf7699b589afb",
    "spdx": "MIT"
@@ -872,13 +867,13 @@
    "spdx": "BSD-3-Clause"
   },
   {
-   "repo": "teijo/jquery-bracket",
-   "sha": "5083b7698f30e8be4ffa9401b348ab8a9f779134",
+   "repo": "Thamizh5253/Age_Calculator",
+   "sha": "525b1862b4c4e0acffff0b5a41a5019d5b6d4605",
    "spdx": "MIT"
   },
   {
-   "repo": "Thamizh5253/Age_Calculator",
-   "sha": "525b1862b4c4e0acffff0b5a41a5019d5b6d4605",
+   "repo": "TheChipmunks/react-tournament-bracket",
+   "sha": "ed88a4d78590e66efc929d90a271f2f893a87f8c",
    "spdx": "MIT"
   },
   {
