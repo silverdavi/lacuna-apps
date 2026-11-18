@@ -48,6 +48,12 @@ for app in $apps; do
     ls "$dir"/tests/*.spec.ts >/dev/null 2>&1 || bad "$app: no tests/*.spec.ts"
   fi
 
+  # Items the branch changed must pass; the others are only reported.
+  if echo "$new_apps" | grep -qx "$app"; then lint_mode=""; else lint_mode="--report"; fi
+  step "$app: acceptance tests (locked, one per check, no fakes) and reference attribution"
+  node scripts/acceptance-lint.mjs "$dir" $lint_mode || bad "$app: acceptance lint"
+  node scripts/reference-lint.mjs "$dir" $lint_mode || bad "$app: reference lint"
+
   step "$app: type check"
   pnpm --filter "./$dir" exec tsc --noEmit || bad "$app: tsc"
 
