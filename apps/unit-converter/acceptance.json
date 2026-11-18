@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "b4852ff260986425bca256ecb971b9e2ee3ad46bc6247426bb00bd8e7cb699e3",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Length: typing 1 in Meters shows 3.28084 in Feet (five significant decimals at most)."
+    },
+    {
+      "id": "A2",
+      "text": "Typing in the second field updates the first (two-way)."
+    },
+    {
+      "id": "A3",
+      "text": "Temperature: 100 Celsius shows 212 Fahrenheit; -40 Celsius shows -40 Fahrenheit."
+    },
+    {
+      "id": "A4",
+      "text": "Switching category resets units to that category's defaults and clears the fields."
+    },
+    {
+      "id": "A5",
+      "text": "The swap button exchanges the two units and keeps the value."
+    },
+    {
+      "id": "A6",
+      "text": "Non-numeric input shows an inline message and does not show `NaN` anywhere."
+    },
+    {
+      "id": "A7",
+      "text": "Each completed conversion is added to a Recent list (newest first, at most 10); clicking one restores it."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the Recent list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "fa85b688802315f90fb3d2744b4d043d4522579243f54844d5b204475d17d3bd"
+    }
+  ]
+}
