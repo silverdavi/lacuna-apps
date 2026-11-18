@@ -1,0 +1,86 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.qr-generator",
+  "name": "QR Maker",
+  "version": "0.1.0",
+  "summary": "Make a QR code from text or a URL, as an SVG you can copy or download.",
+  "description": "Type text or a URL, choose an error-correction level, and get the QR code as an SVG. Copy it to the clipboard or download it as a file. The last code and its settings survive a reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/qr-generator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:qr-code",
+    "export:qr-code"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "qr-code",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the last generated code and its settings"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "qr-code"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
