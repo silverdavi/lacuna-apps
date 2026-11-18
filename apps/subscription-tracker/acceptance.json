@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c68ea894510d107b2b7aa3b3e275b7592aad476f253ec32ab19a42ce3006cf73",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries the page shows the heading \"Subscription Tracker\", the text \"No subscriptions yet\", and the summary line \"Total monthly: $0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Name\" with \"Netflix\", choosing \"Streaming\" in the select labelled \"Category\", typing \"15.99\" in the field labelled \"Monthly cost\", and clicking the button \"Add subscription\" adds a row containing \"Netflix\", \"Streaming\", and \"$15.99\"; the summary shows \"Total monthly: $15.99\" and \"No subscriptions yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After also adding a subscription with Name \"Spotify\", Category \"Music\", and Monthly cost \"10.45\", a row contains \"Spotify\", \"Music\", and \"$10.45\", and the summary shows \"Total monthly: $26.44\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add subscription\" with an empty Name, or with a Monthly cost that is empty, 0, or negative, adds no row and shows the message \"Enter a name and a cost greater than 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every row has a button named \"Delete <name>\". With the subscriptions Netflix 15.99 and Spotify 10.45, clicking \"Delete Spotify\" removes that row and the summary shows \"Total monthly: $15.99\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"123.456\" in the field labelled \"Monthly cost\" and clicking \"Add subscription\" with Name \"Test\" and Category \"Other\" adds a row showing \"$123.46\" and the summary shows \"Total monthly: $123.46\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the column header labelled \"Name\" sorts the rows by name ascending; with subscriptions \"Netflix\" and \"Spotify\", \"Netflix\" appears before \"Spotify\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the column header labelled \"Monthly cost\" sorts the rows by cost descending; with subscriptions \"Netflix\" 15.99 and \"Spotify\" 10.45, \"Netflix\" appears before \"Spotify\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the subscription \"Netflix\" with the text \"$15.99\" and the summary line \"Total monthly: $15.99\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d7741d82b9e735128858bb7fc304e82dcba159145a5ca0fc514899ed7c55d30e"
+    }
+  ]
+}
