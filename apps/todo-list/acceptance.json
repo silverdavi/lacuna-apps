@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "464d4acb6c520d5048ff728521bbc4c8de99ff9c4a9f9b3608ed57c9d7314d84",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no tasks, the page shows the heading \"Simple Todo List\", the text \"No tasks yet\", and the progress bar at 0%."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" in the field labelled \"Task title\" and clicking the button \"Add task\" adds a list item containing \"Buy milk\" with an unchecked checkbox; the progress bar remains at 0%."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Buy milk\", typing \"Call mom\" in the field labelled \"Task title\" and clicking \"Add task\" adds a second list item containing \"Call mom\"; the list shows \"Buy milk\" first and \"Call mom\" second."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the checkbox on the list item containing \"Buy milk\" marks it as complete; the text \"Buy milk\" appears with strikethrough styling, and the progress bar shows 50%."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Buy milk\" and \"Call mom\" both present, dragging the item containing \"Call mom\" above the item containing \"Buy milk\" reorders the list so \"Call mom\" appears first and \"Buy milk\" appears second."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"Buy milk\" in the field labelled \"Task title\" and clicking \"Add task\" when \"Buy milk\" already exists adds no new item and shows the message \"Task already exists\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Buy milk\" on the list item containing \"Buy milk\" removes that item; if it was the only task, the text \"No tasks yet\" reappears and the progress bar shows 0%."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"2024-01-15\" in the field labelled \"Due date\" and clicking \"Add task\" adds a list item containing \"Buy milk\" and the text \"Due: Jan 15, 2024\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the task \"Buy milk\" with its checked state and the progress bar at 50% if it was completed before reload."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "99a49c68285650e236831442901c777adf221c7aadb02e164fb67b721e783ea6"
+    }
+  ]
+}
