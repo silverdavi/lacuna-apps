@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "9437082cf13917c689331f9afbdfb25d88f21e9cf6825542e233f223a1211f4b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Password Generator\", a number field labelled \"Length\" with the value \"16\", and four checked checkboxes labelled \"Lowercase\", \"Uppercase\", \"Digits\" and \"Symbols\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Generate\" puts a password that is exactly 16 characters long in the read-only field labelled \"Password\"."
+    },
+    {
+      "id": "A3",
+      "text": "With only \"Digits\" checked and Length \"8\", Generate gives a password that matches `^[0-9]{8}$`."
+    },
+    {
+      "id": "A4",
+      "text": "With only \"Lowercase\" and \"Uppercase\" checked and Length \"40\", the password matches `^[A-Za-z]{40}$` and contains at least one lowercase letter and at least one uppercase letter."
+    },
+    {
+      "id": "A5",
+      "text": "With all four checkboxes unchecked, Generate shows the message \"Choose at least one character set\" and the Password field stays empty."
+    },
+    {
+      "id": "A6",
+      "text": "With Length \"3\", and again with Length \"65\", Generate shows the message \"Length must be between 4 and 64\" and the Password field stays empty."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking Generate twice with Length \"32\" gives two different passwords."
+    },
+    {
+      "id": "A8",
+      "text": "After Generate with only \"Digits\" checked and Length \"4\" the page shows the text \"Strength: Weak\"; after Generate with all four checked and Length \"20\" it shows \"Strength: Strong\"."
+    },
+    {
+      "id": "A9",
+      "text": "After setting Length to \"24\" and unchecking \"Symbols\", reloading the page still shows Length \"24\", \"Symbols\" unchecked and the other three checked."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b591c372913b512549267f3c6c38e32d3fc02dbfdcdadb15413919daf284286f"
+    }
+  ]
+}

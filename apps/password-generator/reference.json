@@ -1,0 +1,19 @@
+{
+  "repo": "bermi/password-generator",
+  "url": "https://github.com/bermi/password-generator",
+  "sha": "806f694bd53eace574de4182b14dcc2475fe05b9",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2011 Bermi Ferrer"
+  ],
+  "files": [
+    "bench/browser.mjs",
+    "bench/constraints.mjs",
+    "bench/utils.mjs",
+    "src/index.ts",
+    "src/random.ts"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "da14bdf31d01580301bbd442aa57825882fe926a8c1aa800b6068526cc54a877"
+}
