@@ -1,0 +1,111 @@
+.paint-app {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+.paint-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+}
+
+.paint-tools {
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
+}
+
+.paint-tool {
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--soft);
+  border-radius: calc(4px * var(--sf));
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.paint-tool[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.paint-tool:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.paint-palette {
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
+}
+
+.paint-swatches {
+  display: flex;
+  gap: calc(4px * var(--sf));
+}
+
+.paint-swatch {
+  width: calc(20px * var(--sf));
+  height: calc(20px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--soft);
+  border-radius: calc(4px * var(--sf));
+  cursor: pointer;
+  padding: 0;
+}
+
+.paint-swatch[aria-pressed='true'] {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.paint-swatch:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.paint-size {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink);
+}
+
+.paint-size input[type='range'] {
+  width: calc(100px * var(--sf));
+  accent-color: var(--accent);
+}
+
+.paint-size input[type='range']:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.paint-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
+  margin-left: auto;
+}
+
+.paint-canvas-wrap {
+  border: calc(1px * var(--sf)) solid var(--soft);
+  border-radius: calc(4px * var(--sf));
+  overflow: hidden;
+  background: var(--ui-bright);
+}
+
+.paint-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  cursor: crosshair;
+}
