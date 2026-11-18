@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7d128cf69867cc6f7fef6b62dbee3cc492ed3a6c1f2fcb0539c6b7b97206ffd4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Dragging on the canvas with the brush changes canvas pixels along the path (read them back with `getImageData`)."
+    },
+    {
+      "id": "A2",
+      "text": "Choosing a different color from the palette changes the color of the next stroke."
+    },
+    {
+      "id": "A3",
+      "text": "The size slider changes stroke width; a wider stroke covers more pixels than a narrow one."
+    },
+    {
+      "id": "A4",
+      "text": "The eraser tool clears pixels it passes over."
+    },
+    {
+      "id": "A5",
+      "text": "Undo (button and Ctrl/Cmd+Z) removes the last stroke; Redo (button and Shift+Ctrl/Cmd+Z) restores it."
+    },
+    {
+      "id": "A6",
+      "text": "Clear empties the canvas, and Undo brings the drawing back."
+    },
+    {
+      "id": "A7",
+      "text": "Export PNG downloads a file named `paint-<date>.png` (assert with Playwright's download event)."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the drawing."
+    },
+    {
+      "id": "A9",
+      "text": "Every tool, the palette, and the size control work from the keyboard; the selected tool is announced with `aria-pressed`."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0d66860aebdac17cead2a8c4055ece356dfbff050d36fe6632c5495cb2ca41ea"
+    }
+  ]
+}

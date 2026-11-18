@@ -1,243 +1,201 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { useEffect, useRef, useState } from 'react'
+import { Body, Button, Card, MonoLabel, Stack, Title } from '@lacuna/ui'
 import { host, type PaintRecord } from './host'
 import './app.css'
 
 const CANVAS_W = 900
 const CANVAS_H = 560
+const MIN = 8
+const MAX = 96
+
+function drawDefaultSketch(ctx: CanvasRenderingContext2D) {
+  ctx.save()
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  ctx.lineWidth = 10
+  ctx.strokeStyle = 'rgb(24, 24, 24)'
+  ctx.beginPath()
+  ctx.moveTo(40, 40)
+  ctx.lineTo(160, 40)
+  ctx.stroke()
+  ctx.restore()
+}
 
 const SWATCHES = [
-  'rgb(26, 26, 26)',
-  'rgb(181, 80, 42)',
-  'rgb(74, 90, 158)',
-  'rgb(74, 122, 90)',
-  'rgb(201, 151, 30)',
-  'rgb(124, 111, 232)',
-  'rgb(46, 184, 166)',
-  'rgb(240, 100, 73)',
+  { label: 'Black', color: 'rgb(24, 24, 24)' },
+  { label: 'Rust', color: 'rgb(181, 80, 42)' },
+  { label: 'Indigo', color: 'rgb(74, 90, 158)' },
+  { label: 'Moss', color: 'rgb(74, 122, 90)' },
+  { label: 'Gold', color: 'rgb(201, 151, 30)' },
+  { label: 'Violet', color: 'rgb(124, 111, 232)' },
+  { label: 'Teal', color: 'rgb(46, 184, 166)' },
+  { label: 'Red', color: 'rgb(235, 61, 49)' },
 ] as const
 
 type Tool = 'brush' | 'eraser'
 
-function loadImage(dataUrl: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = reject
-    img.src = dataUrl
-  })
-}
-
 export function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const drawing = useRef(false)
-  const last = useRef<{ x: number; y: number } | null>(null)
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
+  const drawingRef = useRef(false)
+  const lastRef = useRef<{ x: number; y: number } | null>(null)
+  const undoStackRef = useRef<ImageData[]>([])
+  const redoStackRef = useRef<ImageData[]>([])
+  const pristineRef = useRef<ImageData | null>(null)
 
   const [tool, setTool] = useState<Tool>('brush')
-  const [color, setColor] = useState<string>(SWATCHES[0])
-  const [size, setSize] = useState(6)
+  const [color, setColor] = useState<string>(SWATCHES[1].color)
+  const [size, setSize] = useState(32)
 
-  const [history, setHistory] = useState<string[]>([])
-  const [redoStack, setRedoStack] = useState<string[]>([])
+  const toolRef = useRef(tool)
+  const colorRef = useRef(color)
+  const sizeRef = useRef(size)
 
-  const getCtx = useCallback((): CanvasRenderingContext2D | null => {
-    const canvas = canvasRef.current
-    if (!canvas) return null
-    return canvas.getContext('2d')
-  }, [])
+  useEffect(() => {
+    toolRef.current = tool
+  }, [tool])
+  useEffect(() => {
+    colorRef.current = color
+  }, [color])
+  useEffect(() => {
+    sizeRef.current = size
+  }, [size])
 
-  const snapshot = useCallback((): string | null => {
-    const canvas = canvasRef.current
-    if (!canvas) return null
-    return canvas.toDataURL('image/png')
-  }, [])
-
-  const restore = useCallback(
-    async (dataUrl: string) => {
-      const canvas = canvasRef.current
-      const ctx = getCtx()
-      if (!canvas || !ctx) return
-      try {
-        const img = await loadImage(dataUrl)
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(img, 0, 0)
-      } catch {
-        /* ignore */
-      }
-    },
-    [getCtx],
-  )
-
-  const clearCanvas = useCallback(() => {
-    const canvas = canvasRef.current
-    const ctx = getCtx()
-    if (!canvas || !ctx) return
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-  }, [getCtx])
-
-  const persist = useCallback(() => {
+  useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const image = canvas.toDataURL('image/png')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctxRef.current = ctx
+
+    const record = host.loadPaint()
+    if (record?.image) {
+      const img = new Image()
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(img, 0, 0)
+        const snap = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        undoStackRef.current = [snap]
+        pristineRef.current = snap
+      }
+      img.src = record.image
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      drawDefaultSketch(ctx)
+      const snap = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      undoStackRef.current = [snap]
+      pristineRef.current = snap
+    }
+  }, [])
+
+  const persist = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
     const record: PaintRecord = {
       id: 'paint-1',
-      image,
+      image: canvas.toDataURL('image/png'),
       width: canvas.width,
       height: canvas.height,
       savedAt: new Date().toISOString(),
     }
     host.savePaint(record)
-  }, [])
+  }
 
-  const pushHistory = useCallback(() => {
-    const snap = snapshot()
-    if (!snap) return
-    setHistory((h) => [...h, snap])
-    setRedoStack([])
-  }, [snapshot])
-
-  const undo = useCallback(() => {
-    setHistory((h) => {
-      if (h.length === 0) return h
-      const prev = h[h.length - 1]
-      const current = snapshot()
-      if (current) setRedoStack((r) => [...r, current])
-      void restore(prev)
-      return h.slice(0, -1)
-    })
-  }, [restore, snapshot])
-
-  const redo = useCallback(() => {
-    setRedoStack((r) => {
-      if (r.length === 0) return r
-      const next = r[r.length - 1]
-      const current = snapshot()
-      if (current) setHistory((h) => [...h, current])
-      void restore(next)
-      return r.slice(0, -1)
-    })
-  }, [restore, snapshot])
-
-  // Load persisted drawing exactly once on mount.
-  const loaded = useRef(false)
-  useEffect(() => {
-    if (loaded.current) return
-    loaded.current = true
+  const pushHistory = () => {
     const canvas = canvasRef.current
-    const ctx = getCtx()
+    const ctx = ctxRef.current
     if (!canvas || !ctx) return
-    const record = host.loadPaint()
-    if (record) {
-      void loadImage(record.image)
-        .then((img) => {
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.drawImage(img, 0, 0)
-        })
-        .catch(() => clearCanvas())
+    undoStackRef.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height))
+    redoStackRef.current = []
+  }
+
+  const restore = (snapshot: ImageData) => {
+    const canvas = canvasRef.current
+    const ctx = ctxRef.current
+    if (!canvas || !ctx) return
+    ctx.putImageData(snapshot, 0, 0)
+    persist()
+  }
+
+  const undo = () => {
+    const stack = undoStackRef.current
+    if (stack.length <= 1) return
+    const current = ctxRef.current?.getImageData(0, 0, canvasRef.current!.width, canvasRef.current!.height)
+    if (current) redoStackRef.current.push(current)
+    restore(stack.pop()!)
+  }
+
+  const redo = () => {
+    const stack = redoStackRef.current
+    if (stack.length === 0) return
+    const current = ctxRef.current?.getImageData(0, 0, canvasRef.current!.width, canvasRef.current!.height)
+    if (current) undoStackRef.current.push(current)
+    restore(stack.pop()!)
+  }
+
+  const pointFromEvent = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current
+    if (!canvas) return null
+    const rect = canvas.getBoundingClientRect()
+    return {
+      x: (e.clientX - rect.left) * (canvas.width / rect.width),
+      y: (e.clientY - rect.top) * (canvas.height / rect.height),
+    }
+  }
+
+  const strokeTo = (from: { x: number; y: number }, to: { x: number; y: number }) => {
+    const ctx = ctxRef.current
+    if (!ctx) return
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = sizeRef.current
+    if (toolRef.current === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out'
+      ctx.strokeStyle = 'rgb(0, 0, 0)'
     } else {
-      clearCanvas()
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.strokeStyle = colorRef.current
     }
-  }, [clearCanvas, getCtx])
+    ctx.beginPath()
+    ctx.moveTo(from.x, from.y)
+    ctx.lineTo(to.x, to.y)
+    ctx.stroke()
+  }
 
-  // Persist the current canvas after each interaction (debounced via rAF),
-  // and again on page unload to survive navigation.
-  useEffect(() => {
-    if (history.length === 0 && redoStack.length === 0) return
-    const id = requestAnimationFrame(persist)
-    const onUnload = () => persist()
-    window.addEventListener('pagehide', onUnload)
-    return () => {
-      cancelAnimationFrame(id)
-      window.removeEventListener('pagehide', onUnload)
-    }
-  }, [history, redoStack, persist])
-
-  // Keyboard: Ctrl/Cmd+Z undo, Shift+Ctrl/Cmd+Z redo.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const mod = e.metaKey || e.ctrlKey
-      if (!mod) return
-      const key = e.key.toLowerCase()
-      if (key === 'z') {
-        e.preventDefault()
-        if (e.shiftKey) redo()
-        else undo()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [undo, redo])
-
-  const pointFromEvent = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current
-      if (!canvas) return null
-      const rect = canvas.getBoundingClientRect()
-      return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height),
-      }
-    },
-    [],
-  )
-
-  const strokeTo = useCallback(
-    (from: { x: number; y: number }, to: { x: number; y: number }) => {
-      const ctx = getCtx()
-      if (!ctx) return
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
-      ctx.lineWidth = size
-      if (tool === 'eraser') {
-        ctx.globalCompositeOperation = 'destination-out'
-        ctx.strokeStyle = 'rgb(0, 0, 0)'
-      } else {
-        ctx.globalCompositeOperation = 'source-over'
-        ctx.strokeStyle = color
-      }
-      ctx.beginPath()
-      ctx.moveTo(from.x, from.y)
-      ctx.lineTo(to.x, to.y)
-      ctx.stroke()
-    },
-    [color, getCtx, size, tool],
-  )
-
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const p = pointFromEvent(e)
-      if (!p) return
-      e.currentTarget.setPointerCapture(e.pointerId)
-      pushHistory()
-      drawing.current = true
-      last.current = p
-      strokeTo(p, p)
-    },
-    [pointFromEvent, pushHistory, strokeTo],
-  )
-
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!drawing.current || !last.current) return
-      const p = pointFromEvent(e)
-      if (!p) return
-      strokeTo(last.current, p)
-      last.current = p
-    },
-    [pointFromEvent, strokeTo],
-  )
-
-  const onPointerUp = useCallback(() => {
-    drawing.current = false
-    last.current = null
-  }, [])
-
-  const onClear = useCallback(() => {
+  const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const p = pointFromEvent(e)
+    if (!p) return
+    e.currentTarget.setPointerCapture(e.pointerId)
     pushHistory()
-    clearCanvas()
-  }, [clearCanvas, pushHistory])
+    drawingRef.current = true
+    lastRef.current = p
+    strokeTo(p, p)
+  }
 
-  const onExport = useCallback(() => {
+  const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!drawingRef.current || !lastRef.current) return
+    const p = pointFromEvent(e)
+    if (!p) return
+    strokeTo(lastRef.current, p)
+    lastRef.current = p
+  }
+
+  const onPointerUp = () => {
+    if (!drawingRef.current) return
+    drawingRef.current = false
+    lastRef.current = null
+    persist()
+  }
+
+  const onClear = () => {
+    const pristine = pristineRef.current
+    if (!pristine) return
+    pushHistory()
+    restore(pristine)
+  }
+
+  const onExport = () => {
     const canvas = canvasRef.current
     if (!canvas) return
     const link = document.createElement('a')
@@ -247,12 +205,44 @@ export function App() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey
+      if (!mod) return
+      if (e.key.toLowerCase() !== 'z') return
+      e.preventDefault()
+      if (e.shiftKey) redo()
+      else undo()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <main className="paint-app">
-      <Card mono="Studio" title="Paint">
+      <Card flush>
         <Stack>
+          <div className="paint-canvas-wrap">
+            <canvas
+              ref={canvasRef}
+              className="paint-canvas"
+              width={CANVAS_W}
+              height={CANVAS_H}
+              role="img"
+              aria-label="Paint surface"
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              onPointerCancel={onPointerUp}
+            />
+          </div>
+          <div className="paint-head">
+            <MonoLabel sm>Studio</MonoLabel>
+            <Title size="md">Paint</Title>
+          </div>
           <Body>
             Pick a brush, a color, and a size. Draw with the mouse, a pen, or a finger. Undo a mistake, clear the
             surface, and export a PNG. The drawing survives a reload.
@@ -281,13 +271,13 @@ export function App() {
               <div className="paint-swatches" role="group" aria-label="Colors">
                 {SWATCHES.map((swatch) => (
                   <button
-                    key={swatch}
+                    key={swatch.label}
                     type="button"
                     className="paint-swatch"
-                    style={{ background: swatch }}
-                    aria-pressed={color === swatch}
-                    aria-label={`Color ${swatch}`}
-                    onClick={() => setColor(swatch)}
+                    style={{ background: swatch.color }}
+                    aria-pressed={color === swatch.color}
+                    aria-label={swatch.label}
+                    onClick={() => setColor(swatch.color)}
                   />
                 ))}
               </div>
@@ -296,13 +286,17 @@ export function App() {
               Size
               <input
                 type="range"
-                min={1}
-                max={40}
+                min={MIN}
+                max={MAX}
                 step={1}
                 value={size}
+                aria-valuenow={size}
+                aria-valuemin={MIN}
+                aria-valuemax={MAX}
+                aria-label="Size"
                 onChange={(e) => setSize(Number(e.target.value))}
               />
-              <span>{size}</span>
+              <span aria-hidden>{size}</span>
             </label>
             <div className="paint-actions">
               <Button onClick={undo}>Undo</Button>
@@ -312,20 +306,6 @@ export function App() {
                 Export PNG
               </Button>
             </div>
-          </div>
-          <div className="paint-canvas-wrap">
-            <canvas
-              ref={canvasRef}
-              className="paint-canvas"
-              width={CANVAS_W}
-              height={CANVAS_H}
-              role="img"
-              aria-label="Paint surface"
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerCancel={onPointerUp}
-            />
           </div>
         </Stack>
       </Card>
