@@ -1,0 +1,16 @@
+/* App-level overrides. The shared kit's inactive tabs and faint labels fall
+   below the WCAG AA contrast floor, so this app lifts them to var(--ink-60).
+   Selectors are written more specific than the kit's compound classes so the
+   lift wins the cascade. */
+
+main .lc-tab {
+  color: var(--ink-60);
+}
+
+main .lc-tab.active {
+  color: var(--ink);
+}
+
+main .lc-mono.lc-faint {
+  color: var(--ink-60);
+}
