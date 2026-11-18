@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "32a94177109cc5eb7c942e7c8ea76f6159ffea5a11fe3b4738da06edcbe1fbf4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Typing `#FF5733` in the field labelled \"Hex\" updates the field labelled \"R\" to \"255\", the field labelled \"G\" to \"87\", and the field labelled \"B\" to \"51\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the current color set to `#FF5733`, the field labelled \"Contrast on White\" shows \"3.02\" and the field labelled \"Contrast on Black\" shows \"10.45\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `128` in the field labelled \"R\", `64` in the field labelled \"G\", and `32` in the field labelled \"B\" updates the field labelled \"Hex\" to `#804020`."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Generate Palette\" adds five new swatches to the palette grid, and the first swatch displays the hex value `#FF5733` when the current color is `#FF5733`."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Copy Hex\" with the current color `#FF5733` changes the button text to \"Copied!\" for 2 seconds, and the clipboard contains `#FF5733`."
+    },
+    {
+      "id": "A6",
+      "text": "Typing `50` in the field labelled \"H\" and `100` in the field labelled \"S\" with the current color `#FF5733` updates the field labelled \"Hex\" to `#FF0000`."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Remove\" on the second swatch in the palette grid removes that swatch, and the grid now shows one fewer swatch."
+    },
+    {
+      "id": "A8",
+      "text": "Typing `10` in the field labelled \"L\" of the OKLCH section updates the field labelled \"Hex\" to a darker variant of the current color, specifically `#0A0503` when starting from `#FF5733` with H=25 and C=0.15."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current color: after setting the hex to `#123456` and reloading the page, the field labelled \"Hex\" still shows `#123456`."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "37074dba7f0be0e88b989d04d8490379590084dddd8f5588b8265f9fe71a0d86"
+    }
+  ]
+}
