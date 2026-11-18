@@ -95,6 +95,12 @@
   margin-left: auto;
 }
 
+.paint-head {
+  display: flex;
+  align-items: baseline;
+  gap: calc(8px * var(--sf));
+}
+
 .paint-canvas-wrap {
   border: calc(1px * var(--sf)) solid var(--soft);
   border-radius: calc(4px * var(--sf));
@@ -104,8 +110,6 @@
 
 .paint-canvas {
   display: block;
-  width: 100%;
-  height: auto;
   touch-action: none;
   cursor: crosshair;
 }

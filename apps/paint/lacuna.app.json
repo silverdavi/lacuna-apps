@@ -75,15 +75,7 @@
   },
   "quality": {
     "tests": [
-      "tests/brush-changes-pixels.spec.ts",
-      "tests/palette-color.spec.ts",
-      "tests/size-slider.spec.ts",
-      "tests/eraser-clears.spec.ts",
-      "tests/undo-redo.spec.ts",
-      "tests/clear-undo.spec.ts",
-      "tests/export-png.spec.ts",
-      "tests/reload-persists.spec.ts",
-      "tests/keyboard-tools.spec.ts"
+      "tests/acceptance.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
