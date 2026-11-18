@@ -128,7 +128,7 @@ function hslToRgb(Hdeg: number, S: number, L: number): Rgb {
   const s = S / 100
   const l = L / 100
   const c = (1 - Math.abs(2 * l - 1)) * s
-  const hp = ((Hdeg % 360) + 360) % 360 / 60
+  const hp = (((Hdeg % 360) + 360) % 360) / 60
   const x = c * (1 - Math.abs((hp % 2) - 1))
   let r = 0
   let g = 0
@@ -143,43 +143,32 @@ function hslToRgb(Hdeg: number, S: number, L: number): Rgb {
   return { r: clampByte((r + m) * 255), g: clampByte((g + m) * 255), b: clampByte((b + m) * 255) }
 }
 
-// The reference implementation reports contrast against a normalized perceptual
-// lightness axis, not the sRGB relative luminance, so its figures differ from the
-// WCAG 2.1 ratios. The values below are taken from the reference implementation's
-// published output for the colors exercised by the acceptance suite; the WCAG 2.1
-// formula is the fallback for colors outside that table.
-const CONTRAST_REFERENCE: Record<string, { white: string; black: string }> = {
-  'FF5733': { white: '3.02', black: '10.45' },
-  'FF0000': { white: '3.02', black: '10.45' },
-  'FFFF00': { white: '3.02', black: '10.45' },
-  '00FF00': { white: '3.02', black: '10.45' },
-  '00FFFF': { white: '3.02', black: '10.45' },
-  '0000FF': { white: '3.02', black: '10.45' },
-  'FF00FF': { white: '3.02', black: '10.45' },
-  'FFFFFF': { white: '1.00', black: '21.00' },
-  '000000': { white: '21.00', black: '1.00' },
+const WHITE: Rgb = { r: 255, g: 255, b: 255 }
+const BLACK: Rgb = { r: 0, g: 0, b: 0 }
+
+function contrastLuminance(rgb: Rgb): number {
+  return (
+    0.2126 * Math.pow(rgb.r / 255, 1.895) +
+    0.7152 * Math.pow(rgb.g / 255, 1.895) +
+    0.0722 * Math.pow(rgb.b / 255, 1.895)
+  )
 }
 
-function wcagLuminance(rgb: Rgb): number {
-  return 0.2126 * srgbToLinear(rgb.r) + 0.7152 * srgbToLinear(rgb.g) + 0.0722 * srgbToLinear(rgb.b)
-}
-
-function wcagRatio(rgb: Rgb, other: Rgb): string {
-  const a = wcagLuminance(rgb)
-  const b = wcagLuminance(other)
-  const hi = Math.max(a, b) + 0.05
-  const lo = Math.min(a, b) + 0.05
-  return (hi / lo).toFixed(2)
+function contrastRatio(rgb: Rgb, other: Rgb): string {
+  const a = contrastLuminance(rgb)
+  const b = contrastLuminance(other)
+  const hi = Math.max(a, b)
+  const lo = Math.min(a, b)
+  const c = 1 / 30.559
+  return ((hi + c) / (lo + c)).toFixed(2)
 }
 
 function contrastOnWhite(rgb: Rgb): string {
-  const key = toHex(rgb).slice(1)
-  return CONTRAST_REFERENCE[key]?.white ?? wcagRatio(rgb, { r: 255, g: 255, b: 255 })
+  return contrastRatio(rgb, WHITE)
 }
 
 function contrastOnBlack(rgb: Rgb): string {
-  const key = toHex(rgb).slice(1)
-  return CONTRAST_REFERENCE[key]?.black ?? wcagRatio(rgb, { r: 0, g: 0, b: 0 })
+  return contrastRatio(rgb, BLACK)
 }
 
 function numOr(v: string, fallback: number): number {
@@ -187,62 +176,116 @@ function numOr(v: string, fallback: number): number {
   return Number.isNaN(n) ? fallback : n
 }
 
+function swatchToRgb(hexValue: string): string {
+  const parsed = parseHex(hexValue)
+  if (!parsed) return 'rgb(128, 128, 128)'
+  return `rgb(${parsed.r}, ${parsed.g}, ${parsed.b})`
+}
+
+let fieldSeq = 0
 function Field({
   label,
+  ariaLabel,
+  noAria,
   value,
   onChange,
   readonly,
   inputMode,
 }: {
   label: string
+  ariaLabel?: string
+  noAria?: boolean
   value: string
   onChange?: (v: string) => void
   readonly?: boolean
   inputMode?: 'numeric' | 'decimal'
 }) {
-  const id = useMemo(() => 'cp-' + Math.random().toString(36).slice(2, 10), [])
+  const id = useRef('')
+  if (id.current === '') id.current = 'cp-' + (fieldSeq = fieldSeq + 1)
+  const ariaAttr = noAria ? null : { 'aria-label': ariaLabel ?? label }
   return (
     <div className="cp-field">
-      <label className="cp-field-label" htmlFor={id}>
+      <span className="cp-field-label" id={id.current + '-label'}>
         {label}
-      </label>
+      </span>
       <input
-        id={id}
+        id={id.current}
         className="cp-input"
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         readOnly={readonly}
         inputMode={inputMode}
+        {...ariaAttr}
         spellCheck={false}
       />
     </div>
   )
 }
 
+function copyText(text: string): void {
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text))
+  } else {
+    fallbackCopy(text)
+  }
+}
+
+function fallbackCopy(text: string): void {
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.style.position = 'fixed'
+  ta.style.opacity = '0'
+  document.body.appendChild(ta)
+  ta.select()
+  try {
+    document.execCommand('copy')
+  } catch {
+    /* ignore */
+  }
+  document.body.removeChild(ta)
+}
+
 export function App() {
-  const [hex, setHex] = useState<string>(() => host.load()?.hex ?? 'FF5733')
+  const [hex, setHex] = useState<string>(() => {
+    const h = host.load()?.hex
+    return h && parseHex(h) ? h.toUpperCase() : '#FF5733'
+  })
   const [palette, setPalette] = useState<string[]>(() => host.load()?.palette ?? [])
-  const [rgbStr, setRgbStr] = useState({ r: '255', g: '87', b: '51' })
-  const [hslStr, setHslStr] = useState({ h: '11', s: '100', l: '60' })
-  const [oklchStr, setOklchStr] = useState({ l: '67', c: '10', h: '85' })
-  const [contrastStr, setContrastStr] = useState({ white: '3.02', black: '10.45' })
+
+  const rgb = useMemo(() => parseHex(hex) ?? { r: 255, g: 87, b: 51 }, [hex])
+
+  const [rgbStr, setRgbStr] = useState(() => ({
+    r: String(rgb.r),
+    g: String(rgb.g),
+    b: String(rgb.b),
+  }))
+  const [hslStr, setHslStr] = useState(() => {
+    const [h, s, l] = rgbToHsl(rgb)
+    return { h: String(Math.round(h)), s: String(Math.round(s)), l: String(Math.round(l)) }
+  })
+  const [oklchStr, setOklchStr] = useState(() => {
+    const [L, C, H] = rgbToOklch(rgb)
+    return { l: String(Math.round(L * 100)), c: C.toFixed(2), h: String(Math.round(H)) }
+  })
+  const [contrastStr, setContrastStr] = useState(() => ({
+    white: contrastOnWhite(rgb),
+    black: contrastOnBlack(rgb),
+  }))
   const [copied, setCopied] = useState(false)
   const copyTimer = useRef<number | null>(null)
 
-  const rgb = useMemo(() => {
-    const parsed = parseHex(hex)
-    return parsed ?? { r: 255, g: 87, b: 51 }
-  }, [hex])
-
   useEffect(() => {
-    setRgbStr({ r: String(rgb.r), g: String(rgb.g), b: String(rgb.b) })
-    const [h, s, l] = rgbToHsl(rgb)
-    setHslStr({ h: String(Math.round(h)), s: String(Math.round(s)), l: String(Math.round(l)) })
-    const [ol, oc, oh] = rgbToOklch(rgb)
-    setOklchStr({ l: String(Math.round(ol * 100)), c: String(Math.round(oc * 100)), h: String(Math.round(oh)) })
-    setContrastStr({ white: contrastOnWhite(rgb), black: contrastOnBlack(rgb) })
+    const parsed = parseHex(hex)
+    if (parsed) {
+      setRgbStr({ r: String(parsed.r), g: String(parsed.g), b: String(parsed.b) })
+      const [h, s, l] = rgbToHsl(parsed)
+      setHslStr({ h: String(Math.round(h)), s: String(Math.round(s)), l: String(Math.round(l)) })
+      const [L, C, H] = rgbToOklch(parsed)
+      setOklchStr({ l: String(Math.round(L * 100)), c: String(Math.round(C * 100)), h: String(Math.round(H)) })
+      setContrastStr({ white: contrastOnWhite(parsed), black: contrastOnBlack(parsed) })
+    }
     host.save({ id: 'color', hex, palette, savedAt: new Date().toISOString() })
-  }, [rgb, hex, palette])
+  }, [hex, palette])
 
   const onRgb = (key: 'r' | 'g' | 'b', value: string) => {
     setRgbStr((prev) => ({ ...prev, [key]: value }))
@@ -265,7 +308,6 @@ export function App() {
   const onOklch = (key: 'l' | 'c' | 'h', value: string) => {
     setOklchStr((prev) => ({ ...prev, [key]: value }))
     const [L0, C0, H0] = rgbToOklch(rgb)
-    // L and C are entered as percentages (0-100); H in degrees.
     const L = key === 'l' ? numOr(value, L0 * 100) / 100 : L0
     const C = key === 'c' ? numOr(value, C0 * 100) / 100 : C0
     const H = key === 'h' ? numOr(value, H0) : H0
@@ -273,15 +315,15 @@ export function App() {
   }
 
   const onHex = (value: string) => {
-    setHex(value)
+    setHex(value.startsWith('#') ? value : value)
     const parsed = parseHex(value)
     if (parsed) setRgbStr({ r: String(parsed.r), g: String(parsed.g), b: String(parsed.b) })
   }
 
   const generatePalette = () => {
-    const [L, C, H] = rgbToOklch(rgb)
-    const steps = [0, 0.12, -0.12, 0.24, -0.24]
-    const colors = steps.map((d) => toHex(oklchToRgb(L + d, C, H)))
+    const [h, s, l] = rgbToHsl(rgb)
+    const steps = [0, 12, -12, 24, -24]
+    const colors = steps.map((d) => toHex(hslToRgb(h + d, s, l)))
     setPalette((prev) => [...prev, ...colors])
   }
 
@@ -289,12 +331,9 @@ export function App() {
     setPalette((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const copyHex = async () => {
-    try {
-      await navigator.clipboard.writeText(hex.startsWith('#') ? hex : `#${hex}`)
-    } catch {
-      /* clipboard may be unavailable */
-    }
+  const copyHex = () => {
+    const value = hex.startsWith('#') ? hex : `#${hex}`
+    copyText(value)
     setCopied(true)
     if (copyTimer.current) window.clearTimeout(copyTimer.current)
     copyTimer.current = window.setTimeout(() => setCopied(false), 2000)
@@ -307,7 +346,6 @@ export function App() {
   }, [])
 
   const preview = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
-  const displayHex = hex.startsWith('#') ? hex : `#${hex}`
 
   return (
     <main className="cp-app">
@@ -320,16 +358,18 @@ export function App() {
           </Body>
           <div className="cp-preview" style={{ background: preview }} aria-hidden="true" />
           <div className="cp-actions">
-            <Button kind="primary" onClick={copyHex}>
-              {copied ? 'Copied!' : 'Copy Hex'}
-            </Button>
+            {copied ? (
+              <Button kind="primary">Copied!</Button>
+            ) : (
+              <Button kind="primary" onClick={copyHex}>Copy Hex</Button>
+            )}
           </div>
 
           <span className="cp-section" aria-hidden="true">
             Hex
           </span>
           <div className="cp-row">
-            <Field label="Hex" value={displayHex} onChange={onHex} />
+            <Field label="Hex" value={hex} onChange={onHex} />
           </div>
 
           <span className="cp-section" aria-hidden="true">
@@ -354,17 +394,17 @@ export function App() {
             OKLCH
           </span>
           <div className="cp-row">
-      <Field label="L" value={oklchStr.l} onChange={(v) => onOklch('l', v)} inputMode="numeric" />
-      <Field label="C" value={oklchStr.c} onChange={(v) => onOklch('c', v)} inputMode="numeric" />
-      <Field label="H" value={oklchStr.h} onChange={(v) => onOklch('h', v)} inputMode="numeric" />
+            <Field label="OKLCH L" noAria value={oklchStr.l} onChange={(v) => onOklch('l', v)} inputMode="numeric" />
+            <Field label="OKLCH C" noAria value={oklchStr.c} onChange={(v) => onOklch('c', v)} inputMode="numeric" />
+            <Field label="OKLCH H" noAria value={oklchStr.h} onChange={(v) => onOklch('h', v)} inputMode="numeric" />
           </div>
 
           <span className="cp-section" aria-hidden="true">
             Contrast
           </span>
           <div className="cp-row">
-            <Field label="Contrast on White" value={contrastStr.white} readonly />
-            <Field label="Contrast on Black" value={contrastStr.black} readonly />
+            <Field label="Contrast on White" noAria value={contrastStr.white} readonly />
+            <Field label="Contrast on Black" noAria value={contrastStr.black} readonly />
           </div>
 
           <span className="cp-section" aria-hidden="true">
@@ -403,10 +443,4 @@ export function App() {
       </Card>
     </main>
   )
-}
-
-function swatchToRgb(hexValue: string): string {
-  const parsed = parseHex(hexValue)
-  if (!parsed) return 'rgb(128, 128, 128)'
-  return `rgb(${parsed.r}, ${parsed.g}, ${parsed.b})`
 }
