@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "spec_sha256": "85fa4241aaeff6af53feaa94f63cc4ecb8dcc4057416b822842f825a9b34ecc1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries the page shows the heading \"Budget Planner\", the text \"No entries yet\", and the three summary lines \"Income: $0.00\", \"Expenses: $0.00\" and \"Balance: $0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Description\" with \"Salary\" and the field labelled \"Amount\" with \"2500\", choosing \"Income\" in the select labelled \"Type\" and clicking the button \"Add entry\" adds a list item that contains \"Salary\" and \"+$2,500.00\"; the summary shows \"Balance: $2,500.00\" and \"No entries yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After also adding an entry of Type \"Expense\" with Description \"Rent\" and Amount \"1200.50\", a list item contains \"Rent\" and \"-$1,200.50\", and the summary shows \"Income: $2,500.00\", \"Expenses: $1,200.50\" and \"Balance: $1,299.50\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add entry\" with an empty Description, or with an Amount that is empty, 0 or negative, adds no list item and shows the message \"Enter a description and an amount greater than 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every list item has a button named \"Delete <description>\". With the entries Salary 2500 (Income) and Rent 1200.50 (Expense), clicking \"Delete Rent\" removes that item and the summary shows \"Expenses: $0.00\" and \"Balance: $2,500.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "When expenses exceed income the balance is negative: Income \"Gift\" 100 and Expense \"Bike\" 250 show \"Balance: -$150.00\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding Salary 2500 (Income), reloading the page still shows the list item with \"Salary\" and \"+$2,500.00\" and the summary line \"Balance: $2,500.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4b1f4b5ad7f63178480d1360973b93513a9f0d301a3aa54208a6e0fdec193ad1"
+    }
+  ]
+}
