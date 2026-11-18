@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "d4f055c8c965e8cd305f0108e9651fbe58dfb9e9aab401dff87323fdd0f404e6",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no tasks, the page shows the heading \"Task List\", the text \"No tasks yet\", and the progress bar at 0%."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" in the field labelled \"New task\" and pressing Enter adds a list item containing \"Buy milk\" with an unchecked checkbox; the progress bar shows 0%."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Buy milk\" and \"Walk dog\", clicking the checkbox on the item \"Buy milk\" marks it as completed (strikethrough text), and the progress bar shows 50%."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Empty\" in the field labelled \"New task\" and pressing Enter adds no item and shows the toast message \"Task text cannot be empty\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Edit\" on the item \"Buy milk\" changes the item text to an editable input pre-filled with \"Buy milk\"; typing \"Buy oat milk\" and pressing Enter updates the item to \"Buy oat milk\"."
+    },
+    {
+      "id": "A6",
+      "text": "With items \"Buy milk\" and \"Walk dog\", clicking the button labelled \"Delete\" on \"Buy milk\" removes that item; the toast shows \"Task deleted\" with an \"Undo\" button; clicking \"Undo\" restores \"Buy milk\" to its original position."
+    },
+    {
+      "id": "A7",
+      "text": "With items \"Buy milk\" and \"Walk dog\", pressing the keyboard shortcut Alt+ArrowUp while focused on \"Walk dog\" moves it above \"Buy milk\", so \"Walk dog\" appears first in the list."
+    },
+    {
+      "id": "A8",
+      "text": "After adding \"Buy milk\" and \"Walk dog\", reloading the page still shows both items in the same order with \"Buy milk\" first and \"Walk dog\" second, and the progress bar at 0%."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "473c9009f21917ade32ec09c12310bb0b24fd4dd10e33303a1fd3db7ea3c5a86"
+    }
+  ]
+}
