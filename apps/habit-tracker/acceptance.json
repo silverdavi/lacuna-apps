@@ -1,40 +1,52 @@
 {
   "version": 1,
-  "spec_sha256": "5da8d5d974c6a7002e38edd542d411d3c232618f21b90beab9ca73c092801b27",
+  "spec_sha256": "eb8e0cea589dbb23ea775c896c4a33f0905a6a06a1d1c47854793070d0fe3a3d",
   "checks": [
     {
       "id": "A1",
-      "text": "Adding a habit by name shows it in the list; empty or duplicate names are refused with an inline message."
+      "text": "Typing Read in Habit name and clicking Add habit shows a list item with the text Read and the text Streak: 0, and seven unticked checkboxes from \"Read, 6 days ago\" to \"Read, Today\"."
     },
     {
       "id": "A2",
-      "text": "Ticking today's box for a habit marks it done and the streak shows 1."
+      "text": "Clicking Add habit with Habit name empty, and again with Habit name holding three spaces, shows the text \"Enter a habit name.\" and the Habits list stays empty."
     },
     {
       "id": "A3",
-      "text": "With fixture history of 3 consecutive done days ending yesterday, ticking today shows streak 4 (seed the mock store in the test)."
+      "text": "After adding Read, typing Read in Habit name and clicking Add habit shows the text \"That habit already exists.\" and the Habits list still has exactly one item."
     },
     {
       "id": "A4",
-      "text": "Missing a day resets the streak to 0 the next day (use Playwright's clock to move the date)."
+      "text": "After adding Read, clicking the checkbox \"Read, Today\" makes it checked, shows \u2713 inside it, and shows Streak: 1; clicking it again makes it unchecked and shows Streak: 0."
     },
     {
       "id": "A5",
-      "text": "Each habit shows a 7-day row; done days and missed days differ by more than color (icon or label), so the axe scan and a screen reader can tell them apart."
+      "text": "After adding Read, ticking \"Read, 3 days ago\", \"Read, 2 days ago\" and \"Read, 1 day ago\" shows Streak: 3; then ticking \"Read, Today\" shows Streak: 4."
     },
     {
       "id": "A6",
-      "text": "Renaming and deleting a habit work; delete asks for confirmation in a dialog that Escape closes."
+      "text": "After adding Read, ticking only \"Read, 3 days ago\" and \"Read, 2 days ago\" (1 day ago and Today left unticked) shows Streak: 0."
     },
     {
       "id": "A7",
-      "text": "Reload keeps habits and history."
+      "text": "After adding Read and ticking \"Read, Today\", clicking Rename Read shows a text box labelled \"New name for Read\" holding Read; replacing its text with Read daily and pressing Enter shows a list item with the text Read daily, no list item with the exact name Read, and the checkbox \"Read daily, Today\" checked."
+    },
+    {
+      "id": "A8",
+      "text": "After adding Read, clicking Delete Read opens a dialog with the text \"Delete Read?\"; pressing Escape closes the dialog and the list item Read is still shown."
+    },
+    {
+      "id": "A9",
+      "text": "After adding Read, clicking Delete Read and then Confirm delete in the dialog closes the dialog and the Habits list has no items."
+    },
+    {
+      "id": "A10",
+      "text": "Reload keeps habits and ticks: after adding Read and ticking \"Read, Today\", reloading the page shows the list item Read with \"Read, Today\" checked and the text Streak: 1."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "f756947c3419678529a150e1766b9232b5c5e0051b8928310f22c7ae5a92a05f"
+      "sha256": "6e04a0aee2cf278a34aea94e2d61a57cebef58047f9bf7cd5658be2d45004fbc"
     }
   ]
 }
