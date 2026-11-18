@@ -1,0 +1,86 @@
+.budget-app {
+  max-width: calc(480px * var(--sf));
+  margin: calc(16px * var(--sf)) auto;
+  padding: calc(8px * var(--sf));
+  font-family: var(--sans);
+  color: var(--ink);
+}
+
+.budget-heading {
+  font-family: var(--serif);
+  font-size: calc(22px * var(--tf));
+  line-height: 1.2;
+  margin: 0 0 calc(16px * var(--sf));
+  color: var(--ink);
+}
+
+.budget-form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+.budget-field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.budget-label {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--mid);
+}
+
+.budget-error {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--accent);
+}
+
+.budget-summary {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  padding: calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--mid);
+}
+
+.budget-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.budget-item {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  padding: calc(8px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--mid);
+}
+
+.budget-item:last-child {
+  border-bottom: none;
+}
+
+.budget-item-desc {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: calc(13.5px * var(--tf));
+}
+
+.budget-item-amount {
+  font-family: var(--mono);
+  font-size: calc(13.5px * var(--tf));
+}
+
+.budget-item-amount.income {
+  color: var(--accent);
+}
+
+.budget-item-amount.expense {
+  color: var(--ink);
+}
