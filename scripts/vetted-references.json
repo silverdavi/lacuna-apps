@@ -8,7 +8,16 @@
   "ISC",
   "0BSD",
   "Unlicense",
-  "CC0-1.0"
+  "CC0-1.0",
+  "MIT-0",
+  "Zlib",
+  "zlib-acknowledgement",
+  "libpng-2.0",
+  "WTFPL",
+  "BlueOak-1.0.0",
+  "PostgreSQL",
+  "BSD-3-Clause-Clear",
+  "ECL-2.0"
  ],
  "references": [
   {
@@ -447,6 +456,11 @@
    "spdx": "MIT"
   },
   {
+   "repo": "jakebathman/Markdown-Table-Generator",
+   "sha": "a848e0e3eac84f13a16f5c8a9f05ec1ff062a5cd",
+   "spdx": "WTFPL"
+  },
+  {
    "repo": "jamesqquick/Build-A-Quiz-App-With-HTML-CSS-and-JavaScript",
    "sha": "ef07bc7c4baa51bad8eb44727895a5dd667e41dc",
    "spdx": "MIT"
@@ -614,11 +628,6 @@
   {
    "repo": "mykle1/MMM-EventHorizon",
    "sha": "e5bbc2f29e16d094c78b2bd2161d5c851bd16888",
-   "spdx": "MIT"
-  },
-  {
-   "repo": "nas5w/typeofnan-javascript-quizzes",
-   "sha": "d8001e7f14e2b19bbb22aac959a5656bfd077d96",
    "spdx": "MIT"
   },
   {

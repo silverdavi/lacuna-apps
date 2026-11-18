@@ -41,7 +41,18 @@ const MARK = {
   '0BSD': [/Permission to use, copy, modify, and\/?o?r? ?distribute this software/i],
   Unlicense: [/free and unencumbered software released into the public domain/i],
   'CC0-1.0': [/CC0 1\.0 Universal/i, /Statement of Purpose/i],
+  'MIT-0': [/Permission is hereby granted, free of charge/i, /THE SOFTWARE IS PROVIDED "AS IS"/i],
+  Zlib: [/provided ['‘’]as-is['‘’]/i, /Altered source versions must be plainly marked/i],
+  'zlib-acknowledgement': [/provided ['‘’]as-is['‘’]/i, /Altered source versions must be plainly marked/i],
+  'libpng-2.0': [/PNG Reference Library License version 2/i],
+  WTFPL: [/DO WHAT THE FUCK YOU WANT TO PUBLIC LICEN[SC]E/i],
+  'BlueOak-1.0.0': [/Blue Oak Model License/i],
+  PostgreSQL: [/Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee/i],
+  'BSD-3-Clause-Clear': [/Redistribution and use in source and binary forms/i, /NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY['‘’]S PATENT RIGHTS/i],
+  'ECL-2.0': [/Educational Community License/i],
 }
+// The licence section must hold the text, not a mention of it; the WTFPL is shorter than the others.
+const MIN_LICENCE_CHARS = { WTFPL: 150 }
 
 const refPath = path.join(dir, 'reference.json')
 const noticePath = path.join(dir, 'NOTICE.md')
@@ -78,7 +89,7 @@ if (!fs.existsSync(noticePath)) {
   }
   for (const c of copyright) if (!text.includes(c)) bad(`NOTICE.md lacks the copyright line "${c.slice(0, 80)}"`)
   const lic = text.split(/^## Upstream licence\s*$/m)[1]?.split(/^## /m)[0] ?? ''
-  if (lic.trim().length < 400) bad('NOTICE.md has no "## Upstream licence" section with the licence text')
+  if (lic.trim().length < (MIN_LICENCE_CHARS[spdx] ?? 400)) bad('NOTICE.md has no "## Upstream licence" section with the licence text')
   for (const re of MARK[spdx] ?? []) if (!re.test(lic.replace(/\s+/g, ' '))) bad(`NOTICE.md: the licence text does not read as ${spdx}`)
   if (ref.upstream_notice && !/^## Upstream NOTICE\s*$/m.test(text)) bad('NOTICE.md lacks the "## Upstream NOTICE" section the upstream repository requires')
   if (isApp) {
