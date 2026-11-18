@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "spec_sha256": "5da8d5d974c6a7002e38edd542d411d3c232618f21b90beab9ca73c092801b27",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Adding a habit by name shows it in the list; empty or duplicate names are refused with an inline message."
+    },
+    {
+      "id": "A2",
+      "text": "Ticking today's box for a habit marks it done and the streak shows 1."
+    },
+    {
+      "id": "A3",
+      "text": "With fixture history of 3 consecutive done days ending yesterday, ticking today shows streak 4 (seed the mock store in the test)."
+    },
+    {
+      "id": "A4",
+      "text": "Missing a day resets the streak to 0 the next day (use Playwright's clock to move the date)."
+    },
+    {
+      "id": "A5",
+      "text": "Each habit shows a 7-day row; done days and missed days differ by more than color (icon or label), so the axe scan and a screen reader can tell them apart."
+    },
+    {
+      "id": "A6",
+      "text": "Renaming and deleting a habit work; delete asks for confirmation in a dialog that Escape closes."
+    },
+    {
+      "id": "A7",
+      "text": "Reload keeps habits and history."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f756947c3419678529a150e1766b9232b5c5e0051b8928310f22c7ae5a92a05f"
+    }
+  ]
+}
