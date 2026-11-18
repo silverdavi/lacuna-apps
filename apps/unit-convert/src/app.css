@@ -14,3 +14,14 @@ main .lc-tab.active {
 main .lc-mono.lc-faint {
   color: var(--ink-60);
 }
+
+main ul li {
+  margin: 0;
+  padding: 0;
+}
+
+main ul li > button {
+  display: block;
+  width: 100%;
+  text-align: left;
+}

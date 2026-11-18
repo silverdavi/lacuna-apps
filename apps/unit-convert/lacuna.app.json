@@ -75,14 +75,7 @@
   },
   "quality": {
     "tests": [
-      "tests/length-convert.spec.ts",
-      "tests/two-way.spec.ts",
-      "tests/temperature.spec.ts",
-      "tests/category-switch.spec.ts",
-      "tests/swap.spec.ts",
-      "tests/non-numeric.spec.ts",
-      "tests/recent-list.spec.ts",
-      "tests/recent-reload.spec.ts"
+      "tests/acceptance.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
