@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "fa3d8cab0262d3ad2e85fb219a303283b0b0fe2ca14760ae56fab5e71233797d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page shows the heading \"Snake Game\", the text \"Score: 0\", the text \"Best: 0\", and the button \"Start\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Start\" changes the button label to \"Restart\", the text \"Score: 0\" remains, and the board displays a snake of length 1 at the center cell."
+    },
+    {
+      "id": "A3",
+      "text": "After clicking \"Start\", pressing the key \"ArrowUp\" moves the snake one cell up; the snake occupies the cell directly above its starting position and the cell below is empty."
+    },
+    {
+      "id": "A4",
+      "text": "After clicking \"Start\", pressing the key \"ArrowLeft\" when the snake is moving up does not change the snake's direction; the snake continues moving up."
+    },
+    {
+      "id": "A5",
+      "text": "After clicking \"Start\", pressing the key \"ArrowUp\" then \"ArrowRight\" moves the snake up one cell then right one cell; the snake occupies the cell diagonally up-right from the start."
+    },
+    {
+      "id": "A6",
+      "text": "After clicking \"Start\", when the snake eats a food item, the text \"Score: 0\" changes to \"Score: 1\" and the snake length increases by 1."
+    },
+    {
+      "id": "A7",
+      "text": "After clicking \"Start\", when the snake collides with the board boundary, the text \"Game Over\" appears and the button label changes to \"Restart\"."
+    },
+    {
+      "id": "A8",
+      "text": "After a game over with a score of 3, clicking \"Restart\" resets the text \"Score: 0\", removes the text \"Game Over\", and the button label changes to \"Start\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after achieving a score of 5 and reloading the page, the text \"Best: 5\" is displayed."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c43d7cfdb097abe5e30495a400800a72c3a2be66bb57811374e7f13ca86667c9"
+    }
+  ]
+}
