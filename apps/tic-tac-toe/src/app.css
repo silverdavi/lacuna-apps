@@ -1,0 +1,55 @@
+.ttt-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: calc(22px * var(--tf));
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.ttt-status {
+  font-family: var(--sans);
+  font-size: calc(15px * var(--tf));
+  color: var(--ink-80);
+}
+
+.ttt-grid {
+  border-collapse: collapse;
+}
+
+.ttt-td {
+  width: calc(72px * var(--sf));
+  height: calc(64px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  padding: 0;
+}
+
+.ttt-td:focus-visible {
+  outline: calc(1px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.ttt-cell {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: var(--ui-card);
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: calc(22px * var(--tf));
+  color: var(--ink);
+}
+
+.ttt-cell:hover {
+  background: var(--paper-deep);
+}
+
+.ttt-cell-filled {
+  cursor: default;
+}
+
+.ttt-mark {
+  display: block;
+}
