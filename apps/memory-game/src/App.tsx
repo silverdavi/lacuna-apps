@@ -99,12 +99,11 @@ export function App() {
                 <button
                   key={i}
                   type="button"
-                  className="mg-card"
+                  className={`mg-card${isUp(i) ? ' mg-card-up' : ''}`}
                   aria-pressed={isUp(i)}
-                  hidden={!isUp(i)}
                   onClick={() => flip(i)}
                 >
-                  <span className="mg-symbol">{symbol}</span>
+                  <span className={`mg-symbol${isUp(i) ? '' : ' mg-symbol-hidden'}`}>{symbol}</span>
                 </button>
               )
             })}
