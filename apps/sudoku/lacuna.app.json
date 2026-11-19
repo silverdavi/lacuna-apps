@@ -1,0 +1,86 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.sudoku",
+  "name": "Sudoku Puzzle",
+  "version": "0.1.0",
+  "summary": "Solve a 9x9 number placement puzzle.",
+  "description": "Place the digits 1 to 9 so that every row, column and 3x3 box holds each digit exactly once. Pick a difficulty, track the clock, and reload the page any time: the board and the timer come back where you left them.",
+  "category": "personal",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/sudoku"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:puzzle",
+    "fill:puzzle"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "puzzle",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the current puzzle board and its timer"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "puzzle"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
