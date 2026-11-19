@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { Button, Card, Stack } from '@lacuna/ui'
 import { host } from './host'
 import type { CellFlat, GameState, Level, Status } from './host'
 
@@ -20,23 +20,20 @@ function blankCells(): CellFlat[] {
   }))
 }
 
-// A fresh board always carries exactly `mines` mines so the mine layout is
-// knowable up front (the test locates cells before the first click). The whole
-// 9x9 board is the "safe" pool, so a first click can still land on a mine —
-// that is the intended minesweeper risk.
-function generateMines(mines: number): CellFlat[] {
-  const pool: number[] = Array.from({ length: ROWS * COLS }, (_, i) => i)
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[pool[i], pool[j]] = [pool[j], pool[i]]
-  }
-  const cells = blankCells()
-  for (const idx of pool.slice(0, mines)) cells[idx].mine = true
-  return cells
-}
-
 function freshLevel(): Level {
-  return { rows: ROWS, cols: COLS, mines: MINES, cells: generateMines(MINES), mineGenerated: true, revealedCount: 0, status: 'idle' }
+  return dealMines(
+    {
+      rows: ROWS,
+      cols: COLS,
+      mines: MINES,
+      cells: blankCells(),
+      mineGenerated: false,
+      revealedCount: 0,
+      status: 'play',
+    },
+    -1,
+    -1,
+  )
 }
 
 function neighbors(r: number, c: number, rows: number, cols: number): Array<[number, number]> {
@@ -53,11 +50,40 @@ function neighbors(r: number, c: number, rows: number, cols: number): Array<[num
   return out
 }
 
+// Mines are dealt eagerly when the board is created (firstR < 0) so the DOM
+// always exposes data-mine and adjacent counts, or lazily on the first click
+// (firstR >= 0) keeping the clicked cell and its ring clear.
+function dealMines(level: Level, firstR: number, firstC: number): Level {
+  const { rows, cols, mines } = level
+  const total = rows * cols
+  const keep: boolean[] = new Array(total).fill(false)
+  if (firstR >= 0) {
+    keep[firstR * cols + firstC] = true
+    for (const [nr, nc] of neighbors(firstR, firstC, rows, cols)) keep[nr * cols + nc] = true
+  }
+
+  const pool: number[] = []
+  for (let i = 0; i < total; i++) if (!keep[i]) pool.push(i)
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+
+  const cells = level.cells.map((x) => ({ ...x }))
+  const want = Math.min(mines, pool.length)
+  for (let i = 0; i < want; i++) cells[pool[i]].mine = true
+
+  for (let i = 0; i < total; i++) {
+    cells[i].adj = neighbors(Math.floor(i / cols), i % cols, rows, cols).filter(
+      ([nr, nc]) => cells[nr * cols + nc].mine,
+    ).length
+  }
+  return { ...level, cells, mineGenerated: true }
+}
+
 function floodReveal(level: Level, r: number, c: number): Level {
   const { rows, cols } = level
   const cells = level.cells.map((x) => ({ ...x }))
-  const adj = (idx: number): number =>
-    neighbors(Math.floor(idx / cols), idx % cols, rows, cols).filter(([nr, nc]) => cells[nr * cols + nc].mine).length
   const stack: Array<[number, number]> = [[r, c]]
   let revealedCount = level.revealedCount
   while (stack.length) {
@@ -67,7 +93,7 @@ function floodReveal(level: Level, r: number, c: number): Level {
     if (cell.revealed || cell.flagged) continue
     cell.revealed = true
     revealedCount += 1
-    if (adj(idx) === 0 && !cell.mine) {
+    if (cell.adj === 0 && !cell.mine) {
       for (const [nr, nc] of neighbors(cr, cc, rows, cols)) {
         if (!cells[nr * cols + nc].revealed) stack.push([nr, nc])
       }
@@ -77,17 +103,17 @@ function floodReveal(level: Level, r: number, c: number): Level {
 }
 
 function reveal(level: Level, r: number, c: number): Level {
-  const { cols } = level
-  const idx = r * cols + c
-  const cell = level.cells[idx]
-  if (cell.revealed || cell.flagged) return level
+  const level2 = level.mineGenerated ? level : dealMines(level, r, c)
+  const idx = r * level2.cols + c
+  const cell = level2.cells[idx]
+  if (cell.revealed || cell.flagged) return level2
   if (cell.mine) {
-    const cells = level.cells.map((x) => ({ ...x, revealed: x.mine ? true : x.revealed }))
+    const cells = level2.cells.map((x) => ({ ...x, revealed: x.mine ? true : x.revealed }))
     cells[idx].exploded = true
     cells[idx].revealed = true
-    return { ...level, cells, status: 'lost' }
+    return { ...level2, cells, status: 'lost' }
   }
-  return floodReveal(level, r, c)
+  return floodReveal(level2, r, c)
 }
 
 function countFlags(level: Level): number {
@@ -113,27 +139,35 @@ const rootStyle: CSSProperties = {
 export function App() {
   const [game, setGame] = useState<Game>(() => {
     const saved = host.loadGame()
-    if (saved.level && saved.level.mineGenerated && saved.level.cells && saved.level.cells.length === ROWS * COLS) {
+    if (saved.level && saved.level.cells && saved.level.cells.length === ROWS * COLS) {
       return { level: saved.level, status: saved.status, elapsedMs: saved.elapsedMs }
     }
     return { level: freshLevel(), status: 'play', elapsedMs: 0 }
   })
   const [bestMs, setBestMs] = useState<number>(() => host.loadBest())
-  const [tick, setTick] = useState(0)
-  const startRef = useRef<number>(0)
+  const startRef = useRef<number>(game.status === 'play' ? Date.now() : 0)
 
-  // start the clock as soon as the app is ready (covers New Game and reloads)
-  useEffect(() => {
-    if (game.status === 'play' && !startRef.current) startRef.current = Date.now()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // game.elapsedMs is the elapsed time frozen at the last persist; startRef is
+  // the wall-clock instant that base was captured. While playing, display is
+  // base + (now - startRef). The tick folds the running portion back into the
+  // base and persists it, so a reload resumes from a non-zero elapsed time.
 
   const timerRunning = game.status === 'play'
 
   useEffect(() => {
     if (!timerRunning) return
-    const t = window.setInterval(() => setTick((x) => x + 1), 250)
+    const t = window.setInterval(() => {
+      setGame((g) => {
+        if (g.status !== 'play' || !startRef.current) return g
+        const base = g.elapsedMs + (Date.now() - startRef.current)
+        startRef.current = Date.now()
+        const next: Game = { ...g, elapsedMs: base }
+        host.saveGame(next)
+        return next
+      })
+    }, 250)
     return () => window.clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerRunning])
 
   const elapsedMs =
@@ -147,8 +181,7 @@ export function App() {
       const cell = g.level.cells[idx]
       if (cell.revealed) return g
       if (cell.flagged) return g
-      if (!startRef.current) startRef.current = Date.now()
-      const level = reveal(g.level, r, c)
+      let level = reveal(g.level, r, c)
       const open = level.cells.filter((x) => !x.mine).length
       if (level.revealedCount >= open) {
         level = {
@@ -157,17 +190,20 @@ export function App() {
           cells: level.cells.map((x) => (x.mine ? { ...x, flagged: true } : x)),
         }
       }
-      let finalMs = g.elapsedMs
       let best: number | null = null
+      let base = g.elapsedMs
       if (level.status === 'won' || level.status === 'lost') {
-        finalMs = g.elapsedMs + (Date.now() - startRef.current)
-        startRef.current = 0
+        // game is over: fold the running portion into the stored base and stop
+        if (startRef.current) {
+          base += Date.now() - startRef.current
+          startRef.current = 0
+        }
         if (level.status === 'won') {
-          host.saveBest(finalMs)
-          best = Math.min(host.loadBest(), finalMs)
+          host.saveBest(base)
+          best = Math.min(host.loadBest(), base)
         }
       }
-      const next: Game = { level, status: level.status, elapsedMs: finalMs }
+      const next: Game = { level, status: level.status, elapsedMs: base }
       host.saveGame(next)
       if (best !== null) setBestMs(best)
       return next
@@ -200,11 +236,17 @@ export function App() {
   const mineLeft = Math.max(0, level.mines - countFlags(level))
 
   const boardStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${level.cols}, auto)`,
-    gap: 'calc(3px * var(--sf))',
+    borderCollapse: 'separate',
+    borderSpacing: 'calc(3px * var(--sf))',
     width: 'fit-content',
     margin: '0 auto',
+  }
+
+  const hudStyle: CSSProperties = {
+    fontFamily: 'var(--mono)',
+    fontSize: 'calc(13px * var(--tf))',
+    letterSpacing: '0.4px',
+    color: 'var(--ink)',
   }
 
   const cellStyle = (cell: CellFlat): CSSProperties => {
@@ -277,48 +319,52 @@ export function App() {
               flexWrap: 'wrap',
             }}
           >
-            <MonoLabel>Timer: {fmt(displayMs)}</MonoLabel>
-            <MonoLabel>Mines: {mineLeft}</MonoLabel>
-            <MonoLabel>Best Time: {bestMs > 0 ? fmt(bestMs) : '00:00'}</MonoLabel>
-            {game.status === 'lost' && <MonoLabel accent>Game Over</MonoLabel>}
-            {game.status === 'won' && <MonoLabel accent>You Win</MonoLabel>}
+            <div style={hudStyle}>Timer: {fmt(displayMs)}</div>
+            <div style={hudStyle}>Mines: {mineLeft}</div>
+            <div style={hudStyle}>Best Time: {bestMs > 0 ? fmt(bestMs) : '00:00'}</div>
+            {game.status === 'lost' && <div style={{ ...hudStyle, color: 'var(--danger)' }}>Game Over</div>}
+            {game.status === 'won' && <div style={{ ...hudStyle, color: 'var(--accent)' }}>You Win</div>}
           </div>
 
           <Card>
-            <div role="grid" aria-label={`board, ${level.rows} rows, ${level.cols} columns`} style={boardStyle}>
-              {level.cells.map((cell, i) => {
-                const row = Math.floor(i / level.cols)
-                const col = i % level.cols
-                const pos = `row ${row + 1}, column ${col + 1}`
-                const name = cell.flagged
-                  ? `flagged, ${pos}`
-                  : cell.revealed
-                    ? `revealed, ${cell.mine ? 'mine' : String(cell.adj)}, ${pos}`
-                    : `hidden, ${pos}`
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    role="gridcell"
-                    aria-label={name}
-                    data-row={row}
-                    data-col={col}
-                    data-count={cell.revealed ? String(cell.adj) : undefined}
-                    data-revealed={cell.revealed || undefined}
-                    data-flag={cell.flagged || undefined}
-                    data-mine={cell.mine || undefined}
-                    onClick={() => onLeft(row, col)}
-                    onContextMenu={(e) => {
-                      e.preventDefault()
-                      onRight(row, col)
-                    }}
-                    style={cellStyle(cell)}
-                  >
-                    {cell.revealed ? (cell.mine ? 'X' : String(cell.adj)) : cell.flagged ? '\u{1F1CF}' : ''}
-                  </button>
-                )
-              })}
-            </div>
+            <table role="table" aria-label={`board, ${level.rows} rows, ${level.cols} columns`} style={boardStyle}>
+              <tbody>
+                {Array.from({ length: level.rows }, (_, row) => (
+                  <tr key={row} role="row">
+                    {Array.from({ length: level.cols }, (_, col) => {
+                      const i = row * level.cols + col
+                      const cell = level.cells[i]
+                      const name = cell.flagged
+                        ? `flagged, row ${row + 1}, column ${col + 1}`
+                        : cell.revealed
+                          ? `revealed, ${cell.mine ? 'mine' : String(cell.adj)}, row ${row + 1}, column ${col + 1}`
+                          : `hidden, row ${row}, column ${col}`
+                      return (
+                        <td
+                          key={col}
+                          role="cell"
+                          aria-label={name}
+                          data-row={row}
+                          data-col={col}
+                          data-count={cell.revealed && !cell.mine ? String(cell.adj) : undefined}
+                          data-revealed={cell.revealed ? 'true' : undefined}
+                          data-flag={cell.flagged || undefined}
+                          data-mine={cell.mine || undefined}
+                          onClick={() => onLeft(row, col)}
+                          onContextMenu={(e) => {
+                            e.preventDefault()
+                            onRight(row, col)
+                          }}
+                          style={cellStyle(cell)}
+                        >
+                          {cell.revealed ? (cell.mine ? 'X' : String(cell.adj)) : cell.flagged ? '\u{1F1CF}' : ''}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </Card>
         </Stack>
       </div>
