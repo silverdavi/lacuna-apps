@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "db3ef4ad42bb9a98071a1094f022b0a9ea8121a8fabf7b14c6fa004098896d21",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page displays the heading \"Card Memory Match\", a grid of 16 face-down cards, the text \"Score: 0\", and the text \"Best: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the card in the first row, first column (top-left) reveals the symbol \"A\" and changes its background to white; the text \"Score: 0\" remains unchanged."
+    },
+    {
+      "id": "A3",
+      "text": "With the top-left card (symbol \"A\") already face-up, clicking the card in the first row, second column reveals the symbol \"B\"; since the symbols differ, both cards flip back to face-down after 1 second, and the text \"Score: 0\" remains unchanged."
+    },
+    {
+      "id": "A4",
+      "text": "With the top-left card (symbol \"A\") already face-up, clicking the card in the fourth row, fourth column (bottom-right) reveals the symbol \"A\"; since the symbols match, both cards remain face-up, and the text \"Score: 0\" changes to \"Score: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the top-left card (symbol \"A\") already face-up, clicking the top-left card again does nothing; the card remains face-up showing \"A\", and the text \"Score: 0\" remains unchanged."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Restart\" resets the board to 16 face-down cards, changes the text \"Score: 1\" to \"Score: 0\", and keeps the text \"Best: 1\" unchanged."
+    },
+    {
+      "id": "A7",
+      "text": "Pressing the key \"r\" while the game is active resets the board to 16 face-down cards, changes the text \"Score: 1\" to \"Score: 0\", and keeps the text \"Best: 1\" unchanged."
+    },
+    {
+      "id": "A8",
+      "text": "After matching one pair (Score: 1), reloading the page still shows the text \"Score: 1\", the text \"Best: 1\", and the two matched cards (top-left and bottom-right) remain face-up showing \"A\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after matching one pair (Score: 1, Best: 1) and reloading, the page displays the text \"Best: 1\" and the text \"Score: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4f4c72e567def7a8a8bcf55e0477c5c4b20420d66812af2f6163398dae913c58"
+    }
+  ]
+}
