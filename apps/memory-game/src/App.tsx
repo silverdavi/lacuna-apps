@@ -95,15 +95,16 @@ export function App() {
           <h1 className="mg-heading">Card Memory Match</h1>
           <div className="mg-grid" role="group" aria-label="Memory cards">
             {symbols.map((symbol, i) => {
+              const up = isUp(i)
               return (
                 <button
                   key={i}
                   type="button"
-                  className={`mg-card${isUp(i) ? ' mg-card-up' : ''}`}
-                  aria-pressed={isUp(i)}
+                  className={`mg-card${up ? ' mg-card-up' : ''}`}
+                  aria-label={`Card ${i + 1}`}
                   onClick={() => flip(i)}
                 >
-                  <span className={`mg-symbol${isUp(i) ? '' : ' mg-symbol-hidden'}`}>{symbol}</span>
+                  {up ? symbol : '?'}
                 </button>
               )
             })}

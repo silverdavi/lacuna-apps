@@ -44,17 +44,6 @@
   cursor: default;
 }
 
-.mg-symbol {
-  display: block;
-  font-family: var(--sans);
-  font-size: calc(18px * var(--tf));
-  color: var(--ink);
-}
-
-.mg-symbol.mg-symbol-hidden {
-  color: transparent;
-}
-
 .mg-score {
   display: flex;
   gap: calc(20px * var(--sf));
