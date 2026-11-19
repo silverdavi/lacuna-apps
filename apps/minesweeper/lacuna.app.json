@@ -1,0 +1,73 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.minesweeper",
+  "name": "Minesweeper",
+  "version": "0.1.0",
+  "summary": "A 9x9 minesweeper board with a timer, mine counter, and best time.",
+  "description": "A 9 by 9 board with 10 mines. Left-click reveals, right-click flags. Clear every safe cell to win. The timer starts on the first move, the mine count drops as you flag, and the best win time is kept on this device.",
+  "category": "personal",
+  "tags": ["minesweeper", "puzzle", "arcade"],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/minesweeper",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:minesweeper"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "minesweeper",
+        "access": ["read", "write", "create"],
+        "purpose": "Own Minesweeper records"
+      }
+    ],
+    "platform": ["identity.profile.read", "files.pick", "files.save"],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": ["any"]
+    }
+  },
+  "sharing": {
+    "owns": ["minesweeper"],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

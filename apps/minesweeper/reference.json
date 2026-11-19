@@ -1,0 +1,19 @@
+{
+  "repo": "antfu/vue-minesweeper",
+  "url": "https://github.com/antfu/vue-minesweeper",
+  "sha": "46214fc89a7e361494ce08e60bc9a2ada824ba6e",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2020-PRESENT Anthony Fu"
+  ],
+  "files": [
+    "src/components/Confetti.vue",
+    "src/components/MineBlock.vue",
+    "src/composables/logic.ts",
+    "src/main.ts",
+    "src/pages/index.vue"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "62568cdd75e6d37e251b647ab5547e39752617033b633f58ae61125037bde1bb"
+}

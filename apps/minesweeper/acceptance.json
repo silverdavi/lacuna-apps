@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c2137e4d0e9ff46a234bc45efc9fabbbf3c6efaf0911553b49757f37ca1a41a7",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page displays the heading \"Minesweeper Game\", a button labelled \"New Game\", a timer display showing \"00:00\", and a mine counter showing \"Mines: 10\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New Game\" generates a 9x9 grid of 81 cells, all initially hidden, and the timer starts counting up from \"00:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking a safe cell that has no adjacent mines reveals the cell with an empty background and automatically reveals all adjacent safe cells in a flood fill, showing the text \"0\" on cells with no adjacent mines."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking a safe cell with exactly three adjacent mines reveals the cell with the text \"3\" and a red color, while adjacent hidden cells remain hidden."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking a cell containing a mine reveals the mine icon, turns the cell background red, stops the timer, and displays the text \"Game Over\" below the grid."
+    },
+    {
+      "id": "A6",
+      "text": "After a \"Game Over\", clicking any other cell in the grid does not change the revealed state of that cell or the timer."
+    },
+    {
+      "id": "A7",
+      "text": "When all non-mine cells are revealed, the app displays the text \"You Win\", stops the timer, and updates the \"Best Time\" display to the current timer value if it is lower than the previous best."
+    },
+    {
+      "id": "A8",
+      "text": "Right-clicking a safe cell toggles a flag icon on that cell, and the mine counter decreases by 1 (e.g., from \"Mines: 10\" to \"Mines: 9\")."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current game state: if a game is in progress with 5 cells revealed and the timer at \"00:05\", reloading the page restores the grid with those 5 cells revealed, the timer at \"00:05\", and the same mine count."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d543b5133cacb65c2473db857f1fe4323ff1d4a828665b738a41d4e3749dfe87"
+    }
+  ]
+}
