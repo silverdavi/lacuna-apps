@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "30dee6e82963667139055561060e9215b1cf6fe1286e18b2452b5ec63c569f45",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page displays the heading \"Typing Test\", a button labelled \"Start Test\", and the text \"No test in progress\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Start Test\" displays a text area labelled \"Passage\" containing the exact text \"The quick brown fox jumps over the lazy dog\", a text area labelled \"Input\", and a timer displaying \"00:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"The quick\" into the field labelled \"Input\" highlights the first 9 characters of the passage in green and the remaining characters in grey."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"The quik\" into the field labelled \"Input\" highlights the first 8 characters of the passage in red and the remaining characters in grey."
+    },
+    {
+      "id": "A5",
+      "text": "After typing the full passage \"The quick brown fox jumps over the lazy dog\" correctly, the timer stops, and the page displays \"WPM: 12.0\" and \"Accuracy: 100.0%\"."
+    },
+    {
+      "id": "A6",
+      "text": "After a test completes with a score of \"WPM: 12.0\", clicking the button \"Restart\" clears the \"Input\" field, resets the timer to \"00:00\", and displays a new passage in the \"Passage\" field."
+    },
+    {
+      "id": "A7",
+      "text": "If the user types \"The quick brown fox jumps over the lazy dog\" with one typo (e.g., \"The quikc...\"), the final result shows \"Accuracy: 95.8%\" (calculated as correct characters / total characters * 100, rounded to one decimal)."
+    },
+    {
+      "id": "A8",
+      "text": "The button \"Pause\" stops the timer. Clicking \"Resume\" continues the timer from the paused time."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score. After completing a test with \"WPM: 15.0\", reloading the page displays \"Best WPM: 15.0\" below the heading."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1c3b3c12a6da84d8d479fe53470081962d86c57427fec31dd715fa0c4edeb90c"
+    }
+  ]
+}
