@@ -1,6 +1,6 @@
-import { store, type SavedGame } from './mock'
+import { store, type Direction, type SavedGame } from './mock'
 
-export type { SavedGame }
+export type { Direction, SavedGame }
 
 export const host = {
   loadGame(): SavedGame {

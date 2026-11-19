@@ -74,7 +74,8 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts"
+      "tests/acceptance.spec.ts",
+      "tests/probe.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,

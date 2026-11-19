@@ -1,5 +1,7 @@
 export const SIZE = 4
 
+export type Direction = 'up' | 'down' | 'left' | 'right'
+
 export interface SavedGame {
   score: number
   best: number
