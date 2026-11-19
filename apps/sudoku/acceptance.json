@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4f016cb8ebf65bfad6b48e22994d84f3b5e9e24378997d9428bc73b3865b4664",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page displays the heading \"Sudoku Puzzle\", a select labelled \"Difficulty\" with \"Easy\" selected, a button labelled \"New Game\", and a timer display showing \"00:00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New Game\" generates a new board where the first cell (row 1, column 1) contains a non-zero digit, and the timer resets to \"00:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "With a new game active, clicking the cell at row 1, column 1 (which contains a pre-filled digit) and then clicking the button \"1\" does not change the cell's value, as pre-filled cells are locked."
+    },
+    {
+      "id": "A4",
+      "text": "With a new game active, clicking an empty cell at row 1, column 2 and then clicking the button \"5\" changes that cell's text to \"5\"."
+    },
+    {
+      "id": "A5",
+      "text": "After entering a valid number in an empty cell, the timer display updates to show a non-zero value, such as \"00:01\" after one second has passed."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the select labelled \"Difficulty\" and choosing \"Hard\" then clicking \"New Game\" generates a board with fewer pre-filled digits than the \"Easy\" board, specifically at least 30 empty cells."
+    },
+    {
+      "id": "A7",
+      "text": "When all 81 cells contain valid digits 1-9 with no duplicates in any row, column, or 3x3 box, the page displays the text \"Puzzle Solved\" and the timer stops updating."
+    },
+    {
+      "id": "A8",
+      "text": "If a user enters a digit that creates a duplicate in the same row, the cell border turns red and the text \"Invalid move\" appears below the grid."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current board state: after entering \"5\" in row 1, column 2 and reloading the page, the cell at row 1, column 2 still displays \"5\" and the timer continues from the last saved value."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4e64351ac20951e975e9df40f47c3bd6f90956534f6310f5daafbb8fae114968"
+    }
+  ]
+}
