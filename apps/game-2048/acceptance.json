@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "586b792ecff46c992cd5ff35fdd193a239dd4abc6d848ff12aa359a2eb0ab146",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page shows the heading \"2048 Game\", a 4x4 grid with exactly two tiles containing the value \"2\", a score display showing \"Score: 0\", and a best score display showing \"Best: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "With a board containing a single \"2\" tile in the top-left corner and empty cells elsewhere, pressing the ArrowRight key moves that tile to the top-right corner, and the score remains \"Score: 0\"."
+    },
+    {
+      "id": "A3",
+      "text": "With a board containing a \"2\" tile in the top-left and a \"2\" tile in the top-right, pressing the ArrowRight key merges them into a single \"4\" tile in the top-right corner, and the score display updates to \"Score: 4\"."
+    },
+    {
+      "id": "A4",
+      "text": "With a board containing a \"4\" tile in the top-left and a \"2\" tile in the top-right, pressing the ArrowRight key moves the \"2\" to the top-middle and the \"4\" to the top-right, with no merge occurring and the score remaining unchanged."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labeled \"New Game\" resets the board to a fresh state with exactly two \"2\" tiles, resets the score to \"Score: 0\", and preserves the previous best score value in the \"Best\" display."
+    },
+    {
+      "id": "A6",
+      "text": "When the board is full and no merges are possible, the page displays the text \"Game Over\" and the button labeled \"New Game\" remains clickable."
+    },
+    {
+      "id": "A7",
+      "text": "When a tile with the value \"2048\" is created on the board, the page displays the text \"You Win!\" and the button labeled \"Keep Going\" appears, allowing the player to continue playing."
+    },
+    {
+      "id": "A8",
+      "text": "Pressing the ArrowUp key on a board with a \"2\" in the bottom-left moves it to the top-left, and pressing ArrowDown moves it back to the bottom-left, with the score remaining \"Score: 0\" throughout."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current board state, score, and best score: after making a move that results in \"Score: 4\", reloading the page still shows the merged \"4\" tile and \"Score: 4\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "84c7c4d2ec6338e9d5896d12e1b3a2a71962322d790305677113fc038f738c6c"
+    }
+  ]
+}
