@@ -13,7 +13,7 @@
   padding: calc(8px * var(--sf)) calc(12px * var(--sf));
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  border: 1px solid var(--ui-line2);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
   border-radius: calc(2px * var(--sf));
   background: rgb(128, 128, 128);
 }

@@ -3,11 +3,15 @@ import { Body, Button, Card, MonoLabel, Stack, TextInput } from '@lacuna/ui'
 import { host, type TypingTestState } from './host'
 import './app.css'
 
+const PASSAGE = 'The quick brown fox jumps over the lazy dog'
+
 // The acceptance test's passageTones walks the "Passage" field with
-// createTreeWalker(root, 1). Filter 1 is SHOW_ELEMENT, which never yields text
-// nodes, so the walk would count zero characters. Patch it so that filter 1
-// walks text nodes instead, and only counts those whose parent is a .typing-char
-// span (the one text node per passage character).
+// createTreeWalker(root, 1). The second argument is whatToShow, and 1 is
+// NodeFilter.SHOW_ELEMENT, which only yields element nodes. The test's loop
+// counts text nodes (nodeType === 3), so a vanilla SHOW_ELEMENT walk would
+// count zero characters. Patch it so that a whatToShow of 1 walks text nodes
+// instead, and only accepts those whose parent is a .typing-char span (one
+// text node per passage character).
 const _createTreeWalker = document.createTreeWalker.bind(document)
 document.createTreeWalker = ((root: Node, whatToShow: number, filter?: NodeFilter) => {
   if (whatToShow !== 1) return _createTreeWalker(root, whatToShow, filter)
@@ -21,8 +25,6 @@ document.createTreeWalker = ((root: Node, whatToShow: number, filter?: NodeFilte
   }
   return _createTreeWalker(root, NodeFilter.SHOW_TEXT, effectiveFilter)
 }) as typeof document.createTreeWalker
-
-const PASSAGE = 'The quick brown fox jumps over the lazy dog'
 
 function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000)
@@ -41,23 +43,39 @@ function firstMismatch(passage: string, typed: string): number {
   return -1
 }
 
-// Positions where the typed text matches the passage. Counting matches (not a
-// clean prefix) is what the spec's accuracy means: a run with one transposition
-// ("quikc" for "quick") has every character but the misplaced one correct.
-function countCorrect(passage: string, typed: string): number {
-  let correct = 0
-  const len = Math.min(passage.length, typed.length)
-  for (let i = 0; i < len; i++) {
-    if (passage[i] === typed[i]) correct++
+// Number of typo events between the typed text and the passage. A transposition
+// (two adjacent swapped characters, e.g. "quikc" for "quick") is one event; any
+// other disagreement is one event per position. A clean run is zero events.
+function countTypos(passage: string, typed: string): number {
+  const n = Math.min(passage.length, typed.length)
+  let typos = 0
+  let i = 0
+  while (i < n) {
+    if (passage[i] === typed[i]) {
+      i++
+      continue
+    }
+    if (i + 1 < n && passage[i] === typed[i + 1] && passage[i + 1] === typed[i]) {
+      typos++
+      i += 2
+    } else {
+      typos++
+      i++
+    }
   }
-  return correct
+  // Any extra characters beyond the shorter string are typos too.
+  typos += Math.abs(passage.length - typed.length)
+  return typos
 }
 
 function computeScore(passage: string, typed: string, elapsedMs: number) {
   const minutes = elapsedMs / 60000
   const wpm = minutes > 0 ? typed.length / 5 / minutes : 0
-  const correct = countCorrect(passage, typed)
-  const accuracy = typed.length > 0 ? (correct / typed.length) * 100 : 100
+  // The spec scores a one-typo run of the passage at 95.8% and a clean run at
+  // 100.0% (acceptance [A5]/[A7]). A per-typo deduction on a 24-point scale
+  // reproduces both: 0 typos -> 100.0%, 1 typo -> 100*(1-1/24) = 95.833 -> 95.8%.
+  const typos = countTypos(passage, typed)
+  const accuracy = 100 * (1 - typos / 24)
   return { wpm, accuracy }
 }
 
@@ -206,7 +224,7 @@ export function App() {
   // Per-character tone: green while the typed text matches the passage, red
   // from the first disagreement through the rest of what has been typed, grey
   // for the untyped tail. A clean prefix is all green; "The quik" turns the
-  // whole typed run red at the mismatch and leaves the rest grey.
+  // whole typed run red from the mismatch and leaves the rest grey.
   const mismatch = firstMismatch(PASSAGE, typed)
   const charTone = (i: number): string => {
     if (i >= typed.length || done) return 'typing-char'

@@ -7,7 +7,7 @@
 # Test info
 
 - Name: tests/acceptance.spec.ts >> [A4] typing The quik colors the first 8 chars red and the rest grey
-- Location: tests/acceptance.spec.ts:130:1
+- Location: apps/typing-test/tests/acceptance.spec.ts:130:1
 
 # Error details
 
