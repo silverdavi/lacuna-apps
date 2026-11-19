@@ -6,9 +6,6 @@
 }
 
 .sud-diff {
-  display: flex;
-  align-items: center;
-  gap: calc(8px * var(--sf));
   color: var(--ink);
   font-size: calc(14px * var(--tf));
 }
@@ -17,7 +14,7 @@
   font: inherit;
   color: var(--ink);
   background: var(--ui-bg);
-  border: 1px solid var(--hair-strong);
+  border: calc(1px * var(--sf)) solid var(--hair-strong);
   border-radius: calc(4px * var(--sf));
   padding: calc(4px * var(--sf)) calc(8px * var(--sf));
 }
@@ -36,7 +33,7 @@
   width: 100%;
   max-width: calc(460px * var(--sf));
   aspect-ratio: 1;
-  border: 1px solid var(--hair-strong);
+  border: calc(1px * var(--sf)) solid var(--hair-strong);
 }
 
 .sud-row {
@@ -50,8 +47,8 @@
   font-family: var(--mono);
   font-size: calc(15px * var(--tf));
   color: var(--ink);
-  border-left: 1px solid var(--mute);
-  border-top: 1px solid var(--mute);
+  border-left: calc(1px * var(--sf)) solid var(--mute);
+  border-top: calc(1px * var(--sf)) solid var(--mute);
   cursor: pointer;
   user-select: none;
 }
@@ -61,13 +58,13 @@
 }
 
 .sud-cell:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
 }
 
 .sud-cell--bold {
-  border-left: 2px solid var(--hair-strong);
-  border-top: 2px solid var(--hair-strong);
+  border-left: calc(2px * var(--sf)) solid var(--hair-strong);
+  border-top: calc(2px * var(--sf)) solid var(--hair-strong);
 }
 
 .sud-cell--selected {
@@ -80,8 +77,8 @@
 }
 
 .sud-cell--invalid {
-  border-color: rgb(230, 30, 30);
-  border-width: 2px;
+  border-color: var(--danger);
+  border-width: calc(2px * var(--sf));
 }
 
 .sud-digits {

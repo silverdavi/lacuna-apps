@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "4f016cb8ebf65bfad6b48e22994d84f3b5e9e24378997d9428bc73b3865b4664",
+  "spec_sha256": "70eb406d26a1fd6571be3cac8dde785af01ed71dc65c4429a871f306d2d9d738",
   "checks": [
     {
       "id": "A1",
-      "text": "On initial load, the page displays the heading \"Sudoku Puzzle\", a select labelled \"Difficulty\" with \"Easy\" selected, a button labelled \"New Game\", and a timer display showing \"00:00\"."
+      "text": "On load, the page shows the heading \"Sudoku Puzzle\", the select \"Difficulty\" with \"Easy\" selected, the button \"New Game\", and the timer \"Time\" reading \"00:00\"."
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"New Game\" generates a new board where the first cell (row 1, column 1) contains a non-zero digit, and the timer resets to \"00:00\"."
+      "text": "Selecting \"Practice\" and clicking \"New Game\" shows \"1\" in \"Row 1, Column 1\", an empty \"Row 1, Column 2\", and the timer \"00:00\"."
     },
     {
       "id": "A3",
-      "text": "With a new game active, clicking the cell at row 1, column 1 (which contains a pre-filled digit) and then clicking the button \"1\" does not change the cell's value, as pre-filled cells are locked."
+      "text": "In a Practice game, clicking \"Row 1, Column 1\" then the button \"5\" leaves its text \"1\"."
     },
     {
       "id": "A4",
-      "text": "With a new game active, clicking an empty cell at row 1, column 2 and then clicking the button \"5\" changes that cell's text to \"5\"."
+      "text": "In a Practice game, clicking \"Row 1, Column 2\" then the button \"2\" makes its text \"2\"."
     },
     {
       "id": "A5",
-      "text": "After entering a valid number in an empty cell, the timer display updates to show a non-zero value, such as \"00:01\" after one second has passed."
+      "text": "In a Practice game with the clock paused, after `fastForward(1000)` the timer reads \"00:01\", and after another `fastForward(2000)` it reads \"00:03\"."
     },
     {
       "id": "A6",
-      "text": "Clicking the select labelled \"Difficulty\" and choosing \"Hard\" then clicking \"New Game\" generates a board with fewer pre-filled digits than the \"Easy\" board, specifically at least 30 empty cells."
+      "text": "Selecting \"Hard\" and clicking \"New Game\" gives at least 30 gridcells with empty text."
     },
     {
       "id": "A7",
-      "text": "When all 81 cells contain valid digits 1-9 with no duplicates in any row, column, or 3x3 box, the page displays the text \"Puzzle Solved\" and the timer stops updating."
+      "text": "In a Practice game with the clock paused, entering 2 in Row 1 Column 2, 8 in Row 2 Column 5, 9 in Row 5 Column 5 and 8 in Row 9 Column 9 shows \"Puzzle Solved\"; the timer text then stays the same after `fastForward(5000)`."
     },
     {
       "id": "A8",
-      "text": "If a user enters a digit that creates a duplicate in the same row, the cell border turns red and the text \"Invalid move\" appears below the grid."
+      "text": "In a Practice game, entering 1 in \"Row 1, Column 2\" gives that cell `aria-invalid=\"true\"` and shows the text \"Invalid move\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the current board state: after entering \"5\" in row 1, column 2 and reloading the page, the cell at row 1, column 2 still displays \"5\" and the timer continues from the last saved value."
+      "text": "Reload keeps the board: in a Practice game, after entering 2 in \"Row 1, Column 2\" and reloading, that cell reads \"2\" and \"Row 2, Column 5\" is still empty."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "4e64351ac20951e975e9df40f47c3bd6f90956534f6310f5daafbb8fae114968"
+      "sha256": "e5186f509b6a976c209850dcb757fd0e03ba740c66d9e6c9f6680aa49b41e37c"
     }
   ]
 }

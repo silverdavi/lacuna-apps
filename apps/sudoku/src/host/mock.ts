@@ -1,6 +1,6 @@
 const KEY = 'lacuna.sudoku.save'
 
-export type Difficulty = 'Easy' | 'Medium' | 'Hard'
+export type Difficulty = 'Practice' | 'Easy' | 'Hard'
 
 export interface PuzzleRecord {
   id: string
