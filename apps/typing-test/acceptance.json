@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "30dee6e82963667139055561060e9215b1cf6fe1286e18b2452b5ec63c569f45",
+  "spec_sha256": "80592895f36c8f23d3428036d7b4c137d14eee616b4f7686594db826837d5270",
   "checks": [
     {
       "id": "A1",
-      "text": "On initial load, the page displays the heading \"Typing Test\", a button labelled \"Start Test\", and the text \"No test in progress\"."
+      "text": "On load, the page shows the heading \"Typing Test\", the button \"Start Test\", and the text \"No test in progress\"."
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"Start Test\" displays a text area labelled \"Passage\" containing the exact text \"The quick brown fox jumps over the lazy dog\", a text area labelled \"Input\", and a timer displaying \"00:00\"."
+      "text": "Clicking \"Start Test\" shows the passage \"The quick brown fox jumps over the lazy dog\", an empty textarea \"Input\", and the timer reading \"00:00\"."
     },
     {
       "id": "A3",
-      "text": "Typing \"The quick\" into the field labelled \"Input\" highlights the first 9 characters of the passage in green and the remaining characters in grey."
+      "text": "After \"Start Test\", filling \"Input\" with \"The quick\" shows the text \"Correct: 9 / 43\"."
     },
     {
       "id": "A4",
-      "text": "Typing \"The quik\" into the field labelled \"Input\" highlights the first 8 characters of the passage in red and the remaining characters in grey."
+      "text": "After \"Start Test\", filling \"Input\" with \"The quik\" shows the text \"Correct: 7 / 43\"."
     },
     {
       "id": "A5",
-      "text": "After typing the full passage \"The quick brown fox jumps over the lazy dog\" correctly, the timer stops, and the page displays \"WPM: 12.0\" and \"Accuracy: 100.0%\"."
+      "text": "With the clock paused, after \"Start Test\", filling \"Input\" with \"The quick brown fox jumps over the lazy do\", calling `fastForward(45000)` and pressing \"g\" in \"Input\" shows \"WPM: 12.0\", \"Accuracy: 100.0%\" and the timer \"00:45\"; after another `fastForward(5000)` the timer still reads \"00:45\"."
     },
     {
       "id": "A6",
-      "text": "After a test completes with a score of \"WPM: 12.0\", clicking the button \"Restart\" clears the \"Input\" field, resets the timer to \"00:00\", and displays a new passage in the \"Passage\" field."
+      "text": "After finishing as in A5, clicking \"Restart\" empties \"Input\", shows the timer \"00:00\", the passage \"The quick brown fox jumps over the lazy dog\", and no text \"WPM: 12.0\"."
     },
     {
       "id": "A7",
-      "text": "If the user types \"The quick brown fox jumps over the lazy dog\" with one typo (e.g., \"The quikc...\"), the final result shows \"Accuracy: 95.8%\" (calculated as correct characters / total characters * 100, rounded to one decimal)."
+      "text": "With the clock paused, after \"Start Test\", filling \"Input\" with \"The quikc brown fox jumps over the lazy do\", calling `fastForward(45000)` and pressing \"g\" shows \"Accuracy: 95.3%\" and \"WPM: 12.0\"."
     },
     {
       "id": "A8",
-      "text": "The button \"Pause\" stops the timer. Clicking \"Resume\" continues the timer from the paused time."
+      "text": "With the clock paused, after \"Start Test\" and `fastForward(3000)` the timer reads \"00:03\"; after clicking \"Pause\" and `fastForward(5000)` it still reads \"00:03\"; after clicking \"Resume\" and `fastForward(2000)` it reads \"00:05\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the best score. After completing a test with \"WPM: 15.0\", reloading the page displays \"Best WPM: 15.0\" below the heading."
+      "text": "Reload keeps the best score: after finishing as in A5 and reloading, the page shows the text \"Best WPM: 12.0\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "1c3b3c12a6da84d8d479fe53470081962d86c57427fec31dd715fa0c4edeb90c"
+      "sha256": "f67c5f60efb94314b035867b2e83aa025aaca97c23e9b415825b98386e975136"
     }
   ]
 }

@@ -48,10 +48,9 @@
         "kind": "test",
         "access": [
           "read",
-          "write",
           "create"
         ],
-        "purpose": "Store the current test passage and the best score"
+        "purpose": "Create a typing test and record its score and best WPM"
       }
     ],
     "platform": [
@@ -76,7 +75,8 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts"
+      "tests/acceptance.spec.ts",
+      "tests/typing.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
