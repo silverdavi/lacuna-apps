@@ -1,0 +1,200 @@
+.ice-app {
+  display: flex;
+  flex-direction: column;
+  gap: calc(12px * var(--sf));
+  min-height: 100%;
+}
+
+.ice-canvas {
+  display: none;
+}
+
+.ice-file {
+  display: none;
+}
+
+.ice-over {
+  display: flex;
+  flex-direction: column;
+  gap: calc(12px * var(--sf));
+}
+
+.ice-h1 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.ice-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(16px * var(--sf));
+  flex-wrap: wrap;
+}
+
+.ice-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(10px * var(--sf));
+  padding: calc(28px * var(--sf)) calc(18px * var(--sf));
+  border: 1px dashed var(--soft);
+  border-radius: calc(6px * var(--sf));
+  background: var(--ui-card);
+  text-align: center;
+}
+
+.ice-drop-empty {
+  border-color: var(--soft);
+}
+
+.ice-drop-over {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.ice-draghint {
+  font-size: calc(15px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+  cursor: grab;
+  user-select: none;
+}
+
+.ice-draghint:active {
+  cursor: grabbing;
+}
+
+.ice-dropdetail {
+  font-size: calc(12px * var(--tf));
+  color: var(--mid);
+}
+
+.ice-error {
+  border-color: var(--danger);
+}
+
+.ice-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(10px * var(--sf));
+}
+
+.ice-label {
+  font-size: calc(12px * var(--tf));
+  color: var(--mid);
+}
+
+.ice-controls input[type='range'] {
+  accent-color: var(--accent);
+  width: calc(140px * var(--sf));
+}
+
+.ice-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(96px * var(--sf)), 1fr));
+  gap: calc(8px * var(--sf));
+}
+
+.ice-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: calc(2px * var(--sf));
+  width: 100%;
+  height: calc(64px * var(--sf));
+  padding: calc(6px * var(--sf));
+  border: 1px solid var(--ui-line2);
+  border-radius: calc(5px * var(--sf));
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.ice-swatch-on {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.ice-swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.ice-swatch-name {
+  font-size: calc(12px * var(--tf));
+  color: var(--on-accent);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ice-swatch-copy {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--on-accent);
+  opacity: 0.85;
+}
+
+.ice-detail-row {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
+
+.ice-detail-chip {
+  width: calc(48px * var(--sf));
+  height: calc(48px * var(--sf));
+  border-radius: calc(5px * var(--sf));
+  border: 1px solid var(--ui-line2);
+  flex: none;
+}
+
+.ice-rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.ice-row {
+  display: flex;
+  align-items: baseline;
+  gap: calc(12px * var(--sf));
+}
+
+.ice-row > .lc-mono {
+  flex: none;
+  width: calc(56px * var(--sf));
+}
+
+.ice-mono {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.ice-copybtn {
+  font: inherit;
+  font-size: calc(12px * var(--tf));
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: calc(4px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(8px * var(--sf));
+  cursor: pointer;
+}
+
+.ice-copybtn:hover {
+  background: var(--accent-soft);
+}
+
+.ice-copybtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
