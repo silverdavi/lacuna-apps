@@ -1,0 +1,118 @@
+.dm-shell {
+  padding: calc(24px * var(--sf));
+}
+
+.dm-card {
+  max-width: calc(680px * var(--sf));
+}
+
+.dm-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: calc(22px * var(--tf));
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.dm-grid {
+  display: grid;
+  width: 100%;
+}
+
+.dm-grid [role='row'] {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: calc(3px * var(--sf));
+  width: 100%;
+}
+
+.dm-td {
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--ui-card);
+  transition: background 80ms linear, border-color 80ms linear;
+  height: calc(28px * var(--sf));
+  overflow: hidden;
+}
+
+.dm-cell-btn {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dm-cell-on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.dm-td:not(.dm-cell-on):hover {
+  background: var(--paper-deep);
+}
+
+.dm-cell-btn:focus {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(-2px * var(--sf));
+}
+
+.dm-readout {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  letter-spacing: 0.04em;
+  color: var(--ink-80);
+  min-height: calc(1.5em);
+}
+
+.dm-sep {
+  margin: 0 calc(6px * var(--sf));
+  color: var(--ink-40);
+}
+
+.dm-tempo-label {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+}
+
+.dm-tempo-input {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+  background: var(--ui-card);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: 2px;
+  padding: calc(6px * var(--sf)) calc(9px * var(--sf));
+  width: calc(72px * var(--sf));
+}
+
+.dm-tempo-input:focus {
+  outline: none;
+  border-color: var(--mid);
+}
+
+.dm-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(7px * var(--sf));
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  border-radius: 2px;
+  padding: calc(8px * var(--sf)) calc(18px * var(--sf));
+  cursor: pointer;
+  border: 1px solid var(--ui-line2);
+  background: var(--ui-card);
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.dm-play-btn:hover {
+  border-color: var(--hair-strong);
+}

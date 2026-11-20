@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a91711af7c19ce3aa99aa0bb0ba235783a70f9839eec66d0f7c9df2815d75a56",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page shows the heading \"Drum Machine\", a grid of 16 cells in a single row, the text \"Tempo: 120\", and the button \"Play\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the cell labelled \"Step 1\" changes its background to a filled state and shows the text \"Pattern: 1\" below the grid."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the cell labelled \"Step 5\" changes its background to a filled state and updates the text to \"Pattern: 1, 5\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the cell labelled \"Step 1\" again removes the fill and updates the text to \"Pattern: 5\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"140\" in the field labelled \"Tempo\" and pressing Enter updates the text to \"Tempo: 140\"."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Step 1\" and \"Step 5\" active, clicking the button \"Play\" changes the button text to \"Stop\" and starts the audio loop; after 2 seconds, clicking \"Stop\" changes the button text back to \"Play\"."
+    },
+    {
+      "id": "A7",
+      "text": "Pressing the key \"1\" while the grid has focus activates the cell labelled \"Step 1\" and shows \"Pattern: 1\"."
+    },
+    {
+      "id": "A8",
+      "text": "Pressing the key \"5\" while the grid has focus activates the cell labelled \"Step 5\" and shows \"Pattern: 1, 5\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the pattern: with \"Step 1\" and \"Step 5\" active and Tempo \"140\", reloading the page still shows \"Tempo: 140\" and \"Pattern: 1, 5\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "680b6961093955adafee50e49ee29974836ef74f6b5f6ea2ab9286ffc58f85d2"
+    }
+  ]
+}
