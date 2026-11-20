@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d8d6f6b40626263d617225c41e2eb18d5b8d6b8e17a95dfbd1f6ffd474f321c6",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no image loaded, the page shows the heading \"Image Flipper\", the text \"Drop an image or click to browse\", and the buttons \"Flip H\", \"Flip V\", \"Rotate 90\u00b0\", and \"Download\" are all disabled."
+    },
+    {
+      "id": "A2",
+      "text": "After dropping a 100x50 PNG file named \"test.png\" into the drop zone, the preview canvas displays the image, the status text shows \"Loaded: test.png\", and the buttons \"Flip H\", \"Flip V\", \"Rotate 90\u00b0\", and \"Download\" are all enabled."
+    },
+    {
+      "id": "A3",
+      "text": "After loading a 100x50 image, clicking the button \"Flip H\" once updates the status text to \"Loaded: test.png (Flipped H)\" and the preview canvas shows the image mirrored horizontally."
+    },
+    {
+      "id": "A4",
+      "text": "After loading a 100x50 image, clicking the button \"Flip V\" once updates the status text to \"Loaded: test.png (Flipped V)\" and the preview canvas shows the image mirrored vertically."
+    },
+    {
+      "id": "A5",
+      "text": "After loading a 100x50 image, clicking the button \"Rotate 90\u00b0\" once updates the status text to \"Loaded: test.png (Rotated 90\u00b0)\" and the preview canvas shows the image rotated 90 degrees clockwise, with the canvas dimensions now 50x100."
+    },
+    {
+      "id": "A6",
+      "text": "After loading a 100x50 image, clicking \"Flip H\" then \"Rotate 90\u00b0\" updates the status text to \"Loaded: test.png (Flipped H, Rotated 90\u00b0)\" and the preview canvas shows the image both flipped horizontally and rotated 90 degrees clockwise."
+    },
+    {
+      "id": "A7",
+      "text": "After loading a 100x50 image and applying \"Flip H\", clicking the button \"Download\" triggers a file download named \"test_flipped.png\" and the status text remains \"Loaded: test.png (Flipped H)\"."
+    },
+    {
+      "id": "A8",
+      "text": "After loading a 100x50 image, clicking \"Rotate 90\u00b0\" four times returns the status text to \"Loaded: test.png\" and the preview canvas shows the original image orientation with dimensions 100x50."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the loaded image and its transformations: after loading \"test.png\" and clicking \"Flip H\", reloading the page still shows the status text \"Loaded: test.png (Flipped H)\" and the preview canvas displays the horizontally flipped image."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8fd70a76bf81a5e01b3847b62725bdd0a69caeb99e1f18b6c66ea1f8ba46c842"
+    }
+  ]
+}
