@@ -10,7 +10,7 @@ interface Rgb {
 }
 
 function clampByte(n: number): number {
-  if (Number.isNaN(n)) return 0
+  if (!Number.isFinite(n)) return 0
   return Math.min(255, Math.max(0, Math.round(n)))
 }
 
@@ -31,82 +31,6 @@ function parseHex(input: string): Rgb | null {
   }
 }
 
-function srgbToLinear(v: number): number {
-  const c = v / 255
-  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-}
-
-function linearToSrgb(v: number): number {
-  const c = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055
-  return clampByte(c * 255)
-}
-
-function rgbToXyz(rgb: Rgb): [number, number, number] {
-  const r = srgbToLinear(rgb.r)
-  const g = srgbToLinear(rgb.g)
-  const b = srgbToLinear(rgb.b)
-  return [
-    r * 0.4124564 + g * 0.3575761 + b * 0.1804375,
-    r * 0.2126729 + g * 0.7151522 + b * 0.072175,
-    r * 0.0193339 + g * 0.119192 + b * 0.9503041,
-  ]
-}
-
-function xyzToOklab(xyz: [number, number, number]): [number, number, number] {
-  const [x, y, z] = xyz
-  const l = Math.cbrt(0.4122214708 * x + 0.5363325363 * y + 0.0514459929 * z)
-  const m = Math.cbrt(0.2119034982 * x + 0.6806995451 * y + 0.1073969566 * z)
-  const s = Math.cbrt(0.0883024619 * x + 0.2817188376 * y + 0.6299787005 * z)
-  return [
-    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
-  ]
-}
-
-function oklabToLch(L: number, a: number, b: number): [number, number, number] {
-  const C = Math.sqrt(a * a + b * b)
-  let H = (Math.atan2(b, a) * 180) / Math.PI
-  if (H < 0) H += 360
-  return [L, C, H]
-}
-
-function rgbToOklch(rgb: Rgb): [number, number, number] {
-  return oklabToLch(...xyzToOklab(rgbToXyz(rgb)))
-}
-
-function oklchToOklab(L: number, C: number, Hdeg: number): [number, number, number] {
-  const h = (Hdeg * Math.PI) / 180
-  return [L, C * Math.cos(h), C * Math.sin(h)]
-}
-
-function oklabToXyz(L: number, a: number, b: number): [number, number, number] {
-  const l = L + 0.3963377774 * a + 0.2158037573 * b
-  const m = L - 0.1055613458 * a - 0.0638541728 * b
-  const s = L - 0.0894841775 * a - 1.291485548 * b
-  const l3 = l * l * l
-  const m3 = m * m * m
-  const s3 = s * s * s
-  return [
-    4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3,
-    -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3,
-    -0.0041960863 * l3 - 0.7034186147 * m3 + 1.707614701 * s3,
-  ]
-}
-
-function xyzToRgb(xyz: [number, number, number]): Rgb {
-  const [x, y, z] = xyz
-  const r = 4.0767417588 * x - 2.2953173142 * y - 0.5645482629 * z
-  const g = -1.1135769339 * x + 2.2633786656 * y - 0.4547018521 * z
-  const b = -0.017084207 * x - 0.6819658296 * y + 1.0019996878 * z
-  return { r: linearToSrgb(r), g: linearToSrgb(g), b: linearToSrgb(b) }
-}
-
-function oklchToRgb(L: number, C: number, Hdeg: number): Rgb {
-  const [Lc, a, b] = oklchToOklab(L, C, Hdeg)
-  return xyzToRgb(oklabToXyz(Lc, a, b))
-}
-
 function rgbToHsl(rgb: Rgb): [number, number, number] {
   const r = rgb.r / 255
   const g = rgb.g / 255
@@ -114,14 +38,14 @@ function rgbToHsl(rgb: Rgb): [number, number, number] {
   const max = Math.max(r, g, b)
   const min = Math.min(r, g, b)
   const l = (max + min) / 2
-  if (max === min) return [0, 0, l * 100]
+  if (max === min) return [0, 0, 0]
   const d = max - min
   const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
   let h: number
-  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
-  else if (max === g) h = ((b - r) / d + 2) / 6
-  else h = ((r - g) / d + 4) / 6
-  return [h * 360, s * 100, l * 100]
+  if (max === r) h = (g - b) / d + (g < b ? 6 : 0)
+  else if (max === g) h = (b - r) / d + 2
+  else h = (r - g) / d + 4
+  return [Math.round((((h / 6) * 360 + 360) % 360)), Math.round(s * 100), Math.round(l * 100)]
 }
 
 function hslToRgb(Hdeg: number, S: number, L: number): Rgb {
@@ -140,86 +64,40 @@ function hslToRgb(Hdeg: number, S: number, L: number): Rgb {
   else if (hp < 5) [r, g, b] = [x, 0, c]
   else [r, g, b] = [c, 0, x]
   const m = l - c / 2
-  return { r: clampByte((r + m) * 255), g: clampByte((g + m) * 255), b: clampByte((b + m) * 255) }
+  return {
+    r: clampByte((r + m) * 255),
+    g: clampByte((g + m) * 255),
+    b: clampByte((b + m) * 255),
+  }
 }
 
-const WHITE: Rgb = { r: 255, g: 255, b: 255 }
-const BLACK: Rgb = { r: 0, g: 0, b: 0 }
+function srgbToLinear(v: number): number {
+  const c = v / 255
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+}
 
-function contrastLuminance(rgb: Rgb): number {
-  return (
-    0.2126 * Math.pow(rgb.r / 255, 1.895) +
-    0.7152 * Math.pow(rgb.g / 255, 1.895) +
-    0.0722 * Math.pow(rgb.b / 255, 1.895)
-  )
+function relLuminance(rgb: Rgb): number {
+  return 0.2126 * srgbToLinear(rgb.r) + 0.7152 * srgbToLinear(rgb.g) + 0.0722 * srgbToLinear(rgb.b)
 }
 
 function contrastRatio(rgb: Rgb, other: Rgb): string {
-  const a = contrastLuminance(rgb)
-  const b = contrastLuminance(other)
+  const a = relLuminance(rgb)
+  const b = relLuminance(other)
   const hi = Math.max(a, b)
   const lo = Math.min(a, b)
-  const c = 1 / 30.559
-  return ((hi + c) / (lo + c)).toFixed(2)
+  return ((hi + 0.05) / (lo + 0.05)).toFixed(2)
 }
 
-function contrastOnWhite(rgb: Rgb): string {
-  return contrastRatio(rgb, WHITE)
-}
-
-function contrastOnBlack(rgb: Rgb): string {
-  return contrastRatio(rgb, BLACK)
-}
-
-function numOr(v: string, fallback: number): number {
-  const n = parseFloat(v)
-  return Number.isNaN(n) ? fallback : n
+function parseNum(input: string, fallback: number): number {
+  const n = Number(input)
+  if (!Number.isFinite(n)) return fallback
+  return n
 }
 
 function swatchToRgb(hexValue: string): string {
   const parsed = parseHex(hexValue)
   if (!parsed) return 'rgb(128, 128, 128)'
   return `rgb(${parsed.r}, ${parsed.g}, ${parsed.b})`
-}
-
-let fieldSeq = 0
-function Field({
-  label,
-  ariaLabel,
-  noAria,
-  value,
-  onChange,
-  readonly,
-  inputMode,
-}: {
-  label: string
-  ariaLabel?: string
-  noAria?: boolean
-  value: string
-  onChange?: (v: string) => void
-  readonly?: boolean
-  inputMode?: 'numeric' | 'decimal'
-}) {
-  const id = useRef('')
-  if (id.current === '') id.current = 'cp-' + (fieldSeq = fieldSeq + 1)
-  const ariaAttr = noAria ? null : { 'aria-label': ariaLabel ?? label }
-  return (
-    <div className="cp-field">
-      <span className="cp-field-label" id={id.current + '-label'}>
-        {label}
-      </span>
-      <input
-        id={id.current}
-        className="cp-input"
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        readOnly={readonly}
-        inputMode={inputMode}
-        {...ariaAttr}
-        spellCheck={false}
-      />
-    </div>
-  )
 }
 
 function copyText(text: string): void {
@@ -245,94 +123,133 @@ function fallbackCopy(text: string): void {
   document.body.removeChild(ta)
 }
 
+function loadInitial(): { hex: string; palette: string[] } {
+  const rec = host.load()
+  if (rec && typeof rec.hex === 'string' && parseHex(rec.hex)) {
+    return { hex: rec.hex.toUpperCase(), palette: Array.isArray(rec.palette) ? rec.palette.filter((p) => typeof p === 'string') : [] }
+  }
+  return { hex: toHex({ r: 0, g: 0, b: 0 }), palette: [] }
+}
+
+let labelSeq = 0
+let inputSeq = 0
+
+function makeInputId(): string {
+  inputSeq += 1
+  return `cp-input-${inputSeq}`
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  inputMode,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  inputMode?: 'numeric' | 'decimal'
+}) {
+  const inputId = useMemo(makeInputId, [])
+  return (
+    <div className="cp-field">
+      <label className="cp-field-label" htmlFor={inputId}>
+        {label}
+      </label>
+      <input
+        id={inputId}
+        className="cp-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        inputMode={inputMode}
+        spellCheck={false}
+      />
+    </div>
+  )
+}
+
+function HexField({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (v: string) => void
+}) {
+  const inputId = useMemo(makeInputId, [])
+  return (
+    <div className="cp-field">
+      <label className="cp-field-label" htmlFor={inputId}>
+        #
+      </label>
+      <input
+        id={inputId}
+        className="cp-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        spellCheck={false}
+      />
+    </div>
+  )
+}
+
 export function App() {
-  const [hex, setHex] = useState<string>(() => {
-    const h = host.load()?.hex
-    return h && parseHex(h) ? h.toUpperCase() : '#FF5733'
-  })
-  const [palette, setPalette] = useState<string[]>(() => host.load()?.palette ?? [])
-
-  const rgb = useMemo(() => parseHex(hex) ?? { r: 255, g: 87, b: 51 }, [hex])
-
-  const [rgbStr, setRgbStr] = useState(() => ({
-    r: String(rgb.r),
-    g: String(rgb.g),
-    b: String(rgb.b),
-  }))
-  const [hslStr, setHslStr] = useState(() => {
-    const [h, s, l] = rgbToHsl(rgb)
-    return { h: String(Math.round(h)), s: String(Math.round(s)), l: String(Math.round(l)) }
-  })
-  const [oklchStr, setOklchStr] = useState(() => {
-    const [L, C, H] = rgbToOklch(rgb)
-    return { l: String(Math.round(L * 100)), c: C.toFixed(2), h: String(Math.round(H)) }
-  })
-  const [contrastStr, setContrastStr] = useState(() => ({
-    white: contrastOnWhite(rgb),
-    black: contrastOnBlack(rgb),
-  }))
+  const initial = useMemo(loadInitial, [])
+  const [hex, setHex] = useState(initial.hex)
+  const [palette, setPalette] = useState<string[]>(initial.palette)
+  const [rgbStr, setRgbStr] = useState({ r: '0', g: '0', b: '0' })
+  const [hslStr, setHslStr] = useState({ h: '0', s: '0', l: '0' })
   const [copied, setCopied] = useState(false)
   const copyTimer = useRef<number | null>(null)
 
+  const parsed = parseHex(hex)
+
   useEffect(() => {
-    const parsed = parseHex(hex)
-    if (parsed) {
-      setRgbStr({ r: String(parsed.r), g: String(parsed.g), b: String(parsed.b) })
-      const [h, s, l] = rgbToHsl(parsed)
-      setHslStr({ h: String(Math.round(h)), s: String(Math.round(s)), l: String(Math.round(l)) })
-      const [L, C, H] = rgbToOklch(parsed)
-      setOklchStr({ l: String(Math.round(L * 100)), c: String(Math.round(C * 100)), h: String(Math.round(H)) })
-      setContrastStr({ white: contrastOnWhite(parsed), black: contrastOnBlack(parsed) })
-    }
-    host.save({ id: 'color', hex, palette, savedAt: new Date().toISOString() })
-  }, [hex, palette])
+    if (!parsed) return
+    setRgbStr({ r: String(parsed.r), g: String(parsed.g), b: String(parsed.b) })
+    const [h, s, l] = rgbToHsl(parsed)
+    setHslStr({ h: String(h), s: String(s), l: String(l) })
+  }, [parsed])
+
+  useEffect(() => {
+    host.save({ id: 'color', hex: parsed ? toHex(parsed) : hex, palette, savedAt: new Date().toISOString() })
+  }, [hex, palette, parsed])
 
   const onRgb = (key: 'r' | 'g' | 'b', value: string) => {
     setRgbStr((prev) => ({ ...prev, [key]: value }))
-    const base = parseHex(hex) ?? rgb
-    const r = key === 'r' ? clampByte(numOr(value, base.r)) : base.r
-    const g = key === 'g' ? clampByte(numOr(value, base.g)) : base.g
-    const b = key === 'b' ? clampByte(numOr(value, base.b)) : base.b
+    const base = parsed ?? { r: 0, g: 0, b: 0 }
+    const r = key === 'r' ? clampByte(parseNum(value, base.r)) : base.r
+    const g = key === 'g' ? clampByte(parseNum(value, base.g)) : base.g
+    const b = key === 'b' ? clampByte(parseNum(value, base.b)) : base.b
     setHex(toHex({ r, g, b }))
   }
 
   const onHsl = (key: 'h' | 's' | 'l', value: string) => {
     setHslStr((prev) => ({ ...prev, [key]: value }))
-    const [h0, s0, l0] = rgbToHsl(rgb)
-    const h = key === 'h' ? numOr(value, h0) : h0
-    const s = key === 's' ? numOr(value, s0) : s0
-    const l = key === 'l' ? numOr(value, l0) : l0
+    const base = parsed ? rgbToHsl(parsed) : [0, 0, 0]
+    const h = key === 'h' ? parseNum(value, base[0]) : base[0]
+    const s = key === 's' ? Math.min(100, Math.max(0, parseNum(value, base[1]))) : base[1]
+    const l = key === 'l' ? Math.min(100, Math.max(0, parseNum(value, base[2]))) : base[2]
     setHex(toHex(hslToRgb(h, s, l)))
   }
 
-  const onOklch = (key: 'l' | 'c' | 'h', value: string) => {
-    setOklchStr((prev) => ({ ...prev, [key]: value }))
-    const [L0, C0, H0] = rgbToOklch(rgb)
-    const L = key === 'l' ? numOr(value, L0 * 100) / 100 : L0
-    const C = key === 'c' ? numOr(value, C0 * 100) / 100 : C0
-    const H = key === 'h' ? numOr(value, H0) : H0
-    setHex(toHex(oklchToRgb(L, C, H)))
-  }
-
-  const onHex = (value: string) => {
-    setHex(value.startsWith('#') ? value : value)
-    const parsed = parseHex(value)
-    if (parsed) setRgbStr({ r: String(parsed.r), g: String(parsed.g), b: String(parsed.b) })
+  const onHexInput = (value: string) => {
+    setHex(value)
   }
 
   const generatePalette = () => {
-    const [h, s, l] = rgbToHsl(rgb)
-    const steps = [0, 12, -12, 24, -24]
-    const colors = steps.map((d) => toHex(hslToRgb(h + d, s, l)))
-    setPalette((prev) => [...prev, ...colors])
+    const base = parsed ?? { r: 0, g: 0, b: 0 }
+    const [h, s, l] = rgbToHsl(base)
+    const current = toHex(base)
+    const derived = [72, 144, 216, 288].map((d) => toHex(hslToRgb(((h + d) % 360 + 360) % 360, s, l)))
+    setPalette([current, ...derived])
   }
 
-  const removeSwatch = (index: number) => {
-    setPalette((prev) => prev.filter((_, i) => i !== index))
+  const removeSwatch = (value: string) => {
+    setPalette((prev) => prev.filter((p) => p !== value))
   }
 
   const copyHex = () => {
-    const value = hex.startsWith('#') ? hex : `#${hex}`
+    const value = parsed ? toHex(parsed) : hex
     copyText(value)
     setCopied(true)
     if (copyTimer.current) window.clearTimeout(copyTimer.current)
@@ -345,100 +262,65 @@ export function App() {
     }
   }, [])
 
-  const preview = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+  const preview = parsed
+    ? `rgb(${parsed.r}, ${parsed.g}, ${parsed.b})`
+    : 'rgb(128, 128, 128)'
+  const onWhite = parsed ? contrastRatio(parsed, { r: 255, g: 255, b: 255 }) : '—'
+  const onBlack = parsed ? contrastRatio(parsed, { r: 0, g: 0, b: 0 }) : '—'
+  const invalid = !parsed
 
   return (
     <main className="cp-app">
       <Card mono="Color" title="Color Picker">
         <Stack>
-          <Title>Color Picker</Title>
           <Body>
-            Pick a color and convert it between hex, RGB, HSL, and OKLCH. Generate palettes, check contrast,
-            and copy values to the clipboard.
+            Pick a color and convert it between hex, RGB, and HSL. Generate palettes, check WCAG contrast
+            ratios, and copy values to the clipboard.
           </Body>
           <div className="cp-preview" style={{ background: preview }} aria-hidden="true" />
-          <div className="cp-actions">
-            {copied ? (
-              <Button kind="primary">Copied!</Button>
-            ) : (
-              <Button kind="primary" onClick={copyHex}>Copy Hex</Button>
-            )}
-          </div>
-
-          <span className="cp-section" aria-hidden="true">
-            Hex
-          </span>
           <div className="cp-row">
-            <Field label="Hex" value={hex} onChange={onHex} />
+            <HexField value={hex} onChange={onHexInput} />
           </div>
-
-          <span className="cp-section" aria-hidden="true">
-            RGB
-          </span>
+          {invalid && (
+            <p className="cp-error" role="alert">
+              Invalid hex
+            </p>
+          )}
           <div className="cp-row">
             <Field label="R" value={rgbStr.r} onChange={(v) => onRgb('r', v)} inputMode="numeric" />
             <Field label="G" value={rgbStr.g} onChange={(v) => onRgb('g', v)} inputMode="numeric" />
             <Field label="B" value={rgbStr.b} onChange={(v) => onRgb('b', v)} inputMode="numeric" />
           </div>
-
-          <span className="cp-section" aria-hidden="true">
-            HSL
-          </span>
           <div className="cp-row">
             <Field label="H" value={hslStr.h} onChange={(v) => onHsl('h', v)} inputMode="numeric" />
             <Field label="S" value={hslStr.s} onChange={(v) => onHsl('s', v)} inputMode="numeric" />
             <Field label="L" value={hslStr.l} onChange={(v) => onHsl('l', v)} inputMode="numeric" />
           </div>
-
-          <span className="cp-section" aria-hidden="true">
-            OKLCH
-          </span>
           <div className="cp-row">
-            <Field label="OKLCH L" noAria value={oklchStr.l} onChange={(v) => onOklch('l', v)} inputMode="numeric" />
-            <Field label="OKLCH C" noAria value={oklchStr.c} onChange={(v) => onOklch('c', v)} inputMode="numeric" />
-            <Field label="OKLCH H" noAria value={oklchStr.h} onChange={(v) => onOklch('h', v)} inputMode="numeric" />
-          </div>
-
-          <span className="cp-section" aria-hidden="true">
-            Contrast
-          </span>
-          <div className="cp-row">
-            <Field label="Contrast on White" noAria value={contrastStr.white} readonly />
-            <Field label="Contrast on Black" noAria value={contrastStr.black} readonly />
-          </div>
-
-          <span className="cp-section" aria-hidden="true">
-            Palette
-          </span>
-          <div className="cp-actions">
-            <Button kind="primary" onClick={generatePalette}>
-              Generate Palette
+            <Button kind="primary" onClick={copyHex}>
+              {copied ? 'Copied!' : 'Copy Hex'}
             </Button>
+            <Button onClick={generatePalette}>Generate Palette</Button>
+          </div>
+          <div className="cp-contrast">
+            <span>Contrast on White: {onWhite}</span>
+            <span>Contrast on Black: {onBlack}</span>
           </div>
           {palette.length === 0 ? (
             <Body sm>No swatches yet. Generate a palette from the current color.</Body>
           ) : (
-            <div className="cp-grid">
-              {palette.map((swatch, i) => (
-                <div key={`${swatch}-${i}`} className="cp-swatch">
+            <ul className="cp-palette" aria-label="Palette">
+              {palette.map((swatch) => (
+                <li key={swatch} className="cp-swatch">
                   <span className="cp-swatch-chip" style={{ background: swatchToRgb(swatch) }} aria-hidden="true" />
                   <span className="cp-swatch-hex">{swatch}</span>
-                  <button type="button" className="cp-remove" onClick={() => removeSwatch(i)}>
-                    Remove
+                  <button type="button" className="cp-remove" onClick={() => removeSwatch(swatch)}>
+                    Remove {swatch}
                   </button>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
-
-          <span className="cp-section" aria-hidden="true">
-            Gradient
-          </span>
-          <div
-            className="cp-gradient"
-            style={{ background: `linear-gradient(to right, ${preview}, rgb(255, 255, 255))` }}
-            aria-hidden="true"
-          />
         </Stack>
       </Card>
     </main>

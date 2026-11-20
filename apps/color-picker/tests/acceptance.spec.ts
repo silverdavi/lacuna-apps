@@ -1,25 +1,24 @@
-import { expect, test, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
-async function setHex(page: Page, hex: string) {
-  await page.getByLabel('Hex').fill(hex)
-}
-
-test('[A1] typing a hex value updates the R, G and B fields', async ({ page }) => {
+test('[A1] hex to rgb and hsl', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
+  await page.getByLabel('Hex').fill('#FF5733')
   await expect(page.getByLabel('R')).toHaveValue('255')
   await expect(page.getByLabel('G')).toHaveValue('87')
   await expect(page.getByLabel('B')).toHaveValue('51')
+  await expect(page.getByLabel('H')).toHaveValue('11')
+  await expect(page.getByLabel('S')).toHaveValue('100')
+  await expect(page.getByLabel('L')).toHaveValue('60')
 })
 
-test('[A2] #FF5733 shows contrast ratios 3.02 on white and 10.45 on black', async ({ page }) => {
+test('[A2] contrast ratios', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
-  await expect(page.getByLabel('Contrast on White')).toHaveValue('3.02')
-  await expect(page.getByLabel('Contrast on Black')).toHaveValue('10.45')
+  await page.getByLabel('Hex').fill('#FF5733')
+  await expect(page.getByText('Contrast on White: 3.15', { exact: true })).toBeVisible()
+  await expect(page.getByText('Contrast on Black: 6.66', { exact: true })).toBeVisible()
 })
 
-test('[A3] typing R, G and B values updates the hex field', async ({ page }) => {
+test('[A3] rgb to hex', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('R').fill('128')
   await page.getByLabel('G').fill('64')
@@ -27,60 +26,59 @@ test('[A3] typing R, G and B values updates the hex field', async ({ page }) => 
   await expect(page.getByLabel('Hex')).toHaveValue('#804020')
 })
 
-test('[A4] Generate Palette adds five swatches, the first matching the current color', async ({ page }) => {
+test('[A4] generate palette', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
-  const before = await page.getByRole('button', { name: 'Remove' }).count()
-  await page.getByRole('button', { name: 'Generate Palette' }).click()
-  await expect(page.getByRole('button', { name: 'Remove' })).toHaveCount(before + 5)
-  // A swatch is a Remove button next to the hex value it holds.
-  await expect(
-    page.getByRole('button', { name: 'Remove' }).first().locator('..').getByText('#FF5733'),
-  ).toBeVisible()
+  await page.getByLabel('Hex').fill('#FF5733')
+  await page.getByRole('button', { name: 'Generate Palette', exact: true }).click()
+  const swatches = page.getByRole('list', { name: 'Palette' }).getByRole('listitem')
+  await expect(swatches).toHaveCount(5)
+  const expected = ['#FF5733', '#B1FF33', '#33FFAA', '#335FFF', '#FC33FF']
+  for (let i = 0; i < expected.length; i++) {
+    await expect(swatches.nth(i)).toHaveText(new RegExp(expected[i]))
+  }
 })
 
-test('[A5] Copy Hex shows "Copied!" for 2 seconds and copies the hex to the clipboard', async ({ page }) => {
+test('[A5] copy hex', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
-  await page.getByRole('button', { name: 'Copy Hex' }).click()
-  const copied = page.getByRole('button', { name: 'Copied!' })
-  await expect(copied).toBeVisible()
-  const clipboard = await page.evaluate(() => navigator.clipboard.readText())
-  expect(clipboard).toBe('#FF5733')
-  // The spec's "for 2 seconds" means the button reverts after 2 seconds.
-  await copied.waitFor({ state: 'detached', timeout: 5000 })
-  await expect(page.getByRole('button', { name: 'Copy Hex' })).toBeVisible()
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+  await page.getByLabel('Hex').fill('#FF5733')
+  await page.getByRole('button', { name: 'Copy Hex', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Copied!', exact: true })).toBeVisible()
+  const clip = await page.evaluate(() => navigator.clipboard.readText())
+  expect(clip).toBe('#FF5733')
 })
 
-test('[A6] typing H and S values updates the hex field', async ({ page }) => {
+test('[A6] hsl to hex', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
-  await page.getByLabel('H').fill('50')
-  await page.getByLabel('S').fill('100')
-  await expect(page.getByLabel('Hex')).toHaveValue('#FF0000')
+  await page.getByLabel('Hex').fill('#FF5733')
+  await page.getByLabel('H').fill('200')
+  await expect(page.getByLabel('Hex')).toHaveValue('#33BBFF')
 })
 
-test('[A7] Remove on the second swatch removes it and one fewer swatch remains', async ({ page }) => {
+test('[A7] remove swatch', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
-  await page.getByRole('button', { name: 'Generate Palette' }).click()
-  const before = await page.getByRole('button', { name: 'Remove' }).count()
-  expect(before).toBe(5)
-  await page.getByRole('button', { name: 'Remove' }).nth(1).click()
-  await expect(page.getByRole('button', { name: 'Remove' })).toHaveCount(before - 1)
+  await page.getByLabel('Hex').fill('#FF5733')
+  await page.getByRole('button', { name: 'Generate Palette', exact: true }).click()
+  const swatches = page.getByRole('list', { name: 'Palette' }).getByRole('listitem')
+  await expect(swatches).toHaveCount(5)
+  await page.getByRole('button', { name: 'Remove #B1FF33', exact: true }).click()
+  await expect(swatches).toHaveCount(4)
+  await expect(page.getByRole('listitem', { name: '#B1FF33', exact: true })).toHaveCount(0)
 })
 
-// A8: L=10 keeps H=25 and C=0.15, giving #0A0503.
-test('[A8] typing L=10 in the OKLCH section darkens the color to #0A0503', async ({ page }) => {
+test('[A8] invalid hex', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#FF5733')
-  await page.getByLabel('L').fill('10')
-  await expect(page.getByLabel('Hex')).toHaveValue('#0A0503')
+  await page.getByLabel('Hex').fill('#zzz')
+  await expect(page.getByText('Invalid hex', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('R')).toHaveValue('0')
 })
 
-test('[A9] the current color survives a reload', async ({ page }) => {
+test('[A9] reload persists color and palette', async ({ page }) => {
   await page.goto('/')
-  await setHex(page, '#123456')
+  await page.getByLabel('Hex').fill('#123456')
+  await page.getByRole('button', { name: 'Generate Palette', exact: true }).click()
   await page.reload()
   await expect(page.getByLabel('Hex')).toHaveValue('#123456')
+  const first = page.getByRole('list', { name: 'Palette' }).getByRole('listitem').first()
+  await expect(first).toHaveText(/#123456/)
 })

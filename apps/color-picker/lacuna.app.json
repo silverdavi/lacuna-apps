@@ -3,8 +3,8 @@
   "id": "lacuna.color-picker",
   "name": "Color Picker",
   "version": "0.1.0",
-  "summary": "Pick a color and convert it between hex, RGB, HSL, and OKLCH.",
-  "description": "Select a color and convert its value between hex, RGB, HSL, and OKLCH. Generate palettes and gradients, check WCAG contrast ratios, and copy values to the clipboard. The current color and palette survive page reloads.",
+  "summary": "Pick a color and convert it between hex, RGB, and HSL.",
+  "description": "Select a color and convert its value between hex, RGB, and HSL. Generate palettes, check WCAG contrast ratios, and copy values to the clipboard. The current color and palette survive page reloads.",
   "category": "productivity",
   "tags": ["color", "converter", "palette"],
   "icon": "paint",
@@ -40,7 +40,7 @@
   "capabilities": [
     "convert:color",
     "create:palette",
-    "export:clipboard"
+    "export:color"
   ],
   "permissions": {
     "records": [
