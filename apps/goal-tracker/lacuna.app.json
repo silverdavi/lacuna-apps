@@ -1,0 +1,76 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.goal-tracker",
+  "name": "Goal Tracker",
+  "version": "0.1.0",
+  "summary": "Daily goal check-ins, streaks, a 2023 heatmap, and progress.",
+  "description": "Record a daily check-in toward a goal, watch the current and longest streak, review the full 2023 heatmap of 53 weeks, and see weekly progress on a ring. All data stays in the mock space store on this device; nothing leaves it.",
+  "category": "personal",
+  "tags": ["goals", "streaks", "habits"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/goal-tracker"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:goal"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "goal",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own daily goal check-ins, streaks, and heatmap history in this space's mock store."
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "goal"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

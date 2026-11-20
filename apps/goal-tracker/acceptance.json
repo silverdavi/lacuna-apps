@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d37c70816882bd563c7344381acdc9788500ba2be109c37be12d59f7ebcc1fee",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no check-ins, the page shows the heading \"Goal Tracker\", the text \"No check-ins yet\", the streak line \"Current streak: 0 days\", and the progress ring label \"0/30\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Check in today\" adds a check-in for today, updates the streak line to \"Current streak: 1 day\", and changes the progress ring label to \"1/30\"."
+    },
+    {
+      "id": "A3",
+      "text": "After clicking \"Check in today\" once, clicking the button \"Add past check-in\" opens a date input; typing \"2023-10-15\" in the field labelled \"Date\" and clicking \"Save\" adds a check-in for that date, and the heatmap shows a filled cell for October 15, 2023."
+    },
+    {
+      "id": "A4",
+      "text": "After adding check-ins for 2023-10-15, 2023-10-16, and 2023-10-17 (via \"Add past check-in\"), the streak line shows \"Current streak: 3 days\" and \"Longest streak: 3 days\"."
+    },
+    {
+      "id": "A5",
+      "text": "After adding check-ins for 2023-10-15, 2023-10-16, 2023-10-17, 2023-10-20, and 2023-10-21, the streak line shows \"Current streak: 2 days\" and \"Longest streak: 3 days\" because the gap on 2023-10-18 and 2023-10-19 breaks the streak."
+    },
+    {
+      "id": "A6",
+      "text": "The heatmap displays a 53-column grid for the year 2023; the cell for January 1, 2023 is empty (unfilled) and the cell for December 31, 2023 is empty (unfilled) when no check-ins exist for those dates."
+    },
+    {
+      "id": "A7",
+      "text": "After adding 15 check-ins (via \"Check in today\" and \"Add past check-in\"), the progress ring label shows \"15/30\" and the ring is visually half-filled."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete check-in\" on the list item for 2023-10-15 removes that entry, and if it was part of the current streak, the streak line updates to reflect the new current streak."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the check-in for 2023-10-15: after adding it and reloading, the heatmap still shows a filled cell for October 15, 2023, and the streak line still shows \"Current streak: 1 day\" if it is the only check-in."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7231d357413316ca02ffd0c90e9892aef3fea52de4668dd28db359e30233f6b4"
+    }
+  ]
+}
