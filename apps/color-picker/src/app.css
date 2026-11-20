@@ -40,6 +40,19 @@
   color: var(--ink-60);
 }
 
+.cp-field-label-hidden {
+  clip-path: inset(50%);
+  height: calc(1px * var(--sf));
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: calc(1px * var(--sf));
+}
+
+.cp-field {
+  position: relative;
+}
+
 .cp-input {
   font-family: var(--mono);
   font-size: calc(13px * var(--tf));

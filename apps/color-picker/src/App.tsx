@@ -131,14 +131,6 @@ function loadInitial(): { hex: string; palette: string[] } {
   return { hex: toHex({ r: 0, g: 0, b: 0 }), palette: [] }
 }
 
-let labelSeq = 0
-let inputSeq = 0
-
-function makeInputId(): string {
-  inputSeq += 1
-  return `cp-input-${inputSeq}`
-}
-
 function Field({
   label,
   value,
@@ -150,21 +142,17 @@ function Field({
   onChange: (v: string) => void
   inputMode?: 'numeric' | 'decimal'
 }) {
-  const inputId = useMemo(makeInputId, [])
   return (
-    <div className="cp-field">
-      <label className="cp-field-label" htmlFor={inputId}>
-        {label}
-      </label>
+    <label className="cp-field">
+      <span className="cp-field-label">{label}</span>
       <input
-        id={inputId}
         className="cp-input"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         inputMode={inputMode}
         spellCheck={false}
       />
-    </div>
+    </label>
   )
 }
 
@@ -175,15 +163,11 @@ function HexField({
   value: string
   onChange: (v: string) => void
 }) {
-  const inputId = useMemo(makeInputId, [])
   return (
     <div className="cp-field">
-      <label className="cp-field-label" htmlFor={inputId}>
-        #
-      </label>
       <input
-        id={inputId}
         className="cp-input"
+        aria-label="Hex"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         spellCheck={false}
