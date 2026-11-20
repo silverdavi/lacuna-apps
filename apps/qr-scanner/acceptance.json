@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6b01ee34ef5f4a36025d364ed2787d48543128de0f19baf56a7debb0fededc51",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no scans or encodes, the page shows the heading \"QR Code Scanner\", the text \"No results yet\", and two tabs labelled \"Scan\" and \"Encode\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the \"Encode\" tab, typing \"Hello\" in the field labelled \"Text\", selecting \"QR Code\" in the select labelled \"Format\", and clicking the button \"Generate\" shows a preview image with the alt text \"QR Code: Hello\" and a button labelled \"Download\"."
+    },
+    {
+      "id": "A3",
+      "text": "After generating a QR Code with text \"Hello\", clicking \"Download\" triggers a file download with the filename \"qr-hello.png\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Encode\" tab, typing \"123456789012\" in the field labelled \"Text\", selecting \"EAN-13\" in the select labelled \"Format\", and clicking \"Generate\" shows a preview image with the alt text \"EAN-13: 1234567890128\" where the check digit 8 is computed from the input."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Encode\" tab, typing \"ABC\" in the field labelled \"Text\", selecting \"Code 128\" in the select labelled \"Format\", and clicking \"Generate\" shows a preview image with the alt text \"Code 128: ABC\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Scan\" tab, clicking the button \"Upload image\" and selecting a file named \"test-qr.png\" that contains a QR code encoding \"Test123\" shows a result list item containing \"Test123\" and the text \"QR Code\"."
+    },
+    {
+      "id": "A7",
+      "text": "After scanning a QR code that decodes to \"Test123\", clicking the button \"Copy\" on that result item copies \"Test123\" to the clipboard and shows a toast with the text \"Copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Encode\" tab, clicking \"Generate\" with an empty \"Text\" field shows the message \"Enter text to encode\" and does not show a preview image."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the generated QR Code with text \"Hello\": after reloading, the \"Encode\" tab still shows the preview image with alt text \"QR Code: Hello\" and the result list contains an item with \"Hello\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "30d4838b11e132240a2c916be95d80128a9a0f3ca5b462fa7ac42ed1383cc683"
+    }
+  ]
+}
