@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "300f28aeedac84d00c2a49ca2ccdc9aa9ce953cf421bd60da7b5dd68d5d7d1d5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries the page shows the heading \"Sleep Tracker\", the text \"No sleep entries yet\", and the summary lines \"Total nights: 0\", \"Average duration: 0h 00m\", and \"Streak: 0 days\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Date\" with \"2024-01-15\", the field labelled \"Duration\" with \"7h 30m\", choosing \"Good\" in the select labelled \"Quality\" and clicking the button \"Log sleep\" adds a list item that contains \"2024-01-15\", \"7h 30m\", and \"Good\"; the summary shows \"Total nights: 1\", \"Average duration: 7h 30m\", and \"Streak: 1 days\"."
+    },
+    {
+      "id": "A3",
+      "text": "After also logging \"2024-01-16\" with Duration \"6h 15m\" and Quality \"Fair\", a list item contains \"2024-01-16\", \"6h 15m\", and \"Fair\", and the summary shows \"Total nights: 2\", \"Average duration: 6h 53m\", and \"Streak: 2 days\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Log sleep\" with an empty Duration field adds no list item and shows the message \"Enter a valid duration\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every list item has a button named \"Delete 2024-01-15\". With entries for 2024-01-15 and 2024-01-16, clicking \"Delete 2024-01-15\" removes that item and the summary shows \"Total nights: 1\", \"Average duration: 6h 15m\", and \"Streak: 1 days\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"8h\" in the field labelled \"Duration\" and clicking \"Log sleep\" adds a list item that contains \"8h 00m\"."
+    },
+    {
+      "id": "A7",
+      "text": "After logging \"2024-01-15\" with Duration \"7h 30m\" and Quality \"Good\", the heatmap section shows a cell for \"2024-01-15\" with the text \"7h 30m\"."
+    },
+    {
+      "id": "A8",
+      "text": "After logging \"2024-01-15\" with Duration \"7h 30m\" and Quality \"Good\", the trend chart section shows a data point labelled \"2024-01-15\" with the value \"7.5\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry for \"2024-01-15\" with \"7h 30m\" and \"Good\" visible in the list, and the summary line \"Total nights: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "036a2ac8c19b4ace2d5514f222733233e7a4b99596af8d5142644d47c0f8698c"
+    }
+  ]
+}
