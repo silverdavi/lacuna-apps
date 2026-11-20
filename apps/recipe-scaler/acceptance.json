@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "84ea685abfb3dc2bd7cd1a46d989d9927123b040fbdfd823bd32fab3f053456b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no ingredients entered, the page shows the heading \"Recipe Scaler\", the text \"No ingredients yet\", and the summary line \"Scale factor: 1.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"1 1/2\" in the field labelled \"Quantity\", selecting \"cups\" in the select labelled \"Unit\", typing \"Flour\" in the field labelled \"Ingredient\", and clicking the button \"Add ingredient\" adds a table row containing \"Flour\", \"1 1/2\", and \"cups\"; the text \"No ingredients yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the ingredient from A2, typing \"2\" in the field labelled \"Original servings\" and \"4\" in the field labelled \"Target servings\" updates the summary line to \"Scale factor: 2.00\" and the Flour row quantity to \"3 cups\"."
+    },
+    {
+      "id": "A4",
+      "text": "Adding a second ingredient with Quantity \"1/4\", Unit \"tsp\", and Ingredient \"Salt\", then setting Original servings \"2\" and Target servings \"6\", shows the Salt row quantity as \"3/4 tsp\" and the summary line \"Scale factor: 3.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Flour\" removes the Flour row from the table; the Salt row remains with quantity \"3/4 tsp\" and the summary still shows \"Scale factor: 3.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "Setting Original servings \"4\" and Target servings \"2\" with the Salt ingredient (1/4 tsp) shows the Salt row quantity as \"1/8 tsp\" and the summary line \"Scale factor: 0.50\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"0\" in the field labelled \"Target servings\" and pressing Tab shows the message \"Target servings must be greater than 0\" and the summary line remains \"Scale factor: 1.00\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding Flour (1 1/2 cups) and Salt (1/4 tsp), setting Original servings \"2\" and Target servings \"8\", reloading the page still shows the table rows with \"Flour\" and \"6 cups\" and \"Salt\" and \"1 tsp\", and the summary line \"Scale factor: 4.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "68569ba4cbd8a5e442e2ddeb4338dea657f55e1e6c826356b175cafec2de835b"
+    }
+  ]
+}
