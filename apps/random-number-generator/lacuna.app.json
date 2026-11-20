@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.random-number-generator",
+  "name": "Random number generator",
+  "version": "0.1.0",
+  "summary": "Generate random numbers from a range, a count, or dice notation.",
+  "description": "Set a minimum and a maximum, a count, or a dice roll like 2d6, and generate integers. The last generation is kept in the browser and the rolls land in a history table. Nothing leaves the device.",
+  "category": "productivity",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/random-number-generator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:number",
+    "create:number",
+    "edit:number"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "generation",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the last generated result and the roll history"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "generation"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "tags": [
+    "random",
+    "dice",
+    "utility"
+  ]
+}
