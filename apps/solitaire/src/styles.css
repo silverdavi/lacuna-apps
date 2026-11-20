@@ -1,0 +1,8 @@
+.sol .sol-pile:focus {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}
+.sol .sol-pile:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}
