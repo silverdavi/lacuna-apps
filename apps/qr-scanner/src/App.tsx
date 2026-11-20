@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, EmptyState, Stack, Title } from '@lacuna/ui'
+import { Body, Button, Card, EmptyState, Stack } from '@lacuna/ui'
 import { host } from './host'
 import type { CodeFormat, CodeRecord, ScannerState } from './host'
 import { encodeQr, decodeQr } from './lib/qr'
 import { encodePng, decodePng } from './lib/png'
-import { ean13Row, code128Row } from './lib/barcode'
+import { ean13Row, code128Row, ean13CheckDigit } from './lib/barcode'
 
 const KINDS: CodeFormat[] = ['QR Code', 'EAN-13', 'Code 128']
 
@@ -19,8 +19,9 @@ function fileName(kind: CodeFormat, text: string): string {
   return 'c128-' + slug(text) + '.png'
 }
 
-function altText(kind: CodeFormat, text: string): string {
-  return kind + ': ' + text
+function altText(kind: CodeFormat, text: string, code: string): string {
+  const shown = kind === 'EAN-13' ? code : text
+  return kind + ': ' + shown
 }
 
 function scaleRow(row: boolean[], height: number): boolean[] {
@@ -53,7 +54,7 @@ function codeToPng(kind: CodeFormat, text: string): Uint8Array {
 function encodeFor(kind: CodeFormat, text: string): string {
   if (kind === 'EAN-13') {
     if (!/^\d{12}$/.test(text)) throw new Error('EAN-13 needs 12 digits')
-    return text
+    return text + ean13CheckDigit(text)
   }
   if (kind === 'Code 128') {
     if (!text) throw new Error('Code 128 needs text')
@@ -82,6 +83,16 @@ export function App() {
   useEffect(() => {
     host.saveState(state)
   }, [state])
+
+  useEffect(() => {
+    if (lastPng || !state.lastEncode) return
+    try {
+      setLastPng(codeToPng(state.lastEncode.kind, state.lastEncode.text))
+    } catch {
+      setLastPng(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     setLastPng(null)
@@ -161,7 +172,9 @@ export function App() {
     try {
       const buf = new Uint8Array(await file.arrayBuffer())
       const { width, height, gray } = decodePng(buf)
+      console.log('[onFile] decoded png w=' + width + ' h=' + height)
       const decoded = decodeQr(gray, width, height)
+      console.log('[onFile] decoded=' + JSON.stringify(decoded))
       if (!decoded) {
         showToast('No QR code found')
         return
@@ -179,12 +192,23 @@ export function App() {
     }
   }
 
-  const lastAlt = state.lastEncode ? altText(state.lastEncode.kind, state.lastEncode.text) : ''
+  const lastAlt = state.lastEncode ? altText(state.lastEncode.kind, state.lastEncode.text, state.lastEncode.code) : ''
 
   return (
     <main style={{ padding: 'calc(24px * var(--sf))' }}>
-      <Card mono="Lacuna" title="QR Code Scanner" style={{ maxWidth: 720 }}>
+      <Card mono="Lacuna" style={{ maxWidth: 720 }}>
         <Stack lg>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 'calc(20px * var(--tf))',
+              fontWeight: 700,
+              color: 'var(--ink)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            QR Code Scanner
+          </h1>
           <div
             role="tablist"
             aria-label="Scanner modes"
@@ -198,7 +222,6 @@ export function App() {
                 id={'tab-' + t}
                 aria-selected={tab === t}
                 aria-controls={'panel-' + t}
-                tabIndex={tab === t ? 0 : -1}
                 className={'lc-tab' + (tab === t ? ' active' : '')}
                 onClick={() => setTab(t)}
               >
@@ -274,7 +297,16 @@ export function App() {
             </div>
           )}
 
-          <Title size="md">Results</Title>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 'calc(16px * var(--tf))',
+              fontWeight: 600,
+              color: 'var(--ink)',
+            }}
+          >
+            Results
+          </h2>
           {state.records.length === 0 ? (
             <EmptyState title="No results yet" detail="Scans and encodes you save will appear here." />
           ) : (
@@ -288,7 +320,7 @@ export function App() {
                     justifyContent: 'space-between',
                     gap: 'calc(12px * var(--sf))',
                     padding: 'calc(8px * var(--sf)) 0',
-                    borderBottom: '1px solid var(--ui-line2)',
+                    borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(4px * var(--sf))' }}>

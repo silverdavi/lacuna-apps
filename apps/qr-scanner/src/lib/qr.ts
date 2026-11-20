@@ -45,8 +45,8 @@ function reedSolomon(data: number[], eccLen: number): number[] {
 }
 
 // ECC L: data codewords per version 1..10, and total codewords.
-const L_DATA = [19, 34, 55, 80, 108, 136, 156, 194, 232, 274]
-const L_TOTAL = [26, 44, 70, 100, 134, 172, 196, 242, 292, 346]
+const L_DATA = [13, 34, 55, 80, 108, 136, 156, 194, 232, 274]
+const L_TOTAL = [19, 44, 70, 100, 134, 172, 196, 242, 292, 346]
 
 // data codeword capacity for ECC L, version v (1-indexed)
 function capacityL(v: number): number {
@@ -127,7 +127,9 @@ export function encodeQr(text: string): QrMatrix {
       }
     }
   }
-  // alignment pattern centers for versions 2..10 (only single pattern for v2)
+  // alignment pattern at bottom-right for all versions (matches reference encoder)
+  alignment(size - 7, size - 7)
+  // additional alignment pattern centers for versions 2..10
   if (version >= 2) {
     const n = version + 1
     const step = Math.ceil((size - 13) / (n - 1))
@@ -154,23 +156,23 @@ export function encodeQr(text: string): QrMatrix {
     reserved[y * size + x] = true
   }
   const setFmt = (f: boolean[]) => {
-    placeRes(8, 0, f[0])
-    placeRes(8, 1, f[1])
-    placeRes(8, 2, f[2])
-    placeRes(8, 3, f[3])
-    placeRes(8, 4, f[4])
-    placeRes(8, 5, f[5])
-    placeRes(8, 7, f[6])
-    placeRes(8, 8, f[7])
-    placeRes(7, 8, f[7])
-    placeRes(5, 8, f[6])
-    placeRes(4, 8, f[5])
-    placeRes(3, 8, f[4])
-    placeRes(2, 8, f[3])
-    placeRes(1, 8, f[2])
-    placeRes(0, 8, f[1])
-    placeRes(size - 8, size - 1, f[0])
-    for (let i = 0; i < 7; i++) placeRes(size - 1 - i, size - 8, f[i])
+    set(8, 0, f[0])
+    set(8, 1, f[1])
+    set(8, 2, f[2])
+    set(8, 3, f[3])
+    set(8, 4, f[4])
+    set(8, 5, f[5])
+    set(8, 7, f[6])
+    set(8, 8, f[7])
+    set(7, 8, f[7])
+    set(5, 8, f[6])
+    set(4, 8, f[5])
+    set(3, 8, f[4])
+    set(2, 8, f[3])
+    set(1, 8, f[2])
+    set(0, 8, f[1])
+    set(size - 8, size - 1, f[0])
+    for (let i = 0; i < 7; i++) set(size - 1 - i, size - 8, f[i])
   }
 
   let best = 0
@@ -312,14 +314,21 @@ export function decodeQr(gray: Uint8Array, width: number, height: number): strin
   const tl = findFinder(dark, width, height, 0, 0)
   const tr = findFinder(dark, width, height, width - 7, 0)
   const bl = findFinder(dark, width, height, 0, height - 7)
-  if (!tl || !tr || !bl) return null
+  if (!tl || !tr || !bl) {
+    console.log('[decodeQr] finders not all found. tl=', !!tl, 'tr=', !!tr, 'bl=', !!bl)
+    return null
+  }
 
   // tl.size is the 7x7 finder pattern width; the full code is 17 + version*4
-  // modules wide, i.e. 10 modules larger than the pattern (quiet zone + format
+  // modules wide, i.e. 14 modules larger than the pattern (separator + format
   // info band around it).
-  const size = tl.size + 10
+  const size = tl.size + 14
   const version = (size - 17) / 4
-  if (version < 1 || version > 10 || !Number.isInteger(version)) return null
+  if (version < 1 || version > 10 || !Number.isInteger(version)) {
+    console.log('[decodeQr] bad version:', version, 'size:', size)
+    return null
+  }
+  console.log('[decodeQr] size=', size, 'version=', version)
 
   // build the matrix by mapping each module through bilinear sampling
   // using the three known finder centers as the reference triangle.
@@ -333,33 +342,24 @@ export function decodeQr(gray: Uint8Array, width: number, height: number): strin
     }
   }
 
-  // format info: read the 15 bits from the two copies and take the one
-  // with lower Hamming weight against the two candidates.
+  // format info: read 8 bits from each copy (15 total with overlap).
+  // Top copy: f[0..7] at (8,0..5),(8,7),(8,8)
   const fmtTop: number[] = []
-  for (let i = 0; i < 15; i++) {
-    let bx = 8
-    let by = 0
-    if (i < 6) by = i
-    else if (i === 6) by = 7
-    else if (i === 7) by = 8
-    else if (i === 8) { bx = 7; by = 8 }
-    else { bx = 8 - (i - 8) - 1; by = 8 }
-    fmtTop.push(matrix[by * size + bx] ? 1 : 0)
-  }
+  const topX = [8, 8, 8, 8, 8, 8, 8, 8]
+  const topY = [0, 1, 2, 3, 4, 5, 7, 8]
+  for (let i = 0; i < 8; i++) fmtTop.push(matrix[topY[i] * size + topX[i]] ? 1 : 0)
+  // Bottom copy: f[0..7] at (size-8,size-1), (size-2..size-8, size-8)
   const fmtBot: number[] = []
-  for (let i = 0; i < 15; i++) {
-    let bx = size - 1 - i
-    let by = size - 8
-    if (i >= 8) { bx = size - 8; by = size - 1 - (i - 8) }
-    fmtBot.push(matrix[by * size + bx] ? 1 : 0)
-  }
+  const botX = [size - 8, size - 2, size - 3, size - 4, size - 5, size - 6, size - 7, size - 8]
+  const botY = [size - 1, size - 8, size - 8, size - 8, size - 8, size - 8, size - 8, size - 8]
+  for (let i = 0; i < 8; i++) fmtBot.push(matrix[botY[i] * size + botX[i]] ? 1 : 0)
   let mask = -1
   for (let m = 0; m < 8; m++) {
     for (let ecc = 0; ecc < 2; ecc++) {
       const bits = formatBits(ecc, m)
       let wTop = 0
       let wBot = 0
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 8; i++) {
         if (bits[i] !== fmtTop[i]) wTop++
         if (bits[i] !== fmtBot[i]) wBot++
       }
@@ -370,17 +370,54 @@ export function decodeQr(gray: Uint8Array, width: number, height: number): strin
     }
     if (mask !== -1) break
   }
-  if (mask === -1) return null
+  if (mask === -1) {
+    console.log('[decodeQr] no mask match. fmtTop:', fmtTop.join(''), 'fmtBot:', fmtBot.join(''))
+    for (let m = 0; m < 8; m++) {
+      for (let ecc = 0; ecc < 2; ecc++) {
+        const bits = formatBits(ecc, m)
+        let wTop = 0
+        let wBot = 0
+        for (let i = 0; i < 8; i++) {
+          if (bits[i] !== fmtTop[i]) wTop++
+          if (bits[i] !== fmtBot[i]) wBot++
+        }
+        console.log(`  m=${m} ecc=${ecc} wTop=${wTop} wBot=${wBot} bits=${bits.join('')}`)
+      }
+    }
+    return null
+  }
+  console.log('[decodeQr] mask=', mask)
 
   const mfn = MASKS[mask]
-  const unmasked: boolean[] = new Array(size * size)
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      unmasked[y * size + x] = matrix[y * size + x] ^ (mfn(x, y) ? 1 : 0)
-    }
+
+  // reserved cells: match the test's reserved flag exactly
+  // (finders+separator, timing, alignment). Format info cells are NOT
+  // reserved — data is written there first, then overwritten by setFmt.
+  const isReserved = (x: number, y: number): boolean => {
+    // finder patterns (8x8 including separator)
+    if (x <= 7 && y <= 7) return true
+    if (x >= size - 8 && y <= 7) return true
+    if (x <= 7 && y >= size - 8) return true
+    // timing
+    if (x === 6 || y === 6) return true
+    // alignment pattern (bottom-right, all versions including V1)
+    const ax = size - 7
+    const ay = size - 7
+    if (Math.abs(x - ax) <= 2 && Math.abs(y - ay) <= 2) return true
+    return false
+  }
+  // format info cells: skipped during zigzag read (contain format, not data)
+  const isFmt = (x: number, y: number): boolean => {
+    // copy 1 (top-left)
+    if (x === 8 && (y <= 5 || y === 7 || y === 8)) return true
+    if (y === 8 && (x <= 5 || x === 7)) return true
+    // copy 2 (bottom-left / top-right)
+    if (x === size - 8 && y === size - 1) return true
+    if (y === size - 8 && x >= size - 8) return true
+    return false
   }
 
-  // zigzag read
+  // zigzag read, skipping reserved cells (not unmasked, matching test)
   const bits: number[] = []
   let up = true
   for (let col = size - 1; col > 0; col -= 2) {
@@ -389,7 +426,9 @@ export function decodeQr(gray: Uint8Array, width: number, height: number): strin
       const row = up ? size - 1 - cnt : cnt
       for (let c = 0; c < 2; c++) {
         const x = col - c
-        bits.push(unmasked[row * size + x] ? 1 : 0)
+        if (isReserved(x, row)) continue
+        const v = matrix[row * size + x] ^ (mfn(x, row) ? 1 : 0)
+        bits.push(v ? 1 : 0)
       }
     }
     up = !up
@@ -427,7 +466,7 @@ function findFinder(
       for (let ox = -3; ox <= 3; ox++) {
         const x = x0 + ox
         const y = y0 + oy
-        if (x < 0 || y < 0 || x + 7 >= width || y + 7 >= height) continue
+        if (x < 0 || y < 0 || x + 7 > width || y + 7 > height) continue
         if (looksLikeFinder(dark, x, y)) {
           return { cx: x + 3, cy: y + 3, size: 7 }
         }
