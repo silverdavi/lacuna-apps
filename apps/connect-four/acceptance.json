@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "26fe9033a6ecdaeac8a64a5e329a51405c6dd6c36129a3a3fe87de70444e4d78",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Connect Four\", the text \"Player 1's turn\", and the score line \"Score: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button with visible label \"Drop in column 4\" places a red disc in the bottom row of column 4; the text changes to \"Player 2's turn\" and the score line remains \"Score: 0\"."
+    },
+    {
+      "id": "A3",
+      "text": "After Player 1 drops in column 4, Player 2 drops in column 4, Player 1 drops in column 5, and Player 2 drops in column 5, the text shows \"Player 1's turn\" and no winner message is visible."
+    },
+    {
+      "id": "A4",
+      "text": "Continuing from A3, Player 1 drops in column 6 and Player 2 drops in column 6; the text changes to \"Player 1's turn\" and no winner message is visible."
+    },
+    {
+      "id": "A5",
+      "text": "Continuing from A4, Player 1 drops in column 7; the text changes to \"Player 1 wins\" and the score line updates to \"Score: 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "After a win is declared, clicking the button \"Restart\" clears the board, resets the text to \"Player 1's turn\", and keeps the score line at \"Score: 1\"."
+    },
+    {
+      "id": "A7",
+      "text": "After a win is declared, clicking the button \"New game\" clears the board, resets the text to \"Player 1's turn\", and resets the score line to \"Score: 0\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the board full (all 42 cells occupied) and no winner, the text shows \"Draw\" and the score line remains unchanged."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the score: after achieving \"Score: 1\" and reloading the page, the score line still shows \"Score: 1\" and the board is cleared with the text \"Player 1's turn\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7fd9b389de19ada664ebcdf012a384dab5b68438d004bb6ef9369c741a8d2b94"
+    }
+  ]
+}
