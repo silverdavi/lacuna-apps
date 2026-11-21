@@ -2,33 +2,41 @@
 // @lacuna/use-local-record 0.1.0: snapshot of lacuna-components useLocalRecord at 9c7f3ab by sync-toolbox-components.py; a change gets a new version.
 const backing = new Map<string, string>();
 
-type StorageProto = {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-  removeItem: (key: string) => void;
-  clear: () => void;
-};
-
 function installInMemoryStorage(): void {
-  const proto = Storage.prototype as StorageProto;
-  proto.getItem = (key) => (backing.has(key) ? (backing.get(key) as string) : null);
-  proto.setItem = (key, value) => {
-    backing.set(key, String(value));
+  const store = {
+    get length() {
+      return backing.size;
+    },
+    key: (index: number) => Array.from(backing.keys())[index] ?? null,
+    getItem: (key: string) => (backing.has(String(key)) ? (backing.get(String(key)) as string) : null),
+    setItem: (key: string, value: string) => {
+      backing.set(String(key), String(value));
+    },
+    removeItem: (key: string) => {
+      backing.delete(String(key));
+    },
+    clear: () => {
+      backing.clear();
+    },
   };
-  proto.removeItem = (key) => {
-    backing.delete(key);
-  };
-  proto.clear = () => {
-    backing.clear();
-  };
-  Object.defineProperty(globalThis, 'localStorage', {
-    value: Object.create(Storage.prototype),
-    configurable: true,
-    writable: true,
-  });
+  try {
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: store,
+      configurable: true,
+      writable: true,
+    });
+  } catch {
+    // Ignore if non-configurable.
+  }
 }
 
-if (typeof globalThis.localStorage === 'undefined') {
+let hasStorage = false;
+try {
+  hasStorage = typeof globalThis.localStorage !== 'undefined';
+} catch {
+  hasStorage = false;
+}
+if (!hasStorage) {
   installInMemoryStorage();
 }
 
