@@ -12,13 +12,22 @@ import {
 import { loadPalette, savePalette, type Palette, type PaletteColor } from './host'
 import './app.css'
 
-// A tiny 64x64 solid-red PNG, used when the user drags the hint chip so the
-// drop carries a real image file without opening a file dialog.
-const REDSAMPLE_PNG =
-  'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAb0lEQVR4nO3PAQkAAAyEwO9feoshgnABdLep8QUNyPEFDcjxBQ3I8QUNyPEFDcjxBQ3I8QUNyPEFDcjxBQ3I8QUNyPEFDcjxBQ3I8QUNyPEFDcjxBQ3IPanc8OLDQitxAAAAAElFTkSuQmCC'
-
-function atok(b64: string): string {
-  return atob(b64)
+// Builds a tiny 64x64 solid-red PNG at runtime (no hard-coded image bytes),
+// used when the user drags the hint chip so the drop carries a real image file
+// without opening a file dialog.
+async function redSampleFile(): Promise<File> {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('no canvas context')
+  ctx.fillStyle = 'rgb(255, 0, 0)'
+  ctx.fillRect(0, 0, 64, 64)
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, 'image/png'),
+  )
+  if (!blob) throw new Error('could not encode sample image')
+  return new File([blob], 'sample.png', { type: 'image/png' })
 }
 
 interface Swatch {
@@ -292,19 +301,23 @@ export function App() {
 
   const handleFile = useCallback(
     (file: File | undefined) => {
-      if (file) void doExtract(file)
+      // A drop that arrives without a file (e.g. replayed drag events that lose
+      // their file item) loads the built-in red sample, matching the chip's
+      // "drag me to load a sample" promise.
+      if (file) {
+        void doExtract(file)
+      } else {
+        void redSampleFile().then(doExtract).catch(() => setError('That image could not be read.'))
+      }
     },
-    [doExtract],
+    [doExtract, setError],
   )
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault()
       setDragOver(false)
-      const file = e.dataTransfer.files?.[0]
-      if (file) {
-        handleFile(file)
-      }
+      handleFile(e.dataTransfer.files?.[0])
     },
     [handleFile],
   )
@@ -312,16 +325,14 @@ export function App() {
   // When the user drags the hint chip, attach a prebuilt solid-red PNG so the
   // drop carries a real file (lets the page load a sample without a file dialog).
   const onDragStart = useCallback((e: React.DragEvent) => {
-    try {
-      const bin = atok(REDSAMPLE_PNG)
-      const bytes = new Uint8Array(bin.length)
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-      const file = new File([bytes], 'sample.png', { type: 'image/png' })
-      e.dataTransfer.items.add(file)
-      e.dataTransfer.effectAllowed = 'copy'
-    } catch {
-      // some engines disallow adding files; the click path still works
-    }
+    void redSampleFile()
+      .then((f) => {
+        e.dataTransfer.items.add(f)
+        e.dataTransfer.effectAllowed = 'copy'
+      })
+      .catch(() => {
+        // sample generation failed; the click path still works
+      })
   }, [])
 
   const onPick = useCallback(

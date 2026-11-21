@@ -39,7 +39,7 @@
   align-items: center;
   gap: calc(10px * var(--sf));
   padding: calc(28px * var(--sf)) calc(18px * var(--sf));
-  border: 1px dashed var(--soft);
+  border: calc(1px * var(--sf)) dashed var(--soft);
   border-radius: calc(6px * var(--sf));
   background: var(--ui-card);
   text-align: center;
@@ -107,7 +107,7 @@
   width: 100%;
   height: calc(64px * var(--sf));
   padding: calc(6px * var(--sf));
-  border: 1px solid var(--ui-line2);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
   border-radius: calc(5px * var(--sf));
   cursor: pointer;
   text-align: left;
@@ -115,13 +115,13 @@
 }
 
 .ice-swatch-on {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
 }
 
 .ice-swatch:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
 }
 
 .ice-swatch-name {
@@ -151,7 +151,7 @@
   width: calc(48px * var(--sf));
   height: calc(48px * var(--sf));
   border-radius: calc(5px * var(--sf));
-  border: 1px solid var(--ui-line2);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
   flex: none;
 }
 
@@ -184,7 +184,7 @@
   font-size: calc(12px * var(--tf));
   color: var(--accent);
   background: none;
-  border: 1px solid var(--accent);
+  border: calc(1px * var(--sf)) solid var(--accent);
   border-radius: calc(4px * var(--sf));
   padding: calc(2px * var(--sf)) calc(8px * var(--sf));
   cursor: pointer;
@@ -195,6 +195,6 @@
 }
 
 .ice-copybtn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
 }
