@@ -930,6 +930,44 @@
       }
     },
     {
+      "id": "@lacuna/dialog",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Accessible modal dialog that traps focus, closes on Escape, and restores focus to the trigger on close.",
+      "today": [
+        "toolbox/modules/dialog/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Dialog"
+      ],
+      "public": true,
+      "path": "toolbox/modules/dialog/0.1.0",
+      "bridge": {
+        "component": "Dialog",
+        "kind": "widget",
+        "exports": [
+          "Dialog"
+        ],
+        "types": [
+          "DialogProps"
+        ],
+        "signature": "Dialog({ open, onClose, title, children }: DialogProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "443f0e7797fffa00",
+            "lines": 119,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/export-menu",
       "layer": 2,
       "status": "exists",
@@ -1534,6 +1572,46 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "2f3e7db4fa06b82e",
             "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-hotkeys",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Registers scoped keyboard shortcuts with platform-aware modifier keys (Cmd/Ctrl) and automatic input-focus suppression.",
+      "today": [
+        "toolbox/modules/use-hotkeys/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useHotkeys"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-hotkeys/0.1.0",
+      "bridge": {
+        "component": "useHotkeys",
+        "kind": "hook",
+        "exports": [
+          "useHotkeys"
+        ],
+        "types": [
+          "HotkeyBinding",
+          "UseHotkeysOptions",
+          "UseHotkeysReturn"
+        ],
+        "signature": "useHotkeys( bindings: HotkeyBinding[], options?: UseHotkeysOptions )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "5de98e557cdf8071",
+            "lines": 126,
             "dependencies": {}
           }
         }

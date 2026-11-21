@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.connect-four",
+  "name": "Connect Four",
+  "version": "0.1.0",
+  "summary": "Drop discs in a 7-by-6 grid and connect four to win.",
+  "description": "Two players take turns dropping discs into a 7-column, 6-row grid. Connect four horizontally, vertically, or diagonally to win. The score keeps the best result across sessions and the board clears on reload.",
+  "category": "personal",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/connect-four"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/dialog": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:game",
+    "edit:game",
+    "export:game"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "game",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the score and the board while a game is in play"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "game"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
