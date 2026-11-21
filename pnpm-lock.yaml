@@ -1698,15 +1698,33 @@ importers:
 
   apps/wordle-clone:
     dependencies:
+      '@lacuna/board-grid':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/board-grid/0.1.0
+      '@lacuna/dialog':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/dialog/0.1.0
+      '@lacuna/grid-utils':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/grid-utils/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/random':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/random/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
       '@lacuna/use-hotkeys':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/use-hotkeys/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-local-record/0.1.0
+      '@lacuna/use-timer':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-timer/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -3823,6 +3841,7 @@ packages:
 
   /update-browserslist-db@1.3.4(browserslist@4.29.5):
     resolution: {integrity: sha512-t8wonIOdQyOjtPd2VktlBu6QjTVTks6v8bSi7kd0r2Vll8TK1JYDZtRRdbmCHOAMphkZgrzK+L+vXK4pyZ8t4A==}
+    hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
     dependencies:
@@ -3834,6 +3853,7 @@ packages:
   /vite@6.4.5:
     resolution: {integrity: sha512-4enwjFfi4IwtEh0w+jPzpLVOFQiPHmmzPxcHXQOyEur47o6u0jE573DmGpjA+7irXoMLYRZD5ZaFUEneS3abPg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
+    hasBin: true
     peerDependencies:
       '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
       jiti: '>=1.21.0'

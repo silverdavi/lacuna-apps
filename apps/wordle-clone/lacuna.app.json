@@ -32,8 +32,15 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/board-grid": "0.1.0",
+      "@lacuna/dialog": "0.1.0",
+      "@lacuna/grid-utils": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/random": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/use-timer": "0.1.0"
     }
   },
   "capabilities": [
