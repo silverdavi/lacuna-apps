@@ -73,6 +73,13 @@ const inputWrapStyle: CSSProperties = {
   width: 'calc(72px * var(--sf))',
 }
 
+const keyStyle: CSSProperties = {
+  width: 'calc(28px * var(--sf))',
+  height: 'calc(28px * var(--sf))',
+  fontSize: 'calc(12px * var(--tf))',
+  padding: 0,
+}
+
 function HangmanFigure({ strokes }: { strokes: number }) {
   const on = (n: number): CSSProperties =>
     n <= strokes
@@ -234,15 +241,20 @@ export function App() {
 
               <div role="group" aria-label="Keyboard" style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(4px * var(--sf))' }}>
                 {LETTERS.map((ch) => (
-                  <button
+                  <Button
                     key={ch}
-                    type="button"
-                    aria-label={ch}
-                    className={`lc-btn secondary${round.missed.includes(ch) ? ' missed' : ''}`}
-                    style={round.missed.includes(ch) ? { opacity: 0.45 } : undefined}
+                    kind="secondary"
+                    ariaLabel={ch}
+                    title={ch}
+                    style={{
+                      ...keyStyle,
+                      opacity: round.missed.includes(ch) ? 0.45 : undefined,
+                    }}
                     onClick={() => guess(ch)}
                     disabled={!playing}
-                  />
+                  >
+                    {''}
+                  </Button>
                 ))}
               </div>
 
