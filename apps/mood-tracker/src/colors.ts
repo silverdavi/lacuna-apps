@@ -1,8 +1,8 @@
 export const MOOD_VALUE: Record<string, number> = {
-  Anxious: 1,
-  Low: 2,
-  Calm: 3,
-  Good: 4,
+  Anxious: 2,
+  Low: 3,
+  Calm: 4,
+  Good: 5,
   Great: 5,
 }
 
