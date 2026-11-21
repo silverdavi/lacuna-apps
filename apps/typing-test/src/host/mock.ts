@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export interface TypingTestState {
   passage: string
   typed: string
@@ -9,18 +11,18 @@ export interface TypingTestState {
 
 const KEY = 'lacuna.typing-test.state'
 
+function isState(v: unknown): v is TypingTestState {
+  if (typeof v !== 'object' || v === null) return false
+  const r = v as Record<string, unknown>
+  return typeof r.passage === 'string' && typeof r.bestWpm === 'number'
+}
+
+const store = createMockValue<TypingTestState | null>({ key: KEY, fallback: null, validate: isState })
+
 export function loadTestState(): TypingTestState | null {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as TypingTestState
-    if (typeof parsed.passage !== 'string' || typeof parsed.bestWpm !== 'number') return null
-    return parsed
-  } catch {
-    return null
-  }
+  return store.get()
 }
 
 export function saveTestState(state: TypingTestState): void {
-  window.localStorage.setItem(KEY, JSON.stringify(state))
+  store.set(state)
 }

@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@lacuna/ui/tokens.css'
+import '@lacuna/ui/base.css'
 import { App } from './App'
 
 createRoot(document.getElementById('root')!).render(

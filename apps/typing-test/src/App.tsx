@@ -1,5 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack, TextInput } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  MonoLabel,
+  Rail,
+  Stack,
+  Tag,
+  TextInput,
+} from '@lacuna/ui'
 import { host, type TypingTestState } from './host'
 import './app.css'
 
@@ -164,82 +178,91 @@ export function App() {
   const running = phase === 'running'
   const done = phase === 'done'
   const correct = countCorrect(PASSAGE, typed)
-  const mismatch = (() => {
-    const len = Math.min(PASSAGE.length, typed.length)
-    for (let i = 0; i < len; i++) {
-      if (PASSAGE[i] !== typed[i]) return i
-    }
-    return -1
-  })()
 
   const charTone = (i: number): string => {
     if (i >= typed.length) return 'typing-char'
-    if (mismatch >= 0) return 'typing-char typing-char--bad'
-    return 'typing-char typing-char--ok'
+    if (PASSAGE[i] === typed[i]) return 'typing-char typing-char--ok'
+    return 'typing-char typing-char--bad'
   }
 
   return (
-    <main className="typing-app">
-      <Card mono="Tools">
-        <Stack>
-          <h1 className="lc-title lc-title-xl">Typing Test</h1>
-          {restored && bestWpm > 0 && <MonoLabel>Best WPM: {bestWpm.toFixed(1)}</MonoLabel>}
-          <Body>
-            Type the passage as fast and as accurately as you can. The timer and your best score survive a reload.
-          </Body>
-
-          {phase === 'idle' ? (
+    <AppShell
+      name="Typing Test"
+      icon="tasks"
+      hue="gold"
+      category="Productivity"
+      meta={bestWpm > 0 ? `Best ${bestWpm.toFixed(1)} WPM` : 'New test'}
+      side={
+        <Rail title="Typing Test" note="One passage · local">
+          <KpiRow>
+            <Kpi value={bestWpm > 0 ? bestWpm.toFixed(1) : '—'} label="Best WPM" accent />
+          </KpiRow>
+        </Rail>
+      }
+    >
+      <Card
+        mono="Test"
+        title="Passage"
+        actions={
+          phase !== 'idle' ? (
+            <Actions>
+              {running ? <Button onClick={onPause}>Pause</Button> : <Button onClick={onResume}>Resume</Button>}
+              <Button onClick={onRestart}>Restart</Button>
+            </Actions>
+          ) : undefined
+        }
+      >
+        {phase === 'idle' ? (
+          <Stack>
+            <EmptyState
+              mono="Ready"
+              title="No test in progress"
+              detail="Start a timed test to measure your words per minute and accuracy."
+            />
+            <Actions>
+              <Button kind="primary" onClick={onStart}>Start Test</Button>
+            </Actions>
+          </Stack>
+        ) : (
+          <Stack>
             <Stack>
-              <Body>No test in progress</Body>
-              <Button kind="primary" onClick={onStart}>
-                Start Test
-              </Button>
-            </Stack>
-          ) : (
-            <Stack>
-              <TextInput label="Input" rows={3} value={typed} onChange={onInput} />
-
-              <div>
-                <span className="lc-field-label" aria-hidden="true">
-                  Passage
-                </span>
-                <div className="typing-passage" aria-label="Passage">
-                  {PASSAGE.split('').map((ch, i) => (
-                    <span key={i} className={charTone(i)}>
-                      {ch}
-                    </span>
-                  ))}
-                </div>
+              <div className="typing-strip" aria-label="Passage">
+                {PASSAGE.split('').map((ch, i) => (
+                  <span key={i} className={charTone(i)}>
+                    {ch}
+                  </span>
+                ))}
               </div>
-
-              <div className="lc-mono" role="timer" aria-label="Time">
-                {formatTime(elapsed)}
-              </div>
-
-              <MonoLabel>Correct: {correct} / {PASSAGE.length}</MonoLabel>
-
-              {done ? (
-                <Stack>
-                  <MonoLabel accent>WPM: {wpm === null ? '0.0' : wpm.toFixed(1)}</MonoLabel>
-                  <MonoLabel>Accuracy: {accuracy === null ? '0.0' : accuracy.toFixed(1)}%</MonoLabel>
-                  <Button kind="primary" onClick={onRestart}>
-                    Restart
-                  </Button>
-                </Stack>
-              ) : (
-                <div className="typing-actions">
-                  {running ? (
-                    <Button onClick={onPause}>Pause</Button>
-                  ) : (
-                    <Button onClick={onResume}>Resume</Button>
-                  )}
-                  <Button onClick={onRestart}>Restart</Button>
-                </div>
-              )}
+              <TextInput label="Input" rows={3} value={typed} onChange={onInput} placeholder="Type here" />
             </Stack>
-          )}
-        </Stack>
+
+            <div className="lc-mono" role="timer" aria-label="Time">
+              {formatTime(elapsed)}
+            </div>
+
+            <MonoLabel>
+              Correct: {correct} / {PASSAGE.length}
+              {phase === 'paused' ? ' · paused' : ''}
+            </MonoLabel>
+
+            {done ? (
+              <Stack>
+                <KpiRow>
+                  <Kpi value={wpm === null ? '0.0' : wpm.toFixed(1)} label="WPM" accent />
+                  <Kpi value={`${accuracy === null ? '0.0' : accuracy.toFixed(1)}%`} label="Accuracy" />
+                </KpiRow>
+                <MonoLabel>Accuracy: {accuracy === null ? '0.0' : accuracy.toFixed(1)}%</MonoLabel>
+                {bestWpm > 0 && <MonoLabel accent>Best WPM: {bestWpm.toFixed(1)}</MonoLabel>}
+                <Tag accent>Complete</Tag>
+              </Stack>
+            ) : (
+              <Body sm>
+                Type the passage as fast and as accurately as you can. The clock, your progress and your best score survive a reload.
+              </Body>
+            )}
+          </Stack>
+        )}
       </Card>
-    </main>
+    </AppShell>
   )
 }

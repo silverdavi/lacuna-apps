@@ -1,56 +1,21 @@
-.typing-app {
+.typing-strip {
   display: flex;
-  flex-direction: column;
-  gap: calc(8px * var(--sf));
-}
-
-.typing-passage {
-  position: relative;
-  width: 100%;
+  flex-wrap: wrap;
+  gap: calc(1px * var(--sf));
   font-family: var(--mono);
-  font-size: calc(14px * var(--tf));
-  line-height: calc(24px * var(--tf));
-  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  border: calc(1px * var(--sf)) solid var(--ui-line2);
-  border-radius: calc(2px * var(--sf));
-  background: rgb(128, 128, 128);
-}
-
-/* The real form control, carrying the passage value, is present but visually
-   unobtrusive so the field reads as a labelled text area. */
-.typing-passage-value {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  width: 100%;
-  min-height: 100%;
-  overflow: hidden;
-  color: transparent;
-  background: transparent;
-  border: none;
-  resize: none;
-  white-space: pre-wrap;
-  pointer-events: none;
+  font-size: calc(12px * var(--tf));
 }
 
 .typing-char {
   border-radius: calc(1px * var(--sf));
-  background: rgb(128, 128, 128);
-  color: rgb(255, 255, 255);
+  padding: 0 calc(2px * var(--sf));
+  background: var(--ui-line2);
 }
 
 .typing-char--ok {
-  background: rgb(46, 160, 90);
+  background: var(--geo-green);
 }
 
 .typing-char--bad {
-  background: rgb(214, 60, 50);
-}
-
-.typing-actions {
-  display: flex;
-  align-items: center;
-  gap: calc(8px * var(--sf));
+  background: var(--geo-verm);
 }
