@@ -1,48 +1,52 @@
 {
   "version": 1,
-  "spec_sha256": "1446c84f09971e8e65b8defbf6dd512241f45602353c7a3d9b1d099f5e9639e9",
+  "spec_sha256": "1facbcfafa3c53ef6a64e393f9029da131f9697d60537f19e981bea1dc75782f",
   "checks": [
     {
       "id": "A1",
-      "text": "Typing \"100000\" in the field labelled \"Principal\", \"5\" in the field labelled \"Annual rate %\", and \"30\" in the field labelled \"Years\" shows \"567.79\" in the field labelled \"Monthly payment\"."
+      "text": "On first open the fields labelled \"Principal\", \"Annual rate %\" and \"Years\" hold 100000, 5 and 30, and the results show \"Monthly payment\" $536.82, \"Total interest\" $93,255.78 and \"Total paid\" $193,255.78."
     },
     {
       "id": "A2",
-      "text": "With the same inputs as A1, the field labelled \"Total interest\" shows \"104,403.60\" and the field labelled \"Total paid\" shows \"204,403.60\"."
+      "text": "Typing 15 in the field labelled \"Years\" shows \"Monthly payment\" $790.79 and \"Total interest\" $42,342.85."
     },
     {
       "id": "A3",
-      "text": "Changing the field labelled \"Years\" to \"15\" updates the field labelled \"Monthly payment\" to \"791.90\" and the field labelled \"Total interest\" to \"42,943.60\"."
+      "text": "Typing 50000 in \"Principal\", 0 in \"Annual rate %\" and 5 in \"Years\" shows \"Monthly payment\" $833.33 and \"Total interest\" $0.00."
     },
     {
       "id": "A4",
-      "text": "With Principal \"50000\", Annual rate \"0\", and Years \"5\", the field labelled \"Monthly payment\" shows \"833.33\" and the field labelled \"Total interest\" shows \"0.00\"."
+      "text": "Typing 25000 in \"Principal\", 7.5 in \"Annual rate %\" and 5 in \"Years\" shows \"Monthly payment\" $500.95 and \"Total interest\" $5,056.92."
     },
     {
       "id": "A5",
-      "text": "Clicking the button labelled \"Show schedule\" reveals a table where the first data row contains \"1\" in the first column, \"567.79\" in the second column, and \"417.79\" in the third column."
+      "text": "With the first-open values, clicking \"Show schedule\" shows a table with 360 payment rows; the row for payment 1 shows payment $536.82, interest $416.67, principal $120.15 and balance $99,879.85."
     },
     {
       "id": "A6",
-      "text": "In the schedule table from A5, the last data row contains \"360\" in the first column and \"0.00\" in the fourth column."
+      "text": "With the first-open values, the row for payment 360 shows balance $0.00."
     },
     {
       "id": "A7",
-      "text": "Typing \"abc\" in the field labelled \"Principal\" and pressing Tab shows the error message \"Enter a valid number\" and the field labelled \"Monthly payment\" remains empty."
+      "text": "Typing -100 in the field labelled \"Principal\" shows the message \"Principal must be between 1 and 100,000,000\" and the results keep showing the last valid values; typing 80 in \"Years\" shows the message \"Years must be between 1 and 50\"."
     },
     {
       "id": "A8",
-      "text": "Typing \"-100\" in the field labelled \"Principal\" and pressing Tab shows the error message \"Principal must be positive\" and the field labelled \"Monthly payment\" remains empty."
+      "text": "Clicking \"Save loan\" adds a row to the list labelled \"Saved loans\" that contains $536.82; before any loan is saved the list shows \"No saved loans yet\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the calculated results: after entering Principal \"100000\", Annual rate \"5\", Years \"30\" and reloading, the field labelled \"Monthly payment\" still shows \"567.79\"."
+      "text": "Reload keeps the inputs without saving: after typing 25000 in \"Principal\", 7.5 in \"Annual rate %\" and 5 in \"Years\" and reloading (no button pressed), the three fields hold 25000, 7.5 and 5 and the results show \"Monthly payment\" $500.95 with an empty saved loans list (\"No saved loans yet\")."
+    },
+    {
+      "id": "A10",
+      "text": "Reload keeps saved loans: after clicking \"Save loan\" on first open and reloading, the list labelled \"Saved loans\" still contains $536.82."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "597ef1558cfa0c9d9ae11e0d66021adf963a5b60fdaac07938700e8afb34b95b"
+      "sha256": "b10477614e349318aea6882faf989435f735193a857fac946d2221aa05eff997"
     }
   ]
 }

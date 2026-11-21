@@ -1,6 +1,15 @@
-import { emptyLoan, loadLoan, saveLoan, type LoanRecord } from './mock'
+import {
+  emptyLoan,
+  addSavedLoan,
+  listSavedLoans,
+  loadLoan,
+  removeSavedLoan,
+  saveLoan,
+  type LoanRecord,
+  type SavedLoan,
+} from './mock'
 
-export type { LoanRecord }
+export type { LoanRecord, SavedLoan }
 
 export const host = {
   load(): LoanRecord {
@@ -13,5 +22,14 @@ export const host = {
   reset(): LoanRecord {
     saveLoan(emptyLoan)
     return emptyLoan
+  },
+  listSavedLoans(): SavedLoan[] {
+    return listSavedLoans()
+  },
+  addSavedLoan(record: Omit<SavedLoan, 'id'>): SavedLoan {
+    return addSavedLoan(record)
+  },
+  removeSavedLoan(id: string): boolean {
+    return removeSavedLoan(id)
   },
 }
