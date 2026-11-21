@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -12,7 +12,7 @@ import {
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { RecordTable, type ColumnDef } from '@lacuna/record-table'
-import { players, matchWinners } from './host'
+import { players, matchWinners, type Player } from './host'
 
 type ResolvedMatch = {
   id: string
@@ -26,8 +26,8 @@ type ResolvedMatch = {
 function roundCounts(playerCount: number): number[] {
   let n = playerCount
   const counts: number[] = []
-  while (n > 0) {
-    counts.unshift(Math.max(1, Math.ceil(n / 2)))
+  while (n > 1) {
+    counts.push(Math.ceil(n / 2))
     n = Math.ceil(n / 2)
   }
   return counts
@@ -40,27 +40,16 @@ function roundTitle(round: number, totalRounds: number): string {
 }
 
 export function App() {
-  const [tick, setTick] = useState(0)
   const [tab, setTab] = useState<'Players' | 'Bracket' | 'Results'>('Bracket')
   const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [playerList, setPlayerList] = useState<Player[]>(() => players.list().sort((a, b) => a.seed - b.seed))
   const [winners, setWinnersState] = useState<Record<string, string>>(() => matchWinners.get())
   const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
-  useEffect(() => {
-    matchWinners.set(winners)
-  }, [winners])
+  const playerNames = playerList.map((p) => p.name)
 
-  const playerNames = useMemo(
-    () =>
-      players
-        .list()
-        .sort((a, b) => a.seed - b.seed)
-        .map((p) => p.name),
-    [tick],
-  )
-
-  const matches = useMemo(() => {
+  const matches = (() => {
     const counts = roundCounts(playerNames.length)
     const totalRounds = counts.length
     const list: { id: string; round: number; index: number; a: string | null; b: string | null }[] = []
@@ -78,21 +67,12 @@ export function App() {
       }
     }
     return list
-  }, [playerNames])
+  })()
 
-  const totalRounds = useMemo(() => roundCounts(playerNames.length).length, [playerNames.length])
+  const totalRounds = roundCounts(playerNames.length).length
 
-  const resolved = useMemo(() => {
+  const resolved = (() => {
     const byId = new Map(matches.map((m) => [m.id, m]))
-    const winnersById = new Map<string, string | null>()
-    function win(m: { id: string; round: number; index: number }): string | null {
-      const cached = winnersById.get(m.id)
-      if (cached !== undefined) return cached
-      const direct = winners[m.id]
-      const value = direct ?? null
-      winnersById.set(m.id, value)
-      return value
-    }
     const out: ResolvedMatch[] = []
     const walk = (m: { id: string; round: number; index: number; a: string | null; b: string | null }): ResolvedMatch => {
       let a = m.a
@@ -100,8 +80,8 @@ export function App() {
       if (m.round > 1) {
         const left = byId.get(`r${m.round - 1}m${Math.floor(m.index / 2) + 1}`)
         const right = byId.get(`r${m.round - 1}m${Math.floor(m.index / 2) + 2}`)
-        if (left) a = win(left)
-        if (right) b = win(right)
+        if (left) a = winners[left.id] ?? null
+        if (right) b = winners[right.id] ?? null
       }
       const winner = winners[m.id] ?? null
       out.push({ id: m.id, round: m.round, index: m.index, a, b, winner })
@@ -109,40 +89,43 @@ export function App() {
     }
     for (const m of matches) walk(m)
     return out
-  }, [matches, winners])
+  })()
 
-  const rounds = useMemo(
-    () =>
-      Array.from({ length: totalRounds }, (_, i) => ({
-        round: i + 1,
-        title: roundTitle(i + 1, totalRounds),
-        matches: resolved.filter((m) => m.round === i + 1),
-      })),
-    [resolved, totalRounds],
-  )
+  const rounds = Array.from({ length: totalRounds }, (_, i) => ({
+    round: i + 1,
+    title: roundTitle(i + 1, totalRounds),
+    matches: resolved.filter((m) => m.round === i + 1),
+  }))
 
-  const champion = useMemo(() => {
+  const champion = (() => {
     const finalMatches = resolved.filter((m) => m.round === totalRounds)
     if (finalMatches.length === 0) return null
     return finalMatches[finalMatches.length - 1].winner
-  }, [resolved, totalRounds])
+  })()
 
   function pickWinner(matchId: string, winnerName: string | null) {
     if (!winnerName) return
-    setWinnersState((prev) => ({ ...prev, [matchId]: winnerName }))
+    setWinnersState((prev) => {
+      const next = { ...prev, [matchId]: winnerName }
+      matchWinners.set(next)
+      return next
+    })
   }
 
   function addPlayer() {
     const next = name.trim()
-    if (!next) return setError('Type a player name first')
-    if (players.list().some((p) => p.name.toLowerCase() === next.toLowerCase())) {
-      return setError('That player is already in the bracket')
+    if (!next) {
+      setError('Type a player name first')
+      return
     }
-    players.add({ name: next, seed: players.list().length + 1 })
-    setWinnersState({})
+    if (playerList.some((p) => p.name.toLowerCase() === next.toLowerCase())) {
+      setError('That player is already in the bracket')
+      return
+    }
+    const p = players.add({ name: next, seed: playerList.length + 1 })
+    setPlayerList((prev) => [...prev, p].sort((a, b) => a.seed - b.seed))
     setName('')
     setError(null)
-    setTick((t) => t + 1)
   }
 
   const resultsRows = useMemo(
@@ -166,12 +149,8 @@ export function App() {
   }, [resultsRows])
 
   const playerRecords = useMemo(
-    () =>
-      players
-        .list()
-        .sort((a, b) => a.seed - b.seed)
-        .map((p) => ({ id: p.id, name: p.name, seed: p.seed })),
-    [tick],
+    () => playerList.map((p) => ({ id: p.id, name: p.name, seed: p.seed })),
+    [playerList],
   )
 
   const playerColumns: ColumnDef<{ id: string; name: string; seed: number }>[] = useMemo(
@@ -184,6 +163,10 @@ export function App() {
 
   function MatchCard({ match }: { match: ResolvedMatch }) {
     const bothSet = match.a != null && match.b != null
+    const isResolved = match.winner != null
+    if (isResolved) {
+      return null
+    }
     return (
       <div
         style={{
@@ -207,7 +190,7 @@ export function App() {
         </div>
         <div style={{ display: 'flex', gap: 'calc(6px * var(--sf))', flexWrap: 'wrap' }}>
           <Button
-            kind={match.winner === match.a ? 'primary' : 'secondary'}
+            kind="secondary"
             disabled={!bothSet}
             ariaLabel={match.a ? `Winner: ${match.a}` : 'Winner: —'}
             onClick={() => pickWinner(match.id, match.a)}
@@ -215,7 +198,7 @@ export function App() {
             {match.a ?? '—'}
           </Button>
           <Button
-            kind={match.winner === match.b ? 'primary' : 'secondary'}
+            kind="secondary"
             disabled={!bothSet}
             ariaLabel={match.b ? `Winner: ${match.b}` : 'Winner: —'}
             onClick={() => pickWinner(match.id, match.b)}
@@ -229,7 +212,7 @@ export function App() {
 
   const grid: React.CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(calc(180px * var(--sf)), 1fr))',
     gap: 'calc(8px * var(--sf))',
   }
 
@@ -257,7 +240,7 @@ export function App() {
       icon="people"
       hue="gold"
       category="Productivity"
-      meta={`${playerNames.length} player${playerNames.length === 1 ? '' : 's'}`}
+      meta={playerNames.length > 0 ? `${playerNames.length} player${playerNames.length === 1 ? '' : 's'}` : undefined}
       status="Saved on this device"
       side={
         <Rail
@@ -276,6 +259,7 @@ export function App() {
               role="tab"
               aria-selected={tab === item}
               className={`lc-tab${tab === item ? ' active' : ''}`}
+              style={tab === item ? undefined : { color: 'var(--ink-60)' }}
               onClick={() => setTab(item)}
             >
               {item}
@@ -307,7 +291,7 @@ export function App() {
           </Card>
           <Card mono={`${playerNames.length} player${playerNames.length === 1 ? '' : 's'}`} title="Players">
             {playerNames.length === 0 ? (
-              <EmptyState mono="Empty" title="No players yet" detail="Add the first player above to start the bracket." />
+              <EmptyState title="No players yet" detail="Add the first player above to start the bracket." />
             ) : (
               <RecordTable records={playerRecords} columns={playerColumns} ariaLabel="Players" />
             )}
@@ -316,9 +300,19 @@ export function App() {
       )}
 
       {tab === 'Bracket' && (
-        <Card mono={`${resolved.length} matches`} title="Bracket">
+        <Card
+          mono={playerNames.length > 0 ? `${resolved.length} matches` : undefined}
+          title="Bracket"
+          actions={
+            resultsRows.length > 0 ? (
+              <Button kind="secondary" onClick={() => void copy(csvText)}>
+                {copied ? 'Copied' : 'Export CSV'}
+              </Button>
+            ) : undefined
+          }
+        >
           {playerNames.length === 0 ? (
-            <EmptyState mono="Empty" title="No players yet" detail="Add at least 2 players to see the bracket." />
+            <EmptyState title="No players yet" detail="Add at least 2 players to see the bracket." />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(12px * var(--sf))' }}>
               {rounds.map((r) => (
@@ -339,13 +333,15 @@ export function App() {
           mono={`${resultsRows.length} result${resultsRows.length === 1 ? '' : 's'}`}
           title="Results"
           actions={
-            <Button kind="secondary" onClick={() => void copy(csvText)} disabled={resultsRows.length === 0}>
-              {copied ? 'Copied' : 'Export CSV'}
-            </Button>
+            resultsRows.length > 0 ? (
+              <Button kind="secondary" onClick={() => void copy(csvText)}>
+                {copied ? 'Copied' : 'Export CSV'}
+              </Button>
+            ) : undefined
           }
         >
           {resultsRows.length === 0 ? (
-            <EmptyState mono="Empty" title="No results yet" detail="Pick winners in the bracket to see results here." />
+            <EmptyState title="No results yet" detail="Pick winners in the bracket to see results here." />
           ) : (
             <Table
               label="Results"
