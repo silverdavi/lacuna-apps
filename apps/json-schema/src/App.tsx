@@ -1,5 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, Stack, TextInput } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  FormGrid,
+  List,
+  Rail,
+  Row,
+  Stack,
+  TextInput,
+} from '@lacuna/ui'
+import { saveJSON } from '@lacuna/file-save-open'
 import { host } from './host'
 import type { ValidationState } from './host'
 import { validateAgainst } from './validate'
@@ -16,15 +31,7 @@ function downloadReport(state: ValidationState) {
     schema: state.schema,
     errors: state.errors,
   }
-  const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'validation-report.json'
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  URL.revokeObjectURL(url)
+  saveJSON(report, { filename: 'validation-report.json', mimeType: 'application/json' })
 }
 
 export function App() {
@@ -64,36 +71,76 @@ export function App() {
     record(errors.length === 0 ? 'pass' : 'fail', errors)
   }
 
+  const status =
+    result == null
+      ? 'Local · no run yet'
+      : result.status === 'pass'
+        ? 'Local · passed'
+        : result.status === 'fail'
+          ? `Local · ${result.errors.length} error${result.errors.length === 1 ? '' : 's'}`
+          : 'Local · invalid input'
+
   return (
-    <main>
-      <Card mono="Validation">
-        <Stack lg>
-          <h1 className="lc-title lc-title-lg">JSON Schema Validator</h1>
+    <AppShell
+      name="JSON Schema Validator"
+      icon="security"
+      hue="blue"
+      category="Productivity"
+      meta={
+        result == null
+          ? 'draft-07'
+          : result.status === 'pass'
+            ? 'pass'
+            : result.status === 'fail'
+              ? 'failed'
+              : 'invalid'
+      }
+      status={status}
+      side={
+        <Rail title="JSON Schema Validator" note="Two fields · local" chips={['Draft-07', 'Report download', 'Works offline']}>
+          <Body sm>
+            Paste a JSON document and a schema, press Validate, and read the errors. The last
+            inputs and result stay on this device.
+          </Body>
+        </Rail>
+      }
+    >
+      <Card mono="Input" title="Document and schema">
+        <FormGrid>
           <TextInput label="JSON Data" value={data} onChange={setData} rows={6} />
           <TextInput label="Schema" value={schemaText} onChange={setSchemaText} rows={6} />
-          <Stack>
-            <Button kind="primary" onClick={runValidation}>
-              Validate
-            </Button>
-            {result && result.status === 'pass' && (
-              <Button onClick={() => downloadReport(result)}>Download Report</Button>
-            )}
-          </Stack>
-          {!result && <Body>No validation results yet</Body>}
-          {result && result.status === 'pass' && <Body>Validation passed</Body>}
-          {result && result.status === 'fail' && (
-            <Stack>
-              <Body>Validation failed</Body>
-              <ul>
-                {result.errors.map((error) => (
-                  <li key={error}>{error}</li>
-                ))}
-              </ul>
-            </Stack>
+        </FormGrid>
+        <Actions>
+          <Button kind="primary" onClick={runValidation}>Validate</Button>
+          {result != null && result.status === 'pass' && (
+            <Button onClick={() => downloadReport(result)}>Download Report</Button>
           )}
-          {result && result.status === 'invalid-data' && <Body>Invalid JSON in data field</Body>}
-        </Stack>
+        </Actions>
       </Card>
-    </main>
+
+      <Card mono="Result" title="Validation">
+        {result == null && (
+          <EmptyState
+            mono="Empty"
+            title="No validation results yet"
+            detail="Paste a document and a schema, then press Validate."
+          />
+        )}
+        {result != null && result.status === 'pass' && <Body>Validation passed</Body>}
+        {result != null && result.status === 'invalid-data' && (
+          <ErrorState title="Invalid JSON in data field" detail="Fix the JSON Data, then press Validate again." />
+        )}
+        {result != null && result.status === 'fail' && (
+          <Stack>
+            <Body>Validation failed</Body>
+            <List label="Errors">
+              {result.errors.map((error) => (
+                <Row key={error} title={error} />
+              ))}
+            </List>
+          </Stack>
+        )}
+      </Card>
+    </AppShell>
   )
 }
