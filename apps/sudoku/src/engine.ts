@@ -1,6 +1,8 @@
 import { mulberry32, randomInt, shuffle, type Rng } from '@lacuna/random'
 import type { Difficulty, PuzzleRecord } from './host'
 
+export type { Difficulty } from './host'
+
 export const SIZE = 9
 export const CELLS = SIZE * SIZE
 export type Board = number[]

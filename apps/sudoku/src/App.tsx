@@ -1,167 +1,207 @@
-import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, Stack } from '@lacuna/ui'
-import { host, type Difficulty, type PuzzleRecord } from './host'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { AppShell, Card, Rail, Button, Kpi, KpiRow, Keys, Tag } from '@lacuna/ui'
 import {
-  SIZE,
-  formatTime,
-  isSolved,
-  conflictSet,
   makeRecord,
   placeDigit,
+  conflictSet,
+  isSolved,
+  statusFor,
   elapsedSeconds,
-  type TimerBase,
+  formatTime,
+  type Difficulty,
 } from './engine'
+import { host, type PuzzleRecord } from './host'
 import './styles.css'
 
-const cellClass = {
-  root: 'sud-cell',
-  bold: 'sud-cell--bold',
-  selected: 'sud-cell--selected',
-  filled: 'sud-cell--filled',
-  invalid: 'sud-cell--invalid',
+type Status = 'idle' | 'playing' | 'finished'
+
+const boardVars: CSSProperties = {
+  ['--cols' as string]: 9,
+  ['--rows' as string]: 9,
+}
+
+function freshRecord(difficulty: Difficulty, now: number): PuzzleRecord {
+  return makeRecord(difficulty, now, `puz-${now}`, Math.floor(now / 1000))
 }
 
 export function App() {
-  const [record, setRecord] = useState<PuzzleRecord | null>(() => host.loadPuzzle())
-  const [difficulty, setDifficulty] = useState<Difficulty>(() => record?.difficulty ?? 'Easy')
+  const [difficulty, setDifficulty] = useState<Difficulty>('Easy')
+  const [record, setRecord] = useState<PuzzleRecord>(() => host.loadPuzzle() ?? freshRecord('Easy', Date.now()))
   const [selected, setSelected] = useState<number | null>(null)
+  const [status, setStatus] = useState<Status>('idle')
+  const [base, setBase] = useState({ at: Date.now(), seconds: 0 })
+  const [now, setNow] = useState(() => Date.now())
 
-  // Elapsed seconds are derived from a wall-clock reference rather than an
-  // incrementing counter, so the displayed time tracks real elapsed time even
-  // when the tick cadence is coarser than one second.
-  const timerBaseRef = useRef<TimerBase | null>(null)
-
-  const solved = record !== null && isSolved(record.board)
-  const conflict = record ? conflictSet(record.board) : new Set<number>()
-  const status = record !== null ? (solved ? 'Puzzle Solved' : conflict.size > 0 ? 'Invalid move' : '') : ''
-
-  const currentSeconds = (rec: PuzzleRecord | null): number => {
-    const base = timerBaseRef.current
-    if (!rec || !base) return rec ? rec.seconds : 0
-    return elapsedSeconds(base, Date.now())
-  }
-
-  const displaySeconds = record ? currentSeconds(record) : 0
+  // The frozen time after solving: the record's own seconds stay fixed.
+  const seconds = status === 'playing' ? elapsedSeconds(base, now) : record.seconds
+  const time = formatTime(seconds)
+  const statusText = statusFor(record.board)
+  const conflicts = conflictSet(record.board)
+  const stateRef = useRef<{ status: Status; record: PuzzleRecord; selected: number | null; base: { at: number; seconds: number }; place: (digit: number) => void; start: () => void }>({
+    status,
+    record,
+    selected,
+    base,
+    place: () => {},
+    start: () => {},
+  })
 
   useEffect(() => {
-    const active = record !== null && !isSolved(record.board)
-    if (!active) {
-      timerBaseRef.current = null
-      return
-    }
-    if (timerBaseRef.current === null) {
-      timerBaseRef.current = { at: Date.now(), seconds: record ? record.seconds : 0 }
-    }
-    const id = window.setInterval(() => {
-      setRecord((current) => {
-        if (!current || isSolved(current.board)) return current
-        const base = timerBaseRef.current
-        if (!base) return current
-        const seconds = elapsedSeconds(base, Date.now())
-        if (seconds === current.seconds) return current
-        const next = { ...current, seconds, updatedAt: Date.now() }
-        host.savePuzzle(next)
-        return next
-      })
-    }, 250)
-    return () => window.clearInterval(id)
-  }, [record !== null, solved])
+    host.savePuzzle({ ...record, seconds })
+  }, [record, seconds])
 
-  const start = (level: Difficulty) => {
-    const next = makeRecord(level, Date.now(), `puzzle-${Date.now().toString(36)}`)
-    host.savePuzzle(next)
-    timerBaseRef.current = null
-    setRecord(next)
-    setDifficulty(level)
-    setSelected(null)
+  useEffect(() => {
+    if (status !== 'playing') return
+    const id = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(id)
+  }, [status])
+
+  function select(i: number) {
+    if (status === 'finished') return
+    setSelected(selected === i ? null : i)
   }
 
-  const press = (digit: number) => {
-    if (!record || selected === null || solved) return
+  function place(digit: number) {
+    if (status !== 'playing' || selected === null) return
+    if (record.given[selected] !== 0) return
     const board = placeDigit(record.given, record.board, selected, digit)
     if (board === record.board) return
-    const next = { ...record, board, updatedAt: Date.now() }
-    host.savePuzzle(next)
-    setRecord(next)
+    if (isSolved(board)) {
+      setRecord({ ...record, board, seconds: elapsedSeconds(base, Date.now()), updatedAt: Date.now() })
+      setStatus('finished')
+    } else {
+      setRecord({ ...record, board, updatedAt: Date.now() })
+    }
   }
 
+  function start() {
+    if (status === 'finished') return
+    setStatus('playing')
+    setBase({ at: Date.now(), seconds: 0 })
+    setNow(Date.now())
+  }
+
+  function newGame(d: Difficulty) {
+    setRecord(freshRecord(d, Date.now()))
+    setSelected(null)
+    setStatus('playing')
+    setBase({ at: Date.now(), seconds: 0 })
+    setNow(Date.now())
+  }
+
+  stateRef.current = { status, record, selected, base, place, start }
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const s = stateRef.current
+      if (e.key >= '1' && e.key <= '9') s.place(Number(e.key))
+      else if (e.key === ' ') {
+        e.preventDefault()
+        s.start()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
-    <main>
-      <Card mono="Puzzle">
-        <h1 className="lc-title lc-title-md" style={{ margin: 0 }}>
-          Sudoku Puzzle
-        </h1>
-        <Stack>
-          <div className="sud-bar">
-            <label className="sud-diff" htmlFor="sud-difficulty">
-              Difficulty
-            </label>
+    <AppShell name="Sudoku" icon="grid" meta="9 × 9">
+      <div className="sud-heading">
+        <h2 className="sud-title">Sudoku Puzzle</h2>
+        <span role="timer" aria-label="Time" className="sud-timer">
+          {time}
+        </span>
+      </div>
+
+      <Card title="Board">
+        <div className="sud-board lk-board" role="grid" aria-label="Board" style={boardVars}>
+          {Array.from({ length: 9 }, (_, r) => (
+            <div key={r} className="sud-row" role="row">
+              {Array.from({ length: 9 }, (_, c) => {
+                const i = r * 9 + c
+                const v = record.board[i]
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    role="gridcell"
+                    aria-label={`Row ${r + 1}, Column ${c + 1}`}
+                    aria-invalid={conflicts.has(i) ? 'true' : undefined}
+                    data-row={r + 1}
+                    data-col={c + 1}
+                    data-value={v}
+                    data-answer={record.given[i]}
+                    data-selected={selected === i ? 'true' : undefined}
+                    data-conflict={conflicts.has(i) ? 'true' : undefined}
+                    className={
+                      'sud-cell' +
+                      (record.given[i] !== 0 ? ' sud-cell--given' : '') +
+                      (selected === i ? ' sud-cell--selected' : '') +
+                      (conflicts.has(i) ? ' sud-cell--invalid' : '')
+                    }
+                    onClick={() => select(i)}
+                  >
+                    <span className="sud-cell-val">{v || ''}</span>
+                  </button>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+        {statusText ? <Tag accent={statusText === 'Invalid move'}>{statusText}</Tag> : null}
+      </Card>
+
+      <Card title="Controls">
+        <div className="sud-digits">
+          {Array.from({ length: 9 }, (_, k) => k + 1).map((n) => (
+            <Button
+              key={n}
+              ariaLabel={String(n)}
+              style={{ width: 'calc(40px * var(--sf))', justifyContent: 'center' }}
+              onClick={() => place(n)}
+              disabled={status !== 'playing' || selected === null}
+            >
+              {n}
+            </Button>
+          ))}
+        </div>
+        <div className="sud-new">
+          <label className="lc-field sud-field">
+            <span className="lc-field-label" id="sud-difficulty">Difficulty</span>
             <select
-              id="sud-difficulty"
-              className="sud-select"
+              className="lc-input"
+              id="sud-difficulty-select"
+              aria-labelledby="sud-difficulty"
               value={difficulty}
-              onChange={(event) => setDifficulty(event.target.value as Difficulty)}
+              onChange={(event) => {
+                const d = event.target.value as Difficulty
+                setDifficulty(d)
+                newGame(d)
+              }}
             >
               <option value="Practice">Practice</option>
               <option value="Easy">Easy</option>
               <option value="Hard">Hard</option>
             </select>
-            <Button kind="primary" onClick={() => start(difficulty)}>
-              New Game
-            </Button>
-            <span className="sud-timer" role="timer" aria-label="Time">
-              {formatTime(displaySeconds)}
-            </span>
-          </div>
-          <div className="sud-grid" role="grid" aria-label="Board">
-            {Array.from({ length: SIZE }, (_, r) => (
-              <div className="sud-row" role="row" key={r}>
-                {Array.from({ length: SIZE }, (_, c) => {
-                  const i = r * SIZE + c
-                  const given = record !== null && record.given[i] !== 0
-                  const value = record ? record.board[i] : 0
-                  const cls = [
-                    cellClass.root,
-                    (c === 2 || c === 5) && cellClass.bold,
-                    (r === 2 || r === 5) && cellClass.bold,
-                    selected === i && cellClass.selected,
-                    value !== 0 && given && cellClass.filled,
-                    conflict.has(i) && cellClass.invalid,
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                  return (
-                    <div
-                      key={i}
-                      role="gridcell"
-                      aria-label={`Row ${r + 1}, Column ${c + 1}`}
-                      aria-invalid={conflict.has(i) ? 'true' : undefined}
-                      className={cls}
-                      onClick={() => {
-                        setSelected(i)
-                      }}
-                    >
-                      {value === 0 ? '' : value}
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
-          <div className="sud-digits" role="group" aria-label="Digits">
-            {Array.from({ length: 9 }, (_, n) => (
-              <Button key={n} kind="secondary" onClick={() => press(n + 1)}>
-                {n + 1}
-              </Button>
-            ))}
-          </div>
-          {status && <p className="sud-status" role="status">{status}</p>}
-          <Body sm>
-            Pick a difficulty and press New Game. Choose a cell, then a digit. The clock runs while the
-            puzzle is open, and the board is kept when the page reloads.
-          </Body>
-        </Stack>
+          </label>
+          <Button kind="primary" onClick={() => newGame(difficulty)}>
+            New Game
+          </Button>
+        </div>
+        <Keys
+          items={[
+            ['1–9', 'Fill the selected cell.'],
+            ['Space', 'Start the timer.'],
+          ]}
+        />
       </Card>
-    </main>
+
+      <Rail title="Game">
+        <KpiRow>
+          <Kpi label="Status" value={status === 'playing' ? 'playing' : status === 'finished' ? 'solved' : 'ready'} />
+          <Kpi label="Difficulty" value={record.difficulty} />
+        </KpiRow>
+        {status === 'finished' ? <Tag accent>Solved in {time}</Tag> : null}
+      </Rail>
+    </AppShell>
   )
 }
