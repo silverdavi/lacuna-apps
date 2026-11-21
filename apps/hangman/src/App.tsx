@@ -1,7 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { CSSProperties } from 'react'
-import { Body, Card, Stack } from '@lacuna/ui'
-import { loadRecord, saveRecord, type GameRecord } from './host'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  Rail,
+  Stack,
+} from '@lacuna/ui'
+import { useLocalRecord } from '@lacuna/use-local-record'
+
+interface GameRecord {
+  score: number
+  best: number
+}
 
 const WORD = 'CAT'
 const SLOTS = 6
@@ -28,17 +44,33 @@ function freshRound(): Round {
 
 const slotStyle: CSSProperties = {
   display: 'inline-block',
-  border: 'calc(1px * var(--sf)) solid var(--mid)',
+  border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+  borderRadius: 'calc(2px * var(--sf))',
   padding: 'calc(4px * var(--sf)) calc(8px * var(--sf))',
+  fontFamily: 'var(--mono)',
+  fontSize: 'calc(13px * var(--tf))',
+  color: 'var(--ink)',
+}
+
+const lineStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'calc(8px * var(--sf))',
+}
+
+const boardStyle: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 'calc(4px * var(--sf))',
 }
 
 export function App() {
-  const [record, setRecord] = useState<GameRecord>(() => loadRecord())
+  const { value: record, set: setRecord } = useLocalRecord<GameRecord>({
+    key: 'lacuna.hangman.record',
+    version: 1,
+    defaultValue: { score: 0, best: 0 },
+  })
   const [round, setRound] = useState<Round | null>(null)
-
-  useEffect(() => {
-    saveRecord(record)
-  }, [record])
 
   function start() {
     setRound(freshRound())
@@ -52,10 +84,10 @@ export function App() {
       const won = round.word.split('').every((ch, i) => revealed[i])
       setRound({ ...round, revealed, status: won ? 'won' : 'playing' })
       if (won) {
-        setRecord((current) => ({
-          score: current.score + 1,
-          best: Math.max(current.best, current.score + 1),
-        }))
+        setRecord((current) => {
+          const score = current.score + 1
+          return { score, best: Math.max(current.best, score) }
+        })
       }
       return
     }
@@ -67,20 +99,33 @@ export function App() {
   const lives = round ? LIVES - round.missed.length : LIVES
 
   return (
-    <main>
-      <style>{`
-        button[data-letter]::before { content: attr(data-letter); }
-      `}</style>
-      <Card mono="Game">
-        <Stack>
-          <h1 style={{ margin: 0 }}>Hangman Game</h1>
-          <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))' }}>
-            <span>Score: {record.score}</span>
-            <span>Best: {record.best}</span>
-          </div>
+    <AppShell
+      name="Hangman Game"
+      icon="whiteboard"
+      hue="cobalt"
+      category="Personal"
+      meta={`Best ${record.best}`}
+      status="Saved on this device"
+      side={
+        <Rail
+          title="Hangman Game"
+          note="One word · six lives · local"
+          chips={['Guess', 'Restart', 'Works offline']}
+        />
+      }
+    >
+      <Stack lg>
+        <Card mono="Score" title="Standing">
+          <KpiRow>
+            <Kpi value={`Score: ${record.score}`} label="This round" />
+            <Kpi value={`Best: ${record.best}`} label="All time" accent />
+          </KpiRow>
+        </Card>
+
+        <Card mono="Game" title="Round">
           {round ? (
-            <Stack>
-              <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+            <Stack lg>
+              <div role="group" aria-label="Word" style={lineStyle}>
                 {Array.from({ length: SLOTS }, (_, i) => {
                   const ch = round.word[i]
                   return (
@@ -90,33 +135,31 @@ export function App() {
                   )
                 })}
               </div>
-              <span>Lives: {lives}</span>
-              {round.missed.length > 0 && (
-                <div>
-                  <span>Missed:</span>
-                  <span aria-label="Missed letters">
-                    {' '}
-                    {round.missed.join(' ')}
-                  </span>
-                </div>
-              )}
-              <div role="group" aria-label="Keyboard" style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(4px * var(--sf))' }}>
+              <Stack>
+                <span>Lives: {lives}</span>
+                {round.missed.length > 0 && (
+                  <div>
+                    <span>Missed:</span>{' '}
+                    <span aria-label="Missed letters" style={{ color: 'var(--danger)' }}>
+                      {round.missed.join(' ')}
+                    </span>
+                  </div>
+                )}
+              </Stack>
+              <div role="group" aria-label="Keyboard" style={boardStyle}>
                 {LETTERS.map((ch) => (
                   <button
                     key={ch}
                     type="button"
                     aria-label={ch}
+                    className="lc-btn secondary"
                     data-letter={ch}
                     onClick={() => guess(ch)}
-                    style={{
-                      border: 'calc(1px * var(--sf)) solid var(--mid)',
-                      background: round.missed.includes(ch) ? 'var(--bad-bg)' : 'var(--card)',
-                      color: 'var(--text)',
-                      borderRadius: 'calc(4px * var(--sf))',
-                      padding: 'calc(4px * var(--sf)) calc(6px * var(--sf))',
-                      cursor: 'pointer',
-                      font: 'inherit',
-                    }}
+                    style={
+                      round.missed.includes(ch)
+                        ? { opacity: 0.5, background: 'var(--paper-deep)' }
+                        : undefined
+                    }
                   />
                 ))}
               </div>
@@ -127,44 +170,28 @@ export function App() {
                   <Body>The word was {round.word}</Body>
                 </Stack>
               )}
-              <button
-                type="button"
-                onClick={start}
-                style={{
-                  border: 'calc(1px * var(--sf)) solid var(--mid)',
-                  background: 'var(--card)',
-                  color: 'var(--text)',
-                  borderRadius: 'calc(4px * var(--sf))',
-                  padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))',
-                  cursor: 'pointer',
-                  font: 'inherit',
-                }}
-              >
-                Restart
-              </button>
+              <Actions>
+                <Button kind="primary" onClick={start}>
+                  Restart
+                </Button>
+              </Actions>
             </Stack>
           ) : (
             <Stack>
-              <Body>Guess the hidden word before you run out of lives.</Body>
-              <button
-                type="button"
-                onClick={start}
-                style={{
-                  border: 'calc(1px * var(--sf)) solid var(--mid)',
-                  background: 'var(--card)',
-                  color: 'var(--text)',
-                  borderRadius: 'calc(4px * var(--sf))',
-                  padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))',
-                  cursor: 'pointer',
-                  font: 'inherit',
-                }}
-              >
-                Start Game
-              </button>
+              <EmptyState
+                mono="Ready"
+                title="Guess the hidden word"
+                detail="Pick a letter before you run out of six lives."
+              />
+              <Actions>
+                <Button kind="primary" onClick={start}>
+                  Start Game
+                </Button>
+              </Actions>
             </Stack>
           )}
-        </Stack>
-      </Card>
-    </main>
+        </Card>
+      </Stack>
+    </AppShell>
   )
 }
