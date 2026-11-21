@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "23788f5b6915dbd3f26c87b7bccc1b599044b32ad782a66cf884f6f27d65edd4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Favicon Generator\"."
+    },
+    {
+      "id": "A2",
+      "text": "With no image loaded, the drop zone shows the text \"Drop an image or click to browse\"."
+    },
+    {
+      "id": "A3",
+      "text": "After dropping a 512x512 PNG named \"logo.png\", the preview area shows the text \"logo.png\" and the list of generated sizes shows the items \"16x16\", \"32x32\", \"48x48\", \"64x64\", \"128x128\", \"192x192\", \"256x256\" and \"512x512\"."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting \"Square\" in the select labelled \"Crop shape\" and clicking the button \"Apply\" updates the preview and the list still shows all eight size items."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting \"Circle\" in the select labelled \"Crop shape\" and clicking the button \"Apply\" updates the preview; the list still shows all eight size items."
+    },
+    {
+      "id": "A6",
+      "text": "Setting the slider labelled \"Quality\" to \"80\" and clicking the button \"Apply\" updates the preview; the list still shows all eight size items."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Download all\" triggers a download of a file named \"favicons.zip\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Download 16x16\" triggers a download of a file named \"favicon-16x16.png\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the generated set: after dropping \"logo.png\" and reloading, the preview area still shows \"logo.png\" and the list still shows the item \"16x16\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8b37ff09cfb062b6f6577c96d44104d31b297146ef3edb8be72da8bc5a2fc38d"
+    }
+  ]
+}
