@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "6875f1cdcb14c14214bac262b7ce15bff1058734082e173f7e4488c5a59ce047",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Matrix Calculator\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the default 2x2 matrices A = [[1,2],[3,4]] and B = [[5,6],[7,8]] and the operation select set to \"Add\", the result table shows the values 6, 8, 10, 12 in the cells at row 1 col 1, row 1 col 2, row 2 col 1, and row 2 col 2 respectively."
+    },
+    {
+      "id": "A3",
+      "text": "Changing the operation select to \"Multiply\" with the same default matrices updates the result table to show 19, 22, 43, 50 in the cells at row 1 col 1, row 1 col 2, row 2 col 1, and row 2 col 2 respectively."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Copy result\" copies the text \"6 8 10 12\" to the clipboard when the operation is \"Add\" and the default matrices are in use."
+    },
+    {
+      "id": "A5",
+      "text": "Changing the dimension select from \"2x2\" to \"3x3\" adds a third row and column to both matrix input grids, and the result table displays a 3x3 grid of zeros."
+    },
+    {
+      "id": "A6",
+      "text": "With the operation set to \"Add\" and matrices A = [[1,2],[3,4]] and B = [[5,6],[7,8]], clicking the button \"Undo\" reverts the last edit to a matrix cell, restoring the previous value in that cell."
+    },
+    {
+      "id": "A7",
+      "text": "Reload keeps the matrices and operation: after setting the operation to \"Multiply\" and editing cell A11 to \"10\", reloading the page shows the operation select set to \"Multiply\" and cell A11 containing \"10\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the operation set to \"Multiply\" and matrices of incompatible dimensions (e.g., A is 2x2 and B is 2x3 after manual dimension change), the result area shows the message \"Dimensions do not match for multiplication\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "beb5988351561510e6c5e15b37a4b13ea5345195691d6056a698b9acce18ec5e"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.matrix-calculator",
+  "name": "Matrix Calculator",
+  "version": "0.1.0",
+  "summary": "Add, multiply, and invert matrices up to 5x5.",
+  "description": "Enter two matrices of any size up to 5x5, choose Add or Multiply, and read the result in a table. Incompatible dimensions are reported inline. Cell edits undo, and the session persists on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/matrix-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/use-undo-stack": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:matrix-calculator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "matrix-calculator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Matrix Calculator records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "matrix-calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
