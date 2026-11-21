@@ -11,6 +11,7 @@ import {
   TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { ConfirmDialog } from '@lacuna/confirm-dialog'
 import { RecordTable, type ColumnDef } from '@lacuna/record-table'
 import { players, matchWinners, type Player } from './host'
 
@@ -45,6 +46,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null)
   const [playerList, setPlayerList] = useState<Player[]>(() => players.list().sort((a, b) => a.seed - b.seed))
   const [winners, setWinnersState] = useState<Record<string, string>>(() => matchWinners.get())
+  const [confirmReset, setConfirmReset] = useState(false)
   const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
   const playerNames = playerList.map((p) => p.name)
@@ -128,6 +130,33 @@ export function App() {
     setError(null)
   }
 
+  function removePlayer(id: string) {
+    const remaining = playerList.filter((p) => p.id !== id)
+    const renamed = remaining.map((p, i) => ({ ...p, seed: i + 1 }))
+    players.replaceAll(renamed)
+    setPlayerList(renamed)
+    if (Object.keys(winners).length > 0) {
+      const validIds = new Set(roundCounts(renamed.length).map((n, r) => Array.from({ length: n }, (_, i) => `r${r + 1}m${i + 1}`)).flat())
+      const nextWinners: Record<string, string> = {}
+      for (const [matchId, winnerName] of Object.entries(winners)) {
+        if (validIds.has(matchId)) nextWinners[matchId] = winnerName
+      }
+      matchWinners.set(nextWinners)
+      setWinnersState(nextWinners)
+    }
+  }
+
+  function resetBracket() {
+    players.clear()
+    matchWinners.clear()
+    setPlayerList([])
+    setWinnersState({})
+    setName('')
+    setError(null)
+    setConfirmReset(false)
+    setTab('Players')
+  }
+
   const resultsRows = useMemo(
     () =>
       resolved
@@ -157,8 +186,17 @@ export function App() {
     () => [
       { key: 'seed', header: 'Seed', sortable: true },
       { key: 'name', header: 'Name', sortable: true },
+      {
+        key: 'actions',
+        header: '',
+        formatter: (_value, record) => (
+          <Button kind="danger" ariaLabel={`Remove ${record.name}`} onClick={() => removePlayer(record.id)}>
+            Remove
+          </Button>
+        ),
+      },
     ],
-    [],
+    [removePlayer],
   )
 
   function MatchCard({ match }: { match: ResolvedMatch }) {
@@ -289,7 +327,17 @@ export function App() {
               </Button>
             </Actions>
           </Card>
-          <Card mono={`${playerNames.length} player${playerNames.length === 1 ? '' : 's'}`} title="Players">
+          <Card
+            mono={`${playerNames.length} player${playerNames.length === 1 ? '' : 's'}`}
+            title="Players"
+            actions={
+              playerNames.length > 0 ? (
+                <Button kind="secondary" onClick={() => setConfirmReset(true)}>
+                  Reset bracket
+                </Button>
+              ) : undefined
+            }
+          >
             {playerNames.length === 0 ? (
               <EmptyState title="No players yet" detail="Add the first player above to start the bracket." />
             ) : (
@@ -356,6 +404,17 @@ export function App() {
           {championBlock}
         </Card>
       )}
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="Reset bracket"
+        message="This removes every player and every result. The bracket cannot be undone."
+        confirmLabel="Reset"
+        cancelLabel="Cancel"
+        danger
+        onConfirm={resetBracket}
+        onCancel={() => setConfirmReset(false)}
+      />
     </AppShell>
   )
 }
