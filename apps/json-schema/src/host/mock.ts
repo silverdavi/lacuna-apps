@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export type ValidationStatus = 'pass' | 'fail' | 'invalid-data'
 
 export interface ValidationState {
@@ -14,34 +16,26 @@ export interface Host {
 
 const KEY = 'lacuna.json-schema.state'
 
+const EMPTY: ValidationState = { data: '', schema: '', status: 'pass', errors: [] }
+
+function isValidationState(v: unknown): v is ValidationState {
+  if (typeof v !== 'object' || v === null) return false
+  const s = v as Record<string, unknown>
+  return (
+    typeof s.data === 'string' &&
+    typeof s.schema === 'string' &&
+    (s.status === 'pass' || s.status === 'fail' || s.status === 'invalid-data')
+  )
+}
+
+const store = createMockValue<ValidationState>({ key: KEY, fallback: EMPTY, validate: isValidationState })
+
 export const mockHost: Host = {
   loadState() {
-    try {
-      const raw = window.localStorage.getItem(KEY)
-      if (!raw) return null
-      const data = JSON.parse(raw) as Partial<ValidationState>
-      if (
-        typeof data.data !== 'string' ||
-        typeof data.schema !== 'string' ||
-        !['pass', 'fail', 'invalid-data'].includes(data.status as ValidationStatus)
-      ) {
-        return null
-      }
-      return {
-        data: data.data,
-        schema: data.schema,
-        status: data.status as ValidationStatus,
-        errors: Array.isArray(data.errors) ? data.errors.filter((e) => typeof e === 'string') : [],
-      }
-    } catch {
-      return null
-    }
+    const s = store.get()
+    return s.data === '' && s.schema === '' ? null : s
   },
   saveState(state: ValidationState) {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(state))
-    } catch {
-      // storage unavailable; state stays in memory only
-    }
+    store.set(state)
   },
 }
