@@ -1,6 +1,8 @@
 export type Suit = 's' | 'h' | 'd' | 'c'
 export type Rank = 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K'
 
+export const SUIT_SYMBOL: Record<Suit, string> = { s: '♠', h: '♥', d: '♦', c: '♣' }
+
 export interface Card {
   suit: Suit
   rank: Rank

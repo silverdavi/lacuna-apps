@@ -1,5 +1,6 @@
 import { makeMockStore, type GameState, type HostStore } from './mock'
 
+export { SUIT_SYMBOL } from './mock'
 export type { Card, GameState, HostStore, Pile, PileKind, Rank, Suit } from './mock'
 
 let store: HostStore | null = null
