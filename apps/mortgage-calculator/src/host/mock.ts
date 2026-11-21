@@ -1,8 +1,8 @@
 export interface MortgageInputs {
-  loanAmount: string
+  homePrice: string
+  downPayment: string
   interestRate: string
   termYears: string
-  downPayment: string
 }
 
 export interface MortgageResult {
@@ -14,9 +14,15 @@ export interface MortgageResult {
   rows: { year: number; principalPaid: number; interestPaid: number; remainingBalance: number }[]
 }
 
+export interface SavedScenario {
+  inputs: MortgageInputs
+  result: MortgageResult
+}
+
 export interface MortgageState {
   inputs: MortgageInputs
   result: MortgageResult
+  scenarios: SavedScenario[]
 }
 
 export interface Host {
@@ -26,18 +32,36 @@ export interface Host {
 
 const KEY = 'lacuna.mortgage-calculator.state'
 const DEFAULT_INPUTS: MortgageInputs = {
-  loanAmount: '300000',
+  homePrice: '300000',
+  downPayment: '60000',
   interestRate: '6.5',
   termYears: '30',
-  downPayment: '60000',
 }
 
 function isInputs(value: unknown): value is MortgageInputs {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
-  return ['loanAmount', 'interestRate', 'termYears', 'downPayment'].every(
+  return ['homePrice', 'downPayment', 'interestRate', 'termYears'].every(
     (k) => typeof v[k] === 'string',
   )
+}
+
+function isResult(value: unknown): value is MortgageResult {
+  if (typeof value !== 'object' || value === null) return false
+  const v = value as Record<string, unknown>
+  return (
+    typeof v.loanAmount === 'number' &&
+    typeof v.monthlyPayment === 'number' &&
+    typeof v.totalInterest === 'number' &&
+    typeof v.years === 'number' &&
+    Array.isArray(v.rows)
+  )
+}
+
+function isScenario(value: unknown): value is SavedScenario {
+  if (typeof value !== 'object' || value === null) return false
+  const v = value as Record<string, unknown>
+  return isInputs(v.inputs) && isResult(v.result)
 }
 
 export const mockHost: Host = {
@@ -46,10 +70,13 @@ export const mockHost: Host = {
       const raw = window.localStorage.getItem(KEY)
       if (!raw) return null
       const parsed = JSON.parse(raw) as Partial<MortgageState>
-      if (!isInputs(parsed.inputs) || typeof parsed.result !== 'object' || parsed.result === null) {
+      if (!isInputs(parsed.inputs) || !isResult(parsed.result)) {
         return null
       }
-      return { inputs: parsed.inputs, result: parsed.result as MortgageResult }
+      const scenarios = Array.isArray(parsed.scenarios)
+        ? parsed.scenarios.filter(isScenario)
+        : []
+      return { inputs: parsed.inputs, result: parsed.result, scenarios }
     } catch {
       return null
     }

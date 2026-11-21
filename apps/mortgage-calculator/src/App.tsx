@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Body, Button, Card, EmptyState, Kpi, KpiRow, Stack, Table, TextInput, Title } from '@lacuna/ui'
 import { defaultInputs, host } from './host'
-import type { MortgageInputs, MortgageResult } from './host'
+import type { MortgageInputs, MortgageResult, SavedScenario } from './host'
 
 function money(value: number): string {
   return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 function calculate(inputs: MortgageInputs): { result?: MortgageResult; error?: string } {
-  const loanAmount = Number(inputs.loanAmount)
+  const homePrice = Number(inputs.homePrice)
   const interestRate = Number(inputs.interestRate)
   const termYears = Number(inputs.termYears)
   const downPayment = Number(inputs.downPayment)
-  if (!Number.isFinite(loanAmount) || loanAmount <= 0) {
-    return { error: 'Loan amount must be greater than 0' }
+  if (!Number.isFinite(homePrice) || homePrice <= 0) {
+    return { error: 'Home price must be greater than 0' }
   }
   if (!Number.isFinite(interestRate) || interestRate < 0) {
     return { error: 'Interest rate must be 0 or greater' }
@@ -24,15 +24,15 @@ function calculate(inputs: MortgageInputs): { result?: MortgageResult; error?: s
   if (!Number.isFinite(downPayment) || downPayment < 0) {
     return { error: 'Down payment must be 0 or greater' }
   }
-  if (downPayment >= loanAmount) {
-    return { error: 'Down payment must be less than the loan amount' }
+  if (downPayment >= homePrice) {
+    return { error: 'Down payment must be less than the home price' }
   }
-  const financed = loanAmount - downPayment
+  const loanAmount = homePrice - downPayment
   const n = termYears * 12
   const r = interestRate / 100 / 12
-  const monthlyPayment = r === 0 ? financed / n : (financed * r) / (1 - (1 + r) ** -n)
+  const monthlyPayment = r === 0 ? loanAmount / n : (loanAmount * r) / (1 - (1 + r) ** -n)
   const rows: MortgageResult['rows'] = []
-  let balance = financed
+  let balance = loanAmount
   for (let year = 1; year <= termYears; year++) {
     let yearPrincipal = 0
     let yearInterest = 0
@@ -50,95 +50,31 @@ function calculate(inputs: MortgageInputs): { result?: MortgageResult; error?: s
   const totalInterest = rows.reduce((sum, row) => sum + row.interestPaid, 0)
   return {
     result: {
-      loanAmount: financed,
+      loanAmount,
       monthlyPayment,
       totalInterest,
-      totalPaid: financed + totalInterest,
+      totalPaid: loanAmount + totalInterest,
       years: termYears,
       rows,
     },
   }
 }
 
-interface Point {
-  x: number
-  y: number
-  label: string
-  value: number
-}
-
-function Chart({ result }: { result: MortgageResult }) {
-  const width = 560
-  const height = 220
-  const padLeft = 8
-  const padRight = 8
-  const padTop = 12
-  const padBottom = 24
-  const innerW = width - padLeft - padRight
-  const innerH = height - padTop - padBottom
-  const maxValue = Math.max(...result.rows.map((row) => row.interestPaid), 1)
-  const step = result.rows.length > 1 ? innerW / (result.rows.length - 1) : 0
-  const points: Point[] = result.rows.map((row, i) => ({
-    x: padLeft + (result.rows.length > 1 ? i * step : innerW / 2),
-    y: padTop + innerH - (row.interestPaid / maxValue) * innerH,
-    label: `Year ${row.year}`,
-    value: Math.round(row.interestPaid),
-  }))
-  const first = points[0]
-  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-  return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label={`Annual interest paid per year, first year ${money(result.rows[0]?.interestPaid ?? 0)}`}
-      style={{ width: '100%', height: 'auto', display: 'block' }}
-    >
-      {points.map((p, i) => (
-        <g key={p.label}>
-          <circle cx={p.x} cy={p.y} r={2.5} fill="var(--accent)" />
-          <text
-            x={p.x}
-            y={height - 8}
-            textAnchor="middle"
-            style={{
-              fontFamily: 'var(--mono)',
-              fontSize: 'calc(8px * var(--tf))',
-              fill: 'var(--mute)',
-            }}
-          >
-            {i === 0 || result.rows.length <= 6 || i === result.rows.length - 1 || i % 5 === 0 ? p.label : ''}
-          </text>
-          {first && p === first && (
-            <text
-              x={p.x}
-              y={p.y - 6}
-              textAnchor="middle"
-              style={{
-                fontFamily: 'var(--mono)',
-                fontSize: 'calc(9px * var(--tf))',
-                fill: 'var(--accent)',
-              }}
-            >
-              {money(p.value)}
-            </text>
-          )}
-        </g>
-      ))}
-      <path d={path} fill="none" stroke="var(--accent)" strokeWidth={1.5} />
-    </svg>
-  )
-}
-
 export function App() {
   const [inputs, setInputs] = useState<MortgageInputs>(defaultInputs)
   const [result, setResult] = useState<MortgageResult | null>(null)
   const [error, setError] = useState('')
+  const [scenarios, setScenarios] = useState<SavedScenario[]>([])
 
   useEffect(() => {
     const saved = host.loadState()
     if (saved) {
       setInputs(saved.inputs)
-      setResult(saved.result)
+      setScenarios(saved.scenarios)
+      // Do not restore the result; only show it after the user clicks Calculate
+    } else {
+      const fresh = calculate(defaultInputs)
+      if (fresh.result) setResult(fresh.result)
     }
   }, [])
 
@@ -148,14 +84,21 @@ export function App() {
 
   function run() {
     const { result: next, error: nextError } = calculate(inputs)
-    if (nextError) {
+    if (nextError || !next) {
       setResult(null)
-      setError(nextError)
+      setError(nextError ?? 'Calculation failed')
       return
     }
     setResult(next)
     setError('')
-    host.saveState({ inputs, result: next })
+    host.saveState({ inputs, result: next, scenarios })
+  }
+
+  function saveScenario() {
+    if (!result) return
+    const next = [...scenarios, { inputs, result }]
+    setScenarios(next)
+    host.saveState({ inputs, result, scenarios: next })
   }
 
   return (
@@ -164,23 +107,28 @@ export function App() {
         <Stack lg>
           <Title size="lg">Mortgage Calculator</Title>
           <Body>
-            Enter the loan details and press Calculate to see the monthly payment, the total interest, and a
-            year-by-year breakdown of principal and interest.
+            Enter the home price, down payment, rate, and term to see your payment and
+            a year-by-year breakdown.
           </Body>
           <Stack>
-            <TextInput label="Loan amount" value={inputs.loanAmount} onChange={(v) => set('loanAmount', v)} />
+            <TextInput label="Home price" value={inputs.homePrice} onChange={(v) => set('homePrice', v)} />
+            <TextInput label="Down payment" value={inputs.downPayment} onChange={(v) => set('downPayment', v)} />
             <TextInput label="Interest rate" value={inputs.interestRate} onChange={(v) => set('interestRate', v)} />
             <TextInput label="Term" value={inputs.termYears} onChange={(v) => set('termYears', v)} />
-            <TextInput label="Down payment" value={inputs.downPayment} onChange={(v) => set('downPayment', v)} />
             {error && <Body sm style={{ color: 'var(--danger)' }}>{error}</Body>}
-            <Button kind="primary" onClick={run}>Calculate</Button>
+            <Stack style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
+              <Button kind="primary" onClick={run}>Calculate</Button>
+              <Button kind="secondary" onClick={saveScenario} style={!result ? { opacity: 0.5 } : undefined}>
+                Save scenario
+              </Button>
+            </Stack>
           </Stack>
           {result ? (
             <Stack>
               <KpiRow>
-                <Kpi accent value={`Monthly payment: ${money(result.monthlyPayment)}`} label="per month" />
-                <Kpi value={`Total interest: ${money(result.totalInterest)}`} label={`over ${result.years} years`} />
-                <Kpi value={`Loan amount: ${money(result.loanAmount)}`} label="financed balance" />
+                <Kpi value={money(result.loanAmount)} label="Loan amount" accent />
+                <Kpi value={money(result.monthlyPayment)} label="Monthly payment" />
+                <Kpi value={money(result.totalInterest)} label="Total interest" />
               </KpiRow>
               <Card mono="Breakdown" title="Year by year" flush>
                 <Table
@@ -193,20 +141,39 @@ export function App() {
                   rows={result.rows.map((row) => ({
                     cells: {
                       year: `Year ${row.year}`,
-                      principal: `Principal paid: ${money(row.principalPaid)}`,
-                      interest: `Interest paid: ${money(row.interestPaid)}`,
-                      balance: `Remaining balance: ${money(row.remainingBalance)}`,
+                      principal: money(row.principalPaid),
+                      interest: money(row.interestPaid),
+                      balance: money(row.remainingBalance),
                     },
                   }))}
                 />
               </Card>
-              <Card mono="Interest share" title="Annual interest paid">
-                <Chart result={result} />
-              </Card>
             </Stack>
           ) : (
-            <EmptyState title="No calculation yet" detail="Enter the loan details and press Calculate." />
+              <EmptyState title="No calculation yet" detail="Enter the details and press Calculate." />
           )}
+          <Card mono="Scenarios" title="Saved scenarios" flush>
+            {scenarios.length === 0 ? (
+              <EmptyState title="No saved scenarios yet" detail="Press Save scenario to keep a snapshot of the current calculation." />
+            ) : (
+              <div aria-label="Saved scenarios">
+                <Table
+                  columns={[
+                    { key: 'price', label: 'Home price', num: true },
+                    { key: 'payment', label: 'Monthly', num: true },
+                    { key: 'interest', label: 'Interest', num: true },
+                  ]}
+                  rows={scenarios.map((s) => ({
+                    cells: {
+                      price: money(Number(s.inputs.homePrice) || 0),
+                      payment: money(s.result.monthlyPayment),
+                      interest: money(s.result.totalInterest),
+                    },
+                  }))}
+                />
+              </div>
+            )}
+          </Card>
         </Stack>
       </Card>
     </main>
