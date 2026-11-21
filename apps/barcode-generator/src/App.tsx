@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Body, Button, Card, EmptyState, Stack, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Rail, Select, Stack, TextInput } from '@lacuna/ui'
 import { host } from './host'
 import type { BarcodeType } from './host'
 import { encode, toPngBlob, ean13CheckDigit } from './barcode'
@@ -9,6 +9,12 @@ const TYPE_LABELS: Record<BarcodeType, string> = {
   ean13: 'EAN-13',
   qr: 'QR Code',
 }
+
+const TYPE_OPTIONS = [
+  { value: 'code128', label: 'Code 128' },
+  { value: 'ean13', label: 'EAN-13' },
+  { value: 'qr', label: 'QR Code' },
+]
 
 export function App() {
   const [type, setType] = useState<BarcodeType>('code128')
@@ -68,43 +74,55 @@ export function App() {
   }
 
   return (
-    <main>
-      <Card mono="Shelf">
-        <Stack lg>
-          <h1 className="lc-title lc-title-lg">Barcode Generator</h1>
-          <Body>Choose a barcode type, enter data, and generate a preview you can download.</Body>
-          <label className="lc-field">
-            <span className="lc-field-label">Barcode type</span>
-            <select
-              className="lc-input"
-              value={type}
-              onChange={(event) => setType(event.target.value as BarcodeType)}
-            >
-              <option value="code128">Code 128</option>
-              <option value="ean13">EAN-13</option>
-              <option value="qr">QR Code</option>
-            </select>
-          </label>
-          <TextInput label="Data" value={data} onChange={setData} rows={3} />
-          {error && <Body sm style={{ color: 'var(--danger)' }}>{error}</Body>}
-          <Stack>
-            <Button kind="primary" onClick={() => void generate()}>Generate</Button>
-            {preview && (
-              <Button kind="secondary" onClick={() => void download()}>Download PNG</Button>
-            )}
-          </Stack>
-          {preview ? (
-            <div style={{ textAlign: 'center' }}>
-              <img src={preview.src} alt={preview.label} style={{ maxWidth: '100%', height: 'auto' }} />
-              <div className="lc-body-sm" style={{ marginTop: 'calc(8px * var(--sf))' }}>
-                {preview.label}
-              </div>
-            </div>
-          ) : (
-            <EmptyState title="No barcode yet" detail="Enter data and press Generate." />
+    <AppShell
+      name="Barcode Generator"
+      icon="files"
+      hue="blue"
+      category="Productivity"
+      meta="Code 128 · EAN-13 · QR"
+      status="Saved on this device"
+      side={<Rail title="Barcode Generator" note="Text to barcode · local" chips={['Code 128', 'EAN-13', 'QR Code', 'Works offline']} />}
+    >
+      <Card mono="Input" title="Create a barcode">
+        <FormGrid>
+          <Select
+            label="Barcode type"
+            value={type}
+            onChange={(value) => setType(value as BarcodeType)}
+            options={TYPE_OPTIONS}
+          />
+          <TextInput label="Data" value={data} onChange={setData} />
+        </FormGrid>
+        {error && (
+          <div
+            role="alert"
+            style={{
+              marginTop: 'calc(12px * var(--sf))',
+              fontFamily: 'var(--mono)',
+              fontSize: 'calc(12px * var(--tf))',
+              color: 'var(--danger)',
+            }}
+          >
+            {error}
+          </div>
+        )}
+        <Actions>
+          <Button kind="primary" onClick={() => void generate()}>Generate</Button>
+          {preview && (
+            <Button kind="secondary" onClick={() => void download()}>Download PNG</Button>
           )}
-        </Stack>
+        </Actions>
       </Card>
-    </main>
+      <Card mono="Result" title="Preview">
+        {preview ? (
+          <Stack style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <img src={preview.src} alt={preview.label} style={{ maxWidth: '100%', height: 'auto' }} />
+            <div>{preview.label}</div>
+          </Stack>
+        ) : (
+          <EmptyState mono="Empty" title="No barcode yet" detail="Enter data and press Generate." />
+        )}
+      </Card>
+    </AppShell>
   )
 }

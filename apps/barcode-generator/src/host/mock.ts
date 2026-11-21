@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export type BarcodeType = 'code128' | 'ean13' | 'qr'
 
 export interface BarcodeState {
@@ -15,30 +17,29 @@ export interface Host {
 const KEY = 'lacuna.barcode-generator.state'
 const TYPES: BarcodeType[] = ['code128', 'ean13', 'qr']
 
+function isState(v: unknown): v is BarcodeState {
+  if (typeof v !== 'object' || v === null) return false
+  const s = v as Record<string, unknown>
+  return (
+    (s.type === undefined || TYPES.includes(s.type as BarcodeType)) &&
+    typeof s.data === 'string' &&
+    s.data.length > 0 &&
+    typeof s.preview === 'string' &&
+    s.preview.length > 0 &&
+    typeof s.previewLabel === 'string' &&
+    s.previewLabel.length > 0
+  )
+}
+
+const store = createMockValue<BarcodeState | null>({ key: KEY, fallback: null, validate: isState })
+
 export const mockHost: Host = {
   loadState() {
-    try {
-      const raw = window.localStorage.getItem(KEY)
-      if (!raw) return null
-      const parsed = JSON.parse(raw) as Partial<BarcodeState>
-      const data = typeof parsed.data === 'string' ? parsed.data : ''
-      if (data.length === 0) return null
-      const type = TYPES.includes(parsed.type as BarcodeType)
-        ? (parsed.type as BarcodeType)
-        : 'code128'
-      const preview = typeof parsed.preview === 'string' ? parsed.preview : ''
-      const previewLabel = typeof parsed.previewLabel === 'string' ? parsed.previewLabel : ''
-      if (!preview || !previewLabel) return null
-      return { type, data, preview, previewLabel }
-    } catch {
-      return null
-    }
+    const state = store.get()
+    if (!state) return null
+    return { type: state.type ?? 'code128', data: state.data, preview: state.preview, previewLabel: state.previewLabel }
   },
-  saveState(state: BarcodeState) {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(state))
-    } catch {
-      // storage unavailable; state stays in memory only
-    }
+  saveState(state) {
+    store.set(state)
   },
 }
