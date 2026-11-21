@@ -1,3 +1,5 @@
+import { createMockRecordStore } from '@lacuna/host-mock'
+
 const KEY = 'lacuna.sudoku.save'
 
 export type Difficulty = 'Practice' | 'Easy' | 'Hard'
@@ -20,25 +22,31 @@ export interface PuzzleHost {
 }
 
 function makeMock(): PuzzleHost {
+  const store = createMockRecordStore<PuzzleRecord>({
+    key: KEY,
+    validate: (value): value is PuzzleRecord =>
+      value !== null &&
+      typeof value === 'object' &&
+      (value as PuzzleRecord).kind === 'puzzle' &&
+      Array.isArray((value as PuzzleRecord).given) &&
+      Array.isArray((value as PuzzleRecord).board),
+  })
   return {
     loadPuzzle() {
-      const raw = localStorage.getItem(KEY)
-      if (!raw) return null
-      try {
-        const value = JSON.parse(raw)
-        if (value && value.kind === 'puzzle' && Array.isArray(value.given) && Array.isArray(value.board)) {
-          return value as PuzzleRecord
-        }
-      } catch {
-        // a corrupt save is treated as no save
-      }
-      return null
+      return store.list()[0] ?? null
     },
     savePuzzle(record) {
-      localStorage.setItem(KEY, JSON.stringify(record))
+      const existing = store.list()
+      if (existing.length > 0) {
+        store.update(existing[0].id, record)
+      } else {
+        store.add(record)
+      }
     },
     clearPuzzle() {
-      localStorage.removeItem(KEY)
+      for (const record of store.list()) {
+        store.remove(record.id)
+      }
     },
   }
 }
