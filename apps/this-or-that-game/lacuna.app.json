@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.this-or-that-game",
+  "name": "Preference Picker",
+  "version": "0.1.0",
+  "summary": "Pick a side on five quick questions, score a point per pick, and keep your best.",
+  "description": "A preference quiz. Five questions, two options each. Pick a side, get a point per answer, and restart when you are done. Your best score and your last answers stay on this device.",
+  "category": "productivity",
+  "tags": ["quiz", "preferences", "game"],
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/this-or-that-game",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/quiz-engine": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:quiz-session"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "this-or-that",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the quiz answers and the best score"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "this-or-that"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

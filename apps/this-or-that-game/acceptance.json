@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "54543a535893d7a95039e937bb0aa928a2982c41064d57262dd09b4240bcbe64",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"This Or That\" and, before any answers, the text \"No answers yet\" is visible."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Start game\" shows the first question card with the text \"Coffee or Tea?\" and two buttons labelled \"Coffee\" and \"Tea\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Coffee\" on the first question card shows the feedback text \"You picked Coffee\" and a button \"Next question\"."
+    },
+    {
+      "id": "A4",
+      "text": "After answering the first question, clicking \"Next question\" shows the second question card with the text \"Cats or Dogs?\" and the score line \"Score: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "After answering all five questions in a session, the score line shows \"Score: 5\" and the button \"Restart\" is visible."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking \"Restart\" resets the score to \"Score: 0\", shows the first question card again, and the \"No answers yet\" text is gone."
+    },
+    {
+      "id": "A7",
+      "text": "After completing a session with a score of 5, the text \"Best score: 5\" is visible."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab \"Results\" shows a table with a row for each answered question, including the question text, the chosen option, and the point value."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the completed answers: after completing a session and reloading, the tab \"Results\" still shows the row for \"Coffee or Tea?\" with the chosen option \"Coffee\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "eee5114b969b2fd15d7c74126b57638e88fa7ce13059432115c25c6e364556b1"
+    }
+  ]
+}
