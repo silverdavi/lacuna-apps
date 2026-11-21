@@ -2425,6 +2425,48 @@
       }
     },
     {
+      "id": "@lacuna/markdown-view",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Safe rendered Markdown viewer with interactive task-list toggles.",
+      "today": [
+        "toolbox/modules/markdown-view/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/markdown-to-html"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "MarkdownView"
+      ],
+      "public": true,
+      "path": "toolbox/modules/markdown-view/0.1.0",
+      "bridge": {
+        "component": "MarkdownView",
+        "kind": "widget",
+        "exports": [
+          "MarkdownView"
+        ],
+        "types": [
+          "MarkdownViewProps"
+        ],
+        "signature": "MarkdownView({ source, onTaskToggle, disabled = false, label, className, style, children }: Markdo...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "5a2695c06b0cb3a1d47407a70c19e9bd82e2fcf0",
+            "source": "59514237159e42ae",
+            "lines": 100,
+            "dependencies": {
+              "@lacuna/markdown-to-html": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/money",
       "layer": 3,
       "status": "exists",

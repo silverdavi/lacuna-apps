@@ -1578,6 +1578,19 @@ importers:
 
   toolbox/modules/markdown-to-html/0.1.0: {}
 
+  toolbox/modules/markdown-view/0.1.0:
+    dependencies:
+      '@lacuna/markdown-to-html':
+        specifier: workspace:0.1.0
+        version: link:../../markdown-to-html/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/money-input/0.1.0:
     dependencies:
       '@lacuna/money':
