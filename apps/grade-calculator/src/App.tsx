@@ -1,304 +1,192 @@
-import { useState, type ReactNode } from 'react'
-import { Body, Button, Card, Stack, TextInput } from '@lacuna/ui'
-import { host } from './host/mock'
-import type { GradeState } from './host'
+import { useState } from 'react'
+import { AppShell, Button, Card, Stack } from '@lacuna/ui'
+import { host, type GradeState } from './host/mock'
+import { fmt2, fmtPct, sumWeights, validateComponent, weightedTotal, weightsWarning } from './engine'
 
-const fmt2 = (n: number): string => n.toFixed(2)
-const fmtPct = (n: number): string => `${fmt2(n)}%`
-const sumWeights = (state: GradeState): number =>
-  state.components.reduce((acc, c) => acc + c.weight, 0)
-const weightedTotal = (state: GradeState): number =>
-  state.components.reduce((acc, c) => acc + (c.score * c.weight) / 100, 0)
-
-type FormState = {
-  name: string
-  score: string
-  weight: string
-  error: string | null
-}
-
-type Row = {
-  hot?: boolean
-  cells: Record<string, ReactNode>
-}
-
-const emptyForm: FormState = { name: '', score: '', weight: '', error: null }
-
-function BlurField({
-  label,
-  value,
-  onChange,
-  onBlur,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  onBlur: () => void
-}) {
-  return (
-    <label className="lc-field">
-      <span className="lc-field-label">{label}</span>
-      <input
-        className="lc-input"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onBlur={onBlur}
-      />
-    </label>
-  )
-}
+const emptyFields = { name: '', score: '', weight: '' }
 
 export function App() {
   const [state, setState] = useState<GradeState>(() => host.read())
-  const [form, setForm] = useState<FormState>(emptyForm)
+  const [fields, setFields] = useState(emptyFields)
+  const [error, setError] = useState<string | null>(null)
 
-  function patch(part: Partial<FormState>) {
-    setForm((f) => ({ ...f, ...part, error: null }))
+  const setField = (key: 'name' | 'score' | 'weight', value: string) => {
+    setFields((f) => ({ ...f, [key]: value }))
   }
 
-  function validateScore(raw: string): number | null {
-    const text = raw.trim()
-    if (text === '') return null
-    const value = Number(text)
-    return Number.isFinite(value) ? value : null
-  }
-
-  function add() {
-    const name = form.name.trim()
-    const scoreRaw = form.score.trim()
-    const weightRaw = form.weight.trim()
-    if (!name || scoreRaw === '') {
-      setForm((f) => ({ ...f, error: 'Enter a name and a score between 0 and 100' }))
+  const commit = () => {
+    const v = validateComponent(fields.name, fields.score, fields.weight)
+    if (!v.ok) {
+      setError(v.message)
       return
     }
-    const score = validateScore(scoreRaw)
-    if (score === null || score < 0 || score > 100) {
-      setForm((f) => ({ ...f, error: 'Enter a name and a score between 0 and 100' }))
-      return
-    }
-    const weight = weightRaw === '' ? 0 : Number(weightRaw)
-    if (!Number.isFinite(weight) || weight < 0) {
-      setForm((f) => ({ ...f, error: 'Enter a name and a score between 0 and 100' }))
-      return
-    }
-    setState(host.addComponent(name, score, weight))
-    setForm(emptyForm)
+    setError(null)
+    const weight = Number(fields.weight) || 0
+    setState(host.addComponent(v.name, v.score, weight))
+    setFields(emptyFields)
   }
 
-  function onScoreBlur() {
-    if (form.score.trim() !== '' && validateScore(form.score) === null) {
-      setForm((f) => ({ ...f, error: 'Score must be a number' }))
-    }
+  const onScoreBlur = () => {
+    const v = validateComponent(fields.name, fields.score, fields.weight)
+    if (!v.ok) setError(v.message)
   }
 
-  function remove(id: string) {
+  const removeComponent = (id: string, name: string) => {
+    void name
     setState(host.deleteComponent(id))
   }
 
-  const totalWeight = sumWeights(state)
-  const weighted = weightedTotal(state)
-  const hasComponents = state.components.length > 0
+  const clearAll = () => {
+    setState(host.clear())
+  }
 
-  const columns = [
-    { key: 'name', label: 'Component' },
-    { key: 'score', label: 'Score', num: true },
-    { key: 'weight', label: 'Weight', num: true },
-    { key: 'contrib', label: 'Contribution', num: true },
-    { key: 'actions', label: '' },
-  ]
-
-  const rows: Row[] = [
-    ...state.components.map((c): Row => ({
-      cells: {
-        name: c.name,
-        score: fmt2(c.score),
-        weight: `${c.weight}%`,
-        contrib: fmt2((c.score * c.weight) / 100),
-        actions: (
-          <Button kind="ghost" onClick={() => remove(c.id)}>
-            Delete {c.name}
-          </Button>
-        ),
-      },
-    })),
-    {
-      hot: true,
-      cells: {
-        name: 'Total',
-        score: '',
-        weight: `${totalWeight}%`,
-        contrib: fmtPct(weighted),
-        actions: null,
-      },
-    },
-  ]
+  const total = weightedTotal(state)
+  const weights = sumWeights(state)
+  const warning = state.components.length > 0 ? weightsWarning(state) : null
 
   return (
-    <main style={{ display: 'block', width: '100%', padding: 'calc(20px * var(--sf))' }}>
-      <Card title="Grade Calculator" mono="WEIGHTED AVERAGES" accent>
-        <Stack lg>
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                font: '600 calc(22px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-                letterSpacing: 'calc(-0.01em * var(--tf))',
-              }}
-            >
-              Grade Calculator
-            </h1>
-            <Body>Add components with a score and a weight to see the final grade.</Body>
-          </div>
-
-          <Stack>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 'calc(12px * var(--sf))',
-                alignItems: 'flex-end',
-              }}
-            >
-              <TextInput
-                label="Component Name"
-                value={form.name}
-                onChange={(value) => patch({ name: value })}
+    <AppShell
+      name="Grade Calculator"
+      icon="school"
+      hue="green"
+      meta={state.components.length > 0 ? `${state.components.length} components` : undefined}
+      status={`Weighted total ${state.components.length > 0 ? fmt2(total) : '—'} · local, no network`}
+    >
+      <Stack>
+        <Card title="Add a component" mono="New">
+          <div style={{ display: 'grid', gap: 'calc(10px * var(--sf))' }}>
+            <label className="lc-field">
+              <span className="lc-field-label">Component Name</span>
+              <input
+                className="lc-input"
+                value={fields.name}
+                onChange={(e) => setField('name', e.target.value)}
               />
-              <BlurField
-                label="Score"
-                value={form.score}
-                onChange={(value) => patch({ score: value })}
+            </label>
+            <label className="lc-field">
+              <span className="lc-field-label">Score</span>
+              <input
+                className="lc-input"
+                value={fields.score}
+                inputMode="decimal"
+                aria-invalid={error ? true : undefined}
+                onChange={(e) => setField('score', e.target.value)}
                 onBlur={onScoreBlur}
               />
-              <TextInput
-                label="Weight"
-                value={form.weight}
-                onChange={(value) => patch({ weight: value })}
+            </label>
+            <label className="lc-field">
+              <span className="lc-field-label">Weight</span>
+              <input
+                className="lc-input"
+                value={fields.weight}
+                inputMode="decimal"
+                onChange={(e) => setField('weight', e.target.value)}
               />
-            </div>
-            {form.error && (
+            </label>
+            {error ? (
               <div
                 role="alert"
                 style={{
+                  gridColumn: '1 / -1',
                   color: 'var(--danger)',
-                  font: '500 calc(11px * var(--tf)) var(--mono)',
-                  letterSpacing: 'calc(0.4px * var(--sf))',
+                  fontSize: 'calc(13px * var(--tf))',
                 }}
               >
-                {form.error}
+                {error}
               </div>
-            )}
-            <div>
-              <Button kind="primary" onClick={add}>
-                Add component
-              </Button>
-            </div>
-          </Stack>
+            ) : null}
+          </div>
+          <div style={{ marginTop: 'calc(12px * var(--sf))' }}>
+            <Button kind="primary" ariaLabel="Add component" onClick={commit}>
+              Add component
+            </Button>
+          </div>
+        </Card>
 
-          {!hasComponents ? (
-            <Body>No components yet</Body>
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                borderRadius: 'calc(6px * var(--sf))',
-                overflow: 'hidden',
-              }}
-            >
-              <table
-                style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  font: '400 calc(13px * var(--tf)) var(--sans)',
-                  color: 'var(--ink)',
-                }}
-              >
-                <thead>
-                  <tr>
-                    {columns.map((c) => (
-                      <th
-                        key={c.key}
-                        scope="col"
-                        style={{
-                          textAlign: c.num ? 'right' : 'left',
-                          padding: 'calc(8px * var(--sf)) calc(10px * var(--sf))',
-                          border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                          background: 'var(--ui-bright)',
-                          font: '600 calc(11px * var(--tf)) var(--mono)',
-                          color: 'var(--ink-60)',
-                          letterSpacing: 'calc(0.4px * var(--sf))',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {c.label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r, i) => (
-                    <tr key={i}>
-                      {columns.map((c) => (
-                        <td
-                          key={c.key}
-                          style={{
-                            textAlign: c.num ? 'right' : 'left',
-                            padding: 'calc(8px * var(--sf)) calc(10px * var(--sf))',
-                            border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                            background: r.hot ? 'var(--paper-deep)' : undefined,
-                            font: r.hot
-                              ? '600 calc(13px * var(--tf)) var(--sans)'
-                              : '400 calc(13px * var(--tf)) var(--sans)',
-                            color: r.hot ? 'var(--accent)' : 'var(--ink)',
-                          }}
-                        >
-                          {r.cells[c.key]}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {hasComponents && totalWeight !== 100 && (
-            <div
-              role="status"
-              style={{
-                color: 'var(--accent)',
-                font: '500 calc(11px * var(--tf)) var(--mono)',
-                letterSpacing: 'calc(0.4px * var(--sf))',
-              }}
-            >
-              Weights sum to {totalWeight}%
-            </div>
-          )}
-
+        <Card title="Summary" mono="Grade">
           <div
             style={{
               display: 'flex',
               alignItems: 'baseline',
-              gap: 'calc(16px * var(--sf))',
-              padding: 'calc(12px * var(--sf))',
-              border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-              borderRadius: 'calc(6px * var(--sf))',
-              background: 'var(--paper-deep)',
+              gap: 'calc(8px * var(--sf))',
+              padding: 'calc(8px * var(--sf)) 0 calc(12px * var(--sf))',
             }}
           >
             <span
-              style={{
-                font: '600 calc(22px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-              }}
+              style={{ fontSize: 'calc(28px * var(--tf))', fontVariantNumeric: 'tabular-nums' }}
+              aria-hidden="true"
             >
-              Weighted Grade: {fmtPct(weighted)}
+              {state.components.length > 0 ? fmt2(total) : '—'}
             </span>
+            <span aria-hidden="true" style={{ fontSize: 'calc(16px * var(--tf))', color: 'var(--mid)' }}>
+              / 100
+            </span>
+            <span style={{ marginLeft: 'auto', color: 'var(--mid)' }}>Weights add to {fmtPct(weights)}.</span>
           </div>
-        </Stack>
-      </Card>
-    </main>
+          <div>Weighted Grade: {fmt2(total)}%</div>
+          {warning ? (
+            <div style={{ color: 'var(--mid)' }}>{warning}</div>
+          ) : null}
+        </Card>
+
+        {state.components.length === 0 ? (
+          <div style={{ color: 'var(--mid)' }}>No components yet</div>
+        ) : (
+          <Card mono="Breakdown">
+            <table className="lc-table">
+              <thead>
+                <tr>
+                  <th scope="col">Component</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Score</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Weight</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.components.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
+                        {c.name}
+                        <button
+                          type="button"
+                          className="lc-btn"
+                          aria-label={`Delete ${c.name}`}
+                          onClick={() => removeComponent(c.id, c.name)}
+                          style={{ padding: 0, fontSize: 'calc(12px * var(--tf))', color: 'var(--mid)' }}
+                        >
+                          Remove
+                        </button>
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmt2(c.score)}</td>
+                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmtPct(c.weight)}</td>
+                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                      {fmt2((c.score * c.weight) / 100)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>Total</td>
+                  <td />
+                  <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmtPct(weights)}</td>
+                  <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmt2(total)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </Card>
+        )}
+
+        {state.components.length > 0 ? (
+          <div>
+            <Button kind="secondary" ariaLabel="Clear all components" onClick={clearAll}>
+              Clear all
+            </Button>
+          </div>
+        ) : null}
+      </Stack>
+    </AppShell>
   )
 }
