@@ -1513,6 +1513,28 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/calculator-kit/0.2.0:
+    dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../chart/0.1.0
+      '@lacuna/number-input':
+        specifier: workspace:0.1.0
+        version: link:../../number-input/0.1.0
+      '@lacuna/record-table':
+        specifier: workspace:0.1.0
+        version: link:../../record-table/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/canvas-kit/0.1.0:
     dependencies:
       '@lacuna/export-menu':
@@ -1540,6 +1562,22 @@ importers:
 
   toolbox/modules/chart/0.1.0:
     dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/checklist/0.1.0:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      '@lacuna/use-drag-reorder':
+        specifier: workspace:0.1.0
+        version: link:../../use-drag-reorder/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -1965,6 +2003,22 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/signature-pad/0.1.0:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      '@lacuna/use-pointer-draw':
+        specifier: workspace:0.1.0
+        version: link:../../use-pointer-draw/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/spaced-repetition/0.1.0:
     dependencies:
       '@lacuna/date-math':
@@ -1988,6 +2042,19 @@ importers:
         version: 19.3.0
 
   toolbox/modules/text-transforms/0.1.0: {}
+
+  toolbox/modules/time-input/0.1.0:
+    dependencies:
+      '@lacuna/format-duration':
+        specifier: workspace:0.1.0
+        version: link:../../format-duration/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
 
   toolbox/modules/toolbar/0.1.0:
     dependencies:

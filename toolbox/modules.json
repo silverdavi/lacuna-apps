@@ -898,16 +898,17 @@
       "id": "@lacuna/calculator-kit",
       "layer": 2,
       "status": "exists",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "summary": "Inputs panel, result summary, breakdown table, and optional chart for calculator-style apps.",
       "today": [
-        "toolbox/modules/calculator-kit/0.1.0/src/index.ts"
+        "toolbox/modules/calculator-kit/0.2.0/src/index.ts"
       ],
       "gap": "",
       "dependsOn": [
         "@lacuna/chart",
         "@lacuna/number-input",
-        "@lacuna/record-table"
+        "@lacuna/record-table",
+        "@lacuna/ui"
       ],
       "formats": [],
       "keywords": [
@@ -915,7 +916,7 @@
         "CalculatorKit"
       ],
       "public": true,
-      "path": "toolbox/modules/calculator-kit/0.1.0",
+      "path": "toolbox/modules/calculator-kit/0.2.0",
       "bridge": {
         "component": "CalculatorKit",
         "kind": "kit",
@@ -937,6 +938,17 @@
               "@lacuna/chart": "0.1.0",
               "@lacuna/number-input": "0.1.0",
               "@lacuna/record-table": "0.1.0"
+            }
+          },
+          "0.2.0": {
+            "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+            "source": "20c949f21c2e919c",
+            "lines": 156,
+            "dependencies": {
+              "@lacuna/chart": "0.1.0",
+              "@lacuna/number-input": "0.1.0",
+              "@lacuna/record-table": "0.1.0",
+              "@lacuna/ui": "*"
             }
           }
         }
@@ -1027,6 +1039,52 @@
             "source": "2fb6c820ec6d871c",
             "lines": 226,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/checklist",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Checkable list with inline add, edit, drag and keyboard reorder, progress bar, and per-item completion state.",
+      "today": [
+        "toolbox/modules/checklist/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/ui",
+        "@lacuna/use-drag-reorder"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Checklist"
+      ],
+      "public": true,
+      "path": "toolbox/modules/checklist/0.1.0",
+      "bridge": {
+        "component": "Checklist",
+        "kind": "widget",
+        "exports": [
+          "Checklist",
+          "default"
+        ],
+        "types": [
+          "ChecklistItem",
+          "ChecklistProps"
+        ],
+        "signature": "Checklist({ items, onToggle, onAdd, onEdit, onRemove, onReorder, showProgress = true, allowEdit...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+            "source": "4ed4c0290954720b",
+            "lines": 295,
+            "dependencies": {
+              "@lacuna/ui": "*",
+              "@lacuna/use-drag-reorder": "0.1.0"
+            }
           }
         }
       }
@@ -3253,6 +3311,51 @@
       }
     },
     {
+      "id": "@lacuna/signature-pad",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Freehand signature pad that captures pointer strokes on an SVG surface and exports the result as an SVG string or a PNG data URL.",
+      "today": [
+        "toolbox/modules/signature-pad/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/ui",
+        "@lacuna/use-pointer-draw"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "SignaturePad"
+      ],
+      "public": true,
+      "path": "toolbox/modules/signature-pad/0.1.0",
+      "bridge": {
+        "component": "SignaturePad",
+        "kind": "widget",
+        "exports": [
+          "SignaturePad"
+        ],
+        "types": [
+          "SignaturePadProps",
+          "SignatureExportFormat"
+        ],
+        "signature": "SignaturePad({ onClear, onExport, width = 400, height = 200, disabled = false, ariaHidden = false,...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+            "source": "d366b6b0de673735",
+            "lines": 205,
+            "dependencies": {
+              "@lacuna/ui": "*",
+              "@lacuna/use-pointer-draw": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/spaced-repetition",
       "layer": 3,
       "status": "exists",
@@ -3424,6 +3527,48 @@
             "source": "cee13edc953ad6dd",
             "lines": 92,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/time-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A validated time-of-day (HH:MM) or duration (1h 20m) input that commits on Enter and reports errors as an alert.",
+      "today": [
+        "toolbox/modules/time-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/format-duration"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "TimeInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/time-input/0.1.0",
+      "bridge": {
+        "component": "TimeInput",
+        "kind": "widget",
+        "exports": [
+          "TimeInput"
+        ],
+        "types": [
+          "TimeInputProps"
+        ],
+        "signature": "TimeInput({ mode, value, onChange, label, min, max, disabled = false, }: TimeInputProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+            "source": "85c2f4df35bc66e7",
+            "lines": 128,
+            "dependencies": {
+              "@lacuna/format-duration": "0.1.0"
+            }
           }
         }
       }
