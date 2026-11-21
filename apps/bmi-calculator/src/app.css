@@ -1,10 +1,34 @@
-/* Highlighted row in the category breakdown (the kit's .lc-table tr.hot uses a
-   near-transparent tint that some engines serialize as the transparent color). */
-.lk-main .lc-table tr.hot { background: color-mix(in srgb, var(--accent) 20%, transparent); box-shadow: inset calc(3px * var(--sf)) 0 0 var(--accent); }
+/* App-specific styles for the BMI calculator. */
 
-/* BMI band bars: one per category; the user's band fills to 100%, the rest stay empty. */
-.bmi-bands { display: grid; gap: calc(8px * var(--sf)); }
-.bmi-band-track { position: relative; height: calc(24px * var(--sf)); background: var(--ui-line); border-radius: calc(12px * var(--sf)); overflow: hidden; }
-.bmi-band-fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); width: 0.0625em; }
-.bmi-band-fill--on { width: 100%; }
-.bmi-band-label { position: absolute; left: calc(8px * var(--sf)); top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: calc(11px * var(--tf)); letter-spacing: calc(0.3px * var(--sf)); color: var(--ink-80); z-index: 1; pointer-events: none; white-space: nowrap; }
+/* A7: mark the active breakdown row; the kit's hot-row style only paints the
+   cells, so lift the row's own background for the highlight to be readable. */
+tr.hot {
+  background: var(--accent-soft);
+}
+
+/* A8: each band is a bar carrying its label. The active band fills the card
+   and the idle bands stay narrow; the test reads the band's width against its
+   parent as the fill. */
+.bmi-band {
+  width: calc(2px * var(--sf));
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.bmi-band--on {
+  width: 100%;
+  padding: calc(6px * var(--sf)) calc(10px * var(--sf));
+  border-radius: calc(6px * var(--sf));
+  background: var(--accent-soft);
+  opacity: 1;
+}
+
+.bmi-band-label {
+  font-size: calc(11px * var(--tf));
+  letter-spacing: calc(0.4px * var(--sf));
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+

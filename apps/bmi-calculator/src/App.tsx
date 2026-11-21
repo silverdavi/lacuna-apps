@@ -12,12 +12,10 @@ import {
   List,
   Rail,
   Row,
-  SectionLabel,
-  Select,
   Stack,
   Table,
-  TextInput,
 } from '@lacuna/ui'
+import { MeasureField, MeasureSelect } from './fields'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { ExportMenu } from '@lacuna/export-menu'
 import { host, type Units } from './host'
@@ -38,6 +36,27 @@ function categoryOf(bmi: number): Category {
   return 'Obese'
 }
 
+const PLIM = {
+  cm: [50, 272] as const,
+  kg: [2, 635] as const,
+  ft: [50 / 30.48, 272 / 30.48] as const,
+  lbs: [2 / 0.45359237, 635 / 0.45359237] as const,
+} as const
+
+function plausibilityError(units: Units, height: number, weight: number): string | null {
+  const [hMin, hMax] = units === 'metric' ? PLIM.cm : PLIM.ft
+  const [wMin, wMax] = units === 'metric' ? PLIM.kg : PLIM.lbs
+  if (height < hMin || height > hMax) {
+    const fmt = (n: number) => (units === 'metric' ? String(n) : String(Math.round(n * 100) / 100))
+    return `Height must be between ${fmt(hMin)} and ${fmt(hMax)} ${units === 'metric' ? 'cm' : 'ft'}`
+  }
+  if (weight < wMin || weight > wMax) {
+    const fmt = (n: number) => (units === 'metric' ? String(n) : String(Math.round(n * 100) / 100))
+    return `Weight must be between ${fmt(wMin)} and ${fmt(wMax)} ${units === 'metric' ? 'kg' : 'lbs'}`
+  }
+  return null
+}
+
 function calculate(units: Units, heightText: string, weightText: string): number | null {
   const height = Number(heightText)
   const weight = Number(weightText)
@@ -54,28 +73,14 @@ function resultText(bmi: number, category: Category, units: Units, height: strin
   return `BMI: ${bmi.toFixed(1)} - ${category} (height ${height} ${h}, weight ${weight} ${w})`
 }
 
-function BandBar({ label, active }: { label: string; active: boolean }) {
-  return (
-    <div className="bmi-band">
-      <div className="bmi-band-track">
-        <div
-          className={active ? 'bmi-band-fill bmi-band-fill--on' : 'bmi-band-fill'}
-          role="img"
-          aria-label="BMI band"
-        >
-          <span className="bmi-band-label">{label}</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function App() {
   const initial = host.read()
   const [units, setUnits] = useState<Units>(initial?.units ?? 'metric')
   const [height, setHeight] = useState(initial?.height ?? '')
   const [weight, setWeight] = useState(initial?.weight ?? '')
   const [error, setError] = useState<string | null>(null)
+  const [heightError, setHeightError] = useState<string | null>(null)
+  const [weightError, setWeightError] = useState<string | null>(null)
   const [result, setResult] = useState<{ bmi: number; category: Category } | null>(
     initial ? { bmi: initial.bmi, category: categoryOf(initial.bmi) } : null,
   )
@@ -85,17 +90,28 @@ export function App() {
   function onUnits(value: Units) {
     setUnits(value)
     setError(null)
+    setHeightError(null)
+    setWeightError(null)
   }
 
   function onCalculate() {
     const h = Number(height)
     const w = Number(weight)
+    setError(null)
+    setHeightError(null)
+    setWeightError(null)
     if (!Number.isFinite(w) || w <= 0) {
       setError('Weight must be greater than 0')
       return
     }
     if (!Number.isFinite(h) || h <= 0) {
       setError('Height must be greater than 0')
+      return
+    }
+    const rangeError = plausibilityError(units, h, w)
+    if (rangeError) {
+      const which = rangeError.startsWith('Height') ? setHeightError : setWeightError
+      which(rangeError)
       return
     }
     const bmi = calculate(units, height, weight)
@@ -107,7 +123,6 @@ export function App() {
     const category = categoryOf(rounded)
     host.saveLast(units, height, weight, rounded)
     setHistory(host.history())
-    setError(null)
     setResult({ bmi: rounded, category })
   }
 
@@ -119,8 +134,8 @@ export function App() {
     if (result) void copy(resultText(result.bmi, result.category, units, height, weight))
   }
 
-  const heightLabel = units === 'metric' ? 'Height (cm)' : 'Height (ft)'
-  const weightLabel = units === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
+  const heightHint = units === 'metric' ? 'Centimetres (cm)' : 'Feet (ft)'
+  const weightHint = units === 'metric' ? 'Kilograms (kg)' : 'Pounds (lbs)'
 
   const exportJson = () =>
     JSON.stringify(
@@ -155,7 +170,7 @@ export function App() {
           <Body>Enter your height and weight to calculate BMI</Body>
           <div style={{ marginTop: 'calc(12px * var(--sf))', marginBottom: 'calc(12px * var(--sf))' }}>
             <FormGrid>
-              <Select
+              <MeasureSelect
                 label="Units"
                 value={units}
                 onChange={(value) => onUnits(value as Units)}
@@ -164,22 +179,28 @@ export function App() {
                   { value: 'imperial', label: 'Imperial (ft, lbs)' },
                 ]}
               />
-              <TextInput
-                label={heightLabel}
+              <MeasureField
+                label="Height"
                 value={height}
                 onChange={(value) => {
                   setHeight(value)
                   setError(null)
+                  setHeightError(null)
                 }}
+                hint={heightHint}
+                error={heightError}
                 inputMode="decimal"
               />
-              <TextInput
-                label={weightLabel}
+              <MeasureField
+                label="Weight"
                 value={weight}
                 onChange={(value) => {
                   setWeight(value)
                   setError(null)
+                  setWeightError(null)
                 }}
+                hint={weightHint}
+                error={weightError}
                 inputMode="decimal"
               />
             </FormGrid>
@@ -232,11 +253,7 @@ export function App() {
           }
         >
           {result ? (
-            <KpiRow>
-              <div>
-                <Kpi value={`BMI: ${result.bmi.toFixed(1)}`} label={result.category} accent />
-              </div>
-            </KpiRow>
+            <Kpi value={`BMI: ${result.bmi.toFixed(1)}`} label={result.category} accent />
           ) : (
             <EmptyState
               mono="No result yet"
@@ -246,27 +263,33 @@ export function App() {
           )}
         </Card>
 
-        <Card mono="Breakdown" title="BMI categories">
-          <SectionLabel>Where you fall</SectionLabel>
-          <div className="bmi-bands" style={{ margin: 'calc(8px * var(--sf)) 0 calc(14px * var(--sf))' }}>
-            {CATEGORIES.map((c) => (
-              <BandBar key={c.key} label={c.key} active={result?.category === c.key} />
-            ))}
-          </div>
-          <SectionLabel>Categories</SectionLabel>
-          <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
-            <Table
-              label="BMI categories"
-              columns={[
-                { key: 'category', label: 'Category' },
-                { key: 'range', label: 'BMI range', num: true },
-              ]}
-              rows={CATEGORIES.map((c) => ({
-                cells: { category: c.key, range: c.range },
-                hot: result?.category === c.key,
-              }))}
-            />
-          </div>
+        <Card mono="Breakdown" title="Categories">
+          <Table
+            label="BMI categories"
+            columns={[
+              { key: 'category', label: 'Category' },
+              { key: 'range', label: 'BMI range', num: true },
+            ]}
+            rows={CATEGORIES.map((c) => ({
+              cells: { category: c.key, range: c.range },
+              hot: result?.category === c.key,
+            }))}
+          />
+          {result && (
+            <div className="bmi-bands" aria-hidden="true">
+              {CATEGORIES.map((c) => (
+                <div
+                  key={c.key}
+                  role="img"
+                  aria-label={`${c.key} band`}
+                  aria-hidden={result.category === c.key ? undefined : 'true'}
+                  className={result.category === c.key ? 'bmi-band bmi-band--on' : 'bmi-band'}
+                >
+                  <span className="bmi-band-label">{c.key}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
 
         <Card mono={`${history.length} kept`} title="Your last calculations">
