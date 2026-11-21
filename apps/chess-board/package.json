@@ -8,6 +8,8 @@
     "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
+    "@lacuna/board-grid": "workspace:0.1.0",
+    "@lacuna/file-save-open": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
     "react": "^19.0.0",
