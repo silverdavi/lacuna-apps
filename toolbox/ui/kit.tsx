@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
+// Platform chrome for every community app. Twin of the product launcher shell
+// (BrandHome, Breadcrumbs, and the desk header that every window renders).
+// Apps pass name (the window title), hue, and category. This file owns the logo
+// link, the APPS link, the category breadcrumb, the window title, and the focus ring.
+// The two shells cannot share a file. Keep those prop names, and the current-page
+// treatment (ink word, 2px accent underline in kit.css), the same on both.
 // The app kit: the page frame and the few primitives every shelf app is built from.
 // Markup uses the lc-* classes of ui.css (the same ones the Lacuna shell uses) plus lk-* from kit.css.
 // Presentation only: no data access, no routing, no storage.

@@ -3,6 +3,7 @@
 // @lacuna/ui: everything an app's screen is made of.
 // Every app renders one <AppShell> (the page frame, from ./kit) and builds inside it with Card, FormGrid,
 // TextInput, Select, Button, Actions, Kpi, Table, List/Row, Tag, Chip, EmptyState and ErrorState.
+// Platform behavior (primary action, 24px hit target, focus ring, empty state) is behavior.tsx.
 // KIT.md next to this file lists the props, the tokens, and one complete example.
 import type { CSSProperties, ReactNode } from 'react'
 import { HoverLabel } from './hover'
@@ -16,30 +17,11 @@ export { ICONS, SUITE_ICONS, iconForFlow } from './icons'
 export type { IconName, IconProps } from './icons'
 export { AppShell, Board, Checkbox, ErrorState, HUES, Keys, List, Plate, Rail, Row, SectionLabel, Select } from './kit'
 export type { Hue } from './kit'
+export { Adopt } from './adopt'
+export { EmptyState, FOCUS_RING, HIT_MIN_PX, PrimaryButton } from './behavior'
 
 function cx(...parts: (string | false | null | undefined)[]): string {
   return parts.filter(Boolean).join(' ')
-}
-
-export function EmptyState({
-  title,
-  detail,
-  mono,
-  children,
-}: {
-  title: ReactNode
-  detail?: ReactNode
-  mono?: string
-  children?: ReactNode
-}) {
-  return (
-    <div className="lc-empty">
-      {mono && <div className="lc-mono lc-mono-sm lc-faint">{mono}</div>}
-      <div className="lc-empty-title">{title}</div>
-      {detail && <div className="lc-body-sm">{detail}</div>}
-      {children}
-    </div>
-  )
 }
 
 export function Title({ children, size = 'lg', as: As = 'div', style }: { children: ReactNode; size?: 'xl' | 'lg' | 'md'; as?: 'div' | 'h2' | 'h3'; style?: CSSProperties }) {

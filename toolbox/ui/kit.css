@@ -27,6 +27,12 @@
   font-family: var(--mono); font-size: calc(10px * var(--tf)); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--mid); padding: 2px 4px;
 }
+/* Current page. Twin of the product launcher rule on .lc-cv-crumbs .here.
+   Ink word, 2px accent underline. Apps do not restyle this. */
+.lk-shell .lc-cv-crumbs .here {
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
 /* The mark, the APPS chip and the category are links to the Lacuna desktop. Same look as before, as links. */
 .lk-shell a.lc-spacechip, .lk-shell a.lk-crumb { text-decoration: none; cursor: pointer; }
 .lk-shell a.lc-spacechip:hover, .lk-shell a.lk-crumb:hover { color: var(--ink); }
@@ -89,6 +95,9 @@
 .lk-shell select.lc-input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-60) 50%), linear-gradient(135deg, var(--ink-60) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: calc(30px * var(--sf)); }
 .lk-shell .lc-input::placeholder { color: var(--ink-40); }
 .lk-shell .lc-input[aria-invalid='true'] { border-color: var(--danger); }
+/* Focus ring and hit target. Twin of the product launcher .lc-btn rule.
+   Apps do not set outline. Phone rules below raise the hit target to 44px. */
+.lk-shell .lc-btn { min-height: 24px; min-width: 24px; }
 .lk-shell .lc-btn:focus-visible, .lk-shell .lc-input:focus-visible, .lk-shell .lc-pill:focus-visible,
 .lk-shell .lc-tab:focus-visible, .lk-main button:focus-visible, .lk-main input:focus-visible,
 .lk-main select:focus-visible, .lk-main textarea:focus-visible, .lk-row-text:focus-visible {

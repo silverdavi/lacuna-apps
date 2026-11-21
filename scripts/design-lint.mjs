@@ -12,29 +12,37 @@
 //   theme        forces a theme: data-appearance, color-scheme or prefers-color-scheme in src/ or index.html
 //                (the host sets the theme; the default is light)
 //   kit-override restyles the kit from the app's own CSS: a selector on .lc-* / .lk-*, body, html or :root
+//   chrome       draws its own header, logo, or breadcrumb (AppShell owns those)
+//   focus        sets outline (the kit paints the focus ring)
+//   empty        uses EmptyState without actionLabel, or builds its own lc-empty box
+//
+// chrome, focus, and empty fail an app whose creating commit already had toolbox/ui/behavior.tsx.
+// Older apps are not failed by those three. --report never fails.
 //
 // It reads only apps/<slug>/src and apps/<slug>/index.html. It never reads toolbox/, so the kit's own
 // stylesheets (which hold the token values) cannot fail it.
 //
 // Apps made before the kit existed are reported, not failed, until they adopt it: an app is held to the
 // rules when its src/main.tsx imports base.css, or when the commit that created it already had
-// toolbox/ui/kit.tsx. --strict holds every app to them; --report never fails.
+// toolbox/ui/kit.tsx. --strict holds every app to those earlier rules; --report never fails.
 import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
 const args = process.argv.slice(2)
 const reportOnly = args.includes('--report')
 const strict = args.includes('--strict')
 const dir = args.find((a) => !a.startsWith('--'))
 if (!dir) throw new Error('usage: design-lint.mjs <apps/slug> [--report] [--strict]')
-const here = path.dirname(new URL(import.meta.url).pathname)
-const root = path.resolve(here, '..')
-const appDir = path.resolve(dir)
+const here = path.dirname(fileURLToPath(import.meta.url))
+const root = fs.realpathSync(path.resolve(here, '..'))
+const appDir = fs.existsSync(path.resolve(dir)) ? fs.realpathSync(path.resolve(dir)) : path.resolve(dir)
 const slug = path.basename(appDir)
 const relApp = path.relative(root, appDir).split(path.sep).join('/')
 
 const KIT_FILE = 'toolbox/ui/kit.tsx'
+const BEHAVIOR_FILE = 'toolbox/ui/behavior.tsx'
 const BASE_IMPORT = /import\s+['"]@lacuna\/ui\/base\.css['"]/
 const DATA_COLORS = 'src/colors.ts'
 
@@ -74,14 +82,16 @@ function git(...a) {
 const mainTsx = ['src/main.tsx', 'src/main.ts', 'src/main.jsx'].map((f) => path.join(appDir, f)).find((f) => fs.existsSync(f))
 const mainText = mainTsx ? fs.readFileSync(mainTsx, 'utf8') : ''
 const adopted = BASE_IMPORT.test(stripComments(mainText, '.tsx'))
-function bornWithKit() {
-  if (!fs.existsSync(path.join(root, KIT_FILE))) return false
+function bornWith(file) {
+  if (!fs.existsSync(path.join(root, file))) return false
   const born = (git('log', '--diff-filter=A', '--format=%H', '--', `${relApp}/package.json`) ?? '').split('\n').filter(Boolean).pop()
   const at = born ?? 'HEAD'
-  const r = spawnSync('git', ['-C', root, 'cat-file', '-e', `${at}:${KIT_FILE}`])
+  const r = spawnSync('git', ['-C', root, 'cat-file', '-e', `${at}:${file}`])
   return r.status === 0
 }
-const held = strict || adopted || bornWithKit()
+const held = strict || adopted || bornWith(KIT_FILE)
+// New chrome rules follow the birth of behavior.tsx, not --strict, so an older app stays unfailed.
+const behaviorHeld = bornWith(BEHAVIOR_FILE)
 
 // ---------------------------------------------------------------- rules
 const NAMED = 'white|black|red|green|blue|yellow|orange|purple|pink|gr[ae]y|navy|teal|brown|cyan|magenta|silver|gold|maroon|olive|lime|aqua|fuchsia|indigo|violet|beige|ivory|tan|coral|salmon|crimson|khaki|orchid|plum|turquoise|tomato|lavender|(?:dark|light|medium|pale|deep|dim)[a-z]{3,}|[a-z]+(?:white|smoke|gr[ae]y)'
@@ -144,6 +154,36 @@ for (const file of files) {
 if (!mainTsx) bad('shell', 'src/main.tsx', 0, 'missing', 'start from template/: src/main.tsx imports \'@lacuna/ui/base.css\'')
 else if (!adopted) bad('shell', path.relative(appDir, mainTsx), 0, "no import '@lacuna/ui/base.css'", "add: import '@lacuna/ui/base.css' (fonts, tokens, UI classes, app kit)")
 if (!usesShell || !importsShell) bad('shell', 'src/App.tsx', 0, 'no <AppShell> from @lacuna/ui', "wrap the app: import { AppShell } from '@lacuna/ui' and render <AppShell name=... icon=... hue=...> as the outermost element")
+
+// A new app does not draw chrome the shell already owns, and does not invent focus or an empty box.
+if (behaviorHeld) {
+  const chromeLine = [
+    [/<header\b/, 'AppShell owns the header. Pass name, hue, and category. Do not draw a top bar.'],
+    [/\blc-brand-home\b|\blc-brandname\b|\bBrandHome\b|<Mark\b|aria-label=["'](?:Lacuna home|Home)["']/, 'AppShell owns the logo link. Do not add another.'],
+    [/\blc-cv-crumbs\b|\blc-crumb\b|\bBreadcrumbs\b|aria-label=["']Breadcrumb["']/, 'AppShell owns the breadcrumb. Pass category; the app name is the current page.'],
+    [/\blc-desk-head\b|\blk-top\b|\blc-app-bar\b|\blc-topbar\b/, 'AppShell owns the top bar and the window title.'],
+  ]
+  for (const file of files) {
+    const rel = path.relative(appDir, file).split(path.sep).join('/')
+    const ext = path.extname(file)
+    const text = stripComments(fs.readFileSync(file, 'utf8'), ext)
+    text.split('\n').forEach((line, i) => {
+      for (const [re, fix] of chromeLine) {
+        if (re.test(line)) bad('chrome', rel, i + 1, line, fix)
+      }
+      if (/\boutline\s*:/.test(line)) bad('focus', rel, i + 1, line, 'the focus ring comes from the kit (:focus-visible, 2px accent). Do not set outline.')
+      if (/\blc-empty\b/.test(line)) bad('empty', rel, i + 1, line, 'use EmptyState with actionLabel. Do not build an empty box.')
+    })
+    if (ext !== '.css' && ext !== '.html') {
+      for (const m of text.matchAll(/<EmptyState\b[\s\S]*?>/g)) {
+        if (!/\bactionLabel\s*=/.test(m[0])) {
+          const line = text.slice(0, m.index).split('\n').length
+          bad('empty', rel, line, m[0].split('\n')[0], 'EmptyState requires actionLabel, the words for the next action')
+        }
+      }
+    }
+  }
+}
 
 // ---------------------------------------------------------------- report
 const fail = problems.length > 0 && held && !reportOnly

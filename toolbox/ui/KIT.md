@@ -4,6 +4,10 @@ Every app is one `AppShell` with `Card` panels inside. All of it comes from `@la
 
 `src/main.tsx` loads the look once (fonts, tokens, classes): `import '@lacuna/ui/base.css'`.
 
+Platform behavior is `behavior.tsx`, exported from `@lacuna/ui`: `PrimaryButton` (the one primary action), `HIT_MIN_PX` (24), `FOCUS_RING`, and `EmptyState` with `actionLabel` (the next action). The focus ring is the kit's `:focus-visible` outline. `AppShell` is the only header: pass `name`, `hue`, and `category`. Do not draw a logo, an APPS link, a breadcrumb, or a top bar.
+
+`Adopt` (`adopt.tsx`) is the one-line mount for markdown-table, pomodoro, receipt-packet, tex-snippet, and tip-split: `<Adopt name="Tip Split" hue="green" category="Finance"><ExistingScreen /></Adopt>`. A later rebuild uses that and deletes the app's header. Do not restyle those five by hand.
+
 ## Frame
 
 | Component | Props | Draws |
@@ -22,7 +26,7 @@ Every app is one `AppShell` with `Card` panels inside. All of it comes from `@la
 
 | Component | Props |
 |---|---|
-| `Button` | `kind="primary" \| "secondary" \| "ghost" \| "ink" \| "danger"`, `onClick`, `disabled`, `ariaLabel`. One `primary` per panel. |
+| `Button` | `kind="primary" \| "secondary" \| "ghost" \| "ink" \| "danger"`, `onClick`, `disabled`, `ariaLabel`. One `primary` per panel. Prefer `PrimaryButton` for that one. |
 | `TextInput` | `label`, `value`, `onChange`, `error`, `hint`, `placeholder`, `type`, `inputMode`, `rows` (textarea) |
 | `Select` | `label`, `value`, `onChange`, `options`, `error` |
 | `Checkbox` | `label`, `checked`, `onChange` |
@@ -39,7 +43,7 @@ Every app is one `AppShell` with `Card` panels inside. All of it comes from `@la
 | `List` with `Row` | `title`, `meta`, `value`, `action`, `hot`, `onClick` |
 | `Tag` `Chip` | Small mono uppercase labels. `Tag accent` for the one that matters. |
 | `Title` `Body` `MonoLabel` | Serif heading (`as="h2"`), body text, mono label |
-| `EmptyState` | `mono`, `title`, `detail`. Show it whenever a list, table or result has nothing yet. |
+| `EmptyState` | `mono`, `title`, `detail`, `actionLabel`, `onAction`. `actionLabel` names the next action. A new app must pass it. |
 | `ErrorState` | `title`, `detail`. Show it when an action fails. For one bad field use the field's `error` prop. |
 | `Board` | `cols`, `rows`, `cell` (cell size in px, default 28), `label`. A game or puzzle board. Children: one element per cell, row by row (`<div>` or `<button>`), with your own `data-` attributes; set only `style={{ background }}` on a cell. The kit draws the frame, grid lines and size. Never size the board or its cells yourself. |
 | `Keys` | `items={[['←', 'Move left'], ['Space', 'Drop']]}`. Keyboard hints; put it in the `Rail`. |
