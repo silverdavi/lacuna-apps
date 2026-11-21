@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { Button, Body, Card, Stack } from '@lacuna/ui'
+import { AppShell, Button, Body, Card, Stack } from '@lacuna/ui'
 import { host } from './host'
 import {
   COLS,
@@ -79,7 +79,7 @@ export function App() {
     setStatus('playing')
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [handleKey])
@@ -110,12 +110,9 @@ export function App() {
   })
 
   return (
-    <main>
+    <AppShell name="Classic Tetris" icon="grid" hue="cobalt" category="Personal">
       <Card mono="Personal" actions={<Button kind="primary" onClick={restart}>Restart</Button>}>
         <Stack>
-          <h1 className="lc-title lc-title-md" style={{ margin: 0 }}>
-            Classic Tetris
-          </h1>
           <Body sm>
             {status === 'playing'
               ? 'Move with ArrowLeft and ArrowRight, rotate with ArrowUp, and drop with ArrowDown.'
@@ -159,6 +156,6 @@ export function App() {
           <Body sm>ArrowLeft and ArrowRight move the piece, ArrowUp rotates it, and ArrowDown drops it. Clear a full row to score 100.</Body>
         </Stack>
       </Card>
-    </main>
+    </AppShell>
   )
 }
