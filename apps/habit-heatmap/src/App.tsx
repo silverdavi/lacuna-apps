@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AppShell, Body, Button, Card, EmptyState, MonoLabel, Stack } from '@lacuna/ui'
+import { AppShell, Body, Button, Card, EmptyState, MonoLabel, Rail, Stack } from '@lacuna/ui'
 import { host } from './host/mock'
 import type { HabitState } from './host/index'
 import {
@@ -72,9 +72,21 @@ export function App() {
     <AppShell
       name="Habit Heatmap"
       icon="calendar"
-      hue="gold"
+      hue="teal"
       category="Productivity"
-      meta={state.habits.length ? `${state.habits.length} habit${state.habits.length === 1 ? '' : 's'}` : undefined}
+      meta={state.habits.length ? `${state.habits.length} ITEM${state.habits.length === 1 ? '' : 'S'}` : 'EMPTY'}
+      status={state.habits.length ? `${state.completions.length} logged day${state.completions.length === 1 ? '' : 's'} · best ${streaks.longest}` : 'Add a habit to begin'}
+      side={
+        <Rail
+          title="Heatmap tour"
+          note={`${year} · 53 weeks`}
+          chips={[
+            `HABITS ${state.habits.length}`,
+            `LOGGED ${state.completions.length}`,
+            `BEST ${streaks.longest}`,
+          ]}
+        />
+      }
     >
       <div className="lc-tabs" role="tablist" aria-label="Habit Heatmap views">
         {(['Habits', 'Heatmap'] as const).map((t) => (
