@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+// Fonts, tokens, the Lacuna UI classes and the app kit.
+import '@lacuna/ui/base.css'
 import { App } from './App'
 
 createRoot(document.getElementById('root')!).render(

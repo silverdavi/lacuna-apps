@@ -1,5 +1,6 @@
-import { CSSProperties, useEffect, useState } from 'react'
-import { Body, Button, Card, Kpi, Stack } from '@lacuna/ui'
+import { useEffect, useState } from 'react'
+import { Actions, AppShell, Board, Body, Button, Card, Keys, Kpi, KpiRow, Rail, Tag } from '@lacuna/ui'
+import { DISC_1, DISC_2 } from './colors'
 import { host } from './host'
 
 const COLS = 7
@@ -32,18 +33,7 @@ function findWin(board: Cell[][]): Player | 0 {
   return 0
 }
 
-const cellStyle: CSSProperties = {
-  width: 'calc(40px * var(--sf))',
-  height: 'calc(40px * var(--sf))',
-  borderRadius: '50%',
-  border: 'calc(1px * var(--sf)) solid var(--soft)',
-  background: 'var(--ui-bright)',
-}
-
-const discStyle: Record<Player, CSSProperties> = {
-  1: { color: 'rgb(189, 72, 44)' },
-  2: { color: 'rgb(56, 110, 178)' },
-}
+const piece = (v: Cell) => (v === 1 ? DISC_1 : v === 2 ? DISC_2 : 'transparent')
 
 export function App() {
   const [board, setBoard] = useState<Cell[][]>(EMPTY)
@@ -99,48 +89,60 @@ export function App() {
   }
 
   return (
-    <main>
-      <Card mono="Game" title="Connect Four">
-        <Stack>
-          <h1 style={{ margin: 0, fontFamily: 'var(--serif)', fontSize: 'calc(26px * var(--tf))', color: 'var(--ink)' }}>Connect Four</h1>
-          <Body>Drop discs into a column. Four in a row, column, or diagonal wins the game.</Body>
-          <div style={{ textAlign: 'center' }} aria-live="polite">
-            <Kpi
-              value={status === 'playing' ? `Player ${player}'s turn` : status === 'won' ? `Player ${winner} wins` : 'Draw'}
-              label="Status"
-              accent={status === 'won'}
-            />
-            <Kpi value={`Score: ${score}`} label="Best score" />
+    <AppShell
+      name="Connect Four"
+      icon="grid"
+      hue="cobalt"
+      category="Games"
+      meta={`Score: ${score}`}
+      side={
+        <Rail title="Connect Four" note="7 by 6 grid · local" chips={['4 in a row', 'Works offline']}>
+          <KpiRow>
+            <Kpi value={String(score)} label="Score" accent />
+          </KpiRow>
+          <div>
+            <Body sm>Next: {status === 'playing' ? `Player ${player}` : status === 'won' ? `Player ${winner}` : '—'}</Body>
+            <Board cols={COLS} rows={ROWS} cell={18} label="Board preview">
+              {board.map((line, r) =>
+                line.map((cell, c) => (
+                  <div key={`${r}-${c}`} style={{ background: piece(cell) }} />
+                )),
+              )}
+            </Board>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${COLS}, auto)`, gap: 'calc(8px * var(--sf))', justifyItems: 'center' }}>
-            {Array.from({ length: ROWS }, (_, r) =>
-              Array.from({ length: COLS }, (_, c) => (
-                <span
-                  key={`${r}-${c}`}
-                  className={board[r][c] ? 'disc' : undefined}
-                  style={board[r][c] ? { ...cellStyle, background: 'currentColor', borderColor: 'transparent', ...discStyle[board[r][c]] } : cellStyle}
-                />
-              )),
-            )}
-          </div>
-          {status === 'playing' ? (
-            <Stack>
+          <Keys items={[['1-7', 'Drop in a column'], ['R', 'Restart']]} />
+        </Rail>
+      }
+    >
+      <Card
+        mono="Game"
+        title="Board"
+        actions={
+          status === 'playing' ? (
+            <Actions>
               {Array.from({ length: COLS }, (_, i) => (
-                <Button key={i + 1} kind="primary" onClick={() => drop(i)}>
-                  Drop in column {i + 1}
-                </Button>
+                <Button key={i + 1} onClick={() => drop(i)}>Drop in column {i + 1}</Button>
               ))}
-            </Stack>
+            </Actions>
           ) : (
-            <Stack>
-              <Button kind="primary" onClick={restart}>
-                Restart
-              </Button>
+            <Actions>
+              <Button kind="primary" onClick={restart}>Restart</Button>
               <Button onClick={newGame}>New game</Button>
-            </Stack>
+            </Actions>
+          )
+        }
+      >
+        <div>
+          {status === 'playing' ? <Body>Player {player}'s turn</Body> : status === 'won' ? <Tag accent>Player {winner} wins</Tag> : <Tag accent>Draw</Tag>}
+        </div>
+        <Board cols={COLS} rows={ROWS} cell={40} label="Connect Four board">
+          {board.map((line, r) =>
+            line.map((cell, c) => (
+              <div key={`${r}-${c}`} data-row={r} data-col={c} data-piece={cell} style={{ background: piece(cell) }} />
+            )),
           )}
-        </Stack>
+        </Board>
       </Card>
-    </main>
+    </AppShell>
   )
 }
