@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { AppShell, Card, Rail, Button, Kpi, KpiRow, Keys, Tag } from '@lacuna/ui'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { AppShell, Button, Card, Kpi, KpiRow, Keys, Rail, Tag } from '@lacuna/ui'
 import {
   makeRecord,
   placeDigit,
@@ -15,11 +15,6 @@ import './styles.css'
 
 type Status = 'idle' | 'playing' | 'finished'
 
-const boardVars: CSSProperties = {
-  ['--cols' as string]: 9,
-  ['--rows' as string]: 9,
-}
-
 function freshRecord(difficulty: Difficulty, now: number): PuzzleRecord {
   return makeRecord(difficulty, now, `puz-${now}`, Math.floor(now / 1000))
 }
@@ -32,16 +27,12 @@ export function App() {
   const [base, setBase] = useState({ at: Date.now(), seconds: 0 })
   const [now, setNow] = useState(() => Date.now())
 
-  // The frozen time after solving: the record's own seconds stay fixed.
   const seconds = status === 'playing' ? elapsedSeconds(base, now) : record.seconds
   const time = formatTime(seconds)
   const statusText = statusFor(record.board)
   const conflicts = conflictSet(record.board)
-  const stateRef = useRef<{ status: Status; record: PuzzleRecord; selected: number | null; base: { at: number; seconds: number }; place: (digit: number) => void; start: () => void }>({
-    status,
-    record,
-    selected,
-    base,
+
+  const stateRef = useRef<{ place: (d: number) => void; start: () => void }>({
     place: () => {},
     start: () => {},
   })
@@ -89,7 +80,8 @@ export function App() {
     setNow(Date.now())
   }
 
-  stateRef.current = { status, record, selected, base, place, start }
+  stateRef.current = { place, start }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const s = stateRef.current
@@ -103,51 +95,87 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const selectedBox =
+    selected === null ? -1 : Math.floor(selected / 9 / 3) * 3 + Math.floor((selected % 9) / 3)
+
+  const rows: ReactNode[] = []
+  for (let r = 0; r < 9; r++) {
+    const cells: ReactNode[] = []
+    for (let c = 0; c < 9; c++) {
+      const i = r * 9 + c
+      const v = record.board[i]
+      const given = record.given[i] !== 0
+      const invalid = conflicts.has(i)
+      const isSel = selected === i
+      const inBox = Math.floor(r / 3) === selectedBox && Math.floor(c / 3) === selectedBox
+      cells.push(
+        <button
+          key={i}
+          type="button"
+          role="gridcell"
+          aria-label={`Row ${r + 1}, Column ${c + 1}`}
+          aria-selected={isSel || undefined}
+          aria-invalid={invalid ? 'true' : undefined}
+          data-row={r + 1}
+          data-col={c + 1}
+          data-value={v}
+          data-answer={record.given[i]}
+          data-selected={isSel ? 'true' : undefined}
+          data-conflict={invalid ? 'true' : undefined}
+          className={
+            'sud-cell' +
+            (given ? ' sud-cell--given' : '') +
+            (isSel ? ' sud-cell--selected' : '') +
+            (invalid ? ' sud-cell--invalid' : '') +
+            (inBox ? ' sud-cell--peer' : '')
+          }
+          onClick={() => select(i)}
+        >
+          <span className="sud-cell-val" data-val={v || ''}>{v || ''}</span>
+        </button>,
+      )
+    }
+    rows.push(
+      <div key={r} role="row" className="sud-row">
+        {cells}
+      </div>,
+    )
+  }
+
   return (
-    <AppShell name="Sudoku" icon="grid" meta="9 × 9">
+    <AppShell
+      name="Sudoku"
+      icon="grid"
+      hue="gold"
+      category="Games"
+      meta="9 × 9"
+      status="Local · no network"
+      side={
+        <Rail title="Game" note={record.difficulty}>
+          <KpiRow>
+            <Kpi label="Status" value={status === 'playing' ? 'playing' : status === 'finished' ? 'solved' : 'ready'} />
+            <Kpi label="Difficulty" value={record.difficulty} />
+          </KpiRow>
+          {status === 'finished' ? <Tag accent>Solved in {time}</Tag> : null}
+        </Rail>
+      }
+    >
       <div className="sud-heading">
-        <h2 className="sud-title">Sudoku Puzzle</h2>
+        <h2 className="lc-title lc-title-md">Sudoku Puzzle</h2>
         <span role="timer" aria-label="Time" className="sud-timer">
           {time}
         </span>
       </div>
 
       <Card title="Board">
-        <div className="sud-board lk-board" role="grid" aria-label="Board" style={boardVars}>
-          {Array.from({ length: 9 }, (_, r) => (
-            <div key={r} className="sud-row" role="row">
-              {Array.from({ length: 9 }, (_, c) => {
-                const i = r * 9 + c
-                const v = record.board[i]
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    role="gridcell"
-                    aria-label={`Row ${r + 1}, Column ${c + 1}`}
-                    aria-invalid={conflicts.has(i) ? 'true' : undefined}
-                    data-row={r + 1}
-                    data-col={c + 1}
-                    data-value={v}
-                    data-answer={record.given[i]}
-                    data-selected={selected === i ? 'true' : undefined}
-                    data-conflict={conflicts.has(i) ? 'true' : undefined}
-                    className={
-                      'sud-cell' +
-                      (record.given[i] !== 0 ? ' sud-cell--given' : '') +
-                      (selected === i ? ' sud-cell--selected' : '') +
-                      (conflicts.has(i) ? ' sud-cell--invalid' : '')
-                    }
-                    onClick={() => select(i)}
-                  >
-                    <span className="sud-cell-val">{v || ''}</span>
-                  </button>
-                )
-              })}
-            </div>
-          ))}
+        <div className="sud-board lk-board" role="grid" aria-label="Board">
+          {rows}
         </div>
-        {statusText ? <Tag accent={statusText === 'Invalid move'}>{statusText}</Tag> : null}
+        {statusText ? (
+          <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
+            <Tag accent={statusText === 'Invalid move'}>{statusText}</Tag>
+          </div>
+        ) : null}
       </Card>
 
       <Card title="Controls">
@@ -156,7 +184,7 @@ export function App() {
             <Button
               key={n}
               ariaLabel={String(n)}
-              style={{ width: 'calc(40px * var(--sf))', justifyContent: 'center' }}
+              style={{ width: 'calc(40px * var(--sf))', justifyContent: 'center', fontFamily: 'var(--mono)' }}
               onClick={() => place(n)}
               disabled={status !== 'playing' || selected === null}
             >
@@ -165,11 +193,10 @@ export function App() {
           ))}
         </div>
         <div className="sud-new">
-          <label className="lc-field sud-field">
+          <label className="lc-field">
             <span className="lc-field-label" id="sud-difficulty">Difficulty</span>
             <select
               className="lc-input"
-              id="sud-difficulty-select"
               aria-labelledby="sud-difficulty"
               value={difficulty}
               onChange={(event) => {
@@ -194,14 +221,6 @@ export function App() {
           ]}
         />
       </Card>
-
-      <Rail title="Game">
-        <KpiRow>
-          <Kpi label="Status" value={status === 'playing' ? 'playing' : status === 'finished' ? 'solved' : 'ready'} />
-          <Kpi label="Difficulty" value={record.difficulty} />
-        </KpiRow>
-        {status === 'finished' ? <Tag accent>Solved in {time}</Tag> : null}
-      </Rail>
     </AppShell>
   )
 }

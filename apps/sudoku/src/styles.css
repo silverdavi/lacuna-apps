@@ -6,17 +6,15 @@
   flex-wrap: wrap;
 }
 
-.sud-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: calc(22px * var(--tf));
-  color: var(--ink);
-}
-
 .sud-timer {
   font-family: var(--mono);
   font-size: calc(18px * var(--tf));
   color: var(--ink);
+}
+
+.sud-board {
+  --cols: 9;
+  --rows: 9;
 }
 
 .sud-board > .sud-row {
@@ -37,6 +35,7 @@
   place-items: center;
   font-family: var(--mono);
   font-weight: 500;
+  font-size: calc(16px * var(--tf));
   line-height: 1;
   color: var(--ink);
   background: var(--ui-bg);
@@ -51,6 +50,10 @@
 .sud-cell--selected {
   background: var(--accent-soft);
   outline: calc(2px * var(--sf)) solid var(--accent);
+}
+
+.sud-cell--peer {
+  background: var(--ui-line);
 }
 
 .sud-cell--invalid {
@@ -74,13 +77,13 @@
 
 .sud-digits {
   display: flex;
-  gap: calc(4px * var(--sf));
+  gap: calc(6px * var(--sf));
   flex-wrap: wrap;
 }
 
 .sud-new {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: calc(10px * var(--sf));
   flex-wrap: wrap;
   margin-top: calc(10px * var(--sf));
