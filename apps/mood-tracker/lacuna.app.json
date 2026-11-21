@@ -30,6 +30,11 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0"
     }
