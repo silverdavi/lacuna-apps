@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { AppShell, Board, Card, Keys, PrimaryButton, Stack } from '@lacuna/ui'
-import { useHotkeys } from '@lacuna/use-hotkeys'
 import { WORDS } from './words'
 import { gameStore, statsStore } from './host'
 
@@ -68,6 +67,7 @@ export function statusText(state: GameState): string {
   if (state.lost) return 'Game Over'
   if (state.invalid) return 'Invalid word'
   if (state.guesses.length === 0 && state.current.length === 0) return 'Ready'
+  if (state.guesses.length > 0 && state.current.length === 0) return `Try ${state.guesses.length}`
   return `Try ${state.guesses.length + 1}`
 }
 
@@ -97,6 +97,10 @@ export function boardRows(state: GameState): { letter: string; state: TileState 
   }
   return rows
 }
+
+type KeyHandler = (e: KeyboardEvent) => void
+let keyHandler: KeyHandler | null = null
+window.addEventListener('keydown', (e) => keyHandler?.(e))
 
 export function App() {
   const [state, setState] = useState<GameState>(() => {
@@ -136,6 +140,7 @@ export function App() {
     setState(next)
   }
 
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null)
   const submitGuess = () => {
     const prev = stateRef.current
     if (prev.won || prev.lost) return
@@ -147,6 +152,7 @@ export function App() {
       return
     }
     const guesses = [...prev.guesses, word]
+    setPendingStatus(`Try ${guesses.length}`)
     const isWin = word === prev.word
     const isLoss = !isWin && guesses.length >= ROWS
     const next: GameState = { word: prev.word, guesses, current: '', won: isWin, lost: isLoss, invalid: false }
@@ -168,25 +174,30 @@ export function App() {
       }
       return s
     })
+    setTimeout(() => setPendingStatus(null), 500)
   }
 
-  useHotkeys([
-    { keys: 'enter', handler: () => submitGuess() },
-    { keys: 'backspace', handler: () => backspace() },
-    ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => ({
-      keys: letter.toLowerCase(),
-      handler: () => appendLetter(letter),
-    })),
-  ])
+  keyHandler = (e: KeyboardEvent) => {
+    const key = e.key
+    if (key === 'Enter') {
+      e.preventDefault()
+      submitGuess()
+    } else if (key === 'Backspace') {
+      e.preventDefault()
+      backspace()
+    } else if (key.length === 1 && key >= 'A' && key <= 'Z') {
+      appendLetter(key)
+    }
+  }
 
   const newGame = () => {
-    const next = freshGame(stateRef.current.won ? 0 : statsStore.get().gamesPlayed)
+    const next = freshGame(statsStore.get().gamesPlayed)
     stateRef.current = next
     setState(next)
   }
 
   const rows = boardRows(state)
-  const status = statusText(state)
+  const status = pendingStatus ?? statusText(state)
 
   return (
     <AppShell
