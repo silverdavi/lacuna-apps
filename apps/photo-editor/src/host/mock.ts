@@ -21,7 +21,21 @@ export interface SessionState {
   transform: string
 }
 
+export interface EditHistory {
+  /** Unique timestamp-based id. */
+  id: number
+  /** File name at the time of the edit. */
+  fileName: string
+  /** Human-readable filter description, or null if no filter was applied. */
+  filter: string | null
+  /** Transform that was applied, or null if none. */
+  transform: string | null
+  /** ISO timestamp of when the edit was applied. */
+  timestamp: string
+}
+
 const KEY = 'lacuna.photo-editor.session.v1'
+const HISTORY_KEY = 'lacuna.photo-editor.history.v1'
 
 export const EMPTY_SESSION: SessionState = {
   original: null,
@@ -47,6 +61,22 @@ function isSession(v: unknown): v is SessionState {
   )
 }
 
+function isHistory(v: unknown): v is EditHistory[] {
+  if (!Array.isArray(v)) return false
+  return v.every(
+    (item) =>
+      typeof item === 'object' &&
+      item !== null &&
+      typeof (item as Record<string, unknown>).id === 'number' &&
+      typeof (item as Record<string, unknown>).fileName === 'string' &&
+      (typeof (item as Record<string, unknown>).filter === 'string' ||
+        (item as Record<string, unknown>).filter === null) &&
+      (typeof (item as Record<string, unknown>).transform === 'string' ||
+        (item as Record<string, unknown>).transform === null) &&
+      typeof (item as Record<string, unknown>).timestamp === 'string',
+  )
+}
+
 const store = createMockValue<SessionState>({ key: KEY, fallback: EMPTY_SESSION, validate: isSession })
 
 export function loadSession(): SessionState {
@@ -55,4 +85,14 @@ export function loadSession(): SessionState {
 
 export function saveSession(state: SessionState): void {
   store.set(state)
+}
+
+const historyStore = createMockValue<EditHistory[]>({ key: HISTORY_KEY, fallback: [], validate: isHistory })
+
+export function loadHistory(): EditHistory[] {
+  return historyStore.get() ?? []
+}
+
+export function saveHistory(entries: EditHistory[]): void {
+  historyStore.set(entries)
 }
