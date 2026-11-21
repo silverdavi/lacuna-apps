@@ -1,5 +1,19 @@
 import { useState } from 'react'
-import { Body, Button, Card, Stack, Table, TextInput } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  Rail,
+  Stack,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
 import { type RecipeState } from './host'
 import { host } from './host/mock'
 
@@ -14,10 +28,6 @@ function gcd(a: number, b: number): number {
   return a
 }
 
-// Formats the product of a rational quantity string (e.g. "1 1/2") and a scale
-// (e.g. 2) as a rational string: integers plain, otherwise "a/b" or "n a/b".
-// Uses integer arithmetic on common denominators so 1/4 * 3 = "3/4", never
-// 0.75.
 function formatScaled(quantity: string, scale: number): string {
   const match = /^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/.exec(quantity.trim())
   let num: number
@@ -94,25 +104,46 @@ export function App() {
     setState(host.deleteIngredient(id))
   }
 
+  const tableColumns = [
+    { key: 'name', label: 'Ingredient' },
+    { key: 'quantity', label: 'Quantity' },
+    { key: 'scaled', label: 'Scaled' },
+    { key: 'actions', label: ' ' },
+  ]
+
+  const tableRows = state.ingredients.map((ing) => ({
+    cells: {
+      name: ing.name,
+      quantity: `${ing.quantity} ${ing.unit}`,
+      scaled: `${formatScaled(ing.quantity, factor_)} ${ing.unit}`,
+      actions: (
+        <Button kind="ghost" ariaLabel={`Delete ${ing.name}`} onClick={() => deleteIngredient(ing.id)}>
+          Delete {ing.name}
+        </Button>
+      ),
+    },
+  }))
+
   return (
-    <main style={{ display: 'block', width: '100%', padding: 'calc(20px * var(--sf))' }}>
-      <Card mono="RECIPES" accent>
-        <Stack>
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                font: '600 calc(22px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-                letterSpacing: 'calc(-0.01em * var(--tf))',
-              }}
-            >
-              Recipe Scaler
-            </h1>
-            <Body>Scale ingredient quantities from the original serving size to the target.</Body>
-          </div>
-          <Stack>
-            <TextInput label="Quantity" value={quantity} onChange={setQuantity} />
+    <AppShell
+      name="Recipe Scaler"
+      icon="sheets"
+      hue="gold"
+      category="Productivity"
+      meta={`${state.ingredients.length} ${state.ingredients.length === 1 ? 'ingredient' : 'ingredients'}`}
+      status="Saved on this device"
+      side={
+        <Rail
+          title="Recipe Scaler"
+          note="Scale ingredients · local"
+          chips={['Works offline', 'Fractions preserved']}
+        />
+      }
+    >
+      <Stack>
+        <Card mono="New" title="Add an ingredient">
+          <FormGrid>
+            <TextInput label="Quantity" value={quantity} onChange={setQuantity} placeholder="1 1/2" />
             <label className="lc-field">
               <span className="lc-field-label">Unit</span>
               <select
@@ -128,49 +159,40 @@ export function App() {
                 ))}
               </select>
             </label>
-            <TextInput label="Ingredient" value={ingredient} onChange={setIngredient} />
+            <TextInput label="Ingredient" value={ingredient} onChange={setIngredient} placeholder="e.g. Flour" />
+          </FormGrid>
+          <Actions>
             <Button kind="primary" onClick={addIngredient}>
               Add ingredient
             </Button>
-          </Stack>
-          <Stack>
-            <div className="lc-spread">
-              <TextInput label="Original servings" value={originalText} onChange={onOriginalChange} />
-              <TextInput label="Target servings" value={targetText} onChange={onTargetChange} />
-            </div>
-            {error !== '' && (
-              <Body sm style={{ color: 'var(--accent)' }}>
-                {error}
-              </Body>
-            )}
-          </Stack>
-          {state.ingredients.length === 0 ? (
-            <Body>No ingredients yet</Body>
-          ) : (
-            <Table
-              columns={[
-                { key: 'name', label: 'Ingredient' },
-                { key: 'quantity', label: 'Quantity' },
-                { key: 'scaled', label: 'Scaled' },
-                { key: 'actions', label: ' ' },
-              ]}
-              rows={state.ingredients.map((ing) => ({
-                cells: {
-                  name: ing.name,
-                  quantity: `${ing.quantity} ${ing.unit}`,
-                  scaled: `${formatScaled(ing.quantity, factor_)} ${ing.unit}`,
-                  actions: (
-                    <Button kind="ghost" onClick={() => deleteIngredient(ing.id)}>
-                      Delete {ing.name}
-                    </Button>
-                  ),
-                },
-              }))}
-            />
-          )}
+          </Actions>
+        </Card>
+
+        <Card mono="Servings" title="Scale recipe">
+          <FormGrid>
+            <TextInput label="Original servings" value={originalText} onChange={onOriginalChange} />
+            <TextInput label="Target servings" value={targetText} onChange={onTargetChange} />
+          </FormGrid>
+          {error && <div className="lk-field-error" role="alert">{error}</div>}
+        </Card>
+
+        <Card mono="Summary" title="Result">
+          <KpiRow>
+            <Kpi value={state.originalServings} label="Original" />
+            <Kpi value={state.targetServings} label="Target" />
+            <Kpi value={factor_.toFixed(2)} label="Scale factor" accent />
+          </KpiRow>
           <Body>Scale factor: {factor_.toFixed(2)}</Body>
-        </Stack>
-      </Card>
-    </main>
+        </Card>
+
+        <Card mono={`${state.ingredients.length} ${state.ingredients.length === 1 ? 'ingredient' : 'ingredients'}`} title="Ingredients">
+          {state.ingredients.length === 0 ? (
+            <EmptyState mono="Empty" title="No ingredients yet" detail="Add your first ingredient above to start scaling." />
+          ) : (
+            <Table label="Ingredients" columns={tableColumns} rows={tableRows} />
+          )}
+        </Card>
+      </Stack>
+    </AppShell>
   )
 }
