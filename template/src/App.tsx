@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, List, PrimaryButton, Rail, Row, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, List, PrimaryButton, Row, TextInput } from '@lacuna/ui'
 
 // The starting point of every app. Keep AppShell as the outermost element and build inside it
 // with Card panels. Do not add a stylesheet for anything these components already draw.
@@ -26,8 +26,6 @@ export function App() {
       hue="gold"
       category="Productivity"
       meta={`${items.length} ${items.length === 1 ? 'item' : 'items'}`}
-      status="Saved on this device"
-      side={<Rail title="Community app" note="One list · local" chips={['Add', 'Remove', 'Works offline']} />}
     >
       <Card mono="New" title="Add an item">
         <FormGrid>

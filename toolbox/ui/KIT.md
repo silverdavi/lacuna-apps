@@ -12,8 +12,8 @@ Platform behavior is `behavior.tsx`, exported from `@lacuna/ui`: `PrimaryButton`
 
 | Component | Props | Draws |
 |---|---|---|
-| `AppShell` | `name`, `icon`, `hue`, `category`, `meta`, `status`, `actions`, `side` | Dark band, top bar with breadcrumb, the framed app window with its title bar (the page `h1`), optional right rail, status strip. The mark, the APPS chip and the category link to the Lacuna desktop; the app name is the current page. Do not add your own home link. |
-| `Rail` | `title`, `note`, `chips` | One box in the right rail (`side`): serif title, rust mono note, tag chips |
+| `AppShell` | `name`, `icon`, `hue`, `category`, `meta`, `status`, `actions`, `side` | Standalone top bar with breadcrumb (omitted automatically when framed by the launcher), the framed app window with its title bar (the page `h1`), optional right rail, and optional live status strip. Do not add your own home link or narrate that the app runs locally or offline. |
+| `Rail` | `title`, `note`, `chips` | One box in the right rail (`side`) for secondary controls, live totals, or keyboard shortcuts (`Keys`). Omit `side` when you have none; never repeat the window title or list static feature bullets. |
 | `Card` | `mono`, `title`, `actions`, `accent`, `flush` | A panel: mono label, serif title, hairline border |
 | `SectionLabel` | `accent` | Small uppercase mono `h2` above a group |
 | `Cols` `Stack` `Spread` `Divider` | `kind="2" \| "3" \| "main-side"` | Layout |
@@ -64,7 +64,7 @@ Colors that are data (paint swatches, chart series, game pieces) go in `src/colo
 
 ```tsx
 import { useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Kpi, KpiRow, Rail, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Card, EmptyState, FormGrid, Kpi, KpiRow, PrimaryButton, TextInput } from '@lacuna/ui'
 
 export function App() {
   const [bill, setBill] = useState('')
@@ -79,17 +79,16 @@ export function App() {
   }
 
   return (
-    <AppShell name="Tip Calculator" icon="finance" hue="green" category="Finance" meta="20% tip"
-      side={<Rail title="Tip Calculator" note="One bill · local" chips={['20% tip', 'Works offline']} />}>
+    <AppShell name="Tip Calculator" icon="finance" hue="green" category="Finance" meta="20% tip">
       <Card mono="Input" title="Bill">
         <FormGrid>
           <TextInput label="Bill amount" value={bill} onChange={setBill} inputMode="decimal" error={error} />
         </FormGrid>
-        <Actions><Button kind="primary" onClick={calculate}>Calculate</Button></Actions>
+        <Actions><PrimaryButton onClick={calculate}>Calculate</PrimaryButton></Actions>
       </Card>
       <Card mono="Result" title="Tip">
         {tip === null
-          ? <EmptyState mono="Empty" title="No result yet" detail="Enter a bill and press Calculate." />
+          ? <EmptyState mono="Empty" title="No result yet" detail="Enter a bill and press Calculate." actionLabel="Press Calculate" onAction={calculate} />
           : <KpiRow><Kpi value={`$${tip.toFixed(2)}`} label="Tip" accent /></KpiRow>}
       </Card>
     </AppShell>

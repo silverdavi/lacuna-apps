@@ -27,14 +27,17 @@ function cx(...parts: (string | false | null | undefined)[]): string {
 export function Title({ children, size = 'lg', as: As = 'div', style }: { children: ReactNode; size?: 'xl' | 'lg' | 'md'; as?: 'div' | 'h2' | 'h3'; style?: CSSProperties }) {
   return <As className={`lc-title lc-title-${size}`} style={{ margin: 0, ...style }}>{children}</As>
 }
+;(Title as { __lkProse?: boolean }).__lkProse = true
 
 export function MonoLabel({ children, accent, faint, sm, style }: { children: ReactNode; accent?: boolean; faint?: boolean; sm?: boolean; style?: CSSProperties }) {
   return <div className={cx('lc-mono', sm && 'lc-mono-sm', accent && 'lc-accent', faint && 'lc-faint')} style={style}>{children}</div>
 }
+;(MonoLabel as { __lkProse?: boolean }).__lkProse = true
 
 export function Body({ children, sm, style }: { children: ReactNode; sm?: boolean; style?: CSSProperties }) {
   return <div className={sm ? 'lc-body-sm' : 'lc-body'} style={style}>{children}</div>
 }
+;(Body as { __lkProse?: boolean }).__lkProse = true
 
 const AVATAR_TONES = { ink: 'var(--ink)', mid: 'var(--mid)', accent: 'var(--accent)' } as const
 
@@ -226,6 +229,7 @@ export function Cols({ kind, children, style }: { kind: '2' | '3' | 'main-side' 
 export function Stack({ children, lg, style }: { children: ReactNode; lg?: boolean; style?: CSSProperties }) {
   return <div className={lg ? 'lc-stack-lg' : 'lc-stack'} style={style}>{children}</div>
 }
+;(Stack as { __lkProse?: boolean }).__lkProse = true
 
 export function Spread({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return <div className="lc-spread" style={style}>{children}</div>

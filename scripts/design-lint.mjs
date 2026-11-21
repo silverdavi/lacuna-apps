@@ -173,6 +173,9 @@ if (behaviorHeld) {
       }
       if (/\boutline\s*:/.test(line)) bad('focus', rel, i + 1, line, 'the focus ring comes from the kit (:focus-visible, 2px accent). Do not set outline.')
       if (/\blc-empty\b/.test(line)) bad('empty', rel, i + 1, line, 'use EmptyState with actionLabel. Do not build an empty box.')
+      if (/\b(?:works offline|stays on this device|saved on this device|local\s*·\s*no network|runs in your browser|never leave this device)\b/i.test(line)) {
+        bad('narration', rel, i + 1, line, 'do not narrate that the app runs locally or works offline; show only the app\'s own state')
+      }
     })
     if (ext !== '.css' && ext !== '.html') {
       for (const m of text.matchAll(/<EmptyState\b[\s\S]*?>/g)) {
