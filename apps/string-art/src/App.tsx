@@ -23,8 +23,6 @@ interface HistoryEntry {
   color: string
 }
 
-type AppState = 'empty' | 'generated' | 'exported'
-
 function historyId(at: number): string {
   return `${at}-${Math.random().toString(36).slice(2, 8)}`
 }
@@ -83,26 +81,16 @@ export function App() {
     defaultValue: { pattern: null, history: [] },
   })
 
-  const [points, setPoints] = useState<number>(DEFAULT_POINTS)
-  const [step, setStep] = useState<number>(DEFAULT_STEP)
-  const [color, setColor] = useState<string>(DEFAULT_LINE_COLOR)
+  const [points, setPoints] = useState<number>(record.pattern ? record.pattern.points : DEFAULT_POINTS)
+  const [step, setStep] = useState<number>(record.pattern ? record.pattern.step : DEFAULT_STEP)
+  const [color, setColor] = useState<string>(record.pattern ? record.pattern.color || DEFAULT_LINE_COLOR : DEFAULT_LINE_COLOR)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<'Design' | 'History'>('Design')
-  const [appState, setAppState] = useState<AppState>('empty')
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
   const pattern = record.pattern
   const history = record.history
-
-  useEffect(() => {
-    if (record.pattern) {
-      setPoints(record.pattern.points)
-      setStep(record.pattern.step)
-      setColor(record.pattern.color || DEFAULT_LINE_COLOR)
-      setAppState('generated')
-    }
-  }, [record.pattern])
 
   useEffect(() => {
     if (error === null) return
@@ -111,14 +99,22 @@ export function App() {
   }, [error])
 
   useEffect(() => {
+    if (record.pattern) {
+      setPoints(record.pattern.points)
+      setStep(record.pattern.step)
+      setColor(record.pattern.color || DEFAULT_LINE_COLOR)
+    }
+  }, [record.pattern])
+
+  useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas || !pattern) return
+    if (!canvas) return
     try {
-      drawPattern(canvas, pattern.points, pattern.step, resolveColor(pattern.color))
+      drawPattern(canvas, points, step, resolveColor(color))
     } catch {
       // repaint skipped
     }
-  }, [pattern])
+  }, [points, step, color])
 
   function generate() {
     if (points < MIN_POINTS) {
@@ -132,7 +128,6 @@ export function App() {
       history: [{ id: historyId(Date.now()), points, step, color: resolved }, ...prev.history].slice(0, 20),
     }))
     setError(null)
-    setAppState('generated')
   }
 
   function clearAll() {
@@ -141,7 +136,6 @@ export function App() {
     setStep(DEFAULT_STEP)
     setColor(DEFAULT_LINE_COLOR)
     setError(null)
-    setAppState('empty')
   }
 
   function exportPng() {
@@ -153,7 +147,6 @@ export function App() {
       const dataUrl = canvas.toDataURL('image/png')
       const blob = dataUrlToBlob(dataUrl, 'image/png')
       saveBlob(blob, { filename: 'string-art.png', mimeType: 'image/png' })
-      setAppState('exported')
     } catch {
       setError('Export failed')
     }
@@ -164,11 +157,11 @@ export function App() {
     void copy(`String Art: ${pattern.points} points, step ${pattern.step}, color ${resolveColor(pattern.color)}`)
   }
 
+  const lineCount = pattern ? pattern.points : 0
+
   function deleteHistory(id: string) {
     setRecord((prev) => ({ pattern: prev.pattern, history: prev.history.filter((h) => h.id !== id) }))
   }
-
-  const lineCount = pattern ? pattern.points : 0
 
   return (
     <AppShell
@@ -242,7 +235,7 @@ export function App() {
           {tab === 'Design' ? (
             <Stack lg>
               <Card mono="Canvas" title="Pattern">
-                {appState === 'empty' ? (
+                {!pattern ? (
                   <EmptyState mono="Empty" title="No pattern generated yet" detail="Set the points, step, and color, then click Generate." />
                 ) : (
                   <Stack>
@@ -251,17 +244,10 @@ export function App() {
                         ref={(el) => {
                           canvasRef.current = el
                         }}
-                        style={{ display: 'block', width: '100%', height: 'auto', border: 'calc(1px * var(--sf)) solid var(--ui-line2)' }}
+                        style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '1 / 1', border: 'calc(1px * var(--sf)) solid var(--ink)' }}
                       />
                     </div>
-                    {appState === 'generated' ? (
-                      <p style={{ margin: 0, textAlign: 'center', fontSize: 'calc(13px * var(--tf))' }}>Pattern ready</p>
-                    ) : null}
-                    {appState === 'exported' ? (
-                      <p style={{ margin: 0, textAlign: 'center', fontSize: 'calc(13px * var(--tf))', color: 'var(--accent)' }}>
-                        Exported string-art.png
-                      </p>
-                    ) : null}
+                    <p style={{ margin: 0, textAlign: 'center', fontSize: 'calc(13px * var(--tf))' }}>Pattern ready</p>
                   </Stack>
                 )}
               </Card>
