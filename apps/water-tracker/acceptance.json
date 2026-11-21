@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4c10f51f320c73612c71a33af8652a823d0ae9738e59bcd70e837b5afecd6935",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Water Intake Tracker\" and the default daily goal display shows \"Goal: 2000 ml\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"500\" in the field labelled \"Amount (ml)\" and clicking the button \"Log intake\" adds a list item containing \"500 ml\" and the progress ring shows \"500 / 2000 ml\"."
+    },
+    {
+      "id": "A3",
+      "text": "After logging \"500\" and then \"750\" in the field labelled \"Amount (ml)\", the progress ring shows \"1250 / 2000 ml\" and the list contains two items: \"500 ml\" and \"750 ml\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete 500 ml\" removes that entry, leaving only \"750 ml\" in the list, and the progress ring updates to \"750 / 2000 ml\"."
+    },
+    {
+      "id": "A5",
+      "text": "Changing the field labelled \"Daily goal (ml)\" to \"2500\" and clicking \"Save goal\" updates the goal display to \"Goal: 2500 ml\" and the progress ring denominator to \"2500 ml\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab \"Heatmap\" shows a heatmap grid where the cell for today displays the total logged intake for the current day (e.g., \"1250\" if 500 and 750 were logged)."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"Trend\" shows a trend chart with a data point for today equal to the sum of all logged amounts for the current day."
+    },
+    {
+      "id": "A8",
+      "text": "When the total logged intake for today reaches or exceeds the daily goal, the streak counter increments by 1 and displays \"Streak: 1 day\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the logged entries and the custom goal: after logging \"500\" and setting the goal to \"2500\", reloading shows the list item \"500 ml\", the goal display \"Goal: 2500 ml\", and the progress ring \"500 / 2500 ml\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "e6dee4bd4e1518dd97490e9058ff432ac66590a32e03853fe06e3bfc0195e77f"
+    }
+  ]
+}
