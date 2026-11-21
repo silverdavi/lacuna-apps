@@ -1,0 +1,23 @@
+.b64-row {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}
+
+.b64-row label {
+  color: var(--ink);
+}
+
+.b64-select {
+  padding: calc(5px * var(--sf)) calc(9px * var(--sf));
+  border-radius: calc(6px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: calc(14px * var(--tf));
+}
+
+.b64-actions {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}

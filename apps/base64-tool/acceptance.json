@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "9b9f7be91cb251ca3f7da3e49c48c1f2d54ce5675b24a9659941145bafbdeac8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With the app loaded and no input, the input pane is empty, the output pane is empty, and the select labelled \"Encoding\" shows \"Base64\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Hello\" in the input pane and selecting \"Base64\" in the select labelled \"Encoding\" shows \"SGVsbG8=\" in the output pane."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"SGVsbG8=\" in the input pane and selecting \"Base64\" in the select labelled \"Encoding\" shows \"Hello\" in the output pane."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Hello\" in the input pane and selecting \"Hex\" in the select labelled \"Encoding\" shows \"48656c6c6f\" in the output pane."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"48656c6c6f\" in the input pane and selecting \"Hex\" in the select labelled \"Encoding\" shows \"Hello\" in the output pane."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"Hello World\" in the input pane and selecting \"URL-safe Base64\" in the select labelled \"Encoding\" shows \"SGVsbG8gV29ybGQ=\" in the output pane."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Copy\" when the output pane contains \"SGVsbG8=\" shows the tooltip \"Copied\" for 2 seconds and the clipboard contains \"SGVsbG8=\"."
+    },
+    {
+      "id": "A8",
+      "text": "After typing \"Test\" in the input pane and selecting \"Base64\", clicking the button labelled \"Swap\" moves \"VGVzdA==\" to the input pane and \"Test\" to the output pane, with the encoding still \"Base64\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last conversion: after typing \"Persist\" in the input pane and selecting \"Base64\", reloading the page shows \"Persist\" in the input pane and \"UGVyc2lzdA==\" in the output pane."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0a3d9b5bf5db9d9a9b3cf1b309c20c728e9429115fd46bb72c5f9037522334e3"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "repo": "joaquimserafim/base64-url",
+  "url": "https://github.com/joaquimserafim/base64-url",
+  "sha": "b03cc5f5c90282b44df9647d3d0ef44da4260b03",
+  "spdx": "ISC",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2014-2026, Joaquim Jos\u00e9 F. Serafim"
+  ],
+  "files": [
+    "src/index.ts"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "9dbeae0350a7350f3ae9628398a714498299f20731afb2180cec45a175c1ded7"
+}
