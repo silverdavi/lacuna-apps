@@ -1,0 +1,26 @@
+{
+  "name": "@lacuna/fuzzy-search",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Ranked fuzzy substring matching across record fields with character-level highlight ranges.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "fuzzySearch",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "e19b56ef9fc767c1",
+    "lines": 134,
+    "exports": [
+      "fuzzySearch"
+    ],
+    "types": [
+      "FuzzyMatch",
+      "FuzzySearchOptions"
+    ],
+    "signature": "fuzzySearch( records: T[], query: string, options: FuzzySearchOptions )"
+  }
+}

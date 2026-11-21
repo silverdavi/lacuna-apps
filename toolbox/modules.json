@@ -729,6 +729,3287 @@
         "session",
         "sign in"
       ]
+    },
+    {
+      "id": "@lacuna/before-after",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Side-by-side or slider comparison widget that lets users drag a divider to reveal one of two images or text blocks.",
+      "today": [
+        "toolbox/modules/before-after/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "BeforeAfter"
+      ],
+      "public": true,
+      "path": "toolbox/modules/before-after/0.1.0",
+      "bridge": {
+        "component": "BeforeAfter",
+        "kind": "widget",
+        "exports": [
+          "BeforeAfter"
+        ],
+        "types": [
+          "BeforeAfterProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "a1cf0020b48ebd27",
+            "lines": 278,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/big-clock",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A large, high-contrast monospace time display (h:mm:ss, optional ms) for timers, clocks, and countdowns.",
+      "today": [
+        "toolbox/modules/big-clock/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/format-duration"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "BigClock"
+      ],
+      "public": true,
+      "path": "toolbox/modules/big-clock/0.1.0",
+      "bridge": {
+        "component": "BigClock",
+        "kind": "widget",
+        "exports": [
+          "BigClock"
+        ],
+        "types": [
+          "BigClockProps"
+        ],
+        "signature": "BigClock(props: BigClockProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "06a936ae87a87f35",
+            "lines": 74,
+            "dependencies": {
+              "@lacuna/format-duration": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/board-grid",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A 2D cell board with roving keyboard focus for grid-based games and puzzles.",
+      "today": [
+        "toolbox/modules/board-grid/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "BoardGrid"
+      ],
+      "public": true,
+      "path": "toolbox/modules/board-grid/0.1.0",
+      "bridge": {
+        "component": "BoardGrid",
+        "kind": "widget",
+        "exports": [
+          "BoardGrid"
+        ],
+        "types": [
+          "BoardGridProps"
+        ],
+        "signature": "BoardGrid(props: BoardGridProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "a2fea890caad1524",
+            "lines": 186,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/board-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Kanban board with tag chips, detail side panel, and persisted create/edit/delete cards via the board record form.",
+      "today": [
+        "toolbox/modules/board-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/tag-input",
+        "@lacuna/use-collection"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "BoardKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/board-kit/0.1.0",
+      "bridge": {
+        "component": "BoardKit",
+        "kind": "kit",
+        "exports": [
+          "BoardKit"
+        ],
+        "types": [
+          "BoardCard",
+          "BoardColumn",
+          "BoardKitProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "c16104ed71038f0946f1626fadb6487313514027",
+            "source": "77e7c350efc51b2a",
+            "lines": 275,
+            "dependencies": {
+              "@lacuna/tag-input": "0.1.0",
+              "@lacuna/use-collection": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/calculator-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Inputs panel, result summary, breakdown table, and optional chart for calculator-style apps.",
+      "today": [
+        "toolbox/modules/calculator-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/chart",
+        "@lacuna/number-input",
+        "@lacuna/record-table"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "CalculatorKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/calculator-kit/0.1.0",
+      "bridge": {
+        "component": "CalculatorKit",
+        "kind": "kit",
+        "exports": [
+          "CalculatorKit"
+        ],
+        "types": [
+          "CalculatorKitInput",
+          "CalculatorKitResult",
+          "CalculatorKitProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "6f7b21bd520faa51",
+            "lines": 184,
+            "dependencies": {
+              "@lacuna/chart": "0.1.0",
+              "@lacuna/number-input": "0.1.0",
+              "@lacuna/record-table": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/canvas-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A drawing application shell that composes a drawing surface, tool palette, color picker, brush-size slider, and PNG export menu into a ready-to-use layout.",
+      "today": [
+        "toolbox/modules/canvas-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/export-menu",
+        "@lacuna/range-slider",
+        "@lacuna/toolbar",
+        "@lacuna/use-pointer-draw",
+        "@lacuna/use-undo-stack"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "CanvasKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/canvas-kit/0.1.0",
+      "bridge": {
+        "component": "CanvasKit",
+        "kind": "kit",
+        "exports": [
+          "CanvasKit"
+        ],
+        "types": [
+          "CanvasKitProps"
+        ],
+        "signature": "CanvasKit({ swatches, showLayers = false, showZoom = false, defaultBrushSize = 5, onCommit, }: ...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "36bfb2c5f69f6bad",
+            "lines": 399,
+            "dependencies": {
+              "@lacuna/export-menu": "0.1.0",
+              "@lacuna/range-slider": "0.1.0",
+              "@lacuna/toolbar": "0.1.0",
+              "@lacuna/use-pointer-draw": "0.1.0",
+              "@lacuna/use-undo-stack": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/chart",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Small SVG chart with line, bar, and donut types, axes, labels, and hover tooltips.",
+      "today": [
+        "toolbox/modules/chart/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Chart"
+      ],
+      "public": true,
+      "path": "toolbox/modules/chart/0.1.0",
+      "bridge": {
+        "component": "Chart",
+        "kind": "widget",
+        "exports": [
+          "Chart"
+        ],
+        "types": [
+          "ChartDataPoint",
+          "ChartProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "2fb6c820ec6d871c",
+            "lines": 226,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/code-area",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Monospace code editor with line numbers, tab-to-spaces, and light regex highlighting.",
+      "today": [
+        "toolbox/modules/code-area/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "CodeArea"
+      ],
+      "public": true,
+      "path": "toolbox/modules/code-area/0.1.0",
+      "bridge": {
+        "component": "CodeArea",
+        "kind": "widget",
+        "exports": [
+          "CodeArea"
+        ],
+        "types": [
+          "CodeAreaProps"
+        ],
+        "signature": "CodeArea(props: CodeAreaProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "097ecd308968fb92",
+            "lines": 389,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/codecs",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure encode/decode functions for Base64, URL encoding, hex, arbitrary number bases, and Roman numerals.",
+      "today": [
+        "toolbox/modules/codecs/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "codecs"
+      ],
+      "public": true,
+      "path": "toolbox/modules/codecs/0.1.0",
+      "bridge": {
+        "component": "codecs",
+        "kind": "logic",
+        "exports": [
+          "base64Encode",
+          "base64Decode",
+          "urlEncode",
+          "urlDecode",
+          "toHex",
+          "fromHex",
+          "toBase",
+          "fromBase",
+          "toRoman",
+          "fromRoman"
+        ],
+        "types": [],
+        "signature": "base64Encode(input: string); base64Decode(input: string); urlEncode(input: string); urlDecode(input: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "4d66a552a3f8a59e",
+            "lines": 199,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/color-math",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for hex, RGB, HSL, and OKLCH color conversion, WCAG contrast, palettes, and gradients.",
+      "today": [
+        "toolbox/modules/color-math/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "colorMath"
+      ],
+      "public": true,
+      "path": "toolbox/modules/color-math/0.1.0",
+      "bridge": {
+        "component": "colorMath",
+        "kind": "logic",
+        "exports": [
+          "hexToRgb",
+          "rgbToHex",
+          "rgbToHsl",
+          "hslToRgb",
+          "rgbToOklch",
+          "oklchToRgb",
+          "relativeLuminance",
+          "contrastRatio",
+          "meetsWcagAA",
+          "generatePalette",
+          "generateGradient"
+        ],
+        "types": [
+          "RGB",
+          "HSL",
+          "OKLCH"
+        ],
+        "signature": "hexToRgb(hex: string); rgbToHex(rgb: RGB); rgbToHsl(rgb: RGB); hslToRgb(hsl: HSL)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "a3e8e28e15e20f1a",
+            "lines": 164,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/color-palette",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pick one color from a grid of swatches, for paint, labels, and charts.",
+      "today": [
+        "toolbox/modules/color-palette/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "ColorPalette"
+      ],
+      "public": true,
+      "path": "toolbox/modules/color-palette/0.1.0",
+      "bridge": {
+        "component": "ColorPalette",
+        "kind": "widget",
+        "exports": [
+          "DEFAULT_SWATCHES",
+          "ColorPalette"
+        ],
+        "types": [
+          "Swatch",
+          "ColorPaletteProps"
+        ],
+        "signature": "ColorPalette({ label, swatches, value, onChange, columns = 8, }: ColorPaletteProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "2e8bfe62f4b7d012",
+            "lines": 169,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/combobox",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Accessible combo box with type-ahead filtering and keyboard navigation over a list of options.",
+      "today": [
+        "toolbox/modules/combobox/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Combobox"
+      ],
+      "public": true,
+      "path": "toolbox/modules/combobox/0.1.0",
+      "bridge": {
+        "component": "Combobox",
+        "kind": "widget",
+        "exports": [
+          "Combobox"
+        ],
+        "types": [
+          "ComboboxOption",
+          "ComboboxProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "69e722ec86c053df",
+            "lines": 221,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/confirm-dialog",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.2.0",
+      "summary": "A modal that asks the person to confirm or cancel a destructive or committing action.",
+      "today": [
+        "toolbox/modules/confirm-dialog/0.2.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/dialog"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "ConfirmDialog"
+      ],
+      "public": true,
+      "path": "toolbox/modules/confirm-dialog/0.2.0",
+      "bridge": {
+        "component": "ConfirmDialog",
+        "kind": "widget",
+        "exports": [
+          "ConfirmDialog"
+        ],
+        "types": [
+          "ConfirmDialogProps"
+        ],
+        "signature": "ConfirmDialog(props: ConfirmDialogProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "41c6310e0b96fbd3",
+            "lines": 180,
+            "dependencies": {}
+          },
+          "0.2.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "8c2d6a39d0f1bd19",
+            "lines": 97,
+            "dependencies": {
+              "@lacuna/dialog": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/converter-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Reusable conversion-tool layout: input/output panes, swap, preset combobox, copy, and a capped history list with persisted state.",
+      "today": [
+        "toolbox/modules/converter-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/combobox",
+        "@lacuna/use-clipboard",
+        "@lacuna/use-local-record"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "ConverterKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/converter-kit/0.1.0",
+      "bridge": {
+        "component": "ConverterKit",
+        "kind": "kit",
+        "exports": [
+          "ConverterKit"
+        ],
+        "types": [
+          "ConverterPreset",
+          "ConverterKitProps"
+        ],
+        "signature": "ConverterKit(props: ConverterKitProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "6128ff1d75f9eb30",
+            "lines": 285,
+            "dependencies": {
+              "@lacuna/combobox": "0.1.0",
+              "@lacuna/use-clipboard": "0.1.0",
+              "@lacuna/use-local-record": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/csv-parse",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Parse and write RFC 4180 CSV text as rows, with header handling, quoting, and error reporting.",
+      "today": [
+        "toolbox/modules/csv-parse/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "csvParse"
+      ],
+      "public": true,
+      "path": "toolbox/modules/csv-parse/0.1.0",
+      "bridge": {
+        "component": "csvParse",
+        "kind": "logic",
+        "exports": [
+          "parseCsv",
+          "toCsv",
+          "toRecords"
+        ],
+        "types": [
+          "CsvOptions",
+          "CsvResult",
+          "CsvError"
+        ],
+        "signature": "parseCsv(text: string, options: CsvOptions = {}); toCsv(rows: string[][], options: { delimiter?: string } = {}); toRecords(result: CsvResult)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "afb48861689f165b",
+            "lines": 138,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/date-math",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure local-date arithmetic and formatting: add/subtract days/weeks/months, differences, day/week/month bounds, ISO week, age, and relative time strings.",
+      "today": [
+        "toolbox/modules/date-math/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "dateMath"
+      ],
+      "public": true,
+      "path": "toolbox/modules/date-math/0.1.0",
+      "bridge": {
+        "component": "dateMath",
+        "kind": "logic",
+        "exports": [
+          "addDays",
+          "addWeeks",
+          "addMonths",
+          "diff",
+          "startOfDay",
+          "endOfDay",
+          "startOfWeek",
+          "endOfWeek",
+          "startOfMonth",
+          "endOfMonth",
+          "isoWeek",
+          "age",
+          "relativeTime",
+          "toISODate",
+          "fromISODate"
+        ],
+        "types": [
+          "DateParts",
+          "DiffResult"
+        ],
+        "signature": "addDays(date: Date, days: number); addWeeks(date: Date, weeks: number); addMonths(date: Date, months: number); diff(a: Date, b: Date)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f94c8bc071990cdc",
+            "lines": 128,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/date-picker",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Keyboard-navigable calendar grid for single-date and date-range selection.",
+      "today": [
+        "toolbox/modules/date-picker/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "DatePicker"
+      ],
+      "public": true,
+      "path": "toolbox/modules/date-picker/0.1.0",
+      "bridge": {
+        "component": "DatePicker",
+        "kind": "widget",
+        "exports": [
+          "DatePicker"
+        ],
+        "types": [
+          "DatePickerProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "5a26b102ad7ef82f",
+            "lines": 333,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/dialog",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Accessible modal dialog that traps focus, closes on Escape, and restores focus to the trigger on close.",
+      "today": [
+        "toolbox/modules/dialog/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Dialog"
+      ],
+      "public": true,
+      "path": "toolbox/modules/dialog/0.1.0",
+      "bridge": {
+        "component": "Dialog",
+        "kind": "widget",
+        "exports": [
+          "Dialog"
+        ],
+        "types": [
+          "DialogProps"
+        ],
+        "signature": "Dialog({ open, onClose, title, children }: DialogProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "443f0e7797fffa00",
+            "lines": 119,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/draw-canvas",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A canvas drawing surface with brush, eraser, shapes, layers, pan/zoom, undo/redo, and PNG export.",
+      "today": [
+        "toolbox/modules/draw-canvas/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-pointer-draw",
+        "@lacuna/use-undo-stack"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "DrawCanvas"
+      ],
+      "public": true,
+      "path": "toolbox/modules/draw-canvas/0.1.0",
+      "bridge": {
+        "component": "DrawCanvas",
+        "kind": "widget",
+        "exports": [
+          "DrawCanvas"
+        ],
+        "types": [
+          "DrawCanvasProps"
+        ],
+        "signature": "DrawCanvas(props: DrawCanvasProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "959006e604df4469",
+            "lines": 373,
+            "dependencies": {
+              "@lacuna/use-pointer-draw": "0.1.0",
+              "@lacuna/use-undo-stack": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/export-menu",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A dropdown menu that exports content as CSV, JSON, PNG or PDF, or prints it, via fileSaveOpen.",
+      "today": [
+        "toolbox/modules/export-menu/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/file-save-open"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "ExportMenu"
+      ],
+      "public": true,
+      "path": "toolbox/modules/export-menu/0.1.0",
+      "bridge": {
+        "component": "ExportMenu",
+        "kind": "widget",
+        "exports": [
+          "ExportMenu"
+        ],
+        "types": [
+          "ExportMenuProps",
+          "ExportOption"
+        ],
+        "signature": "ExportMenu({ options, fileName = 'export', ariaLabel = 'Export', disabled = false, onExport, onE...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "df3b5f263b718669",
+            "lines": 211,
+            "dependencies": {
+              "@lacuna/file-save-open": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/file-save-open",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Save a Blob, text, or JSON value as a named browser download, and read a user-selected file as text, bytes, or parsed JSON.",
+      "today": [
+        "toolbox/modules/file-save-open/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "fileSaveOpen"
+      ],
+      "public": true,
+      "path": "toolbox/modules/file-save-open/0.1.0",
+      "bridge": {
+        "component": "fileSaveOpen",
+        "kind": "logic",
+        "exports": [
+          "saveBlob",
+          "saveText",
+          "saveJSON",
+          "openFile"
+        ],
+        "types": [
+          "SaveOptions",
+          "FileReadMode",
+          "OpenResult",
+          "OpenError"
+        ],
+        "signature": "saveBlob(blob: Blob, options: SaveOptions); saveText(text: string, options: SaveOptions); saveJSON(data: unknown, options: SaveOptions); openFile( file: File, mode: FileReadMode, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f5f18b31f796b876",
+            "lines": 107,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/file-tool-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Drop or pick a local file, preview it, choose options, apply a transform, and export the result.",
+      "today": [
+        "toolbox/modules/file-tool-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/before-after",
+        "@lacuna/export-menu"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "FileToolKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/file-tool-kit/0.1.0",
+      "bridge": {
+        "component": "FileToolKit",
+        "kind": "kit",
+        "exports": [
+          "FileToolKit"
+        ],
+        "types": [
+          "FileToolKitOptions",
+          "FileToolKitProps",
+          "FileDropZoneProps"
+        ],
+        "signature": "FileToolKit(props: FileToolKitProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "cbabe5bba94419fc",
+            "lines": 322,
+            "dependencies": {
+              "@lacuna/before-after": "0.1.0",
+              "@lacuna/export-menu": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/filter-bar",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A toolbar of toggleable filter chips, a date-range picker, and a sort control for narrowing and ordering a list of records.",
+      "today": [
+        "toolbox/modules/filter-bar/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-picker"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "FilterBar"
+      ],
+      "public": true,
+      "path": "toolbox/modules/filter-bar/0.1.0",
+      "bridge": {
+        "component": "FilterBar",
+        "kind": "widget",
+        "exports": [
+          "FilterBar"
+        ],
+        "types": [
+          "FilterChipDef",
+          "SortDef",
+          "FilterBarProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "08e47585d54ddab6",
+            "lines": 177,
+            "dependencies": {
+              "@lacuna/date-picker": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/format-duration",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Formats millisecond durations as h:mm:ss or human phrases, and parses phrases back.",
+      "today": [
+        "toolbox/modules/format-duration/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "formatDuration"
+      ],
+      "public": true,
+      "path": "toolbox/modules/format-duration/0.1.0",
+      "bridge": {
+        "component": "formatDuration",
+        "kind": "logic",
+        "exports": [
+          "toParts",
+          "formatDuration",
+          "humanizeDuration",
+          "parseDuration"
+        ],
+        "types": [
+          "DurationParts"
+        ],
+        "signature": "toParts(ms: number); formatDuration(ms: number); humanizeDuration(ms: number); parseDuration(input: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "fa8fbfda613bc75e",
+            "lines": 50,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/fuzzy-search",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Ranked fuzzy substring matching across record fields with character-level highlight ranges.",
+      "today": [
+        "toolbox/modules/fuzzy-search/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "fuzzySearch"
+      ],
+      "public": true,
+      "path": "toolbox/modules/fuzzy-search/0.1.0",
+      "bridge": {
+        "component": "fuzzySearch",
+        "kind": "logic",
+        "exports": [
+          "fuzzySearch"
+        ],
+        "types": [
+          "FuzzyMatch",
+          "FuzzySearchOptions"
+        ],
+        "signature": "fuzzySearch( records: T[], query: string, options: FuzzySearchOptions )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "e19b56ef9fc767c1",
+            "lines": 134,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/game-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Game board with score tracking, best-score persistence, and a restart control for board and puzzle games.",
+      "today": [
+        "toolbox/modules/game-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/board-grid",
+        "@lacuna/use-hotkeys",
+        "@lacuna/use-local-record"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "GameKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/game-kit/0.1.0",
+      "bridge": {
+        "component": "GameKit",
+        "kind": "kit",
+        "exports": [
+          "GameKit"
+        ],
+        "types": [
+          "GameKitProps",
+          "GameKitScore",
+          "GameKitState",
+          "HotkeyMap"
+        ],
+        "signature": "GameKit(props: GameKitProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "ab40c8de51c7de97",
+            "lines": 215,
+            "dependencies": {
+              "@lacuna/board-grid": "0.1.0",
+              "@lacuna/use-hotkeys": "0.1.0",
+              "@lacuna/use-local-record": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/grid-utils",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for a 2D grid model: neighbor lookup, flood fill, rotation, and line detection.",
+      "today": [
+        "toolbox/modules/grid-utils/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "gridUtils"
+      ],
+      "public": true,
+      "path": "toolbox/modules/grid-utils/0.1.0",
+      "bridge": {
+        "component": "gridUtils",
+        "kind": "logic",
+        "exports": [
+          "createGrid",
+          "getNeighbors",
+          "floodFill",
+          "rotateGrid",
+          "findLines"
+        ],
+        "types": [
+          "Cell",
+          "Grid",
+          "Direction",
+          "Diagonal",
+          "Neighbor",
+          "CellPos"
+        ],
+        "signature": "createGrid(rows: number, cols: number, fill: Cell = 0); getNeighbors( grid: Grid, row: number, col: number, includeDiagonals: boolean = false ); floodFill( grid: Grid, startRow: number, startCol: number, target: Cell, replacement: Cell ); r",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "d905d568c67e0c02",
+            "lines": 174,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/heatmap",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A year-long grid of daily values in contribution-style columns for visualizing consistency over time.",
+      "today": [
+        "toolbox/modules/heatmap/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Heatmap"
+      ],
+      "public": true,
+      "path": "toolbox/modules/heatmap/0.1.0",
+      "bridge": {
+        "component": "Heatmap",
+        "kind": "widget",
+        "exports": [
+          "Heatmap"
+        ],
+        "types": [
+          "HeatmapCell",
+          "HeatmapProps"
+        ],
+        "signature": "Heatmap(props: HeatmapProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "e16f29810f486f67",
+            "lines": 240,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/host-mock",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "localStorage-backed mock record and value stores, safe against corrupt or missing storage.",
+      "today": [
+        "toolbox/modules/host-mock/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "hostMock"
+      ],
+      "public": true,
+      "path": "toolbox/modules/host-mock/0.1.0",
+      "bridge": {
+        "component": "hostMock",
+        "kind": "logic",
+        "exports": [
+          "createMemoryStorage",
+          "createMockRecordStore",
+          "createMockValue"
+        ],
+        "types": [
+          "StorageLike",
+          "MockRecordStore",
+          "MockValue"
+        ],
+        "signature": "createMemoryStorage(); createMockRecordStore(options: { key: string; validate?: (value: unknown) => value is T; idPrefix?: string;...); createMockValue(options: { key: string; fallback: T; validate?: (value: unknown) => value is T; stora...",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "53b96338a8fe030b",
+            "lines": 181,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/html-to-markdown",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Converts a sanitized HTML string into a Markdown string, stripping scripts and unsafe attributes.",
+      "today": [
+        "toolbox/modules/html-to-markdown/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "htmlToMarkdown"
+      ],
+      "public": true,
+      "path": "toolbox/modules/html-to-markdown/0.1.0",
+      "bridge": {
+        "component": "htmlToMarkdown",
+        "kind": "logic",
+        "exports": [
+          "htmlToMarkdown"
+        ],
+        "types": [
+          "HtmlToMarkdownOptions"
+        ],
+        "signature": "htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "391b6a142b6a0d10",
+            "lines": 268,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/ics-calendar",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Serialize events (with optional recurrence) to an iCalendar .ics string, parse .ics back to events, validate .ics text, and round-trip recurrence rules to and from RRULE.",
+      "today": [
+        "toolbox/modules/ics-calendar/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "icsCalendar"
+      ],
+      "public": true,
+      "path": "toolbox/modules/ics-calendar/0.1.0",
+      "bridge": {
+        "component": "icsCalendar",
+        "kind": "logic",
+        "exports": [
+          "toIcs",
+          "fromIcs",
+          "validateIcs",
+          "icsToRRule",
+          "rruleToIcsRec"
+        ],
+        "types": [
+          "IcsEvent",
+          "IcsEventList"
+        ],
+        "signature": "toIcs(events: IcsEvent[]); fromIcs(text: string); validateIcs(text: string); icsToRRule(rec: IcsRecurrence)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "30b41f2dfb1872e1",
+            "lines": 270,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/image-ops",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for canvas image manipulation: resize, crop, rotate, flip, CSS-like filters, and format encoding.",
+      "today": [
+        "toolbox/modules/image-ops/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "imageOps"
+      ],
+      "public": true,
+      "path": "toolbox/modules/image-ops/0.1.0",
+      "bridge": {
+        "component": "imageOps",
+        "kind": "logic",
+        "exports": [
+          "ImageData",
+          "resizeImageData",
+          "cropImageData",
+          "rotateImageData",
+          "flipImageData",
+          "applyFilter",
+          "encodeCanvas"
+        ],
+        "types": [
+          "CropRect",
+          "FilterParams",
+          "EncodeOptions"
+        ],
+        "signature": "resizeImageData(src: ImageData, width: number, height: number); cropImageData(src: ImageData, rect: CropRect); rotateImageData(src: ImageData, degrees: 90 | 180 | 270); flipImageData(src: ImageData, axis: 'horizontal' | 'vertical')",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "604b284be089503f",
+            "lines": 335,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/json-backup",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Serialises app records into a versioned JSON backup and restores them with schema validation and a migration hook.",
+      "today": [
+        "toolbox/modules/json-backup/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "jsonBackup"
+      ],
+      "public": true,
+      "path": "toolbox/modules/json-backup/0.1.0",
+      "bridge": {
+        "component": "jsonBackup",
+        "kind": "logic",
+        "exports": [
+          "exportBackup",
+          "importBackup"
+        ],
+        "types": [
+          "BackupRecord",
+          "BackupFile",
+          "ExportOptions",
+          "ImportOptions",
+          "ImportResult"
+        ],
+        "signature": "exportBackup(options: ExportOptions<T>); importBackup(json: string, options: ImportOptions<T>)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "4fca272b5a31e4cf",
+            "lines": 136,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/kanban-columns",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Multi-column Kanban board with keyboard card dragging, cross-column moves, and live per-column WIP counts.",
+      "today": [
+        "toolbox/modules/kanban-columns/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-drag-reorder"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "KanbanColumns"
+      ],
+      "public": true,
+      "path": "toolbox/modules/kanban-columns/0.1.0",
+      "bridge": {
+        "component": "KanbanColumns",
+        "kind": "widget",
+        "exports": [
+          "KanbanColumns"
+        ],
+        "types": [
+          "KanbanCard",
+          "KanbanColumnData",
+          "KanbanColumnsProps"
+        ],
+        "signature": "KanbanColumns(props: KanbanColumnsProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "69f3a2e788d02704",
+            "lines": 227,
+            "dependencies": {
+              "@lacuna/use-drag-reorder": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/keypad",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "On-screen grid of keys mirroring physical keyboard input for calculators, PIN entry, and similar apps.",
+      "today": [
+        "toolbox/modules/keypad/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Keypad"
+      ],
+      "public": true,
+      "path": "toolbox/modules/keypad/0.1.0",
+      "bridge": {
+        "component": "Keypad",
+        "kind": "widget",
+        "exports": [
+          "Keypad"
+        ],
+        "types": [
+          "KeypadProps",
+          "KeypadKey"
+        ],
+        "signature": "Keypad({ keys, columns, onKey, onBackspace, onEnter, ariaLabel, }: KeypadProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "4cddd6c4f824bcfdff2939c065faa6944763c0c9",
+            "source": "39db16a055571fa2",
+            "lines": 172,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/line-items",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions that compute subtotals, discounts, tax, and grand totals for line items in integer minor units.",
+      "today": [
+        "toolbox/modules/line-items/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/money"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "lineItems"
+      ],
+      "public": true,
+      "path": "toolbox/modules/line-items/0.1.0",
+      "bridge": {
+        "component": "lineItems",
+        "kind": "logic",
+        "exports": [
+          "computeLineItem",
+          "computeOrderTotals",
+          "formatMinorUnits"
+        ],
+        "types": [
+          "LineItem",
+          "LineItemResult",
+          "OrderTotals"
+        ],
+        "signature": "computeLineItem(item: LineItem); computeOrderTotals(items: readonly LineItem[]); formatMinorUnits(amount: number, currency: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "c077225018184c76",
+            "lines": 94,
+            "dependencies": {
+              "@lacuna/money": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/markdown-to-html",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Converts a CommonMark subset to sanitized HTML strings",
+      "today": [
+        "toolbox/modules/markdown-to-html/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "markdownToHtml"
+      ],
+      "public": true,
+      "path": "toolbox/modules/markdown-to-html/0.1.0",
+      "bridge": {
+        "component": "markdownToHtml",
+        "kind": "logic",
+        "exports": [
+          "markdownToHtml",
+          "parseMarkdown",
+          "sanitizeHtml"
+        ],
+        "types": [
+          "MarkdownToHtmlOptions"
+        ],
+        "signature": "sanitizeHtml(html: string); parseMarkdown(source: string); markdownToHtml(source: string, options?: import('./index').MarkdownToHtmlOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "1896ababcae34606",
+            "lines": 204,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/money",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Integer minor-unit currency arithmetic with exact rounding, largest-remainder allocation, and Intl formatting.",
+      "today": [
+        "toolbox/modules/money/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "money"
+      ],
+      "public": true,
+      "path": "toolbox/modules/money/0.1.0",
+      "bridge": {
+        "component": "money",
+        "kind": "logic",
+        "exports": [
+          "toMinorUnits",
+          "fromMinorUnits",
+          "add",
+          "sub",
+          "mul",
+          "div",
+          "roundMinor",
+          "allocate",
+          "format"
+        ],
+        "types": [
+          "MinorUnits",
+          "MoneyOptions"
+        ],
+        "signature": "toMinorUnits(major: number, _currency?: string); fromMinorUnits(minor: MinorUnits, _currency?: string); add(a: MinorUnits, b: MinorUnits); sub(a: MinorUnits, b: MinorUnits)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "ec90b51d96d0c639",
+            "lines": 182,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/money-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Currency amount input that formats with the money module and emits integer minor units.",
+      "today": [
+        "toolbox/modules/money-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/money"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "MoneyInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/money-input/0.1.0",
+      "bridge": {
+        "component": "MoneyInput",
+        "kind": "widget",
+        "exports": [
+          "MoneyInput"
+        ],
+        "types": [
+          "MoneyInputProps"
+        ],
+        "signature": "MoneyInput({ value, onChange, currency, locale = 'en-US', min, max, step = 1, placeholder, disab...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "3f460adba0c09a65",
+            "lines": 162,
+            "dependencies": {
+              "@lacuna/money": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/number-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Locale-aware numeric input with optional stepper buttons, min/max clamping, and a unit suffix.",
+      "today": [
+        "toolbox/modules/number-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "NumberInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/number-input/0.1.0",
+      "bridge": {
+        "component": "NumberInput",
+        "kind": "widget",
+        "exports": [
+          "NumberInput"
+        ],
+        "types": [
+          "NumberInputProps"
+        ],
+        "signature": "NumberInput({ value, onChange, min, max, step = 1, unit, locale = 'en-US', disabled = false, id, ...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f93ff2554ebb824c",
+            "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/passphrase-crypto",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "AES-GCM encryption and decryption with PBKDF2-derived keys for passphrase-protected local data.",
+      "today": [
+        "toolbox/modules/passphrase-crypto/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "passphraseCrypto"
+      ],
+      "public": true,
+      "path": "toolbox/modules/passphrase-crypto/0.1.0",
+      "bridge": {
+        "component": "passphraseCrypto",
+        "kind": "logic",
+        "exports": [
+          "encrypt",
+          "decrypt",
+          "verifyPassphrase",
+          "generateSalt",
+          "generateIv"
+        ],
+        "types": [
+          "EncryptedPayload",
+          "CryptoOptions"
+        ],
+        "signature": "encrypt(plaintext: string, passphrase: string, options?: CryptoOptions); decrypt(payload: EncryptedPayload, passphrase: string); verifyPassphrase(payload: EncryptedPayload, passphrase: string); generateSalt(length?: number)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "09ffa3a5fcb5061c",
+            "lines": 105,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/password-generate",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Generate random passwords and passphrases with configurable character rules and an entropy estimate in bits.",
+      "today": [
+        "toolbox/modules/password-generate/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/random"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "passwordGenerate"
+      ],
+      "public": true,
+      "path": "toolbox/modules/password-generate/0.1.0",
+      "bridge": {
+        "component": "passwordGenerate",
+        "kind": "logic",
+        "exports": [
+          "generatePassword",
+          "generatePassphrase",
+          "estimateEntropy"
+        ],
+        "types": [
+          "PasswordRules",
+          "PassphraseOptions",
+          "GenerateResult"
+        ],
+        "signature": "generatePassword( length: number, rules: PasswordRules, seed?: number, ); generatePassphrase( options: PassphraseOptions, seed?: number, ); estimateEntropy(value: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "df17aa297372b517",
+            "lines": 139,
+            "dependencies": {
+              "@lacuna/random": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/pdf-ops",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions to merge, split, reorder, and extract PDF pages and convert images into PDF documents.",
+      "today": [
+        "toolbox/modules/pdf-ops/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "pdfOps"
+      ],
+      "public": true,
+      "path": "toolbox/modules/pdf-ops/0.1.0",
+      "bridge": {
+        "component": "pdfOps",
+        "kind": "logic",
+        "exports": [
+          "mergePdfs",
+          "splitPdf",
+          "extractPages",
+          "reorderPages",
+          "imageToPdf",
+          "imagesToPdf"
+        ],
+        "types": [
+          "PdfPage",
+          "PdfDocument",
+          "MergeOptions",
+          "SplitResult"
+        ],
+        "signature": "mergePdfs(docs: PdfDocument[], options?: MergeOptions); splitPdf(doc: PdfDocument); extractPages(doc: PdfDocument, start: number, end: number); reorderPages(doc: PdfDocument, order: number[])",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "e2303b4072932513",
+            "lines": 143,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/progress-ring",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Circular or linear progress indicator with configurable size, stroke width, accent color, and centered content.",
+      "today": [
+        "toolbox/modules/progress-ring/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "ProgressRing"
+      ],
+      "public": true,
+      "path": "toolbox/modules/progress-ring/0.1.0",
+      "bridge": {
+        "component": "ProgressRing",
+        "kind": "widget",
+        "exports": [
+          "ProgressRing"
+        ],
+        "types": [
+          "ProgressRingProps"
+        ],
+        "signature": "ProgressRing({ value, max = 100, orientation = 'circular', size = 12, strokeWidth = 2, label, chil...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "0f213fbaa3438445",
+            "lines": 147,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/quantity-parse",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Parse, normalize, and scale quantities expressed as whole numbers, decimals, fractions, or mixed numbers with optional units.",
+      "today": [
+        "toolbox/modules/quantity-parse/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "quantityParse"
+      ],
+      "public": true,
+      "path": "toolbox/modules/quantity-parse/0.1.0",
+      "bridge": {
+        "component": "quantityParse",
+        "kind": "logic",
+        "exports": [
+          "parseQuantity",
+          "scaleQuantity",
+          "addQuantities",
+          "toFractionString",
+          "isValidQuantity"
+        ],
+        "types": [
+          "ParsedQuantity"
+        ],
+        "signature": "parseQuantity(input: string); scaleQuantity(qty: ParsedQuantity, factor: number); addQuantities(a: ParsedQuantity, b: ParsedQuantity); toFractionString(value: number, maxDenominator = 16)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "3c765fecc3540191",
+            "lines": 123,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/query-spec",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for multi-key sorting, predicate filtering, and group-by aggregation over arrays of records.",
+      "today": [
+        "toolbox/modules/query-spec/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "querySpec"
+      ],
+      "public": true,
+      "path": "toolbox/modules/query-spec/0.1.0",
+      "bridge": {
+        "component": "querySpec",
+        "kind": "logic",
+        "exports": [
+          "sortRecords",
+          "filterRecords",
+          "groupRecords"
+        ],
+        "types": [
+          "SortDirection",
+          "SortKey",
+          "FilterPredicate",
+          "GroupKey",
+          "GroupResult"
+        ],
+        "signature": "sortRecords( records: T[], keys: SortKey<T>[] ); filterRecords( records: T[], predicate: FilterPredicate<T> ); groupRecords( records: T[], key: GroupKey<T> )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "09542eb0e6765652",
+            "lines": 64,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/quiz-engine",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for building question banks, creating shuffled quiz sessions, checking answers, and computing scores.",
+      "today": [
+        "toolbox/modules/quiz-engine/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/random"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "quizEngine"
+      ],
+      "public": true,
+      "path": "toolbox/modules/quiz-engine/0.1.0",
+      "bridge": {
+        "component": "quizEngine",
+        "kind": "logic",
+        "exports": [
+          "createSession",
+          "checkAnswer",
+          "scoreSession",
+          "validateQuestionBank"
+        ],
+        "types": [
+          "QuestionType",
+          "ChoiceQuestion",
+          "TextQuestion",
+          "NumberQuestion",
+          "Question",
+          "QuizSession",
+          "AnswerResult",
+          "Score"
+        ],
+        "signature": "createSession(questions: Question[], seed: number); checkAnswer(question: Question, given: string | number); scoreSession( session: QuizSession, answers: AnswerResult[], ); validateQuestionBank(questions: Question[])",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "729e3ff2dfa35eac",
+            "lines": 110,
+            "dependencies": {
+              "@lacuna/random": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/random",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Seedable pseudo-random generator with shuffling, weighted selection, dice notation parsing, and a crypto-strength path.",
+      "today": [
+        "toolbox/modules/random/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "random"
+      ],
+      "public": true,
+      "path": "toolbox/modules/random/0.1.0",
+      "bridge": {
+        "component": "random",
+        "kind": "logic",
+        "exports": [
+          "mulberry32",
+          "randomInt",
+          "randomFloat",
+          "shuffle",
+          "weightedPick",
+          "parseDiceNotation",
+          "cryptoRng"
+        ],
+        "types": [
+          "Rng"
+        ],
+        "signature": "mulberry32(seed: number); randomInt(rng: Rng, min: number, max: number); randomFloat(rng: Rng, min: number, max: number); shuffle(rng: Rng, items: readonly T[])",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "42aba2f01db07327",
+            "lines": 87,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/range-slider",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A labelled numeric slider with the current value shown next to it; controlled component.",
+      "today": [
+        "toolbox/modules/range-slider/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "RangeSlider"
+      ],
+      "public": true,
+      "path": "toolbox/modules/range-slider/0.1.0",
+      "bridge": {
+        "component": "RangeSlider",
+        "kind": "widget",
+        "exports": [
+          "RangeSlider"
+        ],
+        "types": [
+          "RangeSliderProps"
+        ],
+        "signature": "RangeSlider(props: RangeSliderProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f8c5c7e28e4c81c8",
+            "lines": 193,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/record-form",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Schema-driven form rendering text, number, date, and select fields from a declarative definition, with validation, dirty tracking, and submit handling.",
+      "today": [
+        "toolbox/modules/record-form/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/combobox",
+        "@lacuna/date-picker",
+        "@lacuna/schema-validate",
+        "@lacuna/use-form"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "RecordForm"
+      ],
+      "public": true,
+      "path": "toolbox/modules/record-form/0.1.0",
+      "bridge": {
+        "component": "RecordForm",
+        "kind": "widget",
+        "exports": [
+          "RecordForm"
+        ],
+        "types": [
+          "FieldType",
+          "FieldDef",
+          "RecordValues",
+          "RecordFormProps"
+        ],
+        "signature": "RecordForm(props: RecordFormProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "abc94db0f962fd61",
+            "lines": 331,
+            "dependencies": {
+              "@lacuna/combobox": "0.1.0",
+              "@lacuna/date-picker": "0.1.0",
+              "@lacuna/schema-validate": "0.1.0",
+              "@lacuna/use-form": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/record-table",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A sortable, selectable record table with configurable columns, multi-key sorting, filtering, and group-by support.",
+      "today": [
+        "toolbox/modules/record-table/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/query-spec"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "RecordTable"
+      ],
+      "public": true,
+      "path": "toolbox/modules/record-table/0.1.0",
+      "bridge": {
+        "component": "RecordTable",
+        "kind": "widget",
+        "exports": [
+          "RecordTable"
+        ],
+        "types": [
+          "ColumnDef",
+          "GroupDef",
+          "RecordTableProps"
+        ],
+        "signature": "RecordTable( props: RecordTableProps<T>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "bedc5e2865668475",
+            "lines": 239,
+            "dependencies": {
+              "@lacuna/query-spec": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/recurrence",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Expand daily, weekly, monthly and yearly repeat rules into concrete local dates, with interval, end-date and count limits plus basic RRULE round-tripping.",
+      "today": [
+        "toolbox/modules/recurrence/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "recurrence"
+      ],
+      "public": true,
+      "path": "toolbox/modules/recurrence/0.1.0",
+      "bridge": {
+        "component": "recurrence",
+        "kind": "logic",
+        "exports": [
+          "parseRule",
+          "nextOccurrences",
+          "isRecurring",
+          "occurrencesBetween",
+          "ruleToRRule",
+          "rruleToRule"
+        ],
+        "types": [
+          "RecurrenceFrequency",
+          "RecurrenceRule"
+        ],
+        "signature": "parseRule(input: string); nextOccurrences(rule: RecurrenceRule, count: number); isRecurring(rule: RecurrenceRule, date: string); occurrencesBetween(rule: RecurrenceRule, from: string, to: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "8b1ffe7f3695ead8",
+            "lines": 177,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/schema-validate",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure field-schema definition and validation for text, number, date, and choice fields with required, min/max, pattern, and custom message support.",
+      "today": [
+        "toolbox/modules/schema-validate/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "schemaValidate"
+      ],
+      "public": true,
+      "path": "toolbox/modules/schema-validate/0.1.0",
+      "bridge": {
+        "component": "schemaValidate",
+        "kind": "logic",
+        "exports": [
+          "validateField",
+          "validateForm"
+        ],
+        "types": [
+          "FieldType",
+          "FieldSchema",
+          "ValidationError",
+          "ValidationResult"
+        ],
+        "signature": "validateField( schema: FieldSchema, value: string | number | null | undefined, ); validateForm( schemas: FieldSchema[], values: Record<string, string | number | null | undefined>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "067b6d27d56d087c",
+            "lines": 144,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/search-box",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Search input with ranked fuzzy-match results, keyboard navigation, and highlighted match ranges.",
+      "today": [
+        "toolbox/modules/search-box/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/fuzzy-search"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "SearchBox"
+      ],
+      "public": true,
+      "path": "toolbox/modules/search-box/0.1.0",
+      "bridge": {
+        "component": "SearchBox",
+        "kind": "widget",
+        "exports": [
+          "SearchBox"
+        ],
+        "types": [
+          "SearchBoxField",
+          "SearchBoxProps"
+        ],
+        "signature": "SearchBox({ records, fields, placeholder, maxResults = 10, onSelect, onQueryChange, renderResul...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "13ec0f29e6344dcd",
+            "lines": 234,
+            "dependencies": {
+              "@lacuna/fuzzy-search": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/spaced-repetition",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "SM-2 spaced-repetition scheduling: card state, review grading, due queue, and stats.",
+      "today": [
+        "toolbox/modules/spaced-repetition/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "spacedRepetition"
+      ],
+      "public": true,
+      "path": "toolbox/modules/spaced-repetition/0.1.0",
+      "bridge": {
+        "component": "spacedRepetition",
+        "kind": "logic",
+        "exports": [
+          "newCard",
+          "reviewCard",
+          "getDueQueue",
+          "getStats"
+        ],
+        "types": [
+          "Grade",
+          "CardState",
+          "ReviewResult"
+        ],
+        "signature": "newCard(id: string, today: string); reviewCard(card: CardState, grade: Grade, today: string); getDueQueue(cards: CardState[], today: string); getStats(cards: CardState[], today: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "e7a5c728ad642c43",
+            "lines": 92,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/streak-calc",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Compute current and longest consecutive-day check-in streaks with allowed skip days.",
+      "today": [
+        "toolbox/modules/streak-calc/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "streakCalc"
+      ],
+      "public": true,
+      "path": "toolbox/modules/streak-calc/0.1.0",
+      "bridge": {
+        "component": "streakCalc",
+        "kind": "logic",
+        "exports": [
+          "computeStreaks",
+          "isStreakAlive"
+        ],
+        "types": [
+          "StreakOptions",
+          "StreakResult"
+        ],
+        "signature": "computeStreaks(checkIns: string[], options?: StreakOptions); isStreakAlive(checkIns: string[], options?: StreakOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "ac33969cf945beee",
+            "lines": 94,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/tag-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Text input that adds and removes tags as removable chips, with optional autocomplete suggestions and keyboard navigation.",
+      "today": [
+        "toolbox/modules/tag-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "TagInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/tag-input/0.1.0",
+      "bridge": {
+        "component": "TagInput",
+        "kind": "widget",
+        "exports": [
+          "TagInput"
+        ],
+        "types": [
+          "TagInputProps"
+        ],
+        "signature": "TagInput({ tags, onChange, suggestions, placeholder, maxTags, disabled = false, 'aria-label': ...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "625de40486f07da3",
+            "lines": 279,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/text-transforms",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure text utilities: case conversion, slugify, line trim/dedupe/sort, Lorem Ipsum",
+      "today": [
+        "toolbox/modules/text-transforms/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "textTransforms"
+      ],
+      "public": true,
+      "path": "toolbox/modules/text-transforms/0.1.0",
+      "bridge": {
+        "component": "textTransforms",
+        "kind": "logic",
+        "exports": [
+          "toUpper",
+          "toLower",
+          "toTitleCase",
+          "toSnakeCase",
+          "toKebabCase",
+          "toCamelCase",
+          "toPascalCase",
+          "slugify",
+          "trimLines",
+          "dedupeLines",
+          "sortLines",
+          "loremIpsum"
+        ],
+        "types": [],
+        "signature": "toUpper(text: string); toLower(text: string); toTitleCase(text: string); toSnakeCase(text: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "cee13edc953ad6dd",
+            "lines": 92,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/toolbar",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A horizontal toolbar of tool buttons, toggle buttons, and an overflow menu for items exceeding the visible width.",
+      "today": [
+        "toolbox/modules/toolbar/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-hotkeys"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Toolbar"
+      ],
+      "public": true,
+      "path": "toolbox/modules/toolbar/0.1.0",
+      "bridge": {
+        "component": "Toolbar",
+        "kind": "widget",
+        "exports": [
+          "Toolbar"
+        ],
+        "types": [
+          "ToolbarItem",
+          "ToolbarProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "414cf0ea8d3af913",
+            "lines": 239,
+            "dependencies": {
+              "@lacuna/use-hotkeys": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/tracker-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Value + date entry form, streak counter, heatmap, trend chart, and entry list for daily tracking apps.",
+      "today": [
+        "toolbox/modules/tracker-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/chart",
+        "@lacuna/date-math",
+        "@lacuna/date-picker",
+        "@lacuna/heatmap",
+        "@lacuna/use-collection",
+        "@lacuna/use-streak"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "TrackerKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/tracker-kit/0.1.0",
+      "bridge": {
+        "component": "TrackerKit",
+        "kind": "kit",
+        "exports": [
+          "TrackerKit"
+        ],
+        "types": [
+          "TrackerEntry",
+          "TrackerKitProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "8a23f5ae0f1f5bfd",
+            "lines": 397,
+            "dependencies": {
+              "@lacuna/chart": "0.1.0",
+              "@lacuna/date-math": "0.1.0",
+              "@lacuna/date-picker": "0.1.0",
+              "@lacuna/heatmap": "0.1.0",
+              "@lacuna/use-collection": "0.1.0",
+              "@lacuna/use-streak": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-camera",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Manages a live camera stream: start, stop, device selection, and single-frame capture to a canvas.",
+      "today": [
+        "toolbox/modules/use-camera/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useCamera"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-camera/0.1.0",
+      "bridge": {
+        "component": "useCamera",
+        "kind": "hook",
+        "exports": [
+          "useCamera"
+        ],
+        "types": [
+          "UseCameraOptions",
+          "UseCameraReturn"
+        ],
+        "signature": "useCamera(options?: UseCameraOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "bdae24e3ff2ba347",
+            "lines": 146,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-clipboard",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Copies text or an image Blob to the system clipboard and exposes a transient copied flag with timeout, success and error callbacks.",
+      "today": [
+        "toolbox/modules/use-clipboard/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useClipboard"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-clipboard/0.1.0",
+      "bridge": {
+        "component": "useClipboard",
+        "kind": "hook",
+        "exports": [
+          "useClipboard"
+        ],
+        "types": [
+          "UseClipboardOptions",
+          "UseClipboardReturn"
+        ],
+        "signature": "useClipboard(options?: UseClipboardOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "b4b7ec336936288f",
+            "lines": 78,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-collection",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Persisted, in-memory list of typed records with add, update, remove, reorder, and archive operations.",
+      "today": [
+        "toolbox/modules/use-collection/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-local-record"
+      ],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useCollection"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-collection/0.1.0",
+      "bridge": {
+        "component": "useCollection",
+        "kind": "hook",
+        "exports": [
+          "useCollection"
+        ],
+        "types": [
+          "CollectionItem",
+          "CollectionOptions",
+          "CollectionState",
+          "CollectionActions",
+          "UseCollectionReturn"
+        ],
+        "signature": "useCollection( options: CollectionOptions<T>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "c8084caf7a9a25f3",
+            "lines": 269,
+            "dependencies": {
+              "@lacuna/use-local-record": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-drag-reorder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "React hook for pointer- and keyboard-driven reordering of items within a single list or across multiple lists.",
+      "today": [
+        "toolbox/modules/use-drag-reorder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useDragReorder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-drag-reorder/0.1.0",
+      "bridge": {
+        "component": "useDragReorder",
+        "kind": "hook",
+        "exports": [
+          "useDragReorder"
+        ],
+        "types": [
+          "DragReorderOptions",
+          "DragReorderReturn",
+          "ItemProps",
+          "ListProps"
+        ],
+        "signature": "useDragReorder(options?: DragReorderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "2f3e7db4fa06b82e",
+            "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-form",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Form state with dirty tracking, per-field schema validation, and controlled submit.",
+      "today": [
+        "toolbox/modules/use-form/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/schema-validate"
+      ],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useForm"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-form/0.1.0",
+      "bridge": {
+        "component": "useForm",
+        "kind": "hook",
+        "exports": [
+          "useForm"
+        ],
+        "types": [
+          "FieldValue",
+          "FormField",
+          "FormValues",
+          "FormErrors",
+          "FormConfig",
+          "FormState",
+          "FormActions",
+          "UseFormReturn"
+        ],
+        "signature": "useForm(config: FormConfig)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "d6b9ba48f51e8bf5",
+            "lines": 120,
+            "dependencies": {
+              "@lacuna/schema-validate": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-hotkeys",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Registers scoped keyboard shortcuts with platform-aware modifier keys (Cmd/Ctrl) and automatic input-focus suppression.",
+      "today": [
+        "toolbox/modules/use-hotkeys/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useHotkeys"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-hotkeys/0.1.0",
+      "bridge": {
+        "component": "useHotkeys",
+        "kind": "hook",
+        "exports": [
+          "useHotkeys"
+        ],
+        "types": [
+          "HotkeyBinding",
+          "UseHotkeysOptions",
+          "UseHotkeysReturn"
+        ],
+        "signature": "useHotkeys( bindings: HotkeyBinding[], options?: UseHotkeysOptions )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "5de98e557cdf8071",
+            "lines": 126,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-local-record",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Persist a typed, versioned record to localStorage with automatic schema migrations between versions.",
+      "today": [
+        "toolbox/modules/use-local-record/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useLocalRecord"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-local-record/0.1.0",
+      "bridge": {
+        "component": "useLocalRecord",
+        "kind": "hook",
+        "exports": [
+          "useLocalRecord"
+        ],
+        "types": [
+          "Migration",
+          "UseLocalRecordOptions",
+          "UseLocalRecordReturn"
+        ],
+        "signature": "useLocalRecord( options: UseLocalRecordOptions<T>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "e1b260088ca68f80",
+            "lines": 131,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-media-recorder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Records microphone, camera, or screen media into a Blob with state, elapsed time, and pause/resume/stop controls.",
+      "today": [
+        "toolbox/modules/use-media-recorder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useMediaRecorder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-media-recorder/0.1.0",
+      "bridge": {
+        "component": "useMediaRecorder",
+        "kind": "hook",
+        "exports": [
+          "useMediaRecorder"
+        ],
+        "types": [
+          "MediaSource",
+          "UseMediaRecorderOptions",
+          "UseMediaRecorderReturn",
+          "UseMediaRecorderStatus"
+        ],
+        "signature": "useMediaRecorder(options?: UseMediaRecorderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "b40b837a3a3f192f",
+            "lines": 184,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-pointer-draw",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "React hook that captures pointer events into smoothed, pressure-aware freehand strokes with pan and zoom transforms for sketch pads and annotation tools.",
+      "today": [
+        "toolbox/modules/use-pointer-draw/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "usePointerDraw"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-pointer-draw/0.1.0",
+      "bridge": {
+        "component": "usePointerDraw",
+        "kind": "hook",
+        "exports": [
+          "usePointerDraw"
+        ],
+        "types": [
+          "Point",
+          "Stroke",
+          "Transform",
+          "PointerDrawOptions",
+          "PointerDrawReturn",
+          "SurfaceProps"
+        ],
+        "signature": "usePointerDraw(options?: PointerDrawOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "2c31c89e9803dd2d",
+            "lines": 306,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-reminder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Schedule a local due-time alert via the Notification API with an in-app fallback.",
+      "today": [
+        "toolbox/modules/use-reminder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useReminder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-reminder/0.1.0",
+      "bridge": {
+        "component": "useReminder",
+        "kind": "hook",
+        "exports": [
+          "useReminder",
+          "ensureJestShim"
+        ],
+        "types": [
+          "ReminderOptions",
+          "ReminderState"
+        ],
+        "signature": "ensureJestShim(); useReminder(options: ReminderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "4cddd6c4f824bcfdff2939c065faa6944763c0c9",
+            "source": "ef1e1dd86667e6e2",
+            "lines": 170,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-selection",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Manages single, multi, and range selection state over an indexed list with toggle, clear, and range-select operations.",
+      "today": [
+        "toolbox/modules/use-selection/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useSelection"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-selection/0.1.0",
+      "bridge": {
+        "component": "useSelection",
+        "kind": "hook",
+        "exports": [
+          "useSelection"
+        ],
+        "types": [
+          "UseSelectionOptions",
+          "UseSelectionReturn"
+        ],
+        "signature": "useSelection(options: UseSelectionOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "a37bb2866cf4e279",
+            "lines": 86,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-streak",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "React hook that manages daily check-ins with persisted state, computing current and longest streaks via streakCalc.",
+      "today": [
+        "toolbox/modules/use-streak/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/streak-calc",
+        "@lacuna/use-collection"
+      ],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useStreak"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-streak/0.1.0",
+      "bridge": {
+        "component": "useStreak",
+        "kind": "hook",
+        "exports": [
+          "useStreak"
+        ],
+        "types": [
+          "UseStreakOptions",
+          "UseStreakReturn"
+        ],
+        "signature": "useStreak(options: UseStreakOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "c8686688bd0ac65b",
+            "lines": 80,
+            "dependencies": {
+              "@lacuna/streak-calc": "0.1.0",
+              "@lacuna/use-collection": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-timer",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Drift-free countdown and stopwatch hook with pause, laps, and localStorage persistence.",
+      "today": [
+        "toolbox/modules/use-timer/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useTimer"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-timer/0.1.0",
+      "bridge": {
+        "component": "useTimer",
+        "kind": "hook",
+        "exports": [
+          "useTimer"
+        ],
+        "types": [
+          "TimerOptions",
+          "TimerState",
+          "TimerControls"
+        ],
+        "signature": "useTimer(options?: TimerOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "b1956c2162a837a1",
+            "lines": 226,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-undo-stack",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Undo and redo for any editor state: present value plus past and future stacks.",
+      "today": [
+        "toolbox/modules/use-undo-stack/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useUndoStack"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-undo-stack/0.1.0",
+      "bridge": {
+        "component": "useUndoStack",
+        "kind": "hook",
+        "exports": [
+          "useUndoStack"
+        ],
+        "types": [
+          "UndoStack"
+        ],
+        "signature": "useUndoStack( initial: T, options?: { limit?: number } )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "dddfa1a242548120",
+            "lines": 62,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-wake-lock",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Keeps the screen awake by requesting a Wake Lock while active, with graceful fallback when the API is unavailable.",
+      "today": [
+        "toolbox/modules/use-wake-lock/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useWakeLock"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-wake-lock/0.1.0",
+      "bridge": {
+        "component": "useWakeLock",
+        "kind": "hook",
+        "exports": [
+          "useWakeLock"
+        ],
+        "types": [
+          "UseWakeLockOptions",
+          "UseWakeLockReturn"
+        ],
+        "signature": "useWakeLock(options?: UseWakeLockOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "3b2601d1e599302a",
+            "lines": 86,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/waveform",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Static audio waveform with a draggable playhead and optional trim handles.",
+      "today": [
+        "toolbox/modules/waveform/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Waveform"
+      ],
+      "public": true,
+      "path": "toolbox/modules/waveform/0.1.0",
+      "bridge": {
+        "component": "Waveform",
+        "kind": "widget",
+        "exports": [
+          "Waveform"
+        ],
+        "types": [
+          "WaveformProps"
+        ],
+        "signature": "Waveform(props: WaveformProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "c16104ed71038f0946f1626fadb6487313514027",
+            "source": "05bb5aec3f8a54eb",
+            "lines": 316,
+            "dependencies": {}
+          }
+        }
+      }
     }
   ]
 }

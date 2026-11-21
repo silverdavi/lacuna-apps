@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/use-reminder",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Schedule a local due-time alert via the Notification API with an in-app fallback.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useReminder",
+    "kind": "hook",
+    "commit": "4cddd6c4f824bcfdff2939c065faa6944763c0c9",
+    "source": "ef1e1dd86667e6e2",
+    "lines": 170,
+    "exports": [
+      "useReminder",
+      "ensureJestShim"
+    ],
+    "types": [
+      "ReminderOptions",
+      "ReminderState"
+    ],
+    "signature": "ensureJestShim(); useReminder(options: ReminderOptions)"
+  }
+}

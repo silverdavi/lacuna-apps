@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/use-media-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Records microphone, camera, or screen media into a Blob with state, elapsed time, and pause/resume/stop controls.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useMediaRecorder",
+    "kind": "hook",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "b40b837a3a3f192f",
+    "lines": 184,
+    "exports": [
+      "useMediaRecorder"
+    ],
+    "types": [
+      "MediaSource",
+      "UseMediaRecorderOptions",
+      "UseMediaRecorderReturn",
+      "UseMediaRecorderStatus"
+    ],
+    "signature": "useMediaRecorder(options?: UseMediaRecorderOptions)"
+  }
+}

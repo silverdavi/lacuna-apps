@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "d1ed5aca56382000670e971fd05fb3774d6ea5663de819063f27282fe28bd47c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries, the page shows the heading \"Mood Tracker\", the text \"No moods logged yet\", and the streak counter \"Streak: 0 days\"."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting \"Calm\" in the select labelled \"Mood\", typing \"Good night\" in the field labelled \"Note\", and clicking the button \"Log mood\" adds a list item containing \"Calm\" and \"Good night\"; the streak counter updates to \"Streak: 1 days\" and \"No moods logged yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After logging \"Calm\" for today, selecting \"Anxious\" in the select labelled \"Mood\" and clicking \"Log mood\" again adds a second list item containing \"Anxious\"; the streak counter remains \"Streak: 1 days\" because both logs are for the same day."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Log mood\" with the select labelled \"Mood\" set to the default empty option adds no list item and shows the message \"Select a mood\"."
+    },
+    {
+      "id": "A5",
+      "text": "The heatmap section displays a grid of squares for the last 7 days; the square for today is filled with the color associated with the last logged mood \"Anxious\", and the other 6 squares are empty."
+    },
+    {
+      "id": "A6",
+      "text": "The trend chart section displays an SVG line chart with a single point at the y-axis value corresponding to \"Anxious\" (value 2 on a 1-5 scale) for today's x-axis position."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Calm\" removes the first list item, leaving only the item with \"Anxious\"; the streak counter remains \"Streak: 1 days\"."
+    },
+    {
+      "id": "A8",
+      "text": "After logging \"Calm\" for today, reloading the page still shows the list item with \"Calm\", the streak counter \"Streak: 1 days\", and the heatmap square for today filled."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "30c6697cee35d37c36992c8d9fe8eadb72d075c86717e2db2dbcd407a0411102"
+    }
+  ]
+}
