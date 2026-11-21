@@ -4,9 +4,12 @@ export interface LoanInput {
   years: string
 }
 
-export type LoanError =
+export type LoanFieldError =
   | 'Enter a valid number'
   | 'Principal must be positive'
+  | 'Principal must be 1 to 100,000,000'
+  | 'Rate must be 0 to 100'
+  | 'Years must be 1 to 50'
 
 export interface LoanRow {
   payment: number
@@ -22,18 +25,31 @@ export interface LoanResult {
   rows: LoanRow[]
 }
 
-export function loanError(input: LoanInput): LoanError | null {
-  const p = input.principal.trim()
-  const r = input.rate.trim()
-  const y = input.years.trim()
-  if (p !== '' && Number.isFinite(Number.parseFloat(p)) && Number.parseFloat(p) <= 0)
-    return 'Principal must be positive'
-  if (p === '' || r === '' || y === '') return 'Enter a valid number'
-  const np = Number.parseFloat(p)
-  const nr = Number.parseFloat(r)
-  const ny = Number.parseFloat(y)
-  if (!Number.isFinite(np) || !Number.isFinite(nr) || !Number.isFinite(ny))
-    return 'Enter a valid number'
+export function principalError(value: string): LoanFieldError | null {
+  const v = value.trim()
+  if (v === '') return null
+  const n = Number.parseFloat(v)
+  if (!Number.isFinite(n)) return 'Enter a valid number'
+  if (n <= 0) return 'Principal must be positive'
+  if (n < 1 || n > 100000000) return 'Principal must be 1 to 100,000,000'
+  return null
+}
+
+export function rateError(value: string): LoanFieldError | null {
+  const v = value.trim()
+  if (v === '') return null
+  const n = Number.parseFloat(v)
+  if (!Number.isFinite(n)) return 'Enter a valid number'
+  if (n < 0 || n > 100) return 'Rate must be 0 to 100'
+  return null
+}
+
+export function yearsError(value: string): LoanFieldError | null {
+  const v = value.trim()
+  if (v === '') return null
+  const n = Number.parseFloat(v)
+  if (!Number.isFinite(n)) return 'Enter a valid number'
+  if (n < 1 || n > 50) return 'Years must be 1 to 50'
   return null
 }
 
@@ -62,6 +78,7 @@ export function calculateLoan(input: LoanInput): LoanResult | null {
   ) {
     return null
   }
+  if (p > 100000000 || r > 100 || y > 50) return null
   const n = Math.round(y * 12)
   const i = r / 100 / 12
   let monthly = paymentFor(p, i, n)
