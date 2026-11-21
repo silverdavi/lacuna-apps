@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "5f86b214b1a4437cab61d0dd0c2bb3bab558abcb964cb54dc9e89aace6b83b2c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Wheel Spinner\" and the text \"No entries yet\" in the entries list area."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice\" in the field labelled \"Entry name\" and clicking the button \"Add entry\" adds a list item containing \"Alice\" and the text \"No entries yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Alice\" and \"Bob\", clicking the button \"Spin\" shows a result banner with the text \"Winner: Alice\" or \"Winner: Bob\" (one of the two entries)."
+    },
+    {
+      "id": "A4",
+      "text": "After a spin result is shown, clicking the button \"Copy result\" copies the text \"Winner: Alice\" or \"Winner: Bob\" to the clipboard, matching the current result banner text."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"History\" shows a table with the header \"Spin log\" and at least one row containing the winner name from the last spin and a timestamp."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Alice\" and \"Bob\" in the list, clicking the button \"Delete Bob\" removes the \"Bob\" list item, leaving only \"Alice\" in the entries list."
+    },
+    {
+      "id": "A7",
+      "text": "After adding \"Alice\" and \"Bob\", clicking the button \"Reset all\" clears the entries list to show \"No entries yet\" and clears the History table to show \"No spins yet\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Carol\" in the field labelled \"Entry name\" and clicking \"Add entry\" with \"Alice\" already present adds a second list item containing \"Carol\", so the list shows both \"Alice\" and \"Carol\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry \"Alice\" in the entries list and the spin log row in the History tab after a spin was performed."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a6c9205661252ca4a73680f7b420058e644d52ec47e10372b8d6e4d1e93c8a54"
+    }
+  ]
+}
