@@ -1,0 +1,41 @@
+/* Upload affordances: not drawn by the kit, so styled with tokens only. */
+.js-drop {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) dashed var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink-60);
+}
+
+.js-drop-hot {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.js-drop input[type='file'] {
+  position: absolute;
+  width: calc(1px * var(--sf));
+  height: calc(1px * var(--sf));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.js-drop-label {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink-60);
+}
+
+.js-link {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
