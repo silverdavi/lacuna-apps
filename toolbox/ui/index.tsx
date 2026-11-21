@@ -14,7 +14,7 @@ export type { Crumb, NavLink } from './chrome'
 export { ResizablePanel } from './layout'
 export { ICONS, SUITE_ICONS, iconForFlow } from './icons'
 export type { IconName, IconProps } from './icons'
-export { AppShell, Checkbox, ErrorState, HUES, List, Plate, Rail, Row, SectionLabel, Select } from './kit'
+export { AppShell, Board, Checkbox, ErrorState, HUES, Keys, List, Plate, Rail, Row, SectionLabel, Select } from './kit'
 export type { Hue } from './kit'
 
 function cx(...parts: (string | false | null | undefined)[]): string {

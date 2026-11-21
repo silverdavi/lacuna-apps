@@ -1148,6 +1148,50 @@
       }
     },
     {
+      "id": "@lacuna/kanban-columns",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Multi-column Kanban board with keyboard card dragging, cross-column moves, and live per-column WIP counts.",
+      "today": [
+        "toolbox/modules/kanban-columns/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-drag-reorder"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "KanbanColumns"
+      ],
+      "public": true,
+      "path": "toolbox/modules/kanban-columns/0.1.0",
+      "bridge": {
+        "component": "KanbanColumns",
+        "kind": "widget",
+        "exports": [
+          "KanbanColumns"
+        ],
+        "types": [
+          "KanbanCard",
+          "KanbanColumnData",
+          "KanbanColumnsProps"
+        ],
+        "signature": "KanbanColumns(props: KanbanColumnsProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "69f3a2e788d02704",
+            "lines": 227,
+            "dependencies": {
+              "@lacuna/use-drag-reorder": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/money",
       "layer": 3,
       "status": "exists",
@@ -1450,6 +1494,47 @@
             "dependencies": {
               "@lacuna/use-local-record": "0.1.0"
             }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-drag-reorder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "React hook for pointer- and keyboard-driven reordering of items within a single list or across multiple lists.",
+      "today": [
+        "toolbox/modules/use-drag-reorder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useDragReorder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-drag-reorder/0.1.0",
+      "bridge": {
+        "component": "useDragReorder",
+        "kind": "hook",
+        "exports": [
+          "useDragReorder"
+        ],
+        "types": [
+          "DragReorderOptions",
+          "DragReorderReturn",
+          "ItemProps",
+          "ListProps"
+        ],
+        "signature": "useDragReorder(options?: DragReorderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "2f3e7db4fa06b82e",
+            "lines": 183,
+            "dependencies": {}
           }
         }
       }
