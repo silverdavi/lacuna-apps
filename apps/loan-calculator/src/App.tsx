@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
+import { Chart } from '@lacuna/chart'
 import {
+  Actions,
   AppShell,
   Button,
   Card,
   FormGrid,
   KpiRow,
+  Rail,
   SectionLabel,
   Table,
   TextInput,
 } from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
 import { calculateLoan, formatMoney, loanError, type LoanInput } from './loan'
 import { host } from './host'
 
@@ -33,13 +37,46 @@ export function App() {
     if (!error && result) host.save({ principal, rate, years })
   }, [error, result, principal, rate, years])
 
+  const { copied, copy } = useClipboard({ timeoutMs: 2000 })
+
+  function copySummary() {
+    if (!result) return
+    const lines = [
+      `Principal: ${formatMoney(Number.parseFloat(principal))}`,
+      `Annual rate: ${rate}%`,
+      `Term: ${years} years`,
+      `Monthly payment: ${formatMoney(result.monthlyPayment)}`,
+      `Total interest: ${formatMoney(result.totalInterest)}`,
+      `Total paid: ${formatMoney(result.totalPaid)}`,
+    ]
+    void copy(lines.join('\n'))
+  }
+
+  const stride = Math.max(1, Math.floor((result?.rows.length ?? 0) / 12))
+  const balanceData = result
+    ? result.rows
+        .filter((_, i) => i % stride === 0 || i === result.rows.length - 1)
+        .map((row, idx) => ({
+          label: `Pmt ${(idx * stride) + 1}`,
+          value: row.balance,
+        }))
+    : []
+
   return (
     <AppShell
       name="Loan Calculator"
       icon="finance"
       hue="green"
       category="Personal"
+      meta={result ? `${result.rows.length} payments` : undefined}
       status="Local · no network"
+      side={
+        <Rail
+          title="Loan Calculator"
+          note="Fixed rate · local"
+          chips={['Monthly payment', 'Total interest', 'Amortization', 'Works offline']}
+        />
+      }
     >
       <Card mono="Loan" title="Loan details">
         <FormGrid>
@@ -66,6 +103,11 @@ export function App() {
             placeholder="30"
           />
         </FormGrid>
+        <Actions>
+          <Button kind="secondary" onClick={copySummary} disabled={!result}>
+            {copied ? 'Copied' : 'Copy summary'}
+          </Button>
+        </Actions>
       </Card>
 
       <Card mono="Result" title="Results">
@@ -84,6 +126,19 @@ export function App() {
           </label>
         </KpiRow>
       </Card>
+
+      {result && (
+        <Card mono={`Balance · ${result.rows.length} payments`} title="Balance over time">
+          <Chart
+            type="line"
+            data={balanceData}
+            title="Outstanding balance"
+            ariaLabel="Loan balance over time"
+            width={560}
+            height={200}
+          />
+        </Card>
+      )}
 
       {result && (
         <Card
