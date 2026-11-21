@@ -930,6 +930,101 @@
       }
     },
     {
+      "id": "@lacuna/csv-parse",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Parse and write RFC 4180 CSV text as rows, with header handling, quoting, and error reporting.",
+      "today": [
+        "toolbox/modules/csv-parse/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "csvParse"
+      ],
+      "public": true,
+      "path": "toolbox/modules/csv-parse/0.1.0",
+      "bridge": {
+        "component": "csvParse",
+        "kind": "logic",
+        "exports": [
+          "parseCsv",
+          "toCsv",
+          "toRecords"
+        ],
+        "types": [
+          "CsvOptions",
+          "CsvResult",
+          "CsvError"
+        ],
+        "signature": "parseCsv(text: string, options: CsvOptions = {}); toCsv(rows: string[][], options: { delimiter?: string } = {}); toRecords(result: CsvResult)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "afb48861689f165b",
+            "lines": 138,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/date-math",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure local-date arithmetic and formatting: add/subtract days/weeks/months, differences, day/week/month bounds, ISO week, age, and relative time strings.",
+      "today": [
+        "toolbox/modules/date-math/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "dateMath"
+      ],
+      "public": true,
+      "path": "toolbox/modules/date-math/0.1.0",
+      "bridge": {
+        "component": "dateMath",
+        "kind": "logic",
+        "exports": [
+          "addDays",
+          "addWeeks",
+          "addMonths",
+          "diff",
+          "startOfDay",
+          "endOfDay",
+          "startOfWeek",
+          "endOfWeek",
+          "startOfMonth",
+          "endOfMonth",
+          "isoWeek",
+          "age",
+          "relativeTime",
+          "toISODate",
+          "fromISODate"
+        ],
+        "types": [
+          "DateParts",
+          "DiffResult"
+        ],
+        "signature": "addDays(date: Date, days: number); addWeeks(date: Date, weeks: number); addMonths(date: Date, months: number); diff(a: Date, b: Date)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f94c8bc071990cdc",
+            "lines": 128,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/dialog",
       "layer": 2,
       "status": "exists",
@@ -1050,6 +1145,49 @@
             "source": "f5f18b31f796b876",
             "lines": 107,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/heatmap",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A year-long grid of daily values in contribution-style columns for visualizing consistency over time.",
+      "today": [
+        "toolbox/modules/heatmap/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Heatmap"
+      ],
+      "public": true,
+      "path": "toolbox/modules/heatmap/0.1.0",
+      "bridge": {
+        "component": "Heatmap",
+        "kind": "widget",
+        "exports": [
+          "Heatmap"
+        ],
+        "types": [
+          "HeatmapCell",
+          "HeatmapProps"
+        ],
+        "signature": "Heatmap(props: HeatmapProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "e16f29810f486f67",
+            "lines": 240,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
           }
         }
       }
@@ -1400,6 +1538,50 @@
             "source": "f8c5c7e28e4c81c8",
             "lines": 193,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/streak-calc",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Compute current and longest consecutive-day check-in streaks with allowed skip days.",
+      "today": [
+        "toolbox/modules/streak-calc/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "streakCalc"
+      ],
+      "public": true,
+      "path": "toolbox/modules/streak-calc/0.1.0",
+      "bridge": {
+        "component": "streakCalc",
+        "kind": "logic",
+        "exports": [
+          "computeStreaks",
+          "isStreakAlive"
+        ],
+        "types": [
+          "StreakOptions",
+          "StreakResult"
+        ],
+        "signature": "computeStreaks(checkIns: string[], options?: StreakOptions); isStreakAlive(checkIns: string[], options?: StreakOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "ac33969cf945beee",
+            "lines": 94,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
           }
         }
       }
