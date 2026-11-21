@@ -1,197 +1,320 @@
-import { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
+import React, { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { toCsv } from '@lacuna/csv-parse'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
+import { openFile, saveText } from '@lacuna/file-save-open'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
 import {
+  Actions,
   AppShell,
-  Button,
+  Body,
   Card,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
+  MonoLabel,
+  Pills,
   Select,
+  Stack,
   Table,
   Tag,
   TextInput,
-} from '@lacuna/ui';
+  Button,
+} from '@lacuna/ui'
 import {
+  issues,
+  ISSUE_TYPES,
   ISSUE_PRIORITIES,
   ISSUE_STATUSES,
-  ISSUE_TYPES,
-  issues,
   type Issue,
-} from './host/mock';
+  type IssuePriority,
+  type IssueStatus,
+  type IssueType,
+} from './host/mock'
+import './app.css'
 
-type Draft = Omit<Issue, 'id'>;
-type SortDir = 'asc' | 'desc';
-const PRIORITY_RANK: Record<string, number> = { Low: 0, Medium: 1, High: 2 };
+type SortKey = 'title' | 'type' | 'priority' | 'assignee' | 'status'
+type SortDir = 'asc' | 'desc'
+type TypeFilter = 'all' | IssueType
+type StatusFilter = 'all' | IssueStatus
 
-function newDraft(): Draft {
-  return { title: '', type: 'Bug', priority: 'Medium', assignee: '', status: 'Open' };
+const PRIORITY_RANK: Record<IssuePriority, number> = { Low: 0, Medium: 1, High: 2 }
+
+
+
+interface Draft {
+  title: string
+  type: IssueType
+  priority: IssuePriority
+  assignee: string
+  status: IssueStatus
 }
 
-function escapeCsv(value: string): string {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+const EMPTY_DRAFT: Draft = {
+  title: '',
+  type: 'Bug',
+  priority: 'Medium',
+  assignee: '',
+  status: 'Open',
+}
+
+interface BackupRecord {
+  title: string
+  type: string
+  priority: string
+  assignee: string
+  status: string
+}
+
+function sortValue(issue: Issue, key: SortKey): string | number {
+  if (key === 'priority') return PRIORITY_RANK[issue.priority]
+  if (key === 'assignee') return issue.assignee.toLowerCase()
+  return String(issue[key]).toLowerCase()
+}
+
+function csvText(items: Issue[]): string {
+  return toCsv([
+    ['Title', 'Type', 'Priority', 'Assignee', 'Status'],
+    ...items.map((i) => [i.title, i.type, i.priority, i.assignee, i.status]),
+  ])
+}
+
+function backupRecords(items: Issue[]) {
+  return items.map((issue) => ({
+    id: issue.id,
+    data: {
+      title: issue.title,
+      type: issue.type,
+      priority: issue.priority,
+      assignee: issue.assignee,
+      status: issue.status,
+    } satisfies BackupRecord,
+    createdAt: 0,
+    updatedAt: 0,
+  }))
+}
+
+function isBackupData(record: BackupRecord): string | null {
+  const ok =
+    typeof record.title === 'string' &&
+    (ISSUE_TYPES as readonly string[]).includes(record.type) &&
+    (ISSUE_PRIORITIES as readonly string[]).includes(record.priority) &&
+    typeof record.assignee === 'string' &&
+    (ISSUE_STATUSES as readonly string[]).includes(record.status)
+  return ok ? null : 'not an issue record'
 }
 
 export function App() {
-  const [version, setVersion] = useState(0);
-  const [formOpen, setFormOpen] = useState(false);
-  const [draft, setDraft] = useState<Draft>(newDraft());
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [bugOnly, setBugOnly] = useState(false);
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [items, setItems] = useState<Issue[]>(() => issues.list())
+  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [sortKey, setSortKey] = useState<SortKey>('title')
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+  const [note, setNote] = useState('')
+  const [error, setError] = useState('')
+  const [formOpen, setFormOpen] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  const all = useMemo(() => issues.list(), [version]);
+  useEffect(() => {
+    if (!note && !error) return
+    const t = setTimeout(() => {
+      setNote('')
+      setError('')
+    }, 4000)
+    return () => clearTimeout(t)
+  }, [note, error])
+
+  const refresh = () => setItems(issues.list())
+
+  const lastId = items.length > 0 ? items[items.length - 1].id : null
+  const targetId = editingId ?? selectedId ?? lastId
+  const target = items.find((i) => i.id === targetId) ?? items[items.length - 1]
+
+  const openCount = items.filter((i) => i.status === 'Open').length
+  const progressCount = items.filter((i) => i.status === 'In Progress').length
+  const bugCount = items.filter((i) => i.type === 'Bug').length
+  const doneCount = items.filter((i) => i.status === 'Done').length
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return items.filter((i) => {
+      if (q && !i.title.toLowerCase().includes(q)) return false
+      if (typeFilter !== 'all' && i.type !== typeFilter) return false
+      if (statusFilter !== 'all' && i.status !== statusFilter) return false
+      return true
+    })
+  }, [items, search, typeFilter, statusFilter])
 
   const visible = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const filtered = all.filter((issue) => {
-      if (bugOnly && issue.type !== 'Bug') return false;
-      if (q === '') return true;
-      return (
-        issue.title.toLowerCase().includes(q) ||
-        issue.assignee.toLowerCase().includes(q) ||
-        issue.status.toLowerCase().includes(q)
-      );
-    });
+    const dir = sortDir === 'asc' ? 1 : -1
     return [...filtered].sort((a, b) => {
-      const diff = PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-      return sortDir === 'asc' ? diff : -diff;
-    });
-  }, [all, search, bugOnly, sortDir]);
+      const va = sortValue(a, sortKey)
+      const vb = sortValue(b, sortKey)
+      if (va < vb) return -1 * dir
+      if (va > vb) return 1 * dir
+      return 0
+    })
+  }, [filtered, sortKey, sortDir])
 
-  function refresh() {
-    setVersion((v) => v + 1);
-  }
-
-  function resetForm() {
-    setDraft(newDraft());
-    setEditingId(null);
-    setFormOpen(false);
-  }
-
-  function openNew() {
-    setEditingId(null);
-    setDraft(newDraft());
-    setFormOpen(true);
-  }
-
-  function saveDraft() {
-    const title = draft.title.trim();
-    if (title === '') return;
-    if (editingId !== null) {
-      issues.update(editingId, { ...draft, title });
-    } else {
-      issues.add({ ...draft, title });
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    else {
+      setSortKey(key)
+      setSortDir('asc')
     }
-    resetForm();
-    refresh();
   }
 
-  function startEdit(issue: Issue) {
-    setEditingId(issue.id);
+  const startEdit = (issue: Issue) => {
     setDraft({
       title: issue.title,
       type: issue.type,
       priority: issue.priority,
       assignee: issue.assignee,
       status: issue.status,
-    });
-    setFormOpen(true);
+    })
+    setEditingId(issue.id)
+    setSelectedId(issue.id)
+    setFormOpen(true)
+    setError('')
   }
 
-  function removeIssue(id: string) {
-    issues.remove(id);
-    if (editingId === id) {
-      setEditingId(null);
-      setDraft(newDraft());
+  const openNewForm = () => {
+    setDraft(EMPTY_DRAFT)
+    setEditingId(null)
+    setFormOpen(true)
+    setError('')
+  }
+
+  const cancelForm = () => {
+    setDraft(EMPTY_DRAFT)
+    setEditingId(null)
+    setFormOpen(false)
+    setError('')
+  }
+
+  const save = () => {
+    const title = draft.title.trim()
+    if (!title) {
+      setError('Title is required')
+      return
     }
-    refresh();
+    const patch = {
+      title,
+      type: draft.type,
+      priority: draft.priority,
+      assignee: draft.assignee.trim(),
+      status: draft.status,
+    }
+    if (editingId) {
+      issues.update(editingId, patch)
+      setNote('Issue updated')
+      setEditingId(null)
+    } else {
+      issues.add(patch)
+      setNote('Issue added')
+    }
+    setDraft(EMPTY_DRAFT)
+    setFormOpen(false)
+    setError('')
+    refresh()
   }
 
-  function deleteLast() {
-    if (all.length === 0) return;
-    removeIssue(all[all.length - 1].id);
+  const removeTarget = () => {
+    if (!target) return
+    issues.remove(target.id)
+    if (editingId === target.id) {
+      setEditingId(null)
+      setDraft(EMPTY_DRAFT)
+      setFormOpen(false)
+    }
+    if (selectedId === target.id) setSelectedId(null)
+    setNote('Issue deleted')
+    refresh()
   }
 
-  function exportCsv() {
-    const head = 'Title,Type,Priority,Assignee,Status';
-    const lines = visible.map(
-      (issue) =>
-        [
-          escapeCsv(issue.title),
-          escapeCsv(issue.type),
-          escapeCsv(issue.priority),
-          escapeCsv(issue.assignee),
-          escapeCsv(issue.status),
-        ].join(','),
-    );
-    const csv = [head, ...lines].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'issues.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+  const exportOptions = useMemo<ExportOption[]>(
+    () => [
+      {
+        id: 'csv',
+        label: 'CSV',
+        mimeType: 'text/csv',
+        extension: 'csv',
+        getData: () => csvText(items),
+      },
+      {
+        id: 'json',
+        label: 'Backup (JSON)',
+        mimeType: 'application/json',
+        extension: 'json',
+        getData: () =>
+          exportBackup<BackupRecord>({
+            appId: 'issue-tracker',
+            version: 1,
+            records: backupRecords(items),
+          }),
+      },
+    ],
+    [items],
+  )
+
+  const onExport = (id: string) => setNote(id === 'csv' ? 'CSV exported' : 'Backup exported')
+
+  const onImportFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const result = await openFile(file, 'json')
+    if (!result.ok) {
+      setError(`Could not read ${file.name}: ${result.error}`)
+      return
+    }
+    try {
+      const imported = importBackup<BackupRecord>(JSON.stringify(result.data), {
+        currentVersion: 1,
+        validate: (record) => isBackupData(record.data),
+      })
+      const existing = new Set(issues.list().map((i) => i.id))
+      let added = 0
+      for (const record of imported.records) {
+        if (existing.has(record.id)) continue
+        const data = record.data
+        issues.add({
+          title: data.title,
+          type: data.type as IssueType,
+          priority: data.priority as IssuePriority,
+          assignee: data.assignee,
+          status: data.status as IssueStatus,
+        })
+        added += 1
+      }
+      refresh()
+      if (imported.droppedCount > 0) setError(`Imported ${added} issue(s); dropped ${imported.droppedCount} invalid record(s)`)
+      else if (added === 0) setNote('Nothing new to import')
+      else setNote(`Imported ${added} issue(s)`)
+    } catch {
+      setError('Could not import that file; the list is unchanged')
+    }
   }
 
-  function clearFilters() {
-    setSearch('');
-    setBugOnly(false);
-  }
+  const columns: { key: string; label: React.ReactNode }[] = [
+    { key: 'title', label: <button type="button" className="it-sort" onClick={() => toggleSort('title')}>Title{sortKey === 'title' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</button> },
+    { key: 'type', label: <button type="button" className="it-sort" onClick={() => toggleSort('type')}>Type{sortKey === 'type' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</button> },
+    { key: 'priority', label: <button type="button" className="it-sort" onClick={() => toggleSort('priority')}>Priority{sortKey === 'priority' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</button> },
+    { key: 'assignee', label: <button type="button" className="it-sort" onClick={() => toggleSort('assignee')}>Assignee{sortKey === 'assignee' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</button> },
+    { key: 'status', label: <button type="button" className="it-sort" onClick={() => toggleSort('status')}>Status{sortKey === 'status' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</button> },
+  ]
 
-  const columns: { key: string; label: ReactNode }[] = [
-    { key: 'title', label: 'Title' },
-    { key: 'type', label: 'Type' },
-    {
-      key: 'priority',
-      label: (
-        <span>
-          Priority
-          <button
-            type="button"
-            className="lc-btn ghost"
-            style={{ padding: '0 0 0 calc(6px * var(--sf))' }}
-            aria-hidden="true"
-            tabIndex={-1}
-            onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-          >
-            {sortDir === 'asc' ? '↑' : '↓'}
-          </button>
-        </span>
-      ),
-    },
-    { key: 'assignee', label: 'Assignee' },
-    { key: 'status', label: 'Status' },
-    { key: 'actions', label: '' },
-  ];
-
-  const rows = visible.map((issue) => ({
-    hot: issue.id === editingId,
-    cells: {
-      title: issue.title,
-      type: <Tag>{issue.type}</Tag>,
-      priority: <Tag accent={issue.priority === 'High'}>{issue.priority}</Tag>,
-      assignee: issue.assignee === '' ? '—' : issue.assignee,
-      status: issue.status,
-      actions: (
-        <Button kind="ghost" onClick={() => startEdit(issue)}>
-          Edit
-        </Button>
-      ),
-    },
-  }));
-
-  const hasIssues = all.length > 0;
-
-  const empty = (
-    <EmptyState
-      title="No issues yet"
-      detail="Add a bug or feature above to start tracking it."
-    />
-  );
+  const rowCells = (i: Issue) => ({
+    title: i.title,
+    type: <Tag>{i.type}</Tag>,
+    priority: <Tag accent={i.priority === 'High'}>{i.priority}</Tag>,
+    assignee: i.assignee || '—',
+    status: <Tag accent={i.status === 'Open'}>{i.status}</Tag>,
+  })
 
   return (
     <AppShell
@@ -199,144 +322,197 @@ export function App() {
       icon="tasks"
       hue="teal"
       category="Productivity"
-      meta={all.length === 1 ? '1 issue' : `${all.length} issues`}
-      status="Local · no network"
+      meta={`${items.length} ${items.length === 1 ? 'issue' : 'issues'}`}
+      status="Saved on this device"
       actions={
-        <Button kind="secondary" onClick={openNew}>
-          New issue
-        </Button>
+        <div className="it-toolbar">
+          <Button kind="primary" onClick={openNewForm}>
+            New issue
+          </Button>
+          <Button
+            kind="secondary"
+            onClick={() => saveText(csvText(items), { filename: 'issues.csv', mimeType: 'text/csv' })}
+          >
+            Export CSV
+          </Button>
+          <ExportMenu options={exportOptions} fileName="issues" ariaLabel="Export" onExport={onExport} onError={(id, e) => setError(`Export ${id} failed: ${e.message}`)} />
+        </div>
       }
     >
-      {formOpen && (
-        <Card mono={editingId !== null ? 'Edit issue' : 'New issue'}>
+      <Stack lg>
+        <KpiRow>
+          <Kpi label="Total" value={items.length} accent />
+          <Kpi label="Open" value={openCount} />
+          <Kpi label="In progress" value={progressCount} />
+          <Kpi label="Bugs" value={bugCount} />
+          <Kpi label="Done" value={doneCount} />
+        </KpiRow>
+
+        {formOpen && (
+        <Card
+          mono={editingId ? 'Edit' : 'New'}
+          title={editingId ? 'Edit issue' : 'New issue'}
+          actions={
+            editingId ? (
+              <Button kind="ghost" onClick={cancelForm}>
+                Cancel
+              </Button>
+            ) : undefined
+          }
+        >
           <FormGrid>
             <TextInput
               label="Title"
               value={draft.title}
-              placeholder="Login crash on Safari"
-              onChange={(value) => setDraft((d) => ({ ...d, title: value }))}
+              onChange={(v) => setDraft((d) => ({ ...d, title: v }))}
+              placeholder="What needs tracking?"
             />
             <Select
               label="Type"
               value={draft.type}
-              options={[...ISSUE_TYPES]}
-              onChange={(value) =>
-                setDraft((d) => ({ ...d, type: value as Draft['type'] }))
-              }
+              options={ISSUE_TYPES.map((v) => ({ value: v, label: v }))}
+              onChange={(v) => setDraft((d) => ({ ...d, type: v as IssueType }))}
             />
             <Select
               label="Priority"
               value={draft.priority}
-              options={[...ISSUE_PRIORITIES]}
-              onChange={(value) =>
-                setDraft((d) => ({ ...d, priority: value as Draft['priority'] }))
-              }
+              options={ISSUE_PRIORITIES.map((v) => ({ value: v, label: v }))}
+              onChange={(v) => setDraft((d) => ({ ...d, priority: v as IssuePriority }))}
+            />
+            <Select
+              label="Status"
+              value={draft.status}
+              options={ISSUE_STATUSES.map((v) => ({ value: v, label: v }))}
+              onChange={(v) => setDraft((d) => ({ ...d, status: v as IssueStatus }))}
             />
             <TextInput
               label="Assignee"
               value={draft.assignee}
-              placeholder="Alice"
-              onChange={(value) => setDraft((d) => ({ ...d, assignee: value }))}
+              onChange={(v) => setDraft((d) => ({ ...d, assignee: v }))}
+              placeholder="Who owns it?"
             />
-            {editingId !== null && (
-              <Select
-                label="Status"
-                value={draft.status}
-                options={[...ISSUE_STATUSES]}
-                onChange={(value) =>
-                  setDraft((d) => ({ ...d, status: value as Draft['status'] }))
-                }
-              />
-            )}
           </FormGrid>
-          <div
-            style={{
-              marginTop: 'calc(12px * var(--sf))',
-              display: 'flex',
-              gap: 'calc(8px * var(--sf))',
-            }}
-          >
-            <Button kind="primary" onClick={saveDraft}>
-              Save
-            </Button>
-            <Button kind="ghost" onClick={resetForm}>
-              Cancel
-            </Button>
+          <div style={{ marginTop: 'calc(var(--gap) / 2)' }}>
+            <Actions>
+              <Button kind="primary" onClick={save}>
+                Save
+              </Button>
+            </Actions>
           </div>
         </Card>
-      )}
+        )}
 
-      {hasIssues && (
-        <Card>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 'calc(10px * var(--sf))',
-              alignItems: 'flex-end',
-            }}
-          >
-            <div
-              style={{
-                flex: '1 1 calc(200px * var(--sf))',
-                minWidth: 'calc(160px * var(--sf))',
-              }}
-            >
-              <TextInput
-                label="Search"
-                type="search"
-                value={search}
-                placeholder="Filter by title, assignee, or status"
-                onChange={setSearch}
+        <Card mono="Filter" title="Narrow the list">
+          <Stack style={{ gap: 'calc(var(--gap) / 2)' }}>
+            <div className="it-filter">
+              <MonoLabel sm>Type</MonoLabel>
+              <Pills
+                items={['All', ...ISSUE_TYPES]}
+                active={typeFilter === 'all' ? 'All' : typeFilter}
+                onSelect={(v) => {
+                  const next = v === 'All' ? 'all' : (v as IssueType)
+                  setTypeFilter(typeFilter === next ? 'all' : next)
+                }}
               />
             </div>
-            <Button
-              kind={bugOnly ? 'ink' : 'secondary'}
-              onClick={() => setBugOnly((b) => !b)}
-              aria-label="Filter to Bug issues"
-            >
-              Bug
-            </Button>
-          </div>
+            <div className="it-filter">
+              <MonoLabel sm>Status</MonoLabel>
+              <Pills
+                items={['All', ...ISSUE_STATUSES]}
+                active={statusFilter === 'all' ? 'All' : statusFilter}
+                onSelect={(v) => {
+                  const next = v === 'All' ? 'all' : (v as IssueStatus)
+                  setStatusFilter(statusFilter === next ? 'all' : next)
+                }}
+              />
+            </div>
+            <TextInput label="Search" type="search" value={search} onChange={setSearch} placeholder="Filter by title" />
+          </Stack>
         </Card>
-      )}
 
-      {hasIssues && (
-        <Card>
-          <div
-            style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}
-          >
-            <Button kind="ghost" onClick={deleteLast}>
-              Delete
-            </Button>
-            <Button kind="ghost" onClick={clearFilters}>
-              Clear filters
-            </Button>
-            <Button kind="secondary" onClick={exportCsv}>
-              Export CSV
-            </Button>
-          </div>
+        <Card mono="Board" title="Issues">
+          {items.length === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No issues yet"
+              detail="Add the first bug or feature with the New issue button above."
+            />
+          ) : visible.length === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No matches"
+              detail={`No issues match the current search or filters. ${items.length} ${items.length === 1 ? 'issue' : 'issues'} are hidden.`}
+            />
+          ) : (
+            <>
+              <Table
+                label="Issues"
+                columns={columns}
+                rows={visible.map((i) => ({
+                  hot: i.id === target?.id,
+                  onClick: () => startEdit(i),
+                  cells: rowCells(i),
+                }))}
+              />
+              <div className="it-rowbar">
+                <MonoLabel sm>
+                  {target ? `Acting on: ${target.title}` : 'Select a row to act on it'}
+                </MonoLabel>
+                <div className="it-rowbar-btns">
+                  <Button kind="ghost" onClick={() => target && startEdit(target)}>
+                    Edit
+                  </Button>
+                  <Button kind="ghost" onClick={removeTarget}>
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+          {(note || error) && (
+            <div className="it-footer" role="status">
+              {note ? <Tag accent>{note}</Tag> : null}
+              {error ? <Tag>{error}</Tag> : null}
+            </div>
+          )}
         </Card>
-      )}
 
-      {hasIssues && visible.length === 0 && (
-        <Card>
-          <EmptyState
-            title="No matches"
-            detail="No issues match the current search and filters."
-          />
+        <Card mono="Backup" title="Backup & import">
+          <Stack style={{ gap: 'calc(var(--gap) / 2)' }}>
+            <Body>
+              Export a versioned JSON backup, or import one to restore issues. Records already in the
+              list are kept; duplicates by id are skipped.
+            </Body>
+            <div className="it-exports">
+              <Button
+                kind="secondary"
+                onClick={() =>
+                  saveText(
+                    exportBackup<BackupRecord>({
+                      appId: 'issue-tracker',
+                      version: 1,
+                      records: backupRecords(items),
+                    }),
+                    { filename: 'issue-tracker-backup.json', mimeType: 'application/json' },
+                  )
+                }
+              >
+                Export JSON
+              </Button>
+              <Button kind="secondary" onClick={() => fileRef.current?.click()}>
+                Import JSON
+              </Button>
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              style={{ display: 'none' }}
+              onChange={onImportFile}
+            />
+          </Stack>
         </Card>
-      )}
-
-      {hasIssues && visible.length > 0 && (
-        <Card flush>
-          <div style={{ padding: 'calc(6px * var(--sf)) calc(18px * var(--sf))' }}>
-            <Table label="Issues" columns={columns} rows={rows} empty={empty} />
-          </div>
-        </Card>
-      )}
-
-      {!hasIssues && <Card>{empty}</Card>}
+      </Stack>
     </AppShell>
-  );
+  )
 }

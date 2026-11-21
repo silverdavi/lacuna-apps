@@ -4,7 +4,7 @@
   "name": "Bug Issue Tracker",
   "version": "0.1.0",
   "summary": "Log bugs and features, then sort, filter, and export them.",
-  "description": "Track the bugs and features you are chasing. Add each issue with a title, type, priority, and assignee, then sort by priority, filter by search or type, edit the status as work moves, and export the whole table as CSV. The list survives a reload. Nothing leaves the browser.",
+  "description": "Track the bugs and features you are chasing. Add each issue with a title, type, priority, assignee, and status, then sort by priority, filter by search, type, or status, and track work in a board view. The list is saved in this browser and survives a reload. Export the table as CSV or a JSON backup, and restore from a backup any time. Nothing leaves the browser.",
   "category": "productivity",
   "icon": "tasks",
   "relationship": {
@@ -32,13 +32,20 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0"
     }
   },
   "capabilities": [
-    "create:issue"
+    "create:issue",
+    "edit:issue",
+    "export:issue",
+    "import:issue"
   ],
   "permissions": {
     "records": [

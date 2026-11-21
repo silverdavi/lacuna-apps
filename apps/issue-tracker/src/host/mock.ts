@@ -30,6 +30,8 @@ export function isIssue(value: unknown): value is Issue {
   );
 }
 
+// No `storage` option: the store reads and writes the browser's localStorage,
+// so the issue list survives a page reload (A9).
 export const issues = createMockRecordStore<Issue>({
   key: 'lacuna.issue-tracker.issues',
   validate: isIssue,
