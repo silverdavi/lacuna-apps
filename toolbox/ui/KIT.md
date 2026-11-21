@@ -41,6 +41,8 @@ Every app is one `AppShell` with `Card` panels inside. All of it comes from `@la
 | `Title` `Body` `MonoLabel` | Serif heading (`as="h2"`), body text, mono label |
 | `EmptyState` | `mono`, `title`, `detail`. Show it whenever a list, table or result has nothing yet. |
 | `ErrorState` | `title`, `detail`. Show it when an action fails. For one bad field use the field's `error` prop. |
+| `Board` | `cols`, `rows`, `cell` (cell size in px, default 28), `label`. A game or puzzle board. Children: one element per cell, row by row (`<div>` or `<button>`), with your own `data-` attributes; set only `style={{ background }}` on a cell. The kit draws the frame, grid lines and size. Never size the board or its cells yourself. |
+| `Keys` | `items={[['←', 'Move left'], ['Space', 'Drop']]}`. Keyboard hints; put it in the `Rail`. |
 
 ## Tokens
 

@@ -201,3 +201,35 @@ export function ErrorState({ title, detail, mono = 'Error', children, style }: {
     </div>
   )
 }
+
+/** A game or puzzle board: a fixed-size grid of square cells. Give it one child per cell, row by row; the kit draws
+ *  the frame and the grid lines, the app sets only each cell's `background` (and its own data- attributes). */
+export function Board({ cols, rows, cell = 28, label, children, style }: {
+  cols: number
+  rows: number
+  cell?: number
+  label?: string
+  children: ReactNode
+  style?: CSSProperties
+}) {
+  const vars = { '--cols': cols, '--rows': rows, '--cell': `${cell}px` } as CSSProperties
+  return (
+    <div className="lk-board" role="group" aria-label={label} style={{ ...vars, ...style }}>
+      {children}
+    </div>
+  )
+}
+
+/** Keyboard hints: a keycap and what it does, one pair per line. */
+export function Keys({ items }: { items: [string, string][] }) {
+  return (
+    <dl className="lk-keys">
+      {items.map(([key, what]) => (
+        <div key={key + what} className="lk-key-row">
+          <dt><kbd className="lk-kbd">{key}</kbd></dt>
+          <dd>{what}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
