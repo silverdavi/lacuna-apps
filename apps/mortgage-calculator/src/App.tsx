@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -60,8 +60,37 @@ export function App() {
   const [rateScale, setRateScale] = useState(true)
   const [termCompare, setTermCompare] = useState('15')
   const clipboard = useClipboard({ timeoutMs: 1600 })
+  const chartCardRef = useRef<HTMLDivElement | null>(null)
+  const [chartWidth, setChartWidth] = useState(760)
 
   const { result } = calculateMortgage(inputs)
+
+  useLayoutEffect(() => {
+    const node = chartCardRef.current
+    if (!node) return
+    const measure = () => {
+      const width = Math.floor(node.clientWidth)
+      setChartWidth(width > 0 ? width : 760)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  function validateField(key: 'homePrice' | 'downPayment' | 'rate' | 'term', value: string): string | null {
+    if (key === 'rate') {
+      if (value === '' || Number.isNaN(Number(value))) return 'Interest rate must be a number'
+      if (Number(value) < 0 || Number(value) > 30) return 'Rate must be between 0 and 30'
+    }
+    if (key === 'term') {
+      if (value === '' || Number.isNaN(Number(value))) return 'Term must be a whole number of years'
+      if (!Number.isInteger(Number(value)) || Number(value) < 1 || Number(value) > 50) {
+        return 'Term must be between 1 and 50 years'
+      }
+    }
+    return null
+  }
 
   function setField(key: 'homePrice' | 'downPayment' | 'rate' | 'term', value: string) {
     setInputs((prev) => ({ ...prev, [key]: value }))
@@ -125,7 +154,7 @@ export function App() {
 
   const chartData: ChartDataPoint[] = result
     ? result.years.map((row) => ({
-        label: `Y${row.year}`,
+        label: row.year % 5 === 0 ? `Y${row.year}` : '',
         value: rateScale ? row.interest / 1000 : row.interest,
       }))
     : []
@@ -210,6 +239,7 @@ export function App() {
             type="number"
             inputMode="decimal"
             value={inputs.rate}
+            error={validateField('rate', inputs.rate)}
             onChange={(v) => setField('rate', v)}
           />
           <TextInput
@@ -217,6 +247,7 @@ export function App() {
             type="number"
             inputMode="numeric"
             value={inputs.term}
+            error={validateField('term', inputs.term)}
             onChange={(v) => setField('term', v)}
           />
         </FormGrid>
@@ -282,9 +313,11 @@ export function App() {
               />
             </Card>
 
-            <Card mono="Trend" title="Interest by year">
-              <Chart type="line" data={chartData} title={chartTitle} ariaLabel={chartTitle} height={240} />
-            </Card>
+            <div ref={chartCardRef} style={{ width: '100%' }}>
+              <Card mono="Trend" title="Interest by year">
+                <Chart type="line" data={chartData} title={chartTitle} ariaLabel={chartTitle} width={chartWidth} height={280} />
+              </Card>
+            </div>
 
             <Card mono="Export" title="Share this estimate">
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
