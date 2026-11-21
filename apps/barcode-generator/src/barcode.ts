@@ -4,6 +4,8 @@ export interface BarcodeImage {
   width: number
   height: number
   cells: Uint8Array
+  /** quiet zone in the image's own unit (module for 1D, module for QR) */
+  quiet?: number
 }
 
 const C128_BARS: string[] = [
@@ -42,7 +44,7 @@ export function encodeCode128(data: string): BarcodeImage {
   for (const v of values) modules.push(...[...C128_BARS[v]].map(Number))
   modules.push(...[...C128_STOP].map(Number))
   const cells = new Uint8Array(modules)
-  return { width: cells.length, height: 1, cells }
+  return { width: cells.length, height: 96, cells, quiet: 10 }
 }
 
 export function ean13CheckDigit(digits: string): string {
@@ -90,7 +92,7 @@ export function encodeEan13(digits: string): BarcodeImage {
   parts.push('101')
   const joined = parts.join('')
   const cells = new Uint8Array([...joined].map(Number))
-  return { width: cells.length, height: 1, cells }
+  return { width: cells.length, height: 96, cells, quiet: 10 }
 }
 
 const MODULUS = 0x11d
@@ -534,17 +536,18 @@ function buildBaseMatrix(version: number, level: string, versionBits: number[], 
   return grid
 }
 
-export function toImageData(img: BarcodeImage, scale: number, quiet: number): { width: number; height: number; data: Uint8ClampedArray } {
-  const width = (img.width + quiet * 2) * scale
-  const height = (img.height + quiet * 2) * scale
+export function toImageData(img: BarcodeImage, scale: number, quiet?: number): { width: number; height: number; data: Uint8ClampedArray } {
+  const q = quiet ?? img.quiet ?? 0
+  const width = (img.width + q * 2) * scale
+  const height = (img.height + q * 2) * scale
   const data = new Uint8ClampedArray(width * height * 4)
   for (let y = 0; y < img.height; y++) {
     for (let x = 0; x < img.width; x++) {
       const v = img.cells[y * img.width + x] ? 0 : 255
       for (let sy = 0; sy < scale; sy++) {
         for (let sx = 0; sx < scale; sx++) {
-          const px = (x + quiet) * scale + sx
-          const py = (y + quiet) * scale + sy
+          const px = (x + q) * scale + sx
+          const py = (y + q) * scale + sy
           const o = (py * width + px) * 4
           data[o] = v
           data[o + 1] = v
@@ -557,7 +560,7 @@ export function toImageData(img: BarcodeImage, scale: number, quiet: number): { 
   return { width, height, data }
 }
 
-export function toPngBlob(img: BarcodeImage, scale: number, quiet: number): Promise<Blob> {
+export function toPngBlob(img: BarcodeImage, scale: number, quiet?: number): Promise<Blob> {
   const { width, height, data } = toImageData(img, scale, quiet)
   const canvas = document.createElement('canvas')
   canvas.width = width
@@ -581,5 +584,5 @@ export function encode(type: BarcodeType, data: string): BarcodeImage {
   matrix.forEach((row, y) => row.forEach((v, x) => {
     cells[y * matrix.length + x] = v
   }))
-  return { width: matrix.length, height: matrix.length, cells }
+  return { width: matrix.length, height: matrix.length, cells, quiet: 4 }
 }

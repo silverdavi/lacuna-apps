@@ -11,7 +11,6 @@ import {
   Rail,
   Row,
   Select,
-  Tag,
   TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -141,7 +140,7 @@ export function App() {
       return () => { cancelled = true }
     }
     void (async () => {
-      const blob = await toPngBlob(preview.img, scaleNum(scale), 4)
+      const blob = await toPngBlob(preview.img, scaleNum(scale))
       if (cancelled) return
       blobRef.current = blob
       url = URL.createObjectURL(blob)
@@ -307,14 +306,26 @@ export function App() {
         {error ? (
           <ErrorState title={error} mono="Validation" />
         ) : hasPreview && imgSrc && preview ? (
-          <>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              width: '100%',
+              background: 'var(--paper)',
+              padding: 'calc(12px * var(--sf))',
+              gap: 'calc(6px * var(--sf))',
+            }}
+          >
             <img
               src={imgSrc}
               alt={preview.label}
               style={{ maxWidth: '100%', imageRendering: 'pixelated' }}
             />
-            <Tag accent>{preview.label}</Tag>
-          </>
+            <span style={{ fontFamily: 'var(--mono)' }}>{preview.label}</span>
+          </div>
         ) : (
           <EmptyState
             mono="Waiting"
