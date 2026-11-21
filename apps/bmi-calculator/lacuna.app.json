@@ -1,0 +1,85 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.bmi-calculator",
+  "name": "BMI Calculator",
+  "version": "0.1.0",
+  "summary": "Enter your height and weight to calculate your BMI and see which category you fall into.",
+  "description": "A body-mass-index calculator. Pick metric or imperial, enter height and weight, and get your BMI, its category, a category breakdown, and a visual of where you fall. The last calculation is kept in the space so it is still there after a reload. Nothing leaves the browser.",
+  "category": "healthcare",
+  "tags": ["bmi", "health", "calculator"],
+  "icon": "clinic",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/bmi-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:bmi"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "calculation",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the last BMI calculation"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "calculation"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
