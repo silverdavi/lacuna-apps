@@ -98,6 +98,20 @@
 .lk-field-hint { color: var(--ink-40); }
 .lk-check { display: inline-flex; align-items: center; gap: calc(8px * var(--sf)); font-size: calc(13px * var(--tf)); color: var(--ink-80); cursor: pointer; }
 .lk-check input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+.lk-check { margin: calc(4px * var(--sf)) calc(18px * var(--sf)) calc(4px * var(--sf)) 0; min-height: 24px; }
+.lk-check:last-child { margin-right: 0; }
+/* Buttons that sit next to each other never touch. */
+.lk-shell .lc-btn + .lc-btn { margin-left: calc(8px * var(--sf)); }
+
+/* ---------------------------------------------------------------- shelf widgets
+   Toolbox widgets written before the kit set their look inline (8px corners, soft drop shadows, pills).
+   Inside the frame they are drawn flat like everything else: square corners, hard offset shadow.
+   Percent radii (a disc, a ring) are left alone. Remove this block when the widgets draw with the kit. */
+.lk-shell [style*='border-radius: calc('], .lk-shell [style*='border-radius: 999'],
+.lk-shell [style*='border-radius: 6px'], .lk-shell [style*='border-radius: 8px'], .lk-shell [style*='border-radius: 12px'] {
+  border-radius: 2px !important;
+}
+.lk-shell [style*='box-shadow'][style*='rgba('] { box-shadow: 3px 3px 0 var(--ink) !important; }
 .lk-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0 calc(12px * var(--sf)); align-items: start; }
 .lk-form .lc-field { margin-bottom: calc(12px * var(--sf)); }
 .lk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: calc(8px * var(--sf)); }
