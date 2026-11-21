@@ -34,6 +34,15 @@ export function PrimaryButton({ children, onClick, disabled, type = 'button', ar
  * type so an app that already calls EmptyState still typechecks until it is rebuilt.
  * Pass `onAction` to draw that label as the primary button; otherwise it is shown as text.
  */
+function cleanEmptyDetail(detail: ReactNode): ReactNode {
+  if (typeof detail !== 'string') return detail
+  const cleaned = detail
+    .replace(/\s*It stays on this device\.?/gi, '')
+    .replace(/,\s*on this device\b/gi, '')
+    .trim()
+  return cleaned.length > 0 ? cleaned : null
+}
+
 export function EmptyState({ title, detail, mono, actionLabel, onAction, children }: {
   title: ReactNode
   detail?: ReactNode
@@ -42,11 +51,12 @@ export function EmptyState({ title, detail, mono, actionLabel, onAction, childre
   onAction?: () => void
   children?: ReactNode
 }) {
+  const shownDetail = cleanEmptyDetail(detail)
   return (
     <div className="lc-empty">
       {mono && <div className="lc-mono lc-mono-sm lc-faint">{mono}</div>}
       <div className="lc-empty-title">{title}</div>
-      {detail && <div className="lc-body-sm">{detail}</div>}
+      {shownDetail && <div className="lc-body-sm">{shownDetail}</div>}
       {actionLabel ? (
         onAction ? (
           <button type="button" className="lc-btn primary" onClick={onAction}>{actionLabel}</button>
