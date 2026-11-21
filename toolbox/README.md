@@ -1,5 +1,7 @@
 This is the snapshot apps build against.
 
-Import `@lacuna/ui`. The code is in `ui/`: `tokens.css`, `tokens/brand.css`, `ui.css`, and presentational components (buttons, cards, tables, fields, icons, the mark, breadcrumbs, a resizable panel). `modules.json` is the catalog `schema/validate.mjs` reads when it checks a manifest.
+Import `@lacuna/ui`. The code is in `ui/`: `tokens.css`, `tokens/brand.css`, `ui.css`, presentational components (buttons, cards, tables, fields, icons, the mark, breadcrumbs, a resizable panel), and the app kit (`kit.tsx`, `kit.css`): the page frame `AppShell`, the right rail, list rows, select, checkbox, and the error state. `ui/KIT.md` lists every component and token an app may use. `modules.json` is the catalog `schema/validate.mjs` reads when it checks a manifest.
 
-Color, type, spacing, radius, shadow, and motion come from the tokens. `tokens/brand.css` requests Newsreader, Public Sans, and Spline Sans Mono from Google Fonts. The font stacks name system fonts when that request does not run.
+An app loads the look with one line in `src/main.tsx`: `import '@lacuna/ui/base.css'`. That brings the fonts, the tokens, the UI classes and the kit. Color, type, spacing, radius, shadow, and motion come from the tokens.
+
+The fonts are bundled in `fonts/`, so an app never requests a font CDN and works offline: Newsreader, Public Sans, and Spline Sans Mono, each under the SIL Open Font License 1.1 (`fonts/OFL-*.txt`).
