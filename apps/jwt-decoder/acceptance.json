@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a5b910192d9f1e86b322c55330c21c124a74efd2ce52b195516739ec299688e8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Typing `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c` in the field labelled \"Token\" and clicking \"Decode\" shows a section labelled \"Header\" containing `\"alg\":\"HS256\"` and a section labelled \"Payload\" containing `\"name\":\"John Doe\"`."
+    },
+    {
+      "id": "A2",
+      "text": "After decoding the token from A1, clicking the button labelled \"Copy Header\" changes the button text to \"Copied\" for 2 seconds, and the clipboard contains the exact string `{\"alg\":\"HS256\",\"typ\":\"JWT\"}`."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `invalid.token.here` in the field labelled \"Token\" and clicking \"Decode\" shows the error message \"Invalid JWT format: expected three parts separated by dots\" and does not display Header or Payload sections."
+    },
+    {
+      "id": "A4",
+      "text": "Dropping a file named `token.txt` containing the valid token from A1 into the drop zone labelled \"Drop token file\" automatically fills the field labelled \"Token\" with that token's content and triggers the decode, showing \"Header\" and \"Payload\" sections."
+    },
+    {
+      "id": "A5",
+      "text": "After decoding the token from A1, the section labelled \"Signature\" displays the base64url string `SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c` and a button labelled \"Copy Signature\" is present."
+    },
+    {
+      "id": "A6",
+      "text": "After decoding the token from A1, clicking the button labelled \"Export JSON\" downloads a file named `jwt-decode-<timestamp>.json` containing a JSON object with keys `header`, `payload`, and `signature` where `payload.name` equals `\"John Doe\"`."
+    },
+    {
+      "id": "A7",
+      "text": "After decoding the token from A1, the list labelled \"History\" contains an item with the text `John Doe` and the timestamp of the decode; clicking that item repopulates the field labelled \"Token\" with the original token string."
+    },
+    {
+      "id": "A8",
+      "text": "Typing `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ` (only two parts) in the field labelled \"Token\" and clicking \"Decode\" shows the error message \"Invalid JWT format: expected three parts separated by dots\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history entry: after decoding the token from A1 and reloading the page, the list labelled \"History\" still contains an item with the text `John Doe`."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "68060c9e5d0522bda11398209b005008d14857d0e43a0c6dbd9849b9c58ce863"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "repo": "auth0/jwt-decode",
+  "url": "https://github.com/auth0/jwt-decode",
+  "sha": "1ac937f39daf9bc8cbdeade8748cc901f11fee4a",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2015 Auth0, Inc. <support@auth0.com> (http://auth0.com)"
+  ],
+  "files": [
+    "lib/index.ts"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "ed0f3ad39dbdf7f9ce8b79e54119ca4071432814734696cd873d4474a30b7b85"
+}
