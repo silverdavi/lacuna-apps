@@ -8,10 +8,8 @@
     "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
-    "@lacuna/dialog": "workspace:0.1.0",
-    "@lacuna/random": "workspace:0.1.0",
+    "@lacuna/chart": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
-    "@lacuna/use-hotkeys": "workspace:0.1.0",
     "@lacuna/use-local-record": "workspace:0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
