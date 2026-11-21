@@ -3,43 +3,43 @@
 // the app works offline. State is rehydrated on load and saved on every
 // calculation.
 
+import { createMockValue } from '@lacuna/host-mock'
+
 export type Units = 'metric' | 'imperial'
 
-export type BmiRecord = {
+export interface BmiRecord {
   units: Units
   height: string
   weight: string
   bmi: number
   at: number
-} | null
+}
 
 const KEY = 'lacuna.bmi-calculator.last'
 
-export function loadLast(): BmiRecord {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object') return null
-    const units: Units = parsed.units === 'imperial' ? 'imperial' : 'metric'
-    const height = typeof parsed.height === 'string' ? parsed.height : ''
-    const weight = typeof parsed.weight === 'string' ? parsed.weight : ''
-    const bmi = typeof parsed.bmi === 'number' && Number.isFinite(parsed.bmi) ? parsed.bmi : null
-    if (bmi === null || height === '' || weight === '') return null
-    return { units, height, weight, bmi, at: typeof parsed.at === 'number' ? parsed.at : 0 }
-  } catch {
-    return null
-  }
+export const EMPTY_RECORD: BmiRecord = { units: 'metric', height: '', weight: '', bmi: 0, at: 0 }
+
+function isRecord(v: unknown): v is BmiRecord {
+  if (typeof v !== 'object' || v === null) return false
+  const r = v as Record<string, unknown>
+  return (
+    (r.units === 'metric' || r.units === 'imperial') &&
+    typeof r.height === 'string' &&
+    typeof r.weight === 'string' &&
+    typeof r.bmi === 'number' &&
+    Number.isFinite(r.bmi) &&
+    typeof r.at === 'number'
+  )
 }
 
-export function saveLast(record: BmiRecord): void {
-  try {
-    if (record === null) {
-      window.localStorage.removeItem(KEY)
-      return
-    }
-    window.localStorage.setItem(KEY, JSON.stringify(record))
-  } catch {
-    // storage may be unavailable (private mode, quota); the app keeps working in memory
-  }
+const store = createMockValue<BmiRecord | null>({ key: KEY, fallback: null, validate: isRecord })
+
+export function loadLast(): BmiRecord | null {
+  const record = store.get()
+  if (!record || record.height === '' || record.weight === '' || !Number.isFinite(record.bmi)) return null
+  return record
+}
+
+export function saveLast(record: BmiRecord | null): void {
+  store.set(record)
 }

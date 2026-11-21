@@ -8,21 +8,22 @@ import { loadLast, saveLast, type BmiRecord, type Units } from './mock'
 export const spaceId = 'mock-bmi-calculator'
 
 export const host = {
-  read(): BmiRecord {
+  read(): BmiRecord | null {
     return loadLast()
   },
 
-  write(record: BmiRecord): BmiRecord {
+  write(record: BmiRecord | null): BmiRecord | null {
     saveLast(record)
     return record
   },
 
   saveLast(units: Units, height: string, weight: string, bmi: number): BmiRecord {
     const record: BmiRecord = { units, height, weight, bmi, at: Date.now() }
-    return host.write(record)
+    host.write(record)
+    return record
   },
 
-  clear(): BmiRecord {
+  clear(): BmiRecord | null {
     return host.write(null)
   },
 }
