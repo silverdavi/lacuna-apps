@@ -57,8 +57,7 @@
     ],
     "platform": [
       "identity.profile.read",
-      "files.pick",
-      "files.save"
+      "clipboard.write"
     ],
     "network": {
       "origins": []
