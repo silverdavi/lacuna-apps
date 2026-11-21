@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, EmptyState, MonoLabel, Stack, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, List, Rail, Row, TextInput } from '@lacuna/ui'
 import {
   addAccount,
   deleteAccount,
@@ -11,11 +11,6 @@ import {
   totp,
   type Account,
 } from './host'
-
-interface Row {
-  account: Account
-  code: string
-}
 
 export function App() {
   const [accounts, setAccounts] = useState<Account[]>(() => listAccounts())
@@ -99,56 +94,52 @@ export function App() {
     refresh()
   }
 
-  const listItems = accounts.map((account) => (
-    <li key={account.id} style={{ display: 'flex', alignItems: 'center', gap: 'calc(16px * var(--sf))' }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <MonoLabel>{account.label}</MonoLabel>
-        <div
-          style={{
-            fontFamily: 'var(--mono)',
-            fontSize: 'calc(22px * var(--tf))',
-            letterSpacing: '0.2em',
-            color: 'var(--ink)',
-          }}
-        >
-          {rows[account.id] ?? '······'}
-        </div>
-        <div style={{ fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--faint, var(--ink))', opacity: 0.6 }}>
-          {account.secret}
-        </div>
-      </div>
-      <MonoLabel faint>{remaining(now)}s</MonoLabel>
-      <Button onClick={() => void handleCopy(rows[account.id] ?? '')}>Copy code</Button>
-      <Button onClick={() => handleDelete(account)}>Delete {account.label}</Button>
-    </li>
-  ))
-
   return (
-    <main style={{ padding: 'calc(16px * var(--sf))', display: 'grid', gap: 'calc(16px * var(--sf))' }}>
-      <h1 style={{ fontFamily: 'var(--serif)', margin: 0 }}>TOTP Authenticator</h1>
-      <Card mono="Accounts" title={`Current codes${accounts.length ? ` (${accounts.length})` : ''}`}>
-        <Stack>
-          {accounts.length === 0 ? (
-            <EmptyState title="No accounts yet" detail="Add a base32 secret or an otpauth URI below." />
-          ) : (
-            <ul
-              style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: 0,
-                display: 'grid',
-                gap: 'calc(8px * var(--sf))',
-              }}
-            >
-              {listItems}
-            </ul>
-          )}
+    <AppShell
+      name="TOTP Authenticator"
+      icon="security"
+      hue="green"
+      category="Productivity"
+      meta={`${accounts.length} ${accounts.length === 1 ? 'account' : 'accounts'}`}
+      status="Saved on this device"
+      side={<Rail title="TOTP Authenticator" note="Codes refresh every second" chips={['Local only', 'Works offline']} />}
+    >
+      <Card mono="Current codes" title={`Accounts${accounts.length ? ` (${accounts.length})` : ''}`}>
+        {accounts.length === 0 ? (
+          <EmptyState mono="Empty" title="No accounts yet" detail="Add a base32 secret or an otpauth URI below." />
+        ) : (
+          <List label="Accounts">
+            {accounts.map((account) => (
+              <Row
+                key={account.id}
+                title={account.label}
+                meta={account.secret}
+                value={`${rows[account.id] ?? '······'} · ${remaining(now)}s`}
+                action={
+                  <span>
+                    <Button kind="ghost" onClick={() => void handleCopy(rows[account.id] ?? '')}>
+                      Copy code
+                    </Button>
+                    <Button kind="ghost" onClick={() => handleDelete(account)}>
+                      Delete {account.label}
+                    </Button>
+                  </span>
+                }
+              />
+            ))}
+          </List>
+        )}
+      </Card>
+      <Card mono="New" title="Add an account">
+        <FormGrid>
           <TextInput label="Base32 Secret" value={secretInput} onChange={handleSecretChange} />
           <TextInput label="otpauth URI" value={uriInput} onChange={setUriInput} />
+        </FormGrid>
+        <Actions>
           <Button kind="primary" onClick={handleAdd}>
             Add account
           </Button>
-        </Stack>
+        </Actions>
       </Card>
       {toast && (
         <div
@@ -159,14 +150,17 @@ export function App() {
             left: 'calc(16px * var(--sf))',
             background: 'var(--paper)',
             color: 'var(--ink)',
-            border: 'calc(1px * var(--sf)) solid var(--ink)',
+            border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
             boxShadow: 'var(--shadow)',
             padding: 'calc(8px * var(--sf))',
+            fontFamily: 'var(--mono)',
+            fontSize: 'calc(13px * var(--tf))',
+            zIndex: 10,
           }}
         >
-          <Body sm>{toast}</Body>
+          {toast}
         </div>
       )}
-    </main>
+    </AppShell>
   )
 }

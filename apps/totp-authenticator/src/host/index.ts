@@ -7,7 +7,7 @@ export function listAccounts(): Account[] {
 }
 
 export function addAccount(label: string, secret: string): Account {
-  return store.add(label, secret)
+  return store.add({ label, secret })
 }
 
 export function deleteAccount(id: string) {

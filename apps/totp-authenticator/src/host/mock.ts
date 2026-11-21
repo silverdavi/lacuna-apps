@@ -1,3 +1,5 @@
+import { createMockRecordStore } from '@lacuna/host-mock'
+
 export interface Account {
   id: string
   label: string
@@ -6,42 +8,18 @@ export interface Account {
 
 const KEY = 'lacuna.totp-authenticator.mock.v1'
 
-let seq = 0
-
-function load(): Account[] {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-function save(accounts: Account[]) {
-  window.localStorage.setItem(KEY, JSON.stringify(accounts))
-}
-
-function makeId(): string {
-  seq += 1
-  return `a-${Date.now().toString(36)}-${seq.toString(36)}-${Math.random().toString(36).slice(2, 8)}`
-}
-
-export const store = {
-  list(): Account[] {
-    return load()
+const store = createMockRecordStore<Account>({
+  key: KEY,
+  idPrefix: 'a',
+  validate: (v: unknown): v is Account => {
+    const a = v as { id?: unknown; label?: unknown; secret?: unknown } | null
+    return (
+      !!a &&
+      typeof a.id === 'string' &&
+      typeof a.label === 'string' &&
+      typeof a.secret === 'string'
+    )
   },
+})
 
-  add(label: string, secret: string): Account {
-    const accounts = load()
-    const account: Account = { id: makeId(), label, secret }
-    accounts.push(account)
-    save(accounts)
-    return account
-  },
-
-  remove(id: string) {
-    save(load().filter((a) => a.id !== id))
-  },
-}
+export { store }
