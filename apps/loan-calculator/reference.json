@@ -1,0 +1,15 @@
+{
+  "repo": "CBStanley12/js-loan-calculator",
+  "url": "https://github.com/CBStanley12/js-loan-calculator",
+  "sha": "a1d2ec0c638c4589e8956b9f09c8bb1b5bfe9f89",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2019 Christopher Stanley"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "747f9f49d0bcf80e8530252d1b0e5fb617e5cfc57b2e53113bffa87feae8a287"
+}
