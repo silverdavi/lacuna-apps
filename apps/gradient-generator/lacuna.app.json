@@ -1,0 +1,82 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.gradient-generator",
+  "name": "Gradient Generator",
+  "version": "0.1.0",
+  "summary": "Build a CSS gradient stop by stop and save it to a local library.",
+  "description": "Mix color stops into a linear or radial CSS gradient. Preview the CSS live, copy it to the clipboard, and keep the ones you like in a local library that persists on this device.",
+  "category": "productivity",
+  "tags": ["css", "gradient", "design"],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/gradient-generator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:gradient"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "gradient",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Save gradient recipes to the local library"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "gradient"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

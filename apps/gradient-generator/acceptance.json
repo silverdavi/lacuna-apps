@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c99750cc2c98b2db5543e37a0a523dd554807f3c2cf6b486bb0a5b999357f5ec",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Gradient Generator\" and the text \"No gradients saved\" in the library panel."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add stop\" adds a new stop to the list; the stop list now contains one item labeled \"Stop 1\" with a hex value of \"#ff0000\" and a position of \"0%\"."
+    },
+    {
+      "id": "A3",
+      "text": "With one stop present, typing \"50\" in the field labeled \"Position\" for \"Stop 1\" and pressing Enter updates the position to \"50%\" and the CSS preview text updates to include \"50%\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Add stop\" a second time adds \"Stop 2\" with a hex value of \"#0000ff\" and a position of \"100%\"; the CSS preview now shows two color stops."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting \"Radial\" in the dropdown labeled \"Type\" changes the CSS preview from \"linear-gradient\" to \"radial-gradient\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Copy CSS\" copies the current gradient string to the clipboard and displays the toast message \"CSS copied\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"Sunset\" in the field labeled \"Name\" and clicking the button \"Save gradient\" adds an item to the library panel containing \"Sunset\"; the text \"No gradients saved\" is removed."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete Sunset\" in the library panel removes that item and restores the text \"No gradients saved\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved gradient \"Sunset\" in the library panel and the current stop configuration with \"Stop 1\" at \"50%\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f7e9d2fdba0c552b94b8b3d43b13f1374c9bf81b143bfc0801fe7f0c386b93ee"
+    }
+  ]
+}
