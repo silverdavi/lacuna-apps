@@ -13,6 +13,8 @@ import {
   TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
+import { parseCsv, toRecords } from '@lacuna/csv-parse'
 import {
   calculateLoan,
   formatMoney,
@@ -54,6 +56,8 @@ export function App() {
   const [years, setYears] = useState('')
   const [showSchedule, setShowSchedule] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null)
 
   useEffect(() => {
     const saved = host.load()
@@ -99,6 +103,64 @@ export function App() {
     ]
     void copy(lines.join('\n'))
   }
+
+  function applyImported(record: Record<string, string>) {
+    const p = (record['principal'] ?? '').trim()
+    const r = (record['rate'] ?? '').trim()
+    const y = (record['years'] ?? '').trim()
+    setPrincipal(p)
+    setRate(r)
+    setYears(y)
+    const err = principalError(p) ?? rateError(r) ?? yearsError(y)
+    if (err) {
+      setImportMsg({ ok: false, text: err })
+      return
+    }
+    setImportMsg({ ok: true, text: `Loaded a loan: ${p} at ${r}% over ${y} years` })
+  }
+
+  function runImport() {
+    const text = importText.trim()
+    if (text === '') {
+      setImportMsg({ ok: false, text: 'Paste a row like "100000,5,30" to load a loan.' })
+      return
+    }
+    const parsed = parseCsv(text, { header: true })
+    if (parsed.errors.length > 0) {
+      setImportMsg({ ok: false, text: `Could not read the CSV: ${parsed.errors[0]?.message ?? 'invalid row'}` })
+      return
+    }
+    if (parsed.header === null || parsed.rows.length === 0) {
+      setImportMsg({ ok: false, text: 'No data rows to load.' })
+      return
+    }
+    const records = toRecords(parsed)
+    const record = records[0]
+    if (!record) {
+      setImportMsg({ ok: false, text: 'No data rows to load.' })
+      return
+    }
+    applyImported(record)
+  }
+
+  const exportOptions: ExportOption[] = result
+    ? [
+        {
+          id: 'csv',
+          label: 'Amortization CSV',
+          mimeType: 'text/csv',
+          extension: 'csv',
+          getData: () => scheduleCsv(result),
+        },
+        {
+          id: 'json',
+          label: 'Result JSON',
+          mimeType: 'application/json',
+          extension: 'json',
+          getData: () => JSON.stringify(result, null, 2),
+        },
+      ]
+    : []
 
   const chartData = displayed ? buildChartData(displayed) : []
 
@@ -150,6 +212,34 @@ export function App() {
             {copied ? 'Copied' : 'Copy summary'}
           </Button>
         </Actions>
+      </Card>
+
+      <Card mono="Import · Export" title="Bring in a loan">
+        <FormGrid>
+          <TextInput
+            label="Import"
+            value={importText}
+            onChange={setImportText}
+            inputMode="text"
+            placeholder="principal,rate,years"
+            error={importMsg && !importMsg.ok ? importMsg.text : undefined}
+          />
+        </FormGrid>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Button kind="secondary" onClick={runImport}>
+            Load loan
+          </Button>
+          {result && (
+            <ExportMenu
+              options={exportOptions}
+              fileName={`loan-${principal || 'calc'}`}
+              ariaLabel="Export loan result"
+            />
+          )}
+        </div>
+        {importMsg && importMsg.ok && (
+          <SectionLabel>{importMsg.text}</SectionLabel>
+        )}
       </Card>
 
       <Card mono="Result" title="Results">
@@ -244,4 +334,12 @@ export function App() {
       )}
     </AppShell>
   )
+}
+
+function scheduleCsv(result: LoanResult): string {
+  const head = 'n,payment,interest,principal,balance'
+  const rows = result.rows.map((row, i) =>
+    [i + 1, row.payment.toFixed(2), row.interest.toFixed(2), row.principalPart.toFixed(2), row.balance.toFixed(2)].join(','),
+  )
+  return [head, ...rows].join('\n')
 }

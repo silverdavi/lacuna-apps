@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/csv-parse": "workspace:0.1.0",
+    "@lacuna/export-menu": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
     "@lacuna/use-clipboard": "workspace:0.1.0",
