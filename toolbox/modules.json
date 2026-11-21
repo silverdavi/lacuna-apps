@@ -731,6 +731,45 @@
       ]
     },
     {
+      "id": "@lacuna/chart",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Small SVG chart with line, bar, and donut types, axes, labels, and hover tooltips.",
+      "today": [
+        "toolbox/modules/chart/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Chart"
+      ],
+      "public": true,
+      "path": "toolbox/modules/chart/0.1.0",
+      "bridge": {
+        "component": "Chart",
+        "kind": "widget",
+        "exports": [
+          "Chart"
+        ],
+        "types": [
+          "ChartDataPoint",
+          "ChartProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "2fb6c820ec6d871c",
+            "lines": 226,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/code-area",
       "layer": 2,
       "status": "exists",
