@@ -2012,6 +2012,49 @@
       }
     },
     {
+      "id": "@lacuna/gantt-bars",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Horizontal timeline bars for tasks with dependency arrows and drag or arrow-key rescheduling.",
+      "today": [
+        "toolbox/modules/gantt-bars/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "GanttBars"
+      ],
+      "public": true,
+      "path": "toolbox/modules/gantt-bars/0.1.0",
+      "bridge": {
+        "component": "GanttBars",
+        "kind": "widget",
+        "exports": [
+          "GanttBars"
+        ],
+        "types": [
+          "GanttBar",
+          "GanttBarsProps"
+        ],
+        "signature": "GanttBars({ bars, onBarsChange, width = 800, height = 300, dayWidth = 20, onDragStart, onDragEn...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "02e528989c1ce79e4abef257c3998b2f6e09cda8",
+            "source": "2666542aa8474173",
+            "lines": 223,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/grid-utils",
       "layer": 3,
       "status": "exists",
