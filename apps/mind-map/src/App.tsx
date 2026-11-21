@@ -106,29 +106,27 @@ function drawStrokes(ctx: CanvasRenderingContext2D, strokes: MapStroke[]): void 
     const pts = s.points
     if (pts.length === 0) continue
     ctx.save()
-    ctx.fillStyle = s.color
-    const x0 = Math.round(pts[0]!.x)
-    const yMax = Math.round(Math.max(...pts.map((p) => p.y)))
-    const w = Math.round(s.width)
-    const left = x0 - Math.floor(w / 2)
-    ctx.fillRect(left, 0, w, Math.max(1, yMax))
+    ctx.strokeStyle = s.color
+    ctx.lineWidth = 4
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.beginPath()
+    ctx.moveTo(pts[0]!.x, pts[0]!.y)
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i]!.x, pts[i]!.y)
+    }
+    ctx.stroke()
     ctx.restore()
   }
 }
 
 function paintScene(ctx: CanvasRenderingContext2D, nodes: MapNode[], edges: MapEdge[], strokes: MapStroke[]): void {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  ctx.save()
+  ctx.translate(0, -23)
   drawEdges(ctx, nodes, edges)
   drawStrokes(ctx, strokes)
-}
-
-function distToStroke(stroke: MapStroke, p: Point): number {
-  let best = Infinity
-  for (const q of stroke.points) {
-    const d = Math.hypot(q.x - p.x, q.y - p.y)
-    if (d < best) best = d
-  }
-  return best
+  ctx.restore()
 }
 
 export function App() {
@@ -136,15 +134,19 @@ export function App() {
   const [edges, setEdges] = useState<MapEdge[]>([])
   const [strokes, setStrokes] = useState<MapStroke[]>([])
   const [tool, setTool] = useState<Tool>('select')
-  const [brushSize, setBrushSize] = useState(DEFAULT_BRUSH)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [connectMode, setConnectMode] = useState(false)
   const [connectSource, setConnectSource] = useState<string | null>(null)
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const [flash, setFlash] = useState<string | null>(null)
+  const [brushSize, setBrushSize] = useState(DEFAULT_BRUSH)
+  const [activeStroke, setActiveStroke] = useState<StrokePoint[] | null>(null)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const drawingRef = useRef(false)
+  const lastPointRef = useRef<StrokePoint | null>(null)
+  const isDrawingRef = useRef(false)
 
   const nodesRef = useRef(nodes)
   nodesRef.current = nodes
@@ -154,6 +156,8 @@ export function App() {
   strokesRef.current = strokes
   const toolRef = useRef(tool)
   toolRef.current = tool
+  const brushSizeRef = useRef(brushSize)
+  brushSizeRef.current = brushSize
   const connectSourceRef = useRef(connectSource)
   connectSourceRef.current = connectSource
   const renameIdRef = useRef(renamingId)
@@ -176,8 +180,9 @@ export function App() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    paintScene(ctx, nodesRef.current, edgesRef.current, strokesRef.current)
-  }, [])
+    const allStrokes = activeStroke ? [...strokesRef.current, { id: 'active', points: activeStroke, color: INK, width: brushSizeRef.current }] : strokesRef.current
+    paintScene(ctx, nodesRef.current, edgesRef.current, allStrokes)
+  }, [activeStroke])
 
   const redraw = useCallback(() => {
     drawCanvas()
@@ -312,6 +317,106 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [renamingId, deleteSelected])
 
+  const toCanvasCoords = useCallback((e: ReactPointerEvent): StrokePoint | null => {
+    const canvas = canvasRef.current
+    if (!canvas) return null
+    const rect = canvas.getBoundingClientRect()
+    const cx = (e.clientX - rect.left) / rect.width
+    const cy = (e.clientY - rect.top) / rect.height
+    return {
+      x: cy * canvas.width,
+      y: cx * canvas.height,
+      pressure: e.pressure,
+    }
+  }, [])
+
+  const eraseAt = useCallback(
+    (e: ReactPointerEvent) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const rect = canvas.getBoundingClientRect()
+      const p = {
+        x: (e.clientX - rect.left) * (canvas.width / rect.width),
+        y: (e.clientY - rect.top) * (canvas.height / rect.height),
+      }
+      setStrokes((prev) => prev.filter((s) => s.points.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= 14)))
+      showFlash('Erased')
+    },
+    [showFlash],
+  )
+
+  const handleDrawDown = useCallback(
+    (e: ReactPointerEvent) => {
+      if (toolRef.current === 'select') return
+      if (toolRef.current === 'eraser') {
+        e.currentTarget.setPointerCapture(e.pointerId)
+        isDrawingRef.current = true
+        eraseAt(e)
+        return
+      }
+      const p = toCanvasCoords(e)
+      if (!p) return
+      e.currentTarget.setPointerCapture(e.pointerId)
+      drawingRef.current = true
+      lastPointRef.current = p
+      setActiveStroke([p])
+    },
+    [toCanvasCoords, eraseAt],
+  )
+
+  const handleDrawMove = useCallback(
+    (e: ReactPointerEvent) => {
+      if (toolRef.current === 'select') return
+      if (toolRef.current === 'eraser') {
+        if (isDrawingRef.current) eraseAt(e)
+        return
+      }
+      if (!drawingRef.current) return
+      const p = toCanvasCoords(e)
+      if (!p) return
+      const last = lastPointRef.current
+      if (last && Math.hypot(p.x - last.x, p.y - last.y) < 2) return
+      lastPointRef.current = p
+      setActiveStroke((prev) => (prev ? [...prev, p] : [p]))
+    },
+    [toCanvasCoords, eraseAt],
+  )
+
+  const handleDrawUp = useCallback(
+    (e: ReactPointerEvent) => {
+      if (toolRef.current === 'eraser') {
+        isDrawingRef.current = false
+        e.currentTarget.releasePointerCapture(e.pointerId)
+        return
+      }
+      if (!drawingRef.current) return
+      drawingRef.current = false
+      e.currentTarget.releasePointerCapture(e.pointerId)
+      setActiveStroke((prev) => {
+        if (prev && prev.length > 0) {
+          setStrokes((cur) => [
+            ...cur,
+            { id: uid(), points: prev, color: INK, width: brushSizeRef.current },
+          ])
+          showFlash('Drew')
+        }
+        return null
+      })
+    },
+    [showFlash],
+  )
+
+  const handleDrawLeave = useCallback(
+    (e: ReactPointerEvent) => {
+      if (toolRef.current === 'eraser') {
+        isDrawingRef.current = false
+        return
+      }
+      handleDrawUp(e)
+    },
+    [handleDrawUp],
+  )
+
   useEffect(() => {
     const existing = host.load()
     if (existing) {
@@ -324,63 +429,11 @@ export function App() {
 
   useEffect(() => {
     drawCanvas()
+  }, [nodes, edges, strokes, activeStroke, drawCanvas])
+
+  useEffect(() => {
     commit()
-  }, [nodes, edges, strokes, drawCanvas, commit])
-
-  const activeStrokeRef = useRef<StrokePoint[]>([])
-  const lastPointRef = useRef<Point | null>(null)
-  const isDrawingRef = useRef(false)
-
-  const toCanvasCoords = useCallback((e: ReactPointerEvent): Point => {
-    const canvas = canvasRef.current
-    if (!canvas) return { x: 0, y: 0 }
-    const rect = canvas.getBoundingClientRect()
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY }
-  }, [])
-
-  const handleDrawDown = useCallback((e: ReactPointerEvent) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return
-    if (toolRef.current === 'select') return
-    e.currentTarget.setPointerCapture(e.pointerId)
-    const c = toCanvasCoords(e)
-    activeStrokeRef.current = [{ x: c.x, y: c.y, pressure: e.pressure }]
-    lastPointRef.current = c
-    isDrawingRef.current = true
-  }, [toCanvasCoords])
-
-  const handleDrawMove = useCallback((e: ReactPointerEvent) => {
-    if (!isDrawingRef.current) return
-    const c = toCanvasCoords(e)
-    const last = lastPointRef.current
-    if (last && Math.hypot(c.x - last.x, c.y - last.y) < 1) return
-    lastPointRef.current = c
-    activeStrokeRef.current = [...activeStrokeRef.current, { x: c.x, y: c.y, pressure: e.pressure }]
-  }, [toCanvasCoords])
-
-  const handleDrawUp = useCallback((e: ReactPointerEvent) => {
-    if (!isDrawingRef.current) return
-    isDrawingRef.current = false
-    lastPointRef.current = null
-    try { e.currentTarget.releasePointerCapture(e.pointerId) } catch { /* best effort */ }
-    const pts = activeStrokeRef.current
-    activeStrokeRef.current = []
-    if (pts.length === 0) return
-    if (toolRef.current === 'eraser') {
-      setStrokes((prev) => prev.filter((s) => !pts.some((p) => distToStroke(s, p) < 14)))
-      showFlash('Erased')
-      return
-    }
-    const next: MapStroke = {
-      id: uid(),
-      points: pts,
-      color: INK,
-      width: 5,
-    }
-    setStrokes((prev) => [...prev, next])
-    showFlash('Drew')
-  }, [showFlash, brushSize])
+  }, [nodes, edges, strokes, commit])
 
   const exportPng = useCallback(() => {
     const canvas = document.createElement('canvas')
@@ -448,6 +501,7 @@ export function App() {
             onPointerDown={handleDrawDown}
             onPointerMove={handleDrawMove}
             onPointerUp={handleDrawUp}
+            onPointerLeave={handleDrawLeave}
             style={{
               position: 'absolute',
               inset: 0,
@@ -487,6 +541,7 @@ export function App() {
                     ? 'calc(3px * var(--sf)) calc(3px * var(--sf)) 0 var(--ink)'
                     : 'calc(2px * var(--sf)) calc(2px * var(--sf)) 0 var(--ink)',
                   overflow: 'hidden',
+                  pointerEvents: tool === 'select' ? 'auto' : 'none',
                 }}
                 onClick={(e) => handleNodeClick(e, node.id)}
                 onDoubleClick={(e) => handleNodeDblClick(e, node.id)}
@@ -532,11 +587,10 @@ export function App() {
             marginTop: 'calc(12px * var(--sf))',
           }}
         >
-          <SectionLabel accent>Tool</SectionLabel>
           <RangeSlider
             label="Brush size"
             value={brushSize}
-            onChange={(v) => setBrushSize(v)}
+            onChange={setBrushSize}
             min={1}
             max={24}
             step={1}
