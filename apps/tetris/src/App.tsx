@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { AppShell, Button, Card, Kpi, KpiRow } from '@lacuna/ui'
+import { AppShell, Button, Card, Kpi, KpiRow, Rail } from '@lacuna/ui'
 import { useHotkeys } from '@lacuna/use-hotkeys'
 import { host } from './host'
 import { COLS, ROWS, type Board, newGame, spawnNext, tryMove, tryRotate, lockPiece, clearLines } from './engine'
@@ -107,8 +107,39 @@ export function App() {
     border: `calc(1px * var(--sf)) solid ${CELL_BORDER}`,
   }
 
+  const statusText =
+    status === 'over'
+      ? `Game over · final ${board.score}`
+      : `Playing · ${COLS}×${ROWS} · local`
+
   return (
-    <AppShell name="Classic Tetris" icon="grid" hue="cobalt" category="Personal">
+    <AppShell
+      name="Classic Tetris"
+      icon="grid"
+      hue="cobalt"
+      category="Personal"
+      meta="10×20 field"
+      status={statusText}
+      side={
+        <>
+          <Rail
+            title={status === 'over' ? 'Game over' : 'Controls'}
+            note={status === 'over' ? 'Restart to play again' : 'Keyboard'}
+            chips={status === 'over' ? undefined : ['← → move', '↑ rotate', '↓ drop']}
+          >
+            {status === 'over' ? (
+              <Button kind="primary" onClick={restart} style={{ marginTop: 'calc(12px * var(--sf))' }}>
+                Play again
+              </Button>
+            ) : (
+              <p style={{ fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--ink-60)', lineHeight: 1.6 }}>
+                Clear a full row to score 100. The best score is kept on this device.
+              </p>
+            )}
+          </Rail>
+        </>
+      }
+    >
       <Card mono="Personal" actions={<Button kind="primary" onClick={restart}>Restart</Button>}>
         <KpiRow>
           <Kpi value={`Score: ${board.score}`} label="Score" />
