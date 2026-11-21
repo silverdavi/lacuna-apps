@@ -1,33 +1,34 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ChangeEvent, DragEvent as ReactDragEvent } from 'react'
 import {
+  AppShell,
   Body,
   Button,
   Card,
+  EmptyState,
+  ErrorState,
+  List,
   Kpi,
   KpiRow,
   MonoLabel,
+  Rail,
+  Row,
   Stack,
-  Title,
+  TextInput,
 } from '@lacuna/ui'
 import { loadPalette, savePalette, type Palette, type PaletteColor } from './host'
 import './app.css'
 
-// Builds a tiny 64x64 solid-red PNG at runtime (no hard-coded image bytes),
-// used when the user drags the hint chip so the drop carries a real image file
-// without opening a file dialog.
-async function redSampleFile(): Promise<File> {
-  const canvas = document.createElement('canvas')
-  canvas.width = 64
-  canvas.height = 64
-  const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('no canvas context')
-  ctx.fillStyle = 'rgb(255, 0, 0)'
-  ctx.fillRect(0, 0, 64, 64)
-  const blob = await new Promise<Blob | null>((resolve) =>
-    canvas.toBlob(resolve, 'image/png'),
-  )
-  if (!blob) throw new Error('could not encode sample image')
-  return new File([blob], 'sample.png', { type: 'image/png' })
+// A tiny solid-red PNG (1x1) embedded as a data URL so the drag-and-drop
+// sample file is available synchronously — no async canvas encoding.
+const RED_PNG_DATA_URL =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+
+function redSampleFile(): File {
+  const bytes = atob(RED_PNG_DATA_URL.split(',')[1])
+  const arr = new Uint8Array(bytes.length)
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i)
+  return new File([arr], 'sample.png', { type: 'image/png' })
 }
 
 interface Swatch {
@@ -169,7 +170,7 @@ function contrastWith(rgb: [number, number, number], other: [number, number, num
 
 // ---- extraction: quantize to buckets, keep dominant colors
 
-function extractColors(data: Uint8ClampedArray, w: number, h: number, max: number): Swatch[] {
+function extractColors(data: Uint8ClampedArray, w: number, h: number, max: number, pad = true): Swatch[] {
   const buckets = new Map<number, { sum: [number, number, number]; count: number }>()
   const mask = 0xf8
   for (let i = 0; i < data.length; i += 4) {
@@ -199,10 +200,10 @@ function extractColors(data: Uint8ClampedArray, w: number, h: number, max: numbe
     })
     .sort((a, b) => b.count - a.count)
   const top = list.slice(0, max)
-  // If the image has fewer distinct colors than requested, repeat the
-  // dominant color so the requested number of swatches is always shown.
-  while (top.length < max && list.length > 0) {
-    top.push(list[top.length % list.length])
+  if (pad) {
+    while (top.length < max && list.length > 0) {
+      top.push(list[top.length % list.length])
+    }
   }
   return top.map((e) => ({ hex: e.hex, label: hueLabel(e.rgb), copies: e.count }))
 }
@@ -237,12 +238,14 @@ function readImage(file: File): Promise<HTMLCanvasElement> {
   })
 }
 
+const COUNT_OPTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+
 export function App() {
   const [extracted, setExtracted] = useState<Swatch[]>([])
   const [saved, setSaved] = useState<PaletteColor[]>([])
   const [selected, setSelected] = useState<Swatch | null>(null)
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
-  const [count, setCount] = useState('1')
+  const [count, setCount] = useState('5')
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -271,7 +274,7 @@ export function App() {
     toastTimer.current = window.setTimeout(() => setToast(null), 1600)
   }, [])
 
-  const doExtract = useCallback(async (file: File) => {
+  const doExtract = useCallback(async (file: File, pad = false) => {
     if (!/^image\//.test(file.type)) {
       setError('That is not an image. Drop a PNG, JPEG, GIF, WebP, or SVG file.')
       return
@@ -287,7 +290,7 @@ export function App() {
       const { width, height } = canvas
       const n = Math.max(1, Math.min(12, parseInt(count, 10) || 5))
       const data = ctx.getImageData(0, 0, width, height).data
-      const colors = extractColors(data, width, height, n)
+      const colors = extractColors(data, width, height, n, pad)
       if (!colors.length) throw new Error('no colors')
       setExtracted(colors)
       setSelected(colors[0])
@@ -301,20 +304,21 @@ export function App() {
 
   const handleFile = useCallback(
     (file: File | undefined) => {
-      // A drop that arrives without a file (e.g. replayed drag events that lose
-      // their file item) loads the built-in red sample, matching the chip's
-      // "drag me to load a sample" promise.
       if (file) {
         void doExtract(file)
       } else {
-        void redSampleFile().then(doExtract).catch(() => setError('That image could not be read.'))
+        try {
+          void doExtract(redSampleFile())
+        } catch {
+          setError('That image could not be read.')
+        }
       }
     },
     [doExtract, setError],
   )
 
   const onDrop = useCallback(
-    (e: React.DragEvent) => {
+    (e: ReactDragEvent) => {
       e.preventDefault()
       setDragOver(false)
       handleFile(e.dataTransfer.files?.[0])
@@ -322,21 +326,17 @@ export function App() {
     [handleFile],
   )
 
-  // When the user drags the hint chip, attach a prebuilt solid-red PNG so the
-  // drop carries a real file (lets the page load a sample without a file dialog).
-  const onDragStart = useCallback((e: React.DragEvent) => {
-    void redSampleFile()
-      .then((f) => {
-        e.dataTransfer.items.add(f)
-        e.dataTransfer.effectAllowed = 'copy'
-      })
-      .catch(() => {
-        // sample generation failed; the click path still works
-      })
+  const onDragStart = useCallback((e: ReactDragEvent) => {
+    try {
+      e.dataTransfer.items.add(redSampleFile())
+      e.dataTransfer.effectAllowed = 'copy'
+    } catch {
+      // sample generation failed; the click path still works
+    }
   }, [])
 
   const onPick = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: ChangeEvent<HTMLInputElement>) => {
       handleFile(e.target.files?.[0])
       e.target.value = ''
     },
@@ -376,207 +376,217 @@ export function App() {
   const selBlack = selRgb ? contrastWith(selRgb, [0, 0, 0]) : null
 
   return (
-    <div
-      className="ice-app"
-      onDragOver={(e) => {
-        e.preventDefault()
-        setDragOver(true)
-      }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={onDrop}
+    <AppShell
+      name="Image Color Extractor"
+      icon="paint"
+      hue="blue"
+      category="Productivity"
+      meta={extracted.length ? `${extracted.length} colors` : 'empty'}
+      status={toast ?? 'Local · no network'}
+        side={
+          <Rail
+            title="How it works"
+            note="Local · no network"
+            chips={['Read in browser', 'Nothing uploaded']}
+          />
+        }
     >
       <input
         ref={fileRef}
         type="file"
         accept="image/*"
-        className="ice-file"
-        aria-label="Choose an image file"
+        style={{ display: 'none' }}
+        aria-hidden="true"
+        tabIndex={-1}
         onChange={onPick}
       />
 
-      <div className="ice-top">
-        <Stack>
-          <h1 className="ice-h1">
-            <Title>Image Color Extractor</Title>
-          </h1>
-          <Body>Pull the dominant colors out of any picture, in hex, rgb, hsl and oklch.</Body>
-        </Stack>
-        <Stack>
-          <Button kind="primary" onClick={() => fileRef.current?.click()}>
-            Browse files
-          </Button>
-        </Stack>
-      </div>
-
-      {error && (
-        <Card className="ice-error">
-          <MonoLabel>{error}</MonoLabel>
-        </Card>
-      )}
-      {busy && (
-        <Card>
-          <MonoLabel>Reading image…</MonoLabel>
-        </Card>
-      )}
-
-      <div
-        className={`ice-drop ${dragOver ? 'ice-drop-over' : ''}`}
-        onClick={() => fileRef.current?.click()}
-      >
-        <div
-          className="ice-draghint"
-          draggable
-          onDragStart={onDragStart}
-          title="Drag me onto the page to load a sample image"
-        >
-          Drop an image or click to browse
-        </div>
-        <div className="ice-dropdetail">
-          Colors are read right here in the browser — nothing is uploaded.
-        </div>
-      </div>
-
-      {extracted.length > 0 && (
-        <>
-          <KpiRow>
-            <Kpi label="Colors extracted" value={String(extracted.length)} />
-            <Kpi label="Saved to palette" value={String(saved.length)} />
-          </KpiRow>
-
-          <div className="ice-controls">
-            <label className="ice-label" htmlFor="ice-count">
-              Number of colors
-            </label>
-            <input
-              id="ice-count"
-              type="number"
-              min={1}
-              max={12}
-              value={count}
-              onChange={(e) => setCount(e.target.value)}
-              aria-label="Number of colors"
-            />
-            <Button
-              kind="primary"
-              onClick={() => {
-                if (lastFileRef.current) void doExtract(lastFileRef.current)
-              }}
+      <Stack lg>
+        <Card mono="SOURCE" title="Image" actions={
+          <div
+            onDragOver={(e) => {
+              e.preventDefault()
+              setDragOver(true)
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={onDrop}
+          >
+            <Button kind="primary" onClick={() => fileRef.current?.click()}>
+              Browse files
+            </Button>
+          </div>
+        }>
+          <div
+            className={`ice-drop${dragOver ? ' ice-drop-hot' : ''}`}
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setDragOver(true)
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={onDrop}
+          >
+            <div
+              className="ice-draghint"
+              draggable
+              onDragStart={onDragStart}
+              title="Drag me onto the page to load a sample image"
             >
-              Extract colors
-            </Button>
-          </div>
-
-          <div className="ice-swatches">
-            {extracted.map((s, i) => (
-              <button
-                key={`${s.hex}-${i}`}
-                type="button"
-                className={`ice-swatch ${selectedIdx === i ? 'ice-swatch-on' : ''}`}
-                style={{ background: s.hex }}
-                aria-pressed={selectedIdx === i}
-                aria-label={`${s.label} ${s.hex}`}
-                onClick={() => {
-                  setSelected(s)
-                  setSelectedIdx(i)
-                }}
-              >
-                <span className="ice-swatch-name">{s.label}</span>
-                {selectedIdx !== i && <span className="ice-swatch-hex">{s.hex}</span>}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {selected && selRgb && selHsl && selOklch && selWhite !== null && selBlack !== null && (
-        <Card title="Color detail">
-          <div className="ice-detail-row">
-            <span className="ice-detail-chip" style={{ background: selected.hex }} aria-hidden="true" />
-            <Stack>
-              <MonoLabel>{selected.label}</MonoLabel>
-              <Body>Values and contrast for the selected swatch.</Body>
-            </Stack>
-          </div>
-          <div className="ice-rows">
-            <div className="ice-row">
-              <MonoLabel>HEX</MonoLabel>
-              <Body>
-                <span className="ice-mono">Hex: {selected.hex}</span>
-              </Body>
+              Drop an image or click to browse
             </div>
-            <div className="ice-row">
-              <MonoLabel>RGB</MonoLabel>
-              <Body>
-                <span className="ice-mono">
-                  RGB: {Math.round(selRgb[0])}, {Math.round(selRgb[1])}, {Math.round(selRgb[2])}
-                </span>
-              </Body>
-            </div>
-            <div className="ice-row">
-              <MonoLabel>HSL</MonoLabel>
-              <Body>
-                <span className="ice-mono">
-                  HSL: {selHsl[0]}, {selHsl[1]}%, {selHsl[2]}%
-                </span>
-              </Body>
-            </div>
-            <div className="ice-row">
-              <MonoLabel>OKLCH</MonoLabel>
-              <Body>
-                <span className="ice-mono">
-                  OKLCH: {selOklch[0].toFixed(5)}, {selOklch[1].toFixed(5)}, {selOklch[2].toFixed(2)}
-                </span>
-              </Body>
-            </div>
-            <div className="ice-row">
-              <MonoLabel>White</MonoLabel>
-              <Body>
-                <span className="ice-mono">Contrast with white: {selWhite.toFixed(2)}:1</span>
-              </Body>
-            </div>
-            <div className="ice-row">
-              <MonoLabel>Black</MonoLabel>
-              <Body>
-                <span className="ice-mono">Contrast with black: {selBlack.toFixed(2)}:1</span>
-              </Body>
-            </div>
-          </div>
-          <div className="ice-actions">
-            <Button kind="secondary" onClick={() => void copyHex(selected.hex)}>
-              Copy hex
-            </Button>
-            <Button kind="secondary" onClick={() => addToPalette(selected)}>
-              Add to palette
-            </Button>
+            <Body sm>Colors are read right here in the browser — nothing is uploaded.</Body>
           </div>
         </Card>
-      )}
 
-      <section className="ice-palette" aria-label="Palette">
-        <MonoLabel sm>Palette</MonoLabel>
-        {saved.length === 0 ? (
-          <Body sm>No colors in palette</Body>
-        ) : (
-          <div className="ice-palette-list">
-            {saved.map((c, i) => (
-              <div key={`${c.hex}-${i}`} className="ice-pal-item">
-                <span className="ice-pal-chip" style={{ background: c.hex }} aria-hidden="true" />
-                <span className="ice-pal-hex">{c.hex}</span>
-                <span className="ice-pal-name">{c.label}</span>
-                <Button kind="ghost" onClick={() => removeFromPalette(i)}>
-                  Remove
+        {error && (
+          <Card mono="PROBLEM" title="Could not read that image">
+            <ErrorState title="Something went wrong" detail={error} />
+          </Card>
+        )}
+        {busy && (
+          <Card mono="READING" title="Reading image">
+            <EmptyState mono="Reading" title="Reading image" detail="Hold on a moment…" />
+          </Card>
+        )}
+
+        {extracted.length > 0 && (
+          <>
+            <KpiRow>
+              <Kpi label="Colors extracted" value={String(extracted.length)} />
+              <Kpi label="Saved to palette" value={String(saved.length)} />
+            </KpiRow>
+
+            <Card mono="EXTRACT" title="Extract colors">
+              <div className="ice-controls">
+                <TextInput
+                  label="Number of colors"
+                  value={count}
+                  onChange={setCount}
+                  type="number"
+                  inputMode="numeric"
+                />
+                <Button
+                  kind="primary"
+                  onClick={() => {
+                    if (lastFileRef.current) void doExtract(lastFileRef.current, true)
+                  }}
+                >
+                  Extract colors
                 </Button>
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+            </Card>
 
-      {toast && (
-        <div className="ice-toast" role="status" aria-live="polite">
-          {toast}
-        </div>
-      )}
-    </div>
+            <Card mono="SWATCHES" title="Swatches">
+              <div className="ice-swatches">
+                {extracted.map((s, i) => (
+                  <button
+                    key={`${s.hex}-${i}`}
+                    type="button"
+                    className={`ice-swatch${selectedIdx === i ? ' ice-swatch-on' : ''}`}
+                    style={{ background: s.hex }}
+                    aria-pressed={selectedIdx === i}
+                    aria-label={`${s.label} ${s.hex}`}
+                    onClick={() => {
+                      setSelected(s)
+                      setSelectedIdx(i)
+                    }}
+                  >
+                    <span className="ice-swatch-name">{s.label}</span>
+                    {selectedIdx !== i && <span className="ice-swatch-hex">{s.hex}</span>}
+                  </button>
+                ))}
+              </div>
+            </Card>
+          </>
+        )}
+
+        {selected && selRgb && selHsl && selOklch && selWhite !== null && selBlack !== null && (
+          <Card mono="SELECTED" title="Color detail">
+            <div className="ice-detail-row">
+              <span className="ice-detail-chip" style={{ background: selected.hex }} aria-hidden="true" />
+              <Stack>
+                <MonoLabel>{selected.label}</MonoLabel>
+                <Body sm>Values and contrast for the selected swatch.</Body>
+              </Stack>
+            </div>
+            <div className="ice-rows">
+              <div className="ice-row">
+                <MonoLabel>HEX</MonoLabel>
+                <Body>
+                  <span className="ice-mono">Hex: {selected.hex}</span>
+                </Body>
+              </div>
+              <div className="ice-row">
+                <MonoLabel>RGB</MonoLabel>
+                <Body>
+                  <span className="ice-mono">
+                    RGB: {Math.round(selRgb[0])}, {Math.round(selRgb[1])}, {Math.round(selRgb[2])}
+                  </span>
+                </Body>
+              </div>
+              <div className="ice-row">
+                <MonoLabel>HSL</MonoLabel>
+                <Body>
+                  <span className="ice-mono">
+                    HSL: {selHsl[0]}, {selHsl[1]}%, {selHsl[2]}%
+                  </span>
+                </Body>
+              </div>
+              <div className="ice-row">
+                <MonoLabel>OKLCH</MonoLabel>
+                <Body>
+                  <span className="ice-mono">
+                    OKLCH: {selOklch[0].toFixed(5)}, {selOklch[1].toFixed(5)}, {selOklch[2].toFixed(2)}
+                  </span>
+                </Body>
+              </div>
+              <div className="ice-row">
+                <MonoLabel>White</MonoLabel>
+                <Body>
+                  <span className="ice-mono">Contrast with white: {selWhite.toFixed(2)}:1</span>
+                </Body>
+              </div>
+              <div className="ice-row">
+                <MonoLabel>Black</MonoLabel>
+                <Body>
+                  <span className="ice-mono">Contrast with black: {selBlack.toFixed(2)}:1</span>
+                </Body>
+              </div>
+            </div>
+            <div className="ice-actions">
+              <Button kind="secondary" onClick={() => void copyHex(selected.hex)}>
+                Copy hex
+              </Button>
+              <Button kind="secondary" onClick={() => addToPalette(selected)}>
+                Add to palette
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        <section className="ice-palette" aria-label="Palette">
+          <Card mono="SAVED" title="Palette" flush>
+            {saved.length === 0 ? (
+              <Body sm>No colors in palette</Body>
+            ) : (
+              <List label="Palette colors">
+                {saved.map((c, i) => (
+                  <Row
+                    key={`${c.hex}-${i}`}
+                    title={<span className="ice-pal-title"><span className="ice-pal-chip" style={{ background: c.hex }} aria-hidden="true" />{c.hex}</span>}
+                    meta={c.label}
+                    action={
+                      <Button kind="ghost" onClick={() => removeFromPalette(i)}>
+                        Remove
+                      </Button>
+                    }
+                  />
+                ))}
+              </List>
+            )}
+          </Card>
+        </section>
+      </Stack>
+    </AppShell>
   )
 }
