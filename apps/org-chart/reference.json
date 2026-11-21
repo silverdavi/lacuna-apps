@@ -1,0 +1,16 @@
+{
+  "repo": "daniel-hauser/react-organizational-chart",
+  "url": "https://github.com/daniel-hauser/react-organizational-chart",
+  "sha": "2692a4a4646953d20263cf811982430446768ba2",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2020 Daniel Hauser"
+  ],
+  "files": [
+    "src/components/Tree.tsx",
+    "src/components/TreeNode.tsx"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "1465ab8cfcd4459e23acf49af1e05fa7c94ed1aa1bd6530fb1a4ce2c4a453cf3"
+}
