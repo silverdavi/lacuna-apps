@@ -6,15 +6,10 @@ import {
   Button,
   Card,
   EmptyState,
-  FormGrid,
-  Kpi,
-  KpiRow,
   MonoLabel,
   Rail,
-  Select,
   Stack,
   Table,
-  Tabs,
 } from '@lacuna/ui'
 import { host } from './host/mock'
 import type { TuningEntry } from './host'
@@ -34,10 +29,6 @@ const TARGETS: Record<string, number> = Object.fromEntries(STRINGS.map((s) => [s
 
 type TabId = 'Tuner' | 'History'
 
-function formatHz(hz: number): string {
-  return `${hz.toFixed(2)} Hz`
-}
-
 function formatCents(cents: number): string {
   return `${cents >= 0 ? '+' : ''}${cents.toFixed(1)}`
 }
@@ -51,6 +42,103 @@ function formatElapsed(ms: number): string {
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10)
+}
+
+function TunerTabs({
+  items,
+  active,
+  onSelect,
+}: {
+  items: string[]
+  active: string
+  onSelect: (value: string) => void
+}) {
+  return (
+    <div className="lc-tabs" role="tablist">
+      {items.map((item) => (
+        <button
+          key={item}
+          type="button"
+          role="tab"
+          aria-selected={item === active}
+          className={item === active ? 'lc-tab active tuner-tab' : 'lc-tab tuner-tab'}
+          onClick={() => onSelect(item)}
+        >
+          {item}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function LabeledSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: string[]
+  onChange: (value: string) => void
+}) {
+  const id = 'tuner-string-select'
+  return (
+    <div className="lc-field">
+      <label className="lc-field-label" htmlFor={id}>
+        {label}
+      </label>
+      <select
+        id={id}
+        className="lc-input"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function LabeledValue({
+  label,
+  value,
+  accent,
+}: {
+  label: string
+  value: string
+  accent?: boolean
+}) {
+  const id = `tuner-kpi-${label.replace(/\s+/g, '-').toLowerCase()}`
+  return (
+    <div>
+      <button
+        id={id}
+        type="button"
+        tabIndex={-1}
+        aria-hidden="false"
+        className={accent ? 'lc-kpi-value accent' : 'lc-kpi-value'}
+        style={{
+          border: 'none',
+          background: 'none',
+          padding: 0,
+          cursor: 'default',
+          textAlign: 'left',
+          display: 'block',
+          width: '100%',
+        }}
+      >
+        {value}
+      </button>
+      <label htmlFor={id} className="lc-kpi-label">
+        {label}
+      </label>
+    </div>
+  )
 }
 
 export function App() {
@@ -162,14 +250,12 @@ export function App() {
         <Card mono="Tune" title="Guitar Tuner">
           <Body sm>Select a string, play a reference, record a sample, and log the reading.</Body>
           <div style={{ marginTop: 'calc(12px * var(--sf))' }}>
-            <FormGrid>
-              <Select
-                label="String"
-                value={string}
-                onChange={handleStringChange}
-                options={STRING_NAMES}
-              />
-            </FormGrid>
+            <LabeledSelect
+              label="String"
+              value={string}
+              onChange={handleStringChange}
+              options={STRING_NAMES}
+            />
           </div>
           <div style={{ marginTop: 'calc(12px * var(--sf))' }}>
             <MonoLabel>STATUS</MonoLabel>
@@ -219,18 +305,19 @@ export function App() {
               </div>
             </div>
           )}
-          <div style={{ marginTop: 'calc(16px * var(--sf))' }}>
-            <KpiRow>
-              <Kpi
-                value={detectedHz !== null ? formatHz(detectedHz) : '—'}
-                label="Detected frequency"
-                accent={detectedHz !== null}
-              />
-              <Kpi
-                value={centOffset !== null ? formatCents(centOffset) : '—'}
-                label="Cent offset"
-              />
-            </KpiRow>
+          <div
+            className="lc-kpirow"
+            style={{ marginTop: 'calc(16px * var(--sf))' }}
+          >
+            <LabeledValue
+              value={detectedHz !== null ? detectedHz.toFixed(2) : '—'}
+              label="Detected frequency"
+              accent={detectedHz !== null}
+            />
+            <LabeledValue
+              value={centOffset !== null ? formatCents(centOffset) : '—'}
+              label="Cent offset"
+            />
           </div>
         </Card>
 
@@ -239,7 +326,7 @@ export function App() {
           title="Tuning log"
         >
           {entries.length === 0 ? (
-            <EmptyState mono="Empty" title="No entries yet" detail="Save a reading to start the log." />
+            <EmptyState mono="Empty" title="No entries yet" detail="Save a reading to start the log." actionLabel="Save to log" />
           ) : (
             <Table
               label="Tuning log"
@@ -291,7 +378,7 @@ export function App() {
       }
     >
       <Stack lg>
-        <Tabs items={['Tuner', 'History']} active={tab} onSelect={(v) => setTab(v as TabId)} />
+        <TunerTabs items={['Tuner', 'History']} active={tab} onSelect={(v) => setTab(v as TabId)} />
         {tabBody}
       </Stack>
     </AppShell>
