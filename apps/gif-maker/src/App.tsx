@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import {
   Actions,
@@ -18,15 +18,26 @@ import {
 } from '@lacuna/ui'
 import { ProgressRing } from '@lacuna/progress-ring'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { saveBlob } from '@lacuna/file-save-open'
 import { useGifProject } from './host/mock'
 import { SAMPLE_FRAMES, type GifProject } from './host'
+import { gifBlobFromCanvases, renderSampleFrames } from './gif'
 import './app.css'
 
-type Tab = 'frames' | 'settings'
+type Tab = 'frames' | 'settings' | 'history'
+
+interface HistoryEntry {
+  filename: string
+  frameCount: number
+  delayMs: number
+  width: number
+  height: number
+}
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'frames', label: 'Frames' },
   { id: 'settings', label: 'Settings' },
+  { id: 'history', label: 'History' },
 ]
 
 const monoText: CSSProperties = { fontFamily: 'var(--mono)', fontSize: 'calc(14px * var(--tf))' }
@@ -51,6 +62,7 @@ export function App() {
   const [exporting, setExporting] = useState(false)
   const [exportProgress, setExportProgress] = useState(0)
   const [ready, setReady] = useState(false)
+  const [history, setHistory] = useState<HistoryEntry[]>([])
   const { copied, copy } = useClipboard()
 
   useEffect(() => setDelayDraft(String(project.delayMs)), [project.delayMs])
@@ -98,10 +110,22 @@ export function App() {
     window.setTimeout(tick, 60)
   }
 
-  const download = async () => {
+  const download = useCallback(async () => {
     if (!ready) return
+    const canvases = renderSampleFrames(project.frames, project.width, project.height)
+    const blob = gifBlobFromCanvases(canvases, project.delayMs)
+    saveBlob(blob, { filename: gifName(project), mimeType: 'image/gif' })
+    const entry: HistoryEntry = {
+      filename: gifName(project),
+      frameCount: project.frames.length,
+      delayMs: project.delayMs,
+      width: project.width,
+      height: project.height,
+    }
+    setHistory((prev) => [entry, ...prev].slice(0, 10))
+    setReady(false)
     await copy(gifName(project))
-  }
+  }, [ready, project, copy])
 
   const filename = gifName(project)
 
@@ -122,8 +146,8 @@ export function App() {
             role="tab"
             aria-selected={tab === t.id}
             aria-current={tab === t.id ? 'page' : undefined}
-      className={`lc-tab${tab === t.id ? ' active' : ''}`}
-      onClick={() => setTab(t.id)}
+            className={`lc-tab${tab === t.id ? ' active' : ''}`}
+            onClick={() => setTab(t.id)}
           >
             {t.label}
           </button>
@@ -141,6 +165,28 @@ export function App() {
               Apply
             </PrimaryButton>
           </Actions>
+        </Card>
+      ) : tab === 'history' ? (
+        <Card mono={`${history.length} exports`} title="Export history">
+          {history.length === 0 ? (
+            <EmptyState
+              mono="No exports yet"
+              title="No GIFs exported"
+              detail="Export a GIF to see it here."
+              actionLabel="Go to Frames"
+              onAction={() => setTab('frames')}
+            />
+          ) : (
+            <List label="Exports">
+              {history.map((h, i) => (
+                <Row
+                  key={`${h.filename}-${i}`}
+                  title={<span className="gf-frame">{h.filename}</span>}
+                  meta={`${h.frameCount} frames, ${h.delayMs}ms, ${h.width}x${h.height}`}
+                />
+              ))}
+            </List>
+          )}
         </Card>
       ) : (
         <>

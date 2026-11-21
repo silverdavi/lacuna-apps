@@ -390,6 +390,9 @@ importers:
 
   apps/gif-maker:
     dependencies:
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/file-save-open/0.1.0
       '@lacuna/progress-ring':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/progress-ring/0.1.0

@@ -24,3 +24,5 @@ export const SAMPLE_FRAMES: GifFrame[] = [
   { name: 'frame-2.png' },
   { name: 'frame-3.png' },
 ]
+
+
