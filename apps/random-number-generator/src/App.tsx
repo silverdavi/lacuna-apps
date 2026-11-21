@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Button, Card, Cols, Stack, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, FormGrid, Rail, Stack, Table, TextInput } from '@lacuna/ui'
 import { generationStore } from './host'
 import type { GenerationSession } from './host'
-import './app.css'
 
 const HISTORY_CAP = 1000
 
@@ -31,6 +30,24 @@ interface GenerateOutcome {
   entry: HistoryState
   result: number
   error?: string
+}
+
+function emptyEntry(): HistoryState {
+  return { seed: '', label: '', rows: [] }
+}
+
+function rollEntry(label: string, roll: () => number, count: number): GenerateOutcome {
+  const rows: RollRow[] = []
+  let running = 0
+  for (let i = 0; i < count; i++) {
+    const value = roll()
+    running += value
+    rows.push({ value, running })
+  }
+  return {
+    entry: { seed: makeSeed(), label, rows },
+    result: rows.length > 0 ? rows[rows.length - 1].running : 0,
+  }
 }
 
 function generate(settings: GenerationSession['settings']): GenerateOutcome {
@@ -66,24 +83,6 @@ function generate(settings: GenerationSession['settings']): GenerateOutcome {
   return rollEntry(`${min} to ${max}`, () => randomInt(min, max), count)
 }
 
-function emptyEntry(): HistoryState {
-  return { seed: '', label: '', rows: [] }
-}
-
-function rollEntry(label: string, roll: () => number, count: number): GenerateOutcome {
-  const rows: RollRow[] = []
-  let running = 0
-  for (let i = 0; i < count; i++) {
-    const value = roll()
-    running += value
-    rows.push({ value, running })
-  }
-  return {
-    entry: { seed: makeSeed(), label, rows },
-    result: rows.length > 0 ? rows[rows.length - 1].running : 0,
-  }
-}
-
 function historyFromSession(session: GenerationSession): HistoryState[] {
   return (session.history ?? [])
     .filter((entry) => entry && Array.isArray(entry.rows) && entry.rows.length > 0)
@@ -92,7 +91,10 @@ function historyFromSession(session: GenerationSession): HistoryState[] {
       label: typeof entry.label === 'string' ? entry.label : '',
       rows: entry.rows
         .filter((row) => row && Number.isFinite(row.value))
-        .map((row, index, list) => ({ value: row.value, running: list.slice(0, index + 1).reduce((s, r) => s + r.value, 0) })),
+        .map((row, index, list) => ({
+          value: row.value,
+          running: list.slice(0, index + 1).reduce((s, r) => s + r.value, 0),
+        })),
     }))
     .filter((entry) => entry.rows.length > 0)
 }
@@ -103,7 +105,6 @@ export function App() {
   const [history, setHistory] = useState<HistoryState[]>([])
   const [error, setError] = useState('')
   const ready = useRef(false)
-  const errorRef = useRef<HTMLParagraphElement | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -121,14 +122,17 @@ export function App() {
 
   useEffect(() => {
     if (!ready.current) return
-    void generationStore.save({ settings, last, history: history.map((entry) => ({ ...entry, id: entry.seed })) })
+    void generationStore.save({
+      settings,
+      last,
+      history: history.map((entry) => ({ ...entry, id: entry.seed })),
+    })
   }, [settings, last, history])
 
   const onGenerate = () => {
     const outcome = generate(settings)
     if (outcome.error) {
       setError(outcome.error)
-      errorRef.current?.focus()
       return
     }
     setError('')
@@ -137,89 +141,89 @@ export function App() {
     setLast({ result: outcome.result, seed: outcome.entry.seed })
   }
 
-  let rowKey = 0
+  const tableRows = history.flatMap((entry) =>
+    entry.rows.map((row, rowIndex) => ({
+      cells: {
+        seed: rowIndex === 0 ? entry.seed : null,
+        roll: rowIndex === 0 ? entry.label : null,
+        value: String(row.value),
+        running: String(row.running),
+      },
+    })),
+  )
+
+  const resultValue = last ? String(last.result) : ''
+  const seedValue = last?.seed ?? ''
+
   return (
-    <main className="rng-page">
-      <Card mono="Productivity" title="Random number generator">
-        <Stack lg>
-          <Cols kind="main-side">
-            <div>
-              <TextInput label="Min" value={settings.min} onChange={(v) => setSettings({ ...settings, min: v })} />
-              <TextInput label="Max" value={settings.max} onChange={(v) => setSettings({ ...settings, max: v })} />
-              <TextInput label="Count" value={settings.count} onChange={(v) => setSettings({ ...settings, count: v })} />
-              <TextInput
-                label="Dice Notation"
-                value={settings.dice}
-                onChange={(v) => setSettings({ ...settings, dice: v })}
+    <AppShell
+      name="Random Number Generator"
+      icon="grid"
+      hue="blue"
+      category="Apps"
+      meta="Local only"
+      status="Saved on this device"
+      side={
+        <Rail title="Last result" note="Local only">
+          <Stack>
+            <label className="lc-field">
+              <span className="lc-field-label">Result</span>
+              <input
+                className="lc-input"
+                value={resultValue}
+                readOnly
+                aria-label="Result"
+                onChange={() => undefined}
               />
-              <Button kind="primary" onClick={onGenerate}>
-                Generate
-              </Button>
-            </div>
-            <div>
-              <TextInput label="Result" value={last ? String(last.result) : ''} onChange={() => undefined} />
-              <div className="rng-seed-field">
-                <span className="rng-field-label" id="rng-seed-label">
-                  Seed
-                </span>
-                <output aria-labelledby="rng-seed-label">{last?.seed ?? ''}</output>
-              </div>
-              {error && (
-                <p ref={errorRef} tabIndex={-1} className="rng-error">
-                  {error}
-                </p>
-              )}
-              <span className="rng-note">Nothing leaves this device</span>
-            </div>
-          </Cols>
-          <Card mono="History" title="History">
-            {history.length === 0 ? (
-              <p className="rng-empty">No rolls yet. Set a range or a dice roll and press Generate.</p>
-            ) : (
-              <table className="lc-table">
-                <caption className="rng-caption">History</caption>
-                <thead>
-                  <tr>
-                    <th>Seed</th>
-                    <th>Roll</th>
-                    <th className="num">Value</th>
-                    <th className="num">Running total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.flatMap((entry, entryIndex) =>
-                    entry.rows.map((row, rowIndex) => {
-                      const isLast =
-                        entryIndex === history.length - 1 && rowIndex === entry.rows.length - 1
-                      const key = `${entryIndex}:${rowIndex}`
-                      rowKey += 1
-                      if (rowIndex === 0) {
-                        return [
-                          <tr key={key} className={isLast ? 'hot' : undefined}>
-                            <td rowSpan={entry.rows.length}>
-                              <span className="rng-seed-cell">{entry.seed}</span>
-                            </td>
-                            <td>{entry.label}</td>
-                            <td className="num">{row.value}</td>
-                            <td className="num">{row.running}</td>
-                          </tr>,
-                        ]
-                      }
-                      return [
-                        <tr key={key} className={isLast ? 'hot' : undefined}>
-                          <td>{''}</td>
-                          <td className="num">{row.value}</td>
-                          <td className="num">{row.running}</td>
-                        </tr>,
-                      ]
-                    }),
-                  )}
-                </tbody>
-              </table>
-            )}
-          </Card>
-        </Stack>
-      </Card>
-    </main>
+            </label>
+            <label className="lc-field">
+              <span className="lc-field-label">Seed</span>
+              <output className="lc-mono" aria-label="Seed">
+                {seedValue}
+              </output>
+            </label>
+          </Stack>
+          {error && <p role="alert">{error}</p>}
+        </Rail>
+      }
+    >
+      <Stack lg>
+        <Card mono="Roll" title="Random number generator">
+          <FormGrid>
+            <TextInput label="Min" value={settings.min} onChange={(v) => setSettings({ ...settings, min: v })} />
+            <TextInput label="Max" value={settings.max} onChange={(v) => setSettings({ ...settings, max: v })} />
+            <TextInput label="Count" value={settings.count} onChange={(v) => setSettings({ ...settings, count: v })} />
+            <TextInput
+              label="Dice Notation"
+              value={settings.dice}
+              onChange={(v) => setSettings({ ...settings, dice: v })}
+            />
+          </FormGrid>
+          <Button kind="primary" onClick={onGenerate}>
+            Generate
+          </Button>
+        </Card>
+        <Card mono={`${history.length} rolls`} title="History">
+          {history.length === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No rolls yet"
+              detail="Set a range or a dice roll and press Generate."
+            />
+          ) : (
+            <Table
+              label="History"
+              columns={[
+                { key: 'seed', label: 'Seed' },
+                { key: 'roll', label: 'Roll' },
+                { key: 'value', label: 'Value', num: true },
+                { key: 'running', label: 'Running total', num: true },
+              ]}
+              rows={tableRows}
+            />
+          )}
+        </Card>
+      </Stack>
+    </AppShell>
   )
 }
