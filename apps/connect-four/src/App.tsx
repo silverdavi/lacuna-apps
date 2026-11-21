@@ -68,7 +68,7 @@ function findWin(board: Cell[][]): Player | 0 {
   return 0
 }
 
-const piece = (v: Cell) => (v === 1 ? DISC_1 : v === 2 ? DISC_2 : 'var(--ink)')
+const disc = (v: Cell) => (v === 1 ? DISC_1 : v === 2 ? DISC_2 : undefined)
 const resultText = (status: Status, winner: Player | 0) =>
   status === 'playing' ? `Player ${winner || 1}'s turn` : status === 'won' ? `Player ${winner} wins` : 'Draw'
 
@@ -186,31 +186,17 @@ export function App() {
 
   const playing = status === 'playing'
 
-  const dropActions = (
-    <Actions>
-      {Array.from({ length: COLS }, (_, i) => (
-        <Button key={i + 1} onClick={() => drop(i)} disabled={!playing}>
-          Drop in column {i + 1}
-        </Button>
-      ))}
-    </Actions>
-  )
-
   const boardCard = (
     <Card
       mono="Game"
       title="Board"
       actions={
-        playing ? (
-          dropActions
-        ) : (
-          <Actions>
-            <Button kind="primary" onClick={restart}>
-              Restart
-            </Button>
-            <Button onClick={newGame}>New game</Button>
-          </Actions>
-        )
+        <Actions>
+          <Button kind="primary" onClick={restart}>
+            Restart
+          </Button>
+          <Button onClick={newGame}>New game</Button>
+        </Actions>
       }
     >
       <Stack>
@@ -218,10 +204,17 @@ export function App() {
           <Tag accent>{playing ? `Player ${player}'s turn` : resultText(status, winner)}</Tag>
           <Tag>{`${moves} of ${TOTAL} discs`}</Tag>
         </div>
+        <Board cols={COLS} rows={1} cell={40} label="Drop a disc">
+          {Array.from({ length: COLS }, (_, i) => (
+            <button key={i + 1} type="button" aria-label={`Drop in column ${i + 1}`} onClick={() => drop(i)} disabled={!playing}>
+              {i + 1}
+            </button>
+          ))}
+        </Board>
         <Board cols={COLS} rows={ROWS} cell={40} label="Connect Four board">
           {board.map((line, r) =>
             line.map((cell, c) => (
-              <div key={`${r}-${c}`} data-row={r} data-col={c} data-piece={cell} style={{ background: piece(cell) }} />
+              <div key={`${r}-${c}`} data-row={r} data-col={c} data-piece={cell} style={{ background: disc(cell) }} />
             )),
           )}
         </Board>
@@ -323,13 +316,6 @@ export function App() {
             <Kpi value={String(moves)} label="Discs" />
             <Kpi value={playing ? `P${player}` : '—'} label="Turn" />
           </KpiRow>
-          <Board cols={COLS} rows={ROWS} cell={18} label="Board preview">
-            {board.map((line, r) =>
-              line.map((cell, c) => (
-                <div key={`${r}-${c}`} style={{ background: cell ? piece(cell) : 'var(--ui-bg)' }} />
-              )),
-            )}
-          </Board>
           {last ? (
             <List label="Last result">
               <Row
