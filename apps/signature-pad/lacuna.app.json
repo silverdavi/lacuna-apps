@@ -1,0 +1,100 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.signature-pad",
+  "name": "Signature Pad",
+  "version": "0.1.0",
+  "summary": "Draw a signature, style it, undo/redo, and save it as a PNG.",
+  "description": "A freehand signature pad that keeps every stroke on this device. Pick a stroke color and width, undo or redo mistakes, compare the blank and filled pad, and export a transparent PNG. The session is restored after a reload.",
+  "category": "productivity",
+  "tags": [
+    "signature",
+    "canvas",
+    "drawing",
+    "offline"
+  ],
+  "icon": "signature",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Lacuna",
+    "contact": "apps@lacuna.example"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/signature-pad",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/signature-pad": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:signature-pad"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "signature-pad",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Signature Pad records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "signature-pad"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

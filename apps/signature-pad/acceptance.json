@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8f6904a85f3e20ec9957154841e3105d783bc558c5b51b396687d4a3f744e241",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Signature Pad\" and the button \"Clear canvas\" is visible."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Clear canvas\" removes any existing strokes; the canvas area is empty and the button \"Save PNG\" is disabled."
+    },
+    {
+      "id": "A3",
+      "text": "Drawing a stroke on the canvas (pressing and dragging the pointer) enables the button \"Save PNG\" and shows the text \"Signature ready\" below the canvas."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting \"Red\" in the select labelled \"Stroke color\" and drawing a new stroke changes the stroke color to red; the select shows \"Red\" as the selected value."
+    },
+    {
+      "id": "A5",
+      "text": "Setting the slider labelled \"Stroke width\" to 10 and drawing a new stroke produces a thicker line; the slider value displays \"10\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Save PNG\" downloads a file named \"signature.png\" and shows the toast message \"Signature saved\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Undo\" after drawing two separate strokes removes the most recent stroke; the canvas shows only the first stroke."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Redo\" after an undo restores the removed stroke; the canvas shows both strokes again."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the drawn signature and the stroke color setting: after drawing a stroke with color \"Blue\" and reloading, the canvas still shows the stroke and the select labelled \"Stroke color\" shows \"Blue\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "aefe2169a76dfaf66b9cf7ac84fa8dda266bfd5dd8f1e06e1a34385983a177ac"
+    }
+  ]
+}

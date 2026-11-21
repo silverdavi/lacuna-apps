@@ -1,0 +1,15 @@
+{
+  "repo": "michaeldzjap/react-signature-pad-wrapper",
+  "url": "https://github.com/michaeldzjap/react-signature-pad-wrapper",
+  "sha": "5b5cb7a88ea1e2c2b08ff08fe2febc6e838ef310",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2025 Michael Dzjaparidze"
+  ],
+  "files": [
+    "src/SignaturePad.tsx"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "7adc8fe3701e2ffe3c8e5402bdf552e1551443ea16fc5c2362a5b569e6a24784"
+}
