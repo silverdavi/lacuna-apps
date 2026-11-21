@@ -30,12 +30,6 @@ const COLUMNS: { id: ColumnId; title: string }[] = [
   { id: 'done', title: 'Done' },
 ]
 
-const SAMPLE_CARDS: CardRec[] = [
-  { id: 'kb-sample-1', title: 'Plan sprint', column: 'todo' },
-  { id: 'kb-sample-2', title: 'Write user stories', column: 'doing' },
-  { id: 'kb-sample-3', title: 'Draft release notes', column: 'done' },
-]
-
 const store = createMockRecordStore<CardRec>({
   key: 'lacuna.kanban-board.cards',
   idPrefix: 'kb',
@@ -118,6 +112,10 @@ export function App() {
     setEditing(null)
   }
 
+  const moveCard = (id: string, dest: ColumnId) => {
+    setCards((cs) => cs.map((c) => (c.id === id ? { ...c, column: dest } : c)))
+  }
+
   const openCard = (column: ColumnId, cardId: string) => {
     setEditing({ column, cardId })
   }
@@ -158,12 +156,11 @@ export function App() {
           title="Kanban Board"
           note="Three columns · drag to move"
           chips={[`${cards.length} cards total`, `${todoCount} to do`, `${doingCount} in progress`, `${doneCount} done`]}
-        />
-      }
-      actions={
-        <Button kind="secondary" ariaLabel="Export JSON" onClick={() => void copy(JSON.stringify(cards))}>
-          Export JSON
-        </Button>
+        >
+          <Button kind="secondary" ariaLabel="Export JSON" onClick={() => void copy(JSON.stringify(cards))}>
+            Export JSON
+          </Button>
+        </Rail>
       }
     >
       <div
@@ -174,7 +171,7 @@ export function App() {
           alignItems: 'start',
         }}
       >
-        {COLUMNS.map((col) => {
+        {COLUMNS.map((col, colIndex) => {
           const colCards = byColumn(col.id)
           const open = editing !== null && editing.column === col.id
           const editingCard =
@@ -185,7 +182,6 @@ export function App() {
             <Card
               key={col.id}
               mono={`${colCards.length} CARDS`}
-              flush
               style={{
                 outline:
                   dragFrom !== null && dragFrom.column !== col.id
@@ -208,9 +204,12 @@ export function App() {
                       key={c.id}
                       style={{
                         display: 'flex',
-                        gap: 'calc(8px * var(--sf))',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
+                        flexDirection: 'column',
+                        gap: 'calc(6px * var(--sf))',
+                        border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
+                        background: 'var(--paper)',
+                        borderRadius: 0,
+                        padding: 'calc(8px * var(--sf)) calc(10px * var(--sf))',
                         opacity: dragFrom !== null && dragFrom.id === c.id ? 0.4 : 1,
                       }}
                     >
@@ -221,24 +220,49 @@ export function App() {
                         onClick={() => openCard(col.id, c.id)}
                         style={{
                           background: 'none',
-                          border: 'thin solid var(--ui-line2)',
-                          borderRadius: 'calc(2px * var(--sf))',
-                          padding: 'calc(8px * var(--sf)) calc(10px * var(--sf))',
+                          border: 'none',
+                          padding: 0,
+                          margin: 0,
                           fontFamily: 'var(--sans)',
                           fontSize: 'calc(13px * var(--tf))',
                           color: 'var(--ink)',
                           cursor: 'grab',
+                          textAlign: 'left',
+                          width: '100%',
                         }}
                       >
                         {c.title}
                       </button>
-                      <Button
-                        kind="ghost"
-                        ariaLabel="Delete card"
-                        onClick={() => removeCard(c.id)}
-                      >
-                        Delete card
-                      </Button>
+                      <div style={{ display: 'flex', gap: 'calc(2px * var(--sf))', flexWrap: 'wrap' }}>
+                        {colIndex > 0 ? (
+                          <Button
+                            kind="ghost"
+                            ariaLabel={`Move ${c.title} left`}
+                            style={{ padding: 'calc(3px * var(--sf)) calc(6px * var(--sf))' }}
+                            onClick={() => moveCard(c.id, COLUMNS[colIndex - 1].id)}
+                          >
+                            Move left
+                          </Button>
+                        ) : null}
+                        {colIndex < COLUMNS.length - 1 ? (
+                          <Button
+                            kind="ghost"
+                            ariaLabel={`Move ${c.title} right`}
+                            style={{ padding: 'calc(3px * var(--sf)) calc(6px * var(--sf))' }}
+                            onClick={() => moveCard(c.id, COLUMNS[colIndex + 1].id)}
+                          >
+                            Move right
+                          </Button>
+                        ) : null}
+                        <Button
+                          kind="ghost"
+                          ariaLabel="Delete card"
+                          style={{ padding: 'calc(3px * var(--sf)) calc(6px * var(--sf))' }}
+                          onClick={() => removeCard(c.id)}
+                        >
+                          Delete card
+                        </Button>
+                      </div>
                     </div>
                   ))}
                   <Button
