@@ -9,9 +9,9 @@ import {
   Kpi,
   KpiRow,
   List,
+  MonoLabel,
   Rail,
   Row,
-  Stack,
   Tag,
   Table,
 } from '@lacuna/ui'
@@ -19,7 +19,6 @@ import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useHotkeys } from '@lacuna/use-hotkeys'
 import {
-  clearStorage,
   emptyBoard,
   loadGame,
   makeRecord,
@@ -64,7 +63,7 @@ function boardToText(board: (Mark | null)[]): string {
 }
 
 function resultLabel(rec: GameRecord): string {
-  return rec.result === 'draw' ? 'shared' : `won by ${rec.result}`
+  return rec.result === 'draw' ? 'split' : `won by ${rec.result}`
 }
 
 const OCCUPIED_LOCK_MS = 1200
@@ -152,17 +151,6 @@ export function App() {
     persist({ ...state, score: { x: 0, o: 0, draws: 0 }, history: [], board: emptyBoard(), turn: 'X', winner: null })
   }
 
-  function doErase() {
-    clearStorage()
-    persist({
-      board: emptyBoard(),
-      turn: 'X',
-      score: { x: 0, o: 0, draws: 0 },
-      winner: null,
-      history: [],
-    })
-  }
-
   const playRef = useRef(play)
   playRef.current = play
   const newGameRef = useRef(newGame)
@@ -202,18 +190,18 @@ export function App() {
     )
   }
 
+  const statusText = () => {
+    if (winner === 'X') return 'Player X wins'
+    if (winner === 'O') return 'Player O wins'
+    if (winner === 'draw') return 'Even'
+    return `Player ${state.turn}'s turn`
+  }
+
   useEffect(() => {
     if (!copied) return
     const t = setTimeout(() => setCopied(false), 1400)
     return () => clearTimeout(t)
   }, [copied])
-
-  const statusText = () => {
-    if (winner === 'X') return 'Player X wins'
-    if (winner === 'O') return 'Player O wins'
-    if (winner === 'draw') return 'Shared'
-    return `Player ${state.turn}'s turn`
-  }
 
   const exportOptions: ExportOption[] = [
     {
@@ -257,19 +245,18 @@ export function App() {
       hue="cobalt"
       category="Games"
       meta={`${state.score.x}–${state.score.o}`}
+      status={statusText()}
       side={
         <Rail title="Match" note={`${state.history.length} finished`}>
           <KpiRow>
             <Kpi label="X" value={state.score.x} />
             <Kpi label="O" value={state.score.o} />
-            <Kpi label="Shared" value={state.score.draws} />
+            <Kpi label="Ties" value={state.score.draws} />
           </KpiRow>
-          <Stack>
-            <Tag accent>{statusText()}</Tag>
-            <Tag>
-              {`X: ${state.score.x}, O: ${state.score.o}, Draws: ${state.score.draws}`}
-            </Tag>
-          </Stack>
+          <Tag accent>Round {winner === null ? 'open' : 'final'}</Tag>
+          <div>
+            <MonoLabel>{`X: ${state.score.x}, O: ${state.score.o}, Draws: ${state.score.draws}`}</MonoLabel>
+          </div>
           <Actions>
             <Button onClick={copySummary}>Copy summary</Button>
             <Button onClick={copyBoard}>{copied ? 'Board copied' : 'Copy board'}</Button>
@@ -287,9 +274,6 @@ export function App() {
             </Button>
             <Button onClick={doResetScores}>Reset Scores</Button>
             <ExportMenu options={exportOptions} fileName="tic-tac-toe" ariaLabel="Export game" />
-            <Button kind="danger" onClick={doErase}>
-              Erase everything
-            </Button>
           </Actions>
         }
       >
@@ -319,7 +303,7 @@ export function App() {
         {state.history.length === 0 ? (
           <EmptyState
             title="No finished games yet"
-            detail="Play a full round — a win or a draw — and it will be recorded here."
+            detail="Play a full round to a win or an even board and it will be recorded here."
           />
         ) : (
           <Table
@@ -339,7 +323,7 @@ export function App() {
           <Row title="X opens" meta="always moves first" value={<Tag>X</Tag>} />
           <Row title="O responds" meta="moves second" value={<Tag>O</Tag>} />
           <Row title="Three in a line" meta="row, column, or diagonal" value={<Tag accent>win</Tag>} />
-          <Row title="Full board" meta="no three in a line" value={<Tag>shared</Tag>} />
+          <Row title="Full board" meta="no three in a line" value={<Tag>even</Tag>} />
         </List>
       </Card>
     </AppShell>
