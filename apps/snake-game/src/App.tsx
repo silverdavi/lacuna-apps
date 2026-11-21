@@ -1,24 +1,52 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
-import { AppShell, Button, Body, Card, Stack } from '@lacuna/ui'
+import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties, ReactElement } from 'react'
+import {
+  Actions,
+  AppShell,
+  Board,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  Keys,
+  Rail,
+  Stack,
+  Tag,
+} from '@lacuna/ui'
+import { FOOD, SNAKE } from './colors'
 import { host } from './host'
 import { COLS, ROWS, createGame, queueDirection, stepGame, type Game, type Vec } from './engine'
 
 const TICK_MS = 60
+type Phase = 'idle' | 'playing' | 'over'
 
-function cellStyle(filled: boolean, isFood: boolean): CSSProperties {
-  return {
-    aspectRatio: '1 / 1',
-    border: 'var(--ui-line)',
-    background: filled ? 'var(--ink)' : isFood ? 'var(--accent)' : 'var(--ui-bright)',
-  }
-}
+type Steer = (e: KeyboardEvent) => void
+
+// One keydown listener, attached once at module scope, that calls the handler the
+// component sets on every render. Attaching inside useEffect misses a key pressed
+// the instant the page has loaded; the tests press keys immediately.
+let steerRef: Steer | null = null
+window.addEventListener('keydown', (e) => steerRef?.(e))
 
 export function App() {
-  const [phase, setPhase] = useState<'idle' | 'playing' | 'over'>('idle')
+  const [phase, setPhase] = useState<Phase>('idle')
   const [game, setGame] = useState<Game>(() => createGame())
   const [best, setBest] = useState<number>(() => host.loadGame().best)
   const bestRef = useRef(best)
+
+  // A keypress does not move the snake until a run is in progress.
+  steerRef = (e: KeyboardEvent) => {
+    if (phase !== 'playing') return
+    let dir: Vec | null = null
+    if (e.key === 'ArrowUp') dir = [0, -1]
+    else if (e.key === 'ArrowDown') dir = [0, 1]
+    else if (e.key === 'ArrowLeft') dir = [-1, 0]
+    else if (e.key === 'ArrowRight') dir = [1, 0]
+    if (!dir) return
+    e.preventDefault()
+    setGame((prev) => queueDirection(prev, dir))
+  }
 
   useEffect(() => {
     if (phase !== 'playing') return
@@ -30,122 +58,96 @@ export function App() {
           setBest(next.score)
           host.saveBest(next.score)
         }
-        if (dead) {
-          setPhase('over')
-          return next
-        }
+        if (dead) setPhase('over')
         return next
       })
     }, TICK_MS)
     return () => window.clearInterval(id)
   }, [phase])
 
-  const steer = useCallback(
-    (e: KeyboardEvent) => {
-      let dir: Vec | null = null
-      if (e.key === 'ArrowUp') dir = [0, -1]
-      else if (e.key === 'ArrowDown') dir = [0, 1]
-      else if (e.key === 'ArrowLeft') dir = [-1, 0]
-      else if (e.key === 'ArrowRight') dir = [1, 0]
-      if (!dir) return
-      e.preventDefault()
-      setGame((prev) => {
-        if (phase !== 'playing') return prev
-        return queueDirection(prev, dir)
-      })
-    },
-    [phase],
-  )
-
-  useEffect(() => {
-    window.addEventListener('keydown', steer)
-    return () => window.removeEventListener('keydown', steer)
-  }, [steer])
-
-  const begin = useCallback(() => {
-    host.resetScore()
+  const begin = () => {
     setGame(createGame())
     setPhase('playing')
-  }, [])
-
-  const onKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        if (phase === 'idle' || phase === 'over') {
-          e.preventDefault()
-          begin()
-        }
-      }
-    },
-    [phase, begin],
-  )
-
-  useEffect(() => {
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onKey])
+  }
 
   const occupied = new Set<number>()
   for (const [x, y] of game.snake) occupied.add(y * COLS + x)
 
-  const boardStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-    width: 'calc(12ch * var(--sf))',
-    maxWidth: '100%',
-    border: 'var(--ui-line2)',
+  const cells: ReactElement[] = []
+  for (let i = 0; i < ROWS * COLS; i++) {
+    const y = Math.floor(i / COLS)
+    const x = i % COLS
+    const filled = occupied.has(i)
+    const isFood = !filled && game.food[0] === x && game.food[1] === y
+    const background = filled ? SNAKE : isFood ? FOOD : undefined
+    const foodAttr = isFood ? ({ 'data-food': '' } as Record<string, string>) : undefined
+    cells.push(
+      <div
+        key={i}
+        data-cell=""
+        data-row={y}
+        data-col={x}
+        {...foodAttr}
+        style={{ background } as CSSProperties}
+      />,
+    )
   }
-
-  const hint =
-    phase === 'playing'
-      ? 'Steer with the arrow keys. Eating the meal grows the snake; touching the wall or your own body ends the run.'
-      : phase === 'over'
-        ? 'The snake hit a wall or its own body. Press Restart to run it again.'
-        : 'Press Start, then steer with the arrow keys. Each meal grows the snake and adds one to the score.'
 
   const buttonLabel = phase === 'idle' ? 'Start' : 'Restart'
 
   return (
-    <AppShell name="Snake Game" icon="grid" hue="green" category="Personal">
-      <Card mono="Personal" actions={<Button kind="primary" onClick={begin}>{buttonLabel}</Button>}>
-        <Stack>
-          <Body sm>{hint}</Body>
-          <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', alignItems: 'baseline' }}>
-            <div>
-              <div className="lc-kpi-value">Score: {game.score}</div>
-              <div className="lc-kpi-label">this run</div>
-            </div>
-            <div>
-              <div className="lc-kpi-value">Best: {best}</div>
-              <div className="lc-kpi-label">on this device</div>
-            </div>
-          </div>
-          <div role="table" aria-label={`Snake board, ${COLS} columns by ${ROWS} rows`} style={boardStyle}>
-            {Array.from({ length: ROWS * COLS }, (_, i) => {
-              const y = Math.floor(i / COLS)
-              const x = i % COLS
-              const filled = occupied.has(i)
-              const isFood = !filled && game.food[0] === x && game.food[1] === y
-              return (
-                <div
-                  key={i}
-                  role="presentation"
-                  data-cell=""
-                  data-row={y}
-                  data-col={x}
-                  {...(isFood ? { 'data-food': '' } : {})}
-                  style={cellStyle(filled, isFood)}
-                />
-              )
-            })}
-          </div>
-          {phase === 'over' && (
-            <div role="status" style={{ color: 'var(--accent)', fontWeight: 700 }}>
-              Game Over
-            </div>
-          )}
-          <Body sm>Best scores are saved on this device and survive a reload.</Body>
-        </Stack>
+    <AppShell
+      name="Snake Game"
+      icon="grid"
+      hue="cobalt"
+      category="Games"
+      meta={`Score ${game.score} · Best ${best}`}
+      status={phase === 'playing' ? 'Running' : phase === 'over' ? 'Run ended' : 'Ready'}
+      side={
+        <Rail title="Snake Game" note="One board · local" chips={['16 × 16', 'Best saved']}>
+          <KpiRow>
+            <Kpi value={`Score: ${game.score}`} label="this run" accent />
+            <Kpi value={`Best: ${best}`} label="on this device" />
+          </KpiRow>
+          <Keys
+            items={[
+              ['↑', 'Move up'],
+              ['↓', 'Move down'],
+              ['←', 'Move left'],
+              ['→', 'Move right'],
+            ]}
+          />
+          <Stack>
+            {phase === 'idle' && (
+              <EmptyState
+                mono="Ready"
+                title="Press Start"
+                detail="Steer with the arrow keys. Each meal grows the snake and adds one to the score."
+              />
+            )}
+            {phase === 'playing' && <Tag accent>Running</Tag>}
+            {phase === 'over' && <Tag accent>Run ended</Tag>}
+          </Stack>
+        </Rail>
+      }
+    >
+      <Card
+        mono="Board"
+        title="Snake"
+        actions={
+          <Actions>
+            <Button kind="primary" onClick={begin}>
+              {buttonLabel}
+            </Button>
+          </Actions>
+        }
+      >
+        <Board cols={COLS} rows={ROWS} cell={24} label={`Snake board, ${COLS} columns by ${ROWS} rows`}>
+          {cells}
+        </Board>
+        {phase === 'over' && (
+          <EmptyState mono="Over" title="Game Over" detail="Press Restart to play again." />
+        )}
       </Card>
     </AppShell>
   )
