@@ -11,7 +11,7 @@ export interface BudgetEntry {
 
 const KEY = 'lacuna.budget-planner.entries'
 
-function isEntry(value: unknown): value is BudgetEntry {
+export function isEntry(value: unknown): value is BudgetEntry {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
   return (
