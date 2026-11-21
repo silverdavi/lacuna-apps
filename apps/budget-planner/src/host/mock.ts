@@ -1,3 +1,5 @@
+import { createMockRecordStore } from '@lacuna/host-mock'
+
 export type EntryType = 'income' | 'expense'
 
 export interface BudgetEntry {
@@ -21,18 +23,15 @@ function isEntry(value: unknown): value is BudgetEntry {
   )
 }
 
+export const store = createMockRecordStore<BudgetEntry>({
+  key: KEY,
+  validate: isEntry,
+})
+
 export function loadEntries(): BudgetEntry[] {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return []
-    const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter(isEntry)
-  } catch {
-    return []
-  }
+  return store.list()
 }
 
 export function saveEntries(entries: BudgetEntry[]): void {
-  window.localStorage.setItem(KEY, JSON.stringify(entries))
+  store.replaceAll(entries)
 }
