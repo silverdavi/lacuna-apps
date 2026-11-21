@@ -6,9 +6,9 @@ import {
   Button,
   Card,
   EmptyState,
+  ErrorState,
   FormGrid,
   Kpi,
-  KpiRow,
   List,
   Rail,
   Row,
@@ -207,18 +207,7 @@ export function App() {
             </Button>
           </Actions>
           {error && (
-            <div
-              role="alert"
-              style={{
-                marginTop: 'calc(12px * var(--sf))',
-                fontFamily: 'var(--mono)',
-                fontSize: 'calc(12px * var(--tf))',
-                letterSpacing: 'calc(0.3px * var(--sf))',
-                color: 'var(--danger)',
-              }}
-            >
-              {error}
-            </div>
+            <ErrorState mono="Invalid input" title={error} style={{ marginTop: 'calc(12px * var(--sf))' }} />
           )}
         </Card>
 
