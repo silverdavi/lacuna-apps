@@ -1,0 +1,20 @@
+{
+  "repo": "thesam73/wordle",
+  "url": "https://github.com/thesam73/wordle",
+  "sha": "b522f387147e58425061e7f223754ef88e853263",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2022 Hannah Park"
+  ],
+  "files": [
+    "src/App.tsx",
+    "src/components/alerts/Alert.tsx",
+    "src/components/keyboard/Keyboard.tsx",
+    "src/index.tsx",
+    "src/lib/statuses.ts",
+    "src/lib/words.ts"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "15f7a897c2a4fa43f44b18491d42369f39aad57127f5c8c3db6656cbb7b53ae4"
+}

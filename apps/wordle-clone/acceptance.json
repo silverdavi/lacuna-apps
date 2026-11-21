@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4406c25fd18b892e124c4f4a9b952340a1e3499ea7869be696c5ca5029cb4e8b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Wordle Game\" and the text \"Guess the word in 6 tries\"."
+    },
+    {
+      "id": "A2",
+      "text": "With a fresh game, the button labelled \"New Game\" is visible. Clicking \"New Game\" clears the board and displays the text \"Ready\" in the status area."
+    },
+    {
+      "id": "A3",
+      "text": "In a new game, typing the letters \"C\", \"R\", \"A\", \"M\", \"E\" into the on-screen keyboard or input and pressing the \"Enter\" key submits the guess. The first row of the board displays the letters \"C\", \"R\", \"A\", \"M\", \"E\" and the status area displays \"Try 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "If the hidden word is \"CRANE\" (deterministic seed for testing), submitting \"CRANE\" as the first guess results in all five tiles in the first row being marked as correct (green) and the status area displaying \"Solved in 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "If the hidden word is \"CRANE\" and the first guess is \"CRANE\", the \"New Game\" button is disabled. If the user clicks \"New Game\" (if enabled) or starts a new game, the board resets to empty rows and the status area displays \"Ready\"."
+    },
+    {
+      "id": "A6",
+      "text": "After winning a game (guessing \"CRANE\" in 1 try), the statistics panel displays \"Wins: 1\" and \"Best Streak: 1\"."
+    },
+    {
+      "id": "A7",
+      "text": "After winning a game, clicking \"New Game\" starts a new round. If the user guesses \"APPLE\" (assuming hidden word is \"CRANE\" for consistency in this test sequence, or a different word if the RNG changes, but let's assume a fixed seed for the test where the second word is \"APPLE\"), typing \"APPLE\" and pressing Enter results in all five tiles in the first row being marked as correct (green) and the status area displaying \"Solved in 1\". The statistics panel updates to \"Wins: 2\" and \"Best Streak: 2\"."
+    },
+    {
+      "id": "A8",
+      "text": "If the user submits an invalid word like \"QXZ\" (too short) or \"ABCDEFG\" (too long), the status area displays \"Invalid word\" and the board does not update."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the game state: after winning a game with \"CRANE\" and starting a new game, reloading the page shows the statistics \"Wins: 1\" and \"Best Streak: 1\", and the board is empty with the status \"Ready\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d7ed9f0f24e14c2847bd4c1d75e6e471cfe66232e0a0fa1839d786c09b59ae02"
+    }
+  ]
+}
