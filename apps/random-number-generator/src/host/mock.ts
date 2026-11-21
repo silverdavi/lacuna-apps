@@ -28,6 +28,8 @@ export interface GenerationSession {
   settings: GenerationSettings
   last: LastGeneration | null
   history: HistoryEntry[]
+  /** Serialized settings the user saved with "Save settings". */
+  preset?: string | null
 }
 
 const KEY = 'lacuna.random-number-generator.v1'
@@ -36,6 +38,7 @@ const empty = (): GenerationSession => ({
   settings: { min: '', max: '', count: '', dice: '' },
   last: null,
   history: [],
+  preset: null,
 })
 
 function isGenerationSession(v: unknown): v is GenerationSession {
@@ -53,6 +56,7 @@ function isGenerationSession(v: unknown): v is GenerationSession {
     if (typeof (last as Record<string, unknown>).seed !== 'string') return false
   }
   if (s.history !== undefined && !Array.isArray(s.history)) return false
+  if (s.preset !== undefined && s.preset !== null && typeof s.preset !== 'string') return false
   return true
 }
 
