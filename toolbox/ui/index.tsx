@@ -9,6 +9,30 @@ import type { CSSProperties, ReactNode } from 'react'
 import { HoverLabel } from './hover'
 import './base.css'
 
+// Inside a sandboxed iframe without allow-same-origin, reading globalThis.localStorage
+// throws SecurityError. Install an in-memory Storage shim so every app runs cleanly.
+;(function ensureLocalStorage() {
+  try {
+    if (typeof globalThis.localStorage !== 'undefined') return
+  } catch {
+    // Sandboxed opaque origin — fall through to in-memory storage.
+  }
+  const backing = new Map<string, string>()
+  const store = {
+    get length() { return backing.size },
+    key: (i: number) => Array.from(backing.keys())[i] ?? null,
+    getItem: (k: string) => (backing.has(String(k)) ? (backing.get(String(k)) as string) : null),
+    setItem: (k: string, v: string) => { backing.set(String(k), String(v)) },
+    removeItem: (k: string) => { backing.delete(String(k)) },
+    clear: () => { backing.clear() },
+  }
+  try {
+    Object.defineProperty(globalThis, 'localStorage', { value: store, configurable: true, writable: true })
+  } catch {
+    // Ignore if non-configurable.
+  }
+})()
+
 export { Mark } from './mark'
 export { BrandHome, Breadcrumbs, BackControl } from './chrome'
 export type { Crumb, NavLink } from './chrome'
