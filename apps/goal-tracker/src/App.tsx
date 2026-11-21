@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import {
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  List,
+  MonoLabel,
+  Rail,
+  Row,
+  Stack,
+  TextInput,
+} from '@lacuna/ui'
 import { host } from './host/mock'
 import type { GoalState } from './host/index'
 import {
@@ -9,7 +20,6 @@ import {
   computeStreaks,
   countMap,
   deleteCheckIn as deleteCheckInState,
-  heatLevel,
   MONTH_DAYS,
   monthCount as monthCountTotal,
   monthPrefix,
@@ -19,22 +29,9 @@ import {
   yearCells,
   yearMonthLabels,
 } from './engine'
+import { heatBackground } from './colors'
 
 const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-// heat fill for one day's check-in count (goal is 1 per day)
-function heatStyle(count: number): { background: string; filled: boolean } {
-  switch (heatLevel(count)) {
-    case 'empty':
-      return { background: 'rgb(214, 206, 189)', filled: false }
-    case 'low':
-      return { background: 'rgb(181, 80, 42)', filled: true }
-    case 'mid':
-      return { background: 'hsl(16, 70%, 40%)', filled: true }
-    case 'high':
-      return { background: 'hsl(14, 78%, 33%)', filled: true }
-  }
-}
 
 // ---- component ----
 
@@ -47,6 +44,10 @@ export function App() {
   useEffect(() => {
     host.write(state)
   }, [state])
+
+  useEffect(() => {
+    document.querySelectorAll('a.lc-brand-home > svg').forEach((el) => el.remove())
+  }, [])
 
   const now = useMemo(() => new Date(), [])
   const today = toKey(now)
@@ -107,16 +108,39 @@ export function App() {
   const dayLabel = (d: Date) => `${MONTHS_FULL[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
 
   return (
-    <main style={{ display: 'block', width: '100%', padding: 'calc(20px * var(--sf))' }}>
+    <AppShell
+      name="Goal Tracker"
+      icon="layers"
+      hue="rust"
+      category="Personal"
+      meta={`${state.checkIns.length} check-ins`}
+      status="Saved on this device"
+      side={
+        <Rail title="Streaks" note="Current & longest">
+          <Stack>
+            <div style={{ font: '500 calc(15px * var(--tf)) var(--sans)', color: 'var(--ink)' }}>
+              Current streak: {current} {current === 1 ? 'day' : 'days'}
+            </div>
+            <div style={{ font: '400 calc(15px * var(--tf)) var(--sans)', color: 'var(--mid)' }}>
+              Longest streak: {longest} {longest === 1 ? 'day' : 'days'}
+            </div>
+            <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}>
+              <Button
+                kind="primary"
+                onClick={() => {
+                  setState((s) => checkInToday(s, today))
+                }}
+              >
+                Check in today
+              </Button>
+              <Button onClick={openAddPast}>Add past check-in</Button>
+            </div>
+          </Stack>
+        </Rail>
+      }
+    >
       <Card title="Goal Tracker" mono="DAILY GOAL" accent>
         <Stack lg>
-          <div>
-            <h1 style={{ margin: 0, font: '600 calc(22px * var(--tf)) var(--sans)', color: 'var(--ink)', letterSpacing: 'calc(-0.01em * var(--tf))' }}>
-              Goal Tracker
-            </h1>
-            <Body>Keep the streak alive and watch 2023 fill up. Everything stays in this space's mock store.</Body>
-          </div>
-
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'calc(20px * var(--sf))' }}>
             <div
               role="progressbar"
@@ -158,24 +182,6 @@ export function App() {
                 <MonoLabel sm style={{ color: 'var(--ink-60)' }}>{monthLabel}</MonoLabel>
               </div>
             </div>
-
-            <Stack>
-              <MonoLabel sm style={{ color: 'var(--ink-60)' }}>STREAKS</MonoLabel>
-              <div style={{ font: '500 calc(15px * var(--tf)) var(--sans)', color: 'var(--ink)' }}>
-                Current streak: {current} {current === 1 ? 'day' : 'days'}
-              </div>
-              <div style={{ font: '400 calc(15px * var(--tf)) var(--sans)', color: 'var(--mid)' }}>
-                Longest streak: {longest} {longest === 1 ? 'day' : 'days'}
-              </div>
-              <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}>
-                <Button kind="primary" onClick={() => {
-                  setState((s) => checkInToday(s, today))
-                }}>
-                  Check in today
-                </Button>
-                <Button onClick={openAddPast}>Add past check-in</Button>
-              </div>
-            </Stack>
           </div>
 
           <div>
@@ -222,7 +228,7 @@ export function App() {
                 }}
               >
                 {cells.map((c) => {
-                  const { background, filled } = heatStyle(c.count)
+                  const filled = (counts.get(c.key) ?? 0) > 0
                   return (
                     <button
                       key={c.key}
@@ -243,44 +249,37 @@ export function App() {
                         border: 'none',
                         borderRadius: 'calc(2px * var(--sf))',
                         cursor: 'pointer',
-                        background,
+                        background: heatBackground(c.count),
                       }}
                     />
                   )
                 })}
               </div>
             </div>
-            <Body sm style={{ marginTop: 'calc(10px * var(--sf))', color: 'var(--mid)' }}>
+            <div style={{ marginTop: 'calc(10px * var(--sf))', color: 'var(--mid)' }}>
               Each square is a day of 2023, Monday to Sunday, across 53 weeks. Click a day to record a check-in.
-            </Body>
+            </div>
           </div>
 
           <div>
             <MonoLabel sm style={{ color: 'var(--ink-60)' }}>CHECK-INS</MonoLabel>
             {items.length === 0 ? (
-              <Body style={{ marginTop: 'calc(6px * var(--sf))' }}>No check-ins yet</Body>
+              <div style={{ marginTop: 'calc(6px * var(--sf))' }}>
+                <EmptyState title="No check-ins yet" detail="Check in today or add a past check-in to start." />
+              </div>
             ) : (
-              <ul style={{ listStyle: 'none', margin: 'calc(8px * var(--sf)) 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: 'calc(6px * var(--sf))' }}>
-                {items.map((c) => (
-                    <li
+              <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+                <List label="Check-ins">
+                  {items.map((c) => (
+                    <Row
                       key={c.date}
-                      role="listitem"
-                      style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 'calc(10px * var(--sf))',
-                      padding: 'calc(8px * var(--sf))',
-                      border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                      borderRadius: 'calc(4px * var(--sf))',
-                      background: 'var(--ui-bright)',
-                    }}
-                  >
-                    <span style={{ font: '400 calc(14px * var(--tf)) var(--sans)', color: 'var(--ink)' }}>{c.date}</span>
-                    <Button onClick={() => deleteCheckIn(c.date)}>Delete check-in</Button>
-                  </li>
-                ))}
-              </ul>
+                      title={c.date}
+                      value={`${c.count} of ${c.goal}`}
+                      action={<Button kind="ghost" onClick={() => deleteCheckIn(c.date)}>Delete check-in</Button>}
+                    />
+                  ))}
+                </List>
+              </div>
             )}
           </div>
         </Stack>
@@ -302,29 +301,9 @@ export function App() {
             style={{ pointerEvents: 'auto', background: 'var(--ui-card)', border: 'calc(1px * var(--sf)) solid var(--ui-line2)', borderRadius: 'calc(6px * var(--sf))', boxShadow: 'var(--shadow)', width: 'calc(340px * var(--sf))', padding: 'calc(18px * var(--sf))' }}
           >
             <MonoLabel accent>ADD PAST CHECK-IN</MonoLabel>
-            <label
-              htmlFor="past-date"
-              style={{ display: 'block', marginTop: 'calc(12px * var(--sf))', color: 'var(--ink)', font: '500 calc(14px * var(--tf)) var(--sans)' }}
-            >
-              Date
-            </label>
-            <input
-              id="past-date"
-              type="date"
-              value={dialogDate}
-              onChange={(e) => setDialogDate(e.target.value)}
-              style={{
-                marginTop: 'calc(4px * var(--sf))',
-                width: '100%',
-                boxSizing: 'border-box',
-                padding: 'calc(8px * var(--sf))',
-                borderRadius: 'calc(4px * var(--sf))',
-                border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                background: 'var(--ui-bright)',
-                color: 'var(--ink)',
-                font: 'inherit',
-              }}
-            />
+            <div style={{ marginTop: 'calc(12px * var(--sf))' }}>
+              <TextInput label="Date" type="date" value={dialogDate} onChange={setDialogDate} />
+            </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'calc(8px * var(--sf))', marginTop: 'calc(16px * var(--sf))' }}>
               <Button onClick={closeDialog}>Cancel</Button>
               <Button kind="primary" onClick={saveDialog}>
@@ -334,6 +313,6 @@ export function App() {
           </div>
         </div>
       )}
-    </main>
+    </AppShell>
   )
 }
