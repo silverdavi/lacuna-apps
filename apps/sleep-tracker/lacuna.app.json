@@ -30,14 +30,26 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0"
     }
   },
   "capabilities": [
     "create:sleep-entry",
-    "edit:sleep-entry"
+    "edit:sleep-entry",
+    "view:heatmap",
+    "view:trend",
+    "export:backup",
+    "import:backup"
   ],
   "permissions": {
     "records": [
@@ -53,7 +65,9 @@
       }
     ],
     "platform": [
-      "identity.profile.read"
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
     ],
     "network": {
       "origins": []
