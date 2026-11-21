@@ -29,12 +29,16 @@
     "hostApi": "^1.0.0",
     "modules": {
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/dialog": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0"
     }
   },
   "capabilities": [
     "create:game",
-    "edit:game"
+    "edit:game",
+    "export:game"
   ],
   "permissions": {
     "records": [
