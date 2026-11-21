@@ -1,26 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Body, Button, Card, MonoLabel, Stack, TextInput, Title } from '@lacuna/ui'
-import { addHabit, deleteHabit, dayKey, isDone, listHabits, renameHabit, streak, toggleDay, type Habit } from './host'
+import { addHabit, deleteHabit, listHabits, renameHabit, toggleDay } from './host'
+import { isDone, lastSeven, streak, toggleDone, validateName, type Habit } from './engine'
 
 const SP = 'calc(8px * var(--sf))'
 const SP_SM = 'calc(4px * var(--sf))'
 const RADIUS = 'calc(8px * var(--sf))'
 const RADIUS_SM = 'calc(4px * var(--sf))'
-
-interface DayCell {
-  key: string
-  label: string
-}
-
-function lastSeven(today: Date): DayCell[] {
-  const out: DayCell[] = []
-  for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    out.push({ key: dayKey(d), label: i === 0 ? 'Today' : i === 1 ? '1 day ago' : `${i} days ago` })
-  }
-  return out
-}
 
 export function App() {
   const [habits, setHabits] = useState<Habit[]>(() => listHabits())
@@ -32,10 +18,6 @@ export function App() {
   const [confirm, setConfirm] = useState('')
   const renameInputRef = useRef<HTMLInputElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    setHabits(listHabits())
-  }, [])
 
   useEffect(() => {
     if (confirm) cancelRef.current?.focus()
@@ -67,16 +49,12 @@ export function App() {
   }
 
   function onAdd() {
-    const n = name.trim()
-    if (!n) {
-      setError('Enter a habit name.')
+    const problem = validateName(name, habits)
+    if (problem) {
+      setError(problem)
       return
     }
-    if (habits.some((h) => h.name.toLowerCase() === n.toLowerCase())) {
-      setError('That habit already exists.')
-      return
-    }
-    addHabit(n)
+    addHabit(name.trim())
     setName('')
     setError('')
     refresh()
@@ -88,9 +66,8 @@ export function App() {
   }
 
   function onRenameSave() {
-    const n = renameValue.trim()
     const target = habits.find((h) => h.id === renaming)
-    if (target && n) renameHabit(target.id, n)
+    if (target && renameValue.trim()) renameHabit(target.id, renameValue.trim())
     onRenameCancel()
     refresh()
   }
@@ -99,6 +76,11 @@ export function App() {
     if (confirm) deleteHabit(confirm)
     setConfirm('')
     refresh()
+  }
+
+  function onToggleDay(h: Habit, day: string) {
+    setHabits(toggleDone(habits, h.id, day))
+    toggleDay(h.id, day)
   }
 
   const toDelete = habits.find((h) => h.id === confirm)
@@ -180,10 +162,7 @@ export function App() {
                           role="checkbox"
                           aria-checked={done}
                           aria-label={`${h.name}, ${d.label}`}
-                          onClick={() => {
-                            toggleDay(h.id, d.key)
-                            refresh()
-                          }}
+                          onClick={() => onToggleDay(h, d.key)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',

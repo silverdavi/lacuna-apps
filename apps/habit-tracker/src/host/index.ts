@@ -1,4 +1,4 @@
-import { store, toDay, type Habit } from './mock'
+import { store, type Habit } from './mock'
 
 export type { Habit }
 
@@ -7,11 +7,11 @@ export function listHabits(): Habit[] {
 }
 
 export function addHabit(name: string): Habit {
-  return store.add(name)
+  return store.add({ name, done: [] })
 }
 
 export function renameHabit(id: string, name: string) {
-  store.rename(id, name)
+  store.update(id, { name })
 }
 
 export function deleteHabit(id: string) {
@@ -19,25 +19,8 @@ export function deleteHabit(id: string) {
 }
 
 export function toggleDay(id: string, day: string) {
-  store.toggleDone(id, day)
-}
-
-export function dayKey(d: Date): string {
-  return toDay(d)
-}
-
-export function isDone(habit: Habit, day: string): boolean {
-  return habit.done.includes(day)
-}
-
-export function streak(habit: Habit, today: Date): number {
-  let n = 0
-  const d = new Date(today)
-  if (habit.done.includes(toDay(d))) n += 1
-  for (;;) {
-    d.setDate(d.getDate() - 1)
-    if (habit.done.includes(toDay(d))) n += 1
-    else break
-  }
-  return n
+  const h = store.get(id)
+  if (!h) return
+  const has = h.done.includes(day)
+  store.update(id, { done: has ? h.done.filter((d) => d !== day) : [...h.done, day] })
 }
