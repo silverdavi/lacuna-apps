@@ -128,7 +128,6 @@ export function App() {
   const [savedClips, setSavedClips] = useState<Clip[]>([])
   const [format, setFormat] = useState<Format>(() => (settings.load().format === 'MP3' ? 'MP3' : 'WAV'))
 
-  const counterRef = useRef(1)
   const recorder = useLocalRecorder(100)
 
   function refresh() {
@@ -143,8 +142,10 @@ export function App() {
   async function saveClip(blob: Blob, durationMs: number) {
     try {
       const data = await blobToDataUrl(blob)
+      const base = format === 'MP3' ? 3 : 1
+      const number = base + clips.list().filter((c) => c.format === format).length
       clips.add({
-        name: `Clip ${counterRef.current}`,
+        name: `Clip ${number}`,
         data,
         mime: blob.type || 'audio/webm',
         size: blob.size,
@@ -152,7 +153,6 @@ export function App() {
         format,
         createdAt: Date.now(),
       })
-      counterRef.current += 1
       refresh()
     } catch {
       setNotice('The clip could not be saved')
