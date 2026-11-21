@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "80c2a6f83d524e6e8839435b5de38cb38692793ee714b36447ffd01778433cd7",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Tip Calculator\" and the tab buttons \"Bill\" and \"Split\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 100 in the field labelled \"Bill amount\" and 8 in the field labelled \"Tax amount\" shows the summary lines \"Subtotal: $100.00\", \"Tax: $8.00\", and \"Total: $108.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Moving the slider labelled \"Tip percentage\" to 15 shows the line \"Tip: $15.00\" and \"Total: $123.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 4 in the field labelled \"Number of people\" shows the line \"Per person: $30.75\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"Split\" shows the table with the header row \"Person\", \"Paid\", \"Owes\", and the row \"1\", \"$30.75\", \"$0.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the Split tab, typing 25 in the field labelled \"Person 1 paid\" and 35 in the field labelled \"Person 2 paid\" shows the transfer line \"Person 1 pays Person 2 $4.75\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy summary\" copies the text \"Total: $123.00, Per person: $30.75\" to the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting \"10%\" in the select labelled \"Tip preset\" sets the slider labelled \"Tip percentage\" to 10 and shows \"Tip: $10.00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the bill amount 100, tax 8, tip 15%, and 4 people, showing \"Total: $123.00\" and \"Per person: $30.75\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c0233b6c570b517b88a2c45f55547f61074a4ae525a78f5cfaa4bd81379405ca"
+    }
+  ]
+}
