@@ -1,3 +1,5 @@
+import { addDays, toISODate } from '@lacuna/date-math'
+
 export interface Habit {
   id: string
   name: string
@@ -10,18 +12,14 @@ export interface DayCell {
 }
 
 export function dayKey(d: Date): string {
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
+  return toISODate(d)
 }
 
 export function lastSeven(today: Date): DayCell[] {
   const out: DayCell[] = []
   for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    out.push({ key: dayKey(d), label: i === 0 ? 'Today' : i === 1 ? '1 day ago' : `${i} days ago` })
+    const d = addDays(today, -i)
+    out.push({ key: toISODate(d), label: i === 0 ? 'Today' : i === 1 ? '1 day ago' : `${i} days ago` })
   }
   return out
 }
@@ -32,12 +30,19 @@ export function isDone(habit: Habit, day: string): boolean {
 
 export function streak(habit: Habit, today: Date): number {
   let n = 0
-  const d = new Date(today)
-  if (habit.done.includes(dayKey(d))) n += 1
+  let d = new Date(today)
+  // If today is ticked, count it; otherwise start from yesterday
+  if (habit.done.includes(toISODate(d))) {
+    n += 1
+    d = addDays(d, -1)
+  } else {
+    d = addDays(d, -1)
+  }
+  // Walk backward while days are ticked
   for (;;) {
-    d.setDate(d.getDate() - 1)
-    if (habit.done.includes(dayKey(d))) n += 1
+    if (habit.done.includes(toISODate(d))) n += 1
     else break
+    d = addDays(d, -1)
   }
   return n
 }
