@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7502c3a9a7e8fec7f2420496b41885b1f17bb2e18b76d9193dd9bf40760ca9b2",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Bill Splitter\" and the tab labelled \"Split\" is active by default."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Split\" tab, typing \"Dinner\" in the field labelled \"Description\", \"100\" in the field labelled \"Amount\", and \"Alice, Bob\" in the field labelled \"People\" then clicking \"Add expense\" adds a row in the table labelled \"Expenses\" that contains \"Dinner\", \"$100.00\", and \"Alice, Bob\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the expense from A2, the result summary shows \"Total: $100.00\", \"People: 2\", and \"Per person: $50.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Split\" tab, clicking the button labelled \"Delete Dinner\" removes the \"Dinner\" row from the \"Expenses\" table and the result summary shows \"Total: $0.00\", \"People: 0\", and \"Per person: $0.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "Adding two expenses, \"Dinner\" $100 with \"Alice, Bob\" and \"Taxi\" $50 with \"Alice, Bob, Carol\", the \"Settle up\" tab shows a table labelled \"Transfers\" with rows \"Alice owes Bob $25.00\" and \"Alice owes Carol $25.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Split\" tab, changing the select labelled \"Split mode\" from \"Even\" to \"Percentage\" and entering \"50\" in the field labelled \"Alice %\" and \"50\" in the field labelled \"Bob %\" for the \"Dinner\" expense shows \"Alice: $50.00\" and \"Bob: $50.00\" in the breakdown."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Copy summary\" copies the text \"Total: $100.00, Alice: $50.00, Bob: $50.00\" to the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "The \"Split\" tab shows a chart labelled \"Share by person\" with two bars, one labelled \"Alice\" and one labelled \"Bob\", each at 50% height."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the expense \"Dinner\" with amount \"$100.00\" and people \"Alice, Bob\" in the \"Expenses\" table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "446746d4a34619313d69d7c4e3fc798670e62964bb2232d570d03bcae2ae675a"
+    }
+  ]
+}
