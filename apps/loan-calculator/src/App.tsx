@@ -1,92 +1,125 @@
-import { useMemo, useState } from 'react'
-import { Button, TextInput } from '@lacuna/ui'
-import { calculateLoan, formatMoney, loanError } from './loan'
-import { host, type LoanRecord } from './host'
+import { useEffect, useState } from 'react'
+import {
+  AppShell,
+  Button,
+  Card,
+  FormGrid,
+  KpiRow,
+  SectionLabel,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
+import { calculateLoan, formatMoney, loanError, type LoanInput } from './loan'
+import { host } from './host'
 
 export function App() {
-  const [fields, setFields] = useState<LoanRecord>(() => host.load())
+  const [principal, setPrincipal] = useState('')
+  const [rate, setRate] = useState('')
+  const [years, setYears] = useState('')
   const [showSchedule, setShowSchedule] = useState(false)
 
-  const error = useMemo(() => loanError(fields), [fields])
-  const result = useMemo(
-    () => (error === null ? calculateLoan(fields) : null),
-    [error, fields],
-  )
+  useEffect(() => {
+    const saved = host.load()
+    setPrincipal(saved.principal)
+    setRate(saved.rate)
+    setYears(saved.years)
+  }, [])
 
-  const updateField = (key: keyof LoanRecord) => (value: string) => {
-    const next = { ...fields, [key]: value }
-    setFields(next)
-    host.save(next)
-  }
+  const input: LoanInput = { principal, rate, years }
+  const error = loanError(input)
+  const result = error ? null : calculateLoan(input)
+
+  useEffect(() => {
+    if (!error && result) host.save({ principal, rate, years })
+  }, [error, result, principal, rate, years])
 
   return (
-    <main className="loan-app">
-      <h1 className="loan-heading">Loan payment</h1>
-      <div className="loan-form">
-        <TextInput
-          label="Principal"
-          value={fields.principal}
-          onChange={updateField('principal')}
-        />
-        <TextInput
-          label="Annual rate %"
-          value={fields.rate}
-          onChange={updateField('rate')}
-        />
-        <TextInput
-          label="Years"
-          value={fields.years}
-          onChange={updateField('years')}
-        />
-      </div>
-      {error && (
-        <div className="loan-error" role="alert">
-          {error}
-        </div>
+    <AppShell
+      name="Loan Calculator"
+      icon="finance"
+      hue="green"
+      category="Personal"
+      status="Local · no network"
+    >
+      <Card mono="Loan" title="Loan details">
+        <FormGrid>
+          <TextInput
+            label="Principal"
+            value={principal}
+            onChange={setPrincipal}
+            inputMode="decimal"
+            placeholder="100000"
+            error={error}
+          />
+          <TextInput
+            label="Annual rate %"
+            value={rate}
+            onChange={setRate}
+            inputMode="decimal"
+            placeholder="5"
+          />
+          <TextInput
+            label="Years"
+            value={years}
+            onChange={setYears}
+            inputMode="decimal"
+            placeholder="30"
+          />
+        </FormGrid>
+      </Card>
+
+      <Card mono="Result" title="Results">
+        <KpiRow>
+          <label aria-label="Monthly payment" style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="lc-kpi-value accent">{result ? formatMoney(result.monthlyPayment) : ''}</span>
+            <input value={result ? formatMoney(result.monthlyPayment) : ''} readOnly />
+          </label>
+          <label aria-label="Total interest" style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="lc-kpi-value">{result ? formatMoney(result.totalInterest) : ''}</span>
+            <input value={result ? formatMoney(result.totalInterest) : ''} readOnly />
+          </label>
+          <label aria-label="Total paid" style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="lc-kpi-value">{result ? formatMoney(result.totalPaid) : ''}</span>
+            <input value={result ? formatMoney(result.totalPaid) : ''} readOnly />
+          </label>
+        </KpiRow>
+      </Card>
+
+      {result && (
+        <Card
+          mono={`Amortization · ${result.rows.length} payments`}
+          title="Schedule"
+          actions={
+            <Button kind="secondary" onClick={() => setShowSchedule((s) => !s)}>
+              {showSchedule ? 'Hide schedule' : 'Show schedule'}
+            </Button>
+          }
+        >
+          {showSchedule ? (
+            <Table
+              label="Amortization schedule"
+              columns={[
+                { key: 'n', label: '#' },
+                { key: 'payment', label: 'Payment', num: true },
+                { key: 'interest', label: 'Interest', num: true },
+                { key: 'principal', label: 'Principal', num: true },
+                { key: 'balance', label: 'Balance', num: true },
+              ]}
+              rows={result.rows.map((row, i) => ({
+                cells: {
+                  n: i + 1,
+                  payment: formatMoney(row.payment),
+                  principal: formatMoney(row.principalPart),
+                  interest: formatMoney(row.interest),
+                  balance: formatMoney(row.balance),
+                },
+              }))}
+            />
+          ) : (
+            <SectionLabel>Use Show schedule to reveal the amortization table</SectionLabel>
+          )}
+        </Card>
       )}
-      <div className="loan-summary">
-        <label aria-label="Monthly payment">
-          {result ? formatMoney(result.monthlyPayment) : ''}
-          <input value="" />
-        </label>
-        <label aria-label="Total interest">
-          {result ? formatMoney(result.totalInterest) : ''}
-          <input value="" />
-        </label>
-        <label aria-label="Total paid">
-          {result ? formatMoney(result.totalPaid) : ''}
-          <input value="" />
-        </label>
-      </div>
-      <div className="loan-actions">
-        <Button kind="ghost" onClick={() => setShowSchedule((v) => !v)}>
-          Show schedule
-        </Button>
-      </div>
-      {result && showSchedule && (
-        <table className="loan-table">
-          <thead>
-            <tr>
-              <th>Payment</th>
-              <th className="num">Payment</th>
-              <th className="num">Interest</th>
-              <th className="num">Principal part</th>
-              <th className="num">Remaining</th>
-            </tr>
-          </thead>
-          <tbody>
-            {result.rows.map((row, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td className="num">{formatMoney(row.payment)}</td>
-                <td className="num">{formatMoney(row.interest)}</td>
-                <td className="num">{formatMoney(row.principalPart)}</td>
-                <td className="num">{formatMoney(row.balance)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </main>
+    </AppShell>
   )
 }

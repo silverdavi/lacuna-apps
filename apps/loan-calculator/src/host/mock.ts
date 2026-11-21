@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export interface LoanRecord {
   principal: string
   rate: string
@@ -22,22 +24,16 @@ function isLoan(value: unknown): value is LoanRecord {
   )
 }
 
+const store = createMockValue<LoanRecord>({
+  key: KEY,
+  fallback: emptyLoan,
+  validate: isLoan,
+})
+
 export function loadLoan(): LoanRecord {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return emptyLoan
-    const parsed: unknown = JSON.parse(raw)
-    if (!isLoan(parsed)) return emptyLoan
-    return parsed
-  } catch {
-    return emptyLoan
-  }
+  return store.get()
 }
 
 export function saveLoan(record: LoanRecord): void {
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(record))
-  } catch {
-    // storage unavailable; results stay for this page session only
-  }
+  store.set(record)
 }
