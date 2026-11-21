@@ -257,12 +257,12 @@ export function App() {
         title="Log a night"
         actions={
           hasEntries ? (
-            <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+            <Actions>
               <ExportMenu options={exportOptions} fileName="sleep-tracker" ariaLabel="Export" onExport={onExport} />
               <Button kind="secondary" onClick={pickImport} ariaLabel="Import backup">
                 Import
               </Button>
-            </div>
+            </Actions>
           ) : undefined
         }
       >
@@ -288,7 +288,7 @@ export function App() {
       </Card>
 
       <Card mono={`${entries.length} saved`} title="Summary">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(16px * var(--sf))' }}>
+        <Stack>
           <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
             Total nights: <span style={{ color: 'var(--ink)' }}>{entries.length}</span>
           </div>
@@ -298,7 +298,7 @@ export function App() {
           <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
             Streak: <span style={{ color: 'var(--accent)' }}>{streak} days</span>
           </div>
-        </div>
+        </Stack>
       </Card>
 
       <Card mono={hasEntries ? `${entries.length} entries` : 'Empty'} title="Entries">
@@ -343,7 +343,7 @@ export function App() {
               year={Number(entries[0].date.slice(0, 4))}
               label={`Nightly sleep, ${entries.length} ${entries.length === 1 ? 'night' : 'nights'}`}
             />
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(4px * var(--sf))', marginTop: 'calc(8px * var(--sf))' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(8px * var(--sf))', marginTop: 'calc(8px * var(--sf))' }}>
               {heatmapCells(entries).map((cell) => (
                 <div
                   key={cell.date}
@@ -351,16 +351,15 @@ export function App() {
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 'calc(2px * var(--sf))',
-                    padding: 'calc(6px * var(--sf))',
+                    gap: 'calc(4px * var(--sf))',
+                    padding: 'calc(8px * var(--sf))',
                     border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                    borderRadius: 'calc(4px * var(--sf))',
+                    borderRadius: 'calc(2px * var(--sf))',
                     background: 'var(--ui-bright)',
                   }}
                 >
-                  <span style={{ font: '400 calc(9px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
-                  <span style={{ font: '600 calc(11px * var(--tf)) var(--mono)', color: 'var(--accent)' }}>{cell.label}</span>
+                  <span style={{ font: '400 calc(10.5px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
+                  <span style={{ font: '600 calc(12px * var(--tf)) var(--mono)', color: 'var(--accent)' }}>{cell.label}</span>
                 </div>
               ))}
             </div>
