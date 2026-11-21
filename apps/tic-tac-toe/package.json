@@ -8,7 +8,12 @@
     "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
+    "@lacuna/export-menu": "workspace:0.1.0",
+    "@lacuna/grid-utils": "workspace:0.1.0",
+    "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/use-hotkeys": "workspace:0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
