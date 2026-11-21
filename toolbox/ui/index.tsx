@@ -3,6 +3,7 @@
 // @lacuna/ui: everything an app's screen is made of.
 // Every app renders one <AppShell> (the page frame, from ./kit) and builds inside it with Card, FormGrid,
 // TextInput, Select, Button, Actions, Kpi, Table, List/Row, Tag, Chip, EmptyState and ErrorState.
+// Platform behavior (primary action, 24px hit target, focus ring, empty state) is behavior.tsx.
 // KIT.md next to this file lists the props, the tokens, and one complete example.
 import type { CSSProperties, ReactNode } from 'react'
 import { HoverLabel } from './hover'
@@ -16,43 +17,27 @@ export { ICONS, SUITE_ICONS, iconForFlow } from './icons'
 export type { IconName, IconProps } from './icons'
 export { AppShell, Board, Checkbox, ErrorState, HUES, Keys, List, Plate, Rail, Row, SectionLabel, Select } from './kit'
 export type { Hue } from './kit'
+export { Adopt } from './adopt'
+export { EmptyState, FOCUS_RING, HIT_MIN_PX, PrimaryButton } from './behavior'
 
 function cx(...parts: (string | false | null | undefined)[]): string {
   return parts.filter(Boolean).join(' ')
 }
 
-export function EmptyState({
-  title,
-  detail,
-  mono,
-  children,
-}: {
-  title: ReactNode
-  detail?: ReactNode
-  mono?: string
-  children?: ReactNode
-}) {
-  return (
-    <div className="lc-empty">
-      {mono && <div className="lc-mono lc-mono-sm lc-faint">{mono}</div>}
-      <div className="lc-empty-title">{title}</div>
-      {detail && <div className="lc-body-sm">{detail}</div>}
-      {children}
-    </div>
-  )
-}
-
 export function Title({ children, size = 'lg', as: As = 'div', style }: { children: ReactNode; size?: 'xl' | 'lg' | 'md'; as?: 'div' | 'h2' | 'h3'; style?: CSSProperties }) {
   return <As className={`lc-title lc-title-${size}`} style={{ margin: 0, ...style }}>{children}</As>
 }
+;(Title as { __lkProse?: boolean }).__lkProse = true
 
 export function MonoLabel({ children, accent, faint, sm, style }: { children: ReactNode; accent?: boolean; faint?: boolean; sm?: boolean; style?: CSSProperties }) {
   return <div className={cx('lc-mono', sm && 'lc-mono-sm', accent && 'lc-accent', faint && 'lc-faint')} style={style}>{children}</div>
 }
+;(MonoLabel as { __lkProse?: boolean }).__lkProse = true
 
 export function Body({ children, sm, style }: { children: ReactNode; sm?: boolean; style?: CSSProperties }) {
   return <div className={sm ? 'lc-body-sm' : 'lc-body'} style={style}>{children}</div>
 }
+;(Body as { __lkProse?: boolean }).__lkProse = true
 
 const AVATAR_TONES = { ink: 'var(--ink)', mid: 'var(--mid)', accent: 'var(--accent)' } as const
 
@@ -244,6 +229,7 @@ export function Cols({ kind, children, style }: { kind: '2' | '3' | 'main-side' 
 export function Stack({ children, lg, style }: { children: ReactNode; lg?: boolean; style?: CSSProperties }) {
   return <div className={lg ? 'lc-stack-lg' : 'lc-stack'} style={style}>{children}</div>
 }
+;(Stack as { __lkProse?: boolean }).__lkProse = true
 
 export function Spread({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return <div className="lc-spread" style={style}>{children}</div>

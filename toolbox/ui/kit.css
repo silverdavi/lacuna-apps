@@ -19,13 +19,16 @@
 .lk-shell .lc-tag.accent { color: var(--accent); }
 .lk-shell .lc-app-bar .lc-mono, .lk-shell .lc-chip { color: var(--ink-80); }
 :root[data-appearance='dark'] .lk-shell { --accent: #E27B55; --on-accent: #10171A; --danger: #EE8372; }
-.lk-band { flex: none; padding-top: calc(5px * var(--sf)); padding-bottom: calc(5px * var(--sf)); padding-left: calc(16px * var(--sf)); padding-right: calc(16px * var(--sf)); }
-.lk-band b { font-weight: 500; }
-.lk-band .lc-persona-detail { color: var(--od-55); }
 .lk-shell .lc-desk-head { overflow: visible; }
 .lk-crumb {
   font-family: var(--mono); font-size: calc(10px * var(--tf)); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--mid); padding: 2px 4px;
+}
+/* Current page. Twin of the product launcher rule on .lc-cv-crumbs .here.
+   Ink word, 2px accent underline. Apps do not restyle this. */
+.lk-shell .lc-cv-crumbs .here {
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 /* The mark, the APPS chip and the category are links to the Lacuna desktop. Same look as before, as links. */
 .lk-shell a.lc-spacechip, .lk-shell a.lk-crumb { text-decoration: none; cursor: pointer; }
@@ -37,6 +40,7 @@
   flex: 0 1 auto; width: calc(100% - calc(48px * var(--sf))); max-width: 1120px;
   margin: calc(24px * var(--sf)) auto; overflow: visible;
 }
+.lk-embedded .lk-win { margin-top: calc(18px * var(--sf)); }
 .lk-shell .lc-app-bar .lk-name { margin: 0; line-height: 1.2; flex: 0 1 auto; max-width: none; }
 .lk-grow { flex: 1; }
 .lk-shell .lc-app-body { min-height: 0; }
@@ -57,6 +61,7 @@
 .lk-rail .lc-envelope-fields { margin-top: calc(12px * var(--sf)); }
 .lk-rail .lc-chip { white-space: normal; }
 .lk-rail-body { margin-top: calc(12px * var(--sf)); font-size: calc(12px * var(--tf)); color: var(--ink-60); line-height: 1.5; }
+.lk-rail > :first-child { margin-top: 0; }
 
 /* ---------------------------------------------------------------- section label */
 .lk-section { margin: 0; font-weight: 400; }
@@ -89,6 +94,9 @@
 .lk-shell select.lc-input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-60) 50%), linear-gradient(135deg, var(--ink-60) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: calc(30px * var(--sf)); }
 .lk-shell .lc-input::placeholder { color: var(--ink-40); }
 .lk-shell .lc-input[aria-invalid='true'] { border-color: var(--danger); }
+/* Focus ring and hit target. Twin of the product launcher .lc-btn rule.
+   Apps do not set outline. Phone rules below raise the hit target to 44px. */
+.lk-shell .lc-btn { min-height: 24px; min-width: 24px; }
 .lk-shell .lc-btn:focus-visible, .lk-shell .lc-input:focus-visible, .lk-shell .lc-pill:focus-visible,
 .lk-shell .lc-tab:focus-visible, .lk-main button:focus-visible, .lk-main input:focus-visible,
 .lk-main select:focus-visible, .lk-main textarea:focus-visible, .lk-row-text:focus-visible {
@@ -243,7 +251,6 @@ button.lk-row-text { cursor: pointer; }
   .lk-win { width: calc(100% - calc(16px * var(--sf))); margin: calc(8px * var(--sf)) auto; }
   .lk-shell .lk-win { box-shadow: 3px 3px 0 var(--ink); margin-bottom: calc(14px * var(--sf)); }
   .lk-main { padding: calc(12px * var(--sf)); }
-  .lk-band .lc-persona-detail { display: none; }
   .lk-shell .lc-spacechip { display: none; }
   .lk-shell .lc-btn, .lk-shell .lc-input, .lk-main button:not([class]) { min-height: 44px; }
   .lk-shell .lc-input { font-size: calc(16px * var(--tf)); }
