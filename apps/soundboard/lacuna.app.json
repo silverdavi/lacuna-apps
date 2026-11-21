@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "com.example.soundboard",
+  "id": "lacuna.soundboard",
   "name": "Soundboard",
   "version": "0.1.0",
   "summary": "Record short sound clips, replay them with hotkeys, and keep a running score.",
@@ -12,9 +12,9 @@
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",

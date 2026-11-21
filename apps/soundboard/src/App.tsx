@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AppShell, Button, Card, EmptyState, List } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, Keys, List, Rail } from '@lacuna/ui'
 import { useMediaRecorder } from '@lacuna/use-media-recorder'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useHotkeys } from '@lacuna/use-hotkeys'
@@ -77,7 +77,23 @@ export function App() {
   useHotkeys(hotkeyBindings, { enabled: clips.length > 0 })
 
   return (
-    <AppShell name="Soundboard" icon="notes" hue="cobalt" category="Personal" meta={`${clips.length} ${clips.length === 1 ? 'clip' : 'clips'}`}>
+    <AppShell
+      name="Soundboard"
+      icon="notes"
+      hue="cobalt"
+      category="Personal"
+      meta={`${clips.length} ${clips.length === 1 ? 'clip' : 'clips'}`}
+      status={recording ? `Recording ${clock(recorder.elapsed * 1000)}` : `Score ${scores.score} · Best ${scores.best}`}
+      side={
+        <Rail
+          title="Shortcuts"
+          note={`${clips.length} ${clips.length === 1 ? 'clip' : 'clips'}`}
+          chips={['Record', 'Play', 'Export']}
+        >
+          <Keys items={clips.length > 0 ? [['1', 'Play clip 1'], ['2', 'Play clip 2']] : [['R', 'Record clip']]} />
+        </Rail>
+      }
+    >
       <Card mono="Recorder" title={recording ? 'Recording' : 'Record a clip'}>
         <div className="lk-row" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span className="lk-row-text">
