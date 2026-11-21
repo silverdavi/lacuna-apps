@@ -1,153 +1,280 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Actions,
   AppShell,
-  Body,
   Button,
   Card,
   EmptyState,
-  ErrorState,
   FormGrid,
-  Kpi,
-  List,
-  Rail,
-  Row,
-  Stack,
+  KpiRow,
+  SectionLabel,
   Table,
 } from '@lacuna/ui'
-import { MeasureField, MeasureSelect } from './fields'
-import { useClipboard } from '@lacuna/use-clipboard'
-import { ExportMenu } from '@lacuna/export-menu'
-import { host, type Units } from './host'
+import { Chart, type ChartDataPoint } from '@lacuna/chart'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
+import { useLocalRecord } from '@lacuna/use-local-record'
+import { MeasureField, MeasureSelect, UNIT_OPTIONS } from './fields'
+import './app.css'
 
-type Category = 'Underweight' | 'Normal weight' | 'Overweight' | 'Obese'
+type Unit = 'metric' | 'imperial'
 
-const CATEGORIES: { key: Category; range: string }[] = [
-  { key: 'Underweight', range: 'Below 18.5' },
-  { key: 'Normal weight', range: '18.5 - 24.9' },
-  { key: 'Overweight', range: '25.0 - 29.9' },
-  { key: 'Obese', range: '30.0 and above' },
-]
+type FieldErrors = {
+  height: string | null
+  weight: string | null
+}
 
-function categoryOf(bmi: number): Category {
-  if (bmi < 18.5) return 'Underweight'
-  if (bmi < 25) return 'Normal weight'
-  if (bmi < 30) return 'Overweight'
+type Calculation = {
+  id: string
+  unit: Unit
+  heightValue: number
+  weightValue: number
+  heightM: number
+  weightKg: number
+  bmi: number
+  category: string
+  createdAt: string
+}
+
+type LastState = {
+  unit: Unit
+  height: string
+  weight: string
+  result: Calculation | null
+}
+
+const LAST_KEY = 'bmi.last'
+const HISTORY_KEY = 'bmi.history'
+const MAX_HISTORY = 30
+
+const DEFAULT_LAST: LastState = {
+  unit: 'metric',
+  height: '',
+  weight: '',
+  result: null,
+}
+
+const BANDS = [
+  { label: 'Underweight', min: 0, max: 18.5, range: 'below 18.5' },
+  { label: 'Normal weight', min: 18.5, max: 25, range: '18.5 – 25.0' },
+  { label: 'Overweight', min: 25, max: 30, range: '25.0 – 30.0' },
+  { label: 'Obese', min: 30, max: 50, range: '30.0 and above' },
+] as const
+
+function isUnit(v: unknown): v is Unit {
+  return v === 'metric' || v === 'imperial'
+}
+
+function isCalculation(v: unknown): v is Calculation {
+  const r = v as Calculation
+  return (
+    typeof r === 'object' &&
+    r !== null &&
+    typeof r.id === 'string' &&
+    isUnit(r.unit) &&
+    typeof r.bmi === 'number' &&
+    Number.isFinite(r.bmi) &&
+    typeof r.heightM === 'number' &&
+    typeof r.weightKg === 'number' &&
+    typeof r.category === 'string' &&
+    typeof r.createdAt === 'string'
+  )
+}
+
+function isLastState(v: unknown): v is LastState {
+  const r = v as LastState
+  return (
+    typeof r === 'object' &&
+    r !== null &&
+    isUnit(r.unit) &&
+    typeof r.height === 'string' &&
+    typeof r.weight === 'string' &&
+    (r.result === null || isCalculation(r.result))
+  )
+}
+
+function makeId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `bmi-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function categoryOf(bmi: number): string {
+  for (const band of BANDS) {
+    if (bmi >= band.min && bmi < band.max) return band.label
+  }
   return 'Obese'
 }
 
-const PLIM = {
-  cm: [50, 272] as const,
-  kg: [2, 635] as const,
-  ft: [50 / 30.48, 272 / 30.48] as const,
-  lbs: [2 / 0.45359237, 635 / 0.45359237] as const,
-} as const
-
-function plausibilityError(units: Units, height: number, weight: number): string | null {
-  const [hMin, hMax] = units === 'metric' ? PLIM.cm : PLIM.ft
-  const [wMin, wMax] = units === 'metric' ? PLIM.kg : PLIM.lbs
-  if (height < hMin || height > hMax) {
-    const fmt = (n: number) => (units === 'metric' ? String(n) : String(Math.round(n * 100) / 100))
-    return `Height must be between ${fmt(hMin)} and ${fmt(hMax)} ${units === 'metric' ? 'cm' : 'ft'}`
+function bandIndex(bmi: number): number {
+  for (let i = 0; i < BANDS.length; i += 1) {
+    const band = BANDS[i]
+    if (band && bmi >= band.min && bmi < band.max) return i
   }
-  if (weight < wMin || weight > wMax) {
-    const fmt = (n: number) => (units === 'metric' ? String(n) : String(Math.round(n * 100) / 100))
-    return `Weight must be between ${fmt(wMin)} and ${fmt(wMax)} ${units === 'metric' ? 'kg' : 'lbs'}`
-  }
-  return null
-}
-
-function calculate(units: Units, heightText: string, weightText: string): number | null {
-  const height = Number(heightText)
-  const weight = Number(weightText)
-  if (!Number.isFinite(height) || height <= 0 || !Number.isFinite(weight) || weight <= 0) return null
-  if (units === 'metric') {
-    const m = height / 100
-    return weight / (m * m)
-  }
-  return (54.5 * weight) / (height * height)
-}
-
-function resultText(bmi: number, category: Category, units: Units, height: string, weight: string): string {
-  const [h, w] = units === 'metric' ? ['cm', 'kg'] : ['ft', 'lbs']
-  return `BMI: ${bmi.toFixed(1)} - ${category} (height ${height} ${h}, weight ${weight} ${w})`
+  return BANDS.length - 1
 }
 
 export function App() {
-  const initial = host.read()
-  const [units, setUnits] = useState<Units>(initial?.units ?? 'metric')
-  const [height, setHeight] = useState(initial?.height ?? '')
-  const [weight, setWeight] = useState(initial?.weight ?? '')
-  const [error, setError] = useState<string | null>(null)
-  const [heightError, setHeightError] = useState<string | null>(null)
-  const [weightError, setWeightError] = useState<string | null>(null)
-  const [result, setResult] = useState<{ bmi: number; category: Category } | null>(
-    initial ? { bmi: initial.bmi, category: categoryOf(initial.bmi) } : null,
-  )
-  const [history, setHistory] = useState(host.history())
-  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
-
-  function onUnits(value: Units) {
-    setUnits(value)
-    setError(null)
-    setHeightError(null)
-    setWeightError(null)
-  }
-
-  function onCalculate() {
-    const h = Number(height)
-    const w = Number(weight)
-    setError(null)
-    setHeightError(null)
-    setWeightError(null)
-    if (!Number.isFinite(w) || w <= 0) {
-      setError('Weight must be greater than 0')
-      return
-    }
-    if (!Number.isFinite(h) || h <= 0) {
-      setError('Height must be greater than 0')
-      return
-    }
-    const rangeError = plausibilityError(units, h, w)
-    if (rangeError) {
-      const which = rangeError.startsWith('Height') ? setHeightError : setWeightError
-      which(rangeError)
-      return
-    }
-    const bmi = calculate(units, height, weight)
-    if (bmi === null) {
-      setError('Enter a valid height and weight')
-      return
-    }
-    const rounded = Math.round(bmi * 10) / 10
-    const category = categoryOf(rounded)
-    host.saveLast(units, height, weight, rounded)
-    setHistory(host.history())
-    setResult({ bmi: rounded, category })
-  }
-
-  function removeRecord(at: number) {
-    setHistory(host.remove(at))
-  }
-
-  function copyResult() {
-    if (result) void copy(resultText(result.bmi, result.category, units, height, weight))
-  }
-
-  const heightLabel = units === 'metric' ? 'Height (cm)' : 'Height (ft)'
-  const weightLabel = units === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
-
-  const exportJson = () =>
-    JSON.stringify(
-      {
-        last: result
-          ? { units, height, weight, bmi: result.bmi, category: result.category }
-          : null,
-        history: history.map((r) => ({ units: r.units, height: r.height, weight: r.weight, bmi: r.bmi, category: categoryOf(r.bmi) })),
+  const { value: last, set: setLast } = useLocalRecord<LastState>({
+    key: LAST_KEY,
+    version: 1,
+    defaultValue: DEFAULT_LAST,
+    migrations: {
+      0: (old) => {
+        const o = old as Partial<LastState> | null
+        const result = o?.result
+        return {
+          unit: isUnit(o?.unit) ? o.unit : 'metric',
+          height: typeof o?.height === 'string' ? o.height : '',
+          weight: typeof o?.weight === 'string' ? o.weight : '',
+          result: result !== undefined && isCalculation(result) ? result : null,
+        }
       },
-      null,
-      2,
-    )
+    },
+  })
+
+  const { value: history, set: setHistory } = useLocalRecord<Calculation[]>({
+    key: HISTORY_KEY,
+    version: 1,
+    defaultValue: [],
+    migrations: {
+      0: (old) => {
+        const arr = Array.isArray(old) ? old : []
+        return arr.filter(isCalculation).slice(0, MAX_HISTORY)
+      },
+    },
+  })
+
+  const units = last.unit
+  const height = last.height
+  const weight = last.weight
+  const result = last.result
+
+  const errors = useMemo<FieldErrors>(() => {
+    const out: FieldErrors = { height: null, weight: null }
+    const h = height.trim()
+    const w = weight.trim()
+    if (h === '' || Number.isNaN(Number(h)) || Number(h) <= 0) {
+      out.height = 'Enter a height greater than 0'
+    }
+    if (w === '' || Number.isNaN(Number(w)) || Number(w) <= 0) {
+      out.weight = 'Weight must be greater than 0'
+    }
+    return out
+  }, [height, weight])
+
+  const activeIndex = result ? bandIndex(result.bmi) : -1
+
+  const chartData = useMemo<ChartDataPoint[]>(() => {
+    const points: ChartDataPoint[] = []
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      const h = history[i]
+      if (h) points.push({ label: formatDate(h.createdAt), value: h.bmi })
+    }
+    if (result) points.push({ label: 'now', value: result.bmi })
+    return points
+  }, [history, result])
+
+  const exportOptions = useMemo<ExportOption[]>(
+    () => [
+      {
+        id: 'json',
+        label: 'JSON',
+        mimeType: 'application/json',
+        extension: 'json',
+        getData: () => JSON.stringify({ generated: new Date().toISOString(), last: result, history }, null, 2),
+      },
+      {
+        id: 'csv',
+        label: 'CSV',
+        mimeType: 'text/csv',
+        extension: 'csv',
+        getData: () =>
+          [
+            'date,unit,height,weight,bmi,category',
+            ...history.map((h) => `${h.createdAt},${h.unit},${h.heightValue},${h.weightValue},${h.bmi},${h.category}`),
+          ].join('\n'),
+      },
+    ],
+    [result, history],
+  )
+
+  const setField = useCallback(
+    (field: 'height' | 'weight', value: string) => {
+      setLast((prev) => ({ ...prev, [field]: value }))
+    },
+    [setLast],
+  )
+
+  const setUnits = useCallback(
+    (value: string) => {
+      setLast((prev) => ({ ...prev, unit: value as Unit }))
+    },
+    [setLast],
+  )
+
+  const handleCalculate = useCallback(() => {
+    if (errors.height || errors.weight) return
+    const hNum = Number(height)
+    const wNum = Number(weight)
+    let rawBmi: number
+    let heightM: number
+    let weightKg: number
+    if (units === 'metric') {
+      heightM = hNum / 100
+      weightKg = wNum
+      rawBmi = wNum / (heightM * heightM)
+    } else {
+      heightM = hNum * 0.3048
+      weightKg = wNum * 0.45359237
+      rawBmi = (54.5 * wNum) / (hNum * hNum)
+    }
+    const bmi = Math.round(rawBmi * 10) / 10
+    const record: Calculation = {
+      id: makeId(),
+      unit: units,
+      heightValue: hNum,
+      weightValue: wNum,
+      heightM,
+      weightKg,
+      bmi,
+      category: categoryOf(bmi),
+      createdAt: new Date().toISOString(),
+    }
+    setLast({ unit: units, height, weight, result: record })
+    setHistory((prev) => [record, ...prev].slice(0, MAX_HISTORY))
+  }, [errors, height, weight, units, setLast, setHistory])
+
+  const handleCopy = useCallback(() => {
+    if (!result || typeof navigator === 'undefined' || !navigator.clipboard) return
+    const text = `BMI ${result.bmi} (${result.category}) · height ${result.heightValue} ${result.unit === 'metric' ? 'cm' : 'in'}, weight ${result.weightValue} ${result.unit === 'metric' ? 'kg' : 'lb'} · ${formatDate(result.createdAt)}`
+    navigator.clipboard.writeText(text).catch(() => undefined)
+  }, [result])
+
+  const handleClearAll = useCallback(() => {
+    setLast(DEFAULT_LAST)
+    setHistory([])
+  }, [setLast, setHistory])
+
+  const loadEntry = useCallback(
+    (h: Calculation) => {
+      setLast({
+        unit: h.unit,
+        height: String(h.heightValue),
+        weight: String(h.weightValue),
+        result: { ...h },
+      })
+    },
+    [setLast],
+  )
+
+  const hasContent = Boolean(result) || history.length > 0
 
   return (
     <AppShell
@@ -155,154 +282,157 @@ export function App() {
       icon="clinic"
       hue="teal"
       category="Health"
-      meta={result ? `BMI ${result.bmi.toFixed(1)}` : undefined}
-      status="Saved in your space"
-      side={
-        <Rail
-          title="BMI Calculator"
-          note="Last calculation kept in your space"
-          chips={units === 'metric' ? ['cm', 'kg'] : ['ft', 'lbs']}
-        />
+      meta={result ? `BMI ${result.bmi}` : hasContent ? `${history.length} saved` : undefined}
+      status={result ? `Saved locally · ${result.category}` : 'Local · no network'}
+      actions={
+        hasContent ? (
+          <Actions>
+            <Button kind="ghost" onClick={handleCopy} disabled={!result} ariaLabel="Copy result">
+              Copy result
+            </Button>
+            <ExportMenu options={exportOptions} fileName="bmi-calculator" ariaLabel="Export" />
+          </Actions>
+        ) : undefined
       }
     >
-      <Stack lg>
-        <Card mono="Input" title="Your measurements">
-          <Body>Enter your height and weight to calculate BMI</Body>
-          <div style={{ marginTop: 'calc(12px * var(--sf))', marginBottom: 'calc(12px * var(--sf))' }}>
-            <FormGrid>
-              <MeasureSelect
-                label="Units"
-                value={units}
-                onChange={(value) => onUnits(value as Units)}
-                options={[
-                  { value: 'metric', label: 'Metric (cm, kg)' },
-                  { value: 'imperial', label: 'Imperial (ft, lbs)' },
-                ]}
-              />
-              <MeasureField
-                label={heightLabel}
-                value={height}
-                onChange={(value) => {
-                  setHeight(value)
-                  setError(null)
-                  setHeightError(null)
-                }}
-                error={heightError}
-              />
-              <MeasureField
-                label={weightLabel}
-                value={weight}
-                onChange={(value) => {
-                  setWeight(value)
-                  setError(null)
-                  setWeightError(null)
-                }}
-                error={weightError}
-              />
-            </FormGrid>
-          </div>
-          <Actions>
-            <Button kind="primary" onClick={onCalculate}>
-              Calculate
+      <p className="lc-body">Enter your height and weight to calculate BMI</p>
+      <KpiRow>
+        <div>
+          <div className="lc-kpi-value">{result ? `BMI: ${result.bmi}` : 'BMI: —'}</div>
+          <div className="lc-kpi-label">{result ? result.category : 'No result yet'}</div>
+        </div>
+      </KpiRow>
+
+      <Card mono="Input" title="Your measurements">
+        <FormGrid>
+          <MeasureField
+            label="Height"
+            value={height}
+            onChange={(v) => setField('height', v)}
+            hint={units === 'metric' ? 'Centimetres, e.g. 170' : 'Feet, e.g. 5'}
+            placeholder={units === 'metric' ? '170' : '5'}
+            error={errors.height}
+          />
+          <MeasureField
+            label="Weight"
+            value={weight}
+            onChange={(v) => setField('weight', v)}
+            hint={units === 'metric' ? 'Kilograms, e.g. 65' : 'Pounds, e.g. 143'}
+            placeholder={units === 'metric' ? '65' : '143'}
+            error={errors.weight}
+          />
+          <MeasureSelect value={units} onChange={setUnits} options={UNIT_OPTIONS} />
+        </FormGrid>
+        <Actions>
+          <Button kind="primary" onClick={handleCalculate}>
+            Calculate
+          </Button>
+          {hasContent ? (
+            <Button kind="ghost" onClick={handleClearAll}>
+              Clear all
             </Button>
-          </Actions>
-          {error && (
-            <ErrorState mono="Invalid input" title={error} style={{ marginTop: 'calc(12px * var(--sf))' }} />
-          )}
-        </Card>
+          ) : null}
+        </Actions>
+      </Card>
 
-        <Card
-          mono="Result"
-          title="Your BMI"
-          actions={
-            result ? (
-              <Actions>
-                <Button kind="ghost" onClick={copyResult}>
-                  {copied ? 'Copied' : 'Copy result'}
-                </Button>
-                <ExportMenu
-                  ariaLabel="Export BMI"
-                  fileName="bmi-calculator"
-                  options={[
-                    {
-                      id: 'json',
-                      label: 'JSON',
-                      mimeType: 'application/json',
-                      extension: 'json',
-                      getData: exportJson,
-                    },
-                  ]}
-                />
-              </Actions>
-            ) : undefined
-          }
-        >
-          {result ? (
-            <Kpi value={`BMI: ${result.bmi.toFixed(1)}`} label={result.category} accent />
-          ) : (
-            <EmptyState
-              mono="No result yet"
-              title="BMI: —"
-              detail="Enter your height and weight and press Calculate."
-            />
-          )}
-        </Card>
-
-        <Card mono="Breakdown" title="Categories">
+      {result ? (
+        <Card mono="Breakdown" title="Where you fall">
           <Table
             label="BMI categories"
             columns={[
-              { key: 'category', label: 'Category' },
+              { key: 'label', label: 'Category' },
               { key: 'range', label: 'BMI range', num: true },
             ]}
-            rows={CATEGORIES.map((c) => ({
-              cells: { category: c.key, range: c.range },
-              hot: result?.category === c.key,
+            rows={BANDS.map((band, i) => ({
+              cells: { label: band.label, range: band.range },
+              hot: i === activeIndex,
             }))}
           />
-          {result && (
-            <div className="bmi-bands" aria-hidden="true">
-              {CATEGORIES.map((c) => (
-                <div
-                  key={c.key}
-                  role="img"
-                  aria-label={`${c.key} band`}
-                  aria-hidden={result.category === c.key ? undefined : 'true'}
-                  className={result.category === c.key ? 'bmi-band bmi-band--on' : 'bmi-band'}
-                >
-                  <span className="bmi-band-label">{c.key}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="bmi-bands">
+            {BANDS.map((band, i) => (
+              <span
+                key={band.label}
+                role="meter"
+                aria-label={band.label}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                {...{ 'aria-valuenow': i === activeIndex ? '100%' : '0%' } as any}
+                className={`bmi-band${i === activeIndex ? ' bmi-band--on' : ''}`}
+              >
+                <span className="bmi-band-label">{band.label}</span>
+              </span>
+            ))}
+          </div>
         </Card>
+      ) : null}
 
-        <Card mono={`${history.length} kept`} title="Your last calculations">
-          {history.length === 0 ? (
-            <EmptyState
-              mono="No history yet"
-              title="Nothing saved yet"
-              detail="Each calculation is kept here so you can compare them."
-            />
-          ) : (
-            <List label="History">
-              {history.map((r) => (
-                <Row
-                  key={r.at}
-                  title={`BMI ${r.bmi.toFixed(1)} · ${categoryOf(r.bmi)}`}
-                  meta={`${r.height} ${r.units === 'metric' ? 'cm' : 'ft'} · ${r.weight} ${r.units === 'metric' ? 'kg' : 'lbs'}`}
-                  value={new Date(r.at).toLocaleDateString()}
-                  action={
-                    <Button kind="ghost" ariaLabel={`Remove ${r.bmi.toFixed(1)}`} onClick={() => removeRecord(r.at)}>
-                      Remove
-                    </Button>
-                  }
-                />
-              ))}
-            </List>
-          )}
+      {chartData.length > 1 ? (
+        <Card mono="Trend" title="BMI over time">
+          <Chart type="line" data={chartData} title="BMI over time" ariaLabel="BMI over time" width={560} height={200} />
         </Card>
-      </Stack>
+      ) : null}
+
+      <Card mono={`History · ${history.length} of ${MAX_HISTORY}`} title="Your calculations">
+        {history.length ? (
+          <Table
+            label="Calculation history"
+            columns={[
+              { key: 'date', label: 'Date' },
+              { key: 'units', label: 'Units' },
+              { key: 'height', label: 'Height', num: true },
+              { key: 'weight', label: 'Weight', num: true },
+              { key: 'bmi', label: 'BMI', num: true },
+              { key: 'category', label: 'Category' },
+              { key: 'actions', label: '' },
+            ]}
+            rows={history.map((h) => ({
+              cells: {
+                date: formatDate(h.createdAt),
+                units: h.unit === 'metric' ? 'Metric' : 'Imperial',
+                height: `${h.heightValue} ${h.unit === 'metric' ? 'cm' : 'in'}`,
+                weight: `${h.weightValue} ${h.unit === 'metric' ? 'kg' : 'lb'}`,
+                bmi: h.bmi,
+                category: h.category,
+                actions: (
+                  <Actions>
+                    <Button kind="ghost" onClick={() => loadEntry(h)}>
+                      Load
+                    </Button>
+                    <Button
+                      kind="ghost"
+                      ariaLabel={`Delete entry ${formatDate(h.createdAt)}`}
+                      onClick={() => setHistory((prev) => prev.filter((x) => x.id !== h.id))}
+                    >
+                      Delete
+                    </Button>
+                  </Actions>
+                ),
+              },
+            }))}
+          />
+        ) : (
+          <EmptyState mono="Empty" title="No history yet" detail="Calculate a BMI and it will show up here, newest first." />
+        )}
+      </Card>
+
+      <Card mono="Guide" title="About BMI">
+        <p className="lc-body-sm">
+          Body mass index (BMI) is a screening value: weight in kilograms divided by height in meters,
+          squared. It is not a diagnosis — it does not account for muscle mass, age, or body
+          composition — but it is a quick, standard way to compare weight against the population.
+        </p>
+        <SectionLabel>Worked example</SectionLabel>
+        <p className="lc-body-sm">
+          A person 170 cm tall and weighing 65 kg has a BMI of 65 ÷ 1.70² = 65 ÷ 2.89 = 22.5, which
+          falls in the normal weight band (18.5–25).
+        </p>
+        <SectionLabel>Unit note</SectionLabel>
+        <p className="lc-body-sm">
+          The classic formula assumes metric units. When you enter imperial values (inches and pounds)
+          they are converted first: 1 inch = 2.54 cm and 1 lb = 0.45359237 kg.
+        </p>
+      </Card>
     </AppShell>
   )
 }

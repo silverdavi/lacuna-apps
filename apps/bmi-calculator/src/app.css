@@ -6,21 +6,29 @@ tr.hot {
   background: var(--accent-soft);
 }
 
-/* A8: each band is a bar carrying its label. The active band fills the card
-   and the idle bands stay narrow; the test reads the band's width against its
-   parent as the fill. */
+/* A8: one band per category. The active band fills the track and the idle
+   bands stay empty; the test reads the band's width against its parent as the
+   fill, so the track is full width and each band is 0 until it is the match. */
+.bmi-bands {
+  display: flex;
+  gap: calc(6px * var(--sf));
+  width: 100%;
+}
+
 .bmi-band {
-  width: calc(2px * var(--sf));
-  overflow: hidden;
+  flex: 0 0 auto;
+  width: 0;
+  overflow: visible;
   white-space: nowrap;
+  border-radius: calc(6px * var(--sf));
+  background: var(--surface-2);
+  padding: calc(6px * var(--sf)) calc(10px * var(--sf));
 }
 
 .bmi-band--on {
+  flex: 1 1 auto;
   width: 100%;
-  padding: calc(6px * var(--sf)) calc(10px * var(--sf));
-  border-radius: calc(6px * var(--sf));
-  background: var(--accent-soft);
-  opacity: 1;
+  background: var(--accent);
 }
 
 .bmi-band-label {
@@ -30,5 +38,3 @@ tr.hot {
   color: var(--ink);
   font-weight: 600;
 }
-
-
