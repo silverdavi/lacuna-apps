@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a6febabd78514b0b48da81d521d802178432f7fa54f54fa758c6e8462833ff1f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first open the fields labelled \"Home price\", \"Down payment\", \"Interest rate\" and \"Term\" hold 300000, 60000, 6.5 and 30, and the result summary shows \"Loan amount\" $240,000.00, \"Monthly payment\" $1,516.96 and \"Total interest\" $306,106.77."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 500000 in the field labelled \"Home price\" and clicking \"Calculate\" shows \"Loan amount\" $440,000.00 and \"Monthly payment\" $2,781.10."
+    },
+    {
+      "id": "A3",
+      "text": "With the first-open values, typing 100000 in the field labelled \"Down payment\" and clicking \"Calculate\" shows \"Loan amount\" $200,000.00 and \"Monthly payment\" $1,264.14."
+    },
+    {
+      "id": "A4",
+      "text": "With the first-open values, typing 15 in the field labelled \"Term\" and clicking \"Calculate\" shows \"Monthly payment\" $2,090.66 and \"Total interest\" $136,318.38."
+    },
+    {
+      "id": "A5",
+      "text": "With the first-open values, the yearly table has 30 rows; the row for year 1 shows principal $2,682.54, interest $15,521.02 and balance $237,317.46."
+    },
+    {
+      "id": "A6",
+      "text": "With the first-open values, the row for year 30 shows balance $0.00."
+    },
+    {
+      "id": "A7",
+      "text": "Typing 0 in the field labelled \"Home price\" and clicking \"Calculate\" shows the message \"Home price must be greater than 0\" and the result summary is not shown."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking \"Save scenario\" adds a row to the list labelled \"Saved scenarios\" that contains $1,516.96; before any scenario is saved the list shows \"No saved scenarios yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the work: after typing 500000 in \"Home price\", 100000 in \"Down payment\" and 20 in \"Term\", clicking \"Calculate\", clicking \"Save scenario\" and reloading, the result summary shows \"Monthly payment\" $2,982.29 and the saved scenarios list contains $2,982.29."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0f2bf94456a60769b9fc65cb24741046faaefef5c2c22896539639d25b9af5b1"
+    }
+  ]
+}
