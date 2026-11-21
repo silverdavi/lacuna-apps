@@ -2164,6 +2164,45 @@
       }
     },
     {
+      "id": "@lacuna/keypad",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "On-screen grid of keys mirroring physical keyboard input for calculators, PIN entry, and similar apps.",
+      "today": [
+        "toolbox/modules/keypad/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Keypad"
+      ],
+      "public": true,
+      "path": "toolbox/modules/keypad/0.1.0",
+      "bridge": {
+        "component": "Keypad",
+        "kind": "widget",
+        "exports": [
+          "Keypad"
+        ],
+        "types": [
+          "KeypadProps",
+          "KeypadKey"
+        ],
+        "signature": "Keypad({ keys, columns, onKey, onBackspace, onEnter, ariaLabel, }: KeypadProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "4cddd6c4f824bcfdff2939c065faa6944763c0c9",
+            "source": "39db16a055571fa2",
+            "lines": 172,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/line-items",
       "layer": 3,
       "status": "exists",
@@ -3642,6 +3681,46 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "2c31c89e9803dd2d",
             "lines": 306,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-reminder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Schedule a local due-time alert via the Notification API with an in-app fallback.",
+      "today": [
+        "toolbox/modules/use-reminder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useReminder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-reminder/0.1.0",
+      "bridge": {
+        "component": "useReminder",
+        "kind": "hook",
+        "exports": [
+          "useReminder",
+          "ensureJestShim"
+        ],
+        "types": [
+          "ReminderOptions",
+          "ReminderState"
+        ],
+        "signature": "ensureJestShim(); useReminder(options: ReminderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "4cddd6c4f824bcfdff2939c065faa6944763c0c9",
+            "source": "ef1e1dd86667e6e2",
+            "lines": 170,
             "dependencies": {}
           }
         }

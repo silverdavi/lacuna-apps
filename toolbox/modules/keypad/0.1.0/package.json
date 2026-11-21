@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/keypad",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "On-screen grid of keys mirroring physical keyboard input for calculators, PIN entry, and similar apps.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Keypad",
+    "kind": "widget",
+    "commit": "4cddd6c4f824bcfdff2939c065faa6944763c0c9",
+    "source": "39db16a055571fa2",
+    "lines": 172,
+    "exports": [
+      "Keypad"
+    ],
+    "types": [
+      "KeypadProps",
+      "KeypadKey"
+    ],
+    "signature": "Keypad({ keys, columns, onKey, onBackspace, onEnter, ariaLabel, }: KeypadProps)"
+  }
+}

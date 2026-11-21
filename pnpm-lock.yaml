@@ -1381,6 +1381,16 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/keypad/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/line-items/0.1.0:
     dependencies:
       '@lacuna/money':
@@ -1664,6 +1674,16 @@ importers:
         version: 19.3.0
 
   toolbox/modules/use-pointer-draw/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-reminder/0.1.0:
     dependencies:
       react:
         specifier: ^19.0.0
