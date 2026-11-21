@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "3a909aef77557899af367a74a1c77f30ac2835ec54d5e7fe0749efcba3cf9daf",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Flowchart Editor\" and the canvas area is visible with the default tool \"Select\" active in the toolbar."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the \"Rectangle\" button in the toolbar, then clicking and dragging on the canvas from (100, 100) to (200, 150), creates a rectangle shape; the \"Layers\" panel shows a new item labeled \"Rectangle 1\"."
+    },
+    {
+      "id": "A3",
+      "text": "With \"Rectangle 1\" selected in the Layers panel, typing \"Start\" in the field labeled \"Label\" and pressing Enter updates the shape's visible text to \"Start\"; the Layers panel item updates to \"Start\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the \"Ellipse\" button in the toolbar, then clicking and dragging on the canvas from (300, 100) to (400, 150), creates an ellipse shape; the \"Layers\" panel shows a new item labeled \"Ellipse 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting \"Start\" in the Layers panel, clicking the \"Delete\" button, removes the shape from the canvas; the \"Layers\" panel no longer contains \"Start\" and shows \"No layers\" if it was the only item."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Ellipse 1\" selected, clicking the \"Color\" swatch in the toolbar, selecting the red color option, changes the shape's fill color to red; the \"Color\" swatch in the toolbar displays red."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"Export\" button in the toolbar opens a menu; clicking \"PNG\" triggers a download of a file named \"flowchart.png\"."
+    },
+    {
+      "id": "A8",
+      "text": "After creating \"Start\" (Rectangle) and \"End\" (Ellipse), reloading the page shows both shapes on the canvas and the \"Layers\" panel lists \"Start\" and \"End\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8988e13a91d5e254b27d8c17e9549569f93e2fafa3334da3ea98d6c121bb7074"
+    }
+  ]
+}

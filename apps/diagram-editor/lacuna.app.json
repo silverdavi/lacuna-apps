@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.diagram-editor",
+  "name": "Flowchart Editor",
+  "version": "0.1.0",
+  "summary": "Draw labeled shapes on a canvas and export the flowchart as a PNG.",
+  "description": "Draw rectangles and ellipses on a canvas, label them, pick a fill color, manage them in the Layers panel, and export the flowchart as a PNG. The diagram is a record. Nothing leaves the browser.",
+  "category": "productivity",
+  "icon": "whiteboard",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/diagram-editor",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/color-palette": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:shape",
+    "edit:shape",
+    "export:png"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "flowchart",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the shapes of the flowchart"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "flowchart"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
