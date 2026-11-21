@@ -849,6 +849,52 @@
       }
     },
     {
+      "id": "@lacuna/board-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Kanban board with tag chips, detail side panel, and persisted create/edit/delete cards via the board record form.",
+      "today": [
+        "toolbox/modules/board-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/tag-input",
+        "@lacuna/use-collection"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "BoardKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/board-kit/0.1.0",
+      "bridge": {
+        "component": "BoardKit",
+        "kind": "kit",
+        "exports": [
+          "BoardKit"
+        ],
+        "types": [
+          "BoardCard",
+          "BoardColumn",
+          "BoardKitProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "c16104ed71038f0946f1626fadb6487313514027",
+            "source": "77e7c350efc51b2a",
+            "lines": 275,
+            "dependencies": {
+              "@lacuna/tag-input": "0.1.0",
+              "@lacuna/use-collection": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/calculator-kit",
       "layer": 2,
       "status": "exists",
@@ -3922,6 +3968,44 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "3b2601d1e599302a",
             "lines": 86,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/waveform",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Static audio waveform with a draggable playhead and optional trim handles.",
+      "today": [
+        "toolbox/modules/waveform/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Waveform"
+      ],
+      "public": true,
+      "path": "toolbox/modules/waveform/0.1.0",
+      "bridge": {
+        "component": "Waveform",
+        "kind": "widget",
+        "exports": [
+          "Waveform"
+        ],
+        "types": [
+          "WaveformProps"
+        ],
+        "signature": "Waveform(props: WaveformProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "c16104ed71038f0946f1626fadb6487313514027",
+            "source": "05bb5aec3f8a54eb",
+            "lines": 316,
             "dependencies": {}
           }
         }

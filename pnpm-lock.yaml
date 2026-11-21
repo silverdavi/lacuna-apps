@@ -1103,6 +1103,22 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/board-kit/0.1.0:
+    dependencies:
+      '@lacuna/tag-input':
+        specifier: workspace:0.1.0
+        version: link:../../tag-input/0.1.0
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../use-collection/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/calculator-kit/0.1.0:
     dependencies:
       '@lacuna/chart':
@@ -1740,6 +1756,16 @@ importers:
         version: 19.3.0
 
   toolbox/modules/use-wake-lock/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/waveform/0.1.0:
     dependencies:
       react:
         specifier: ^19.0.0
