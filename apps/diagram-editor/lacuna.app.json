@@ -3,8 +3,8 @@
   "id": "lacuna.diagram-editor",
   "name": "Flowchart Editor",
   "version": "0.1.0",
-  "summary": "Draw labeled shapes on a canvas and export the flowchart as a PNG.",
-  "description": "Draw rectangles and ellipses on a canvas, label them, pick a fill color, manage them in the Layers panel, and export the flowchart as a PNG. The diagram is a record. Nothing leaves the browser.",
+  "summary": "Draw and connect labeled shapes on a canvas, manage layers, and export or back up the flowchart.",
+  "description": "Draw rectangles and ellipses on a canvas, label and recolor them, connect shapes with connectors, manage them in the Layers panel, review a Data summary, and export the flowchart as PNG, SVG, or a JSON backup you can import back. The diagram is a record. Nothing leaves the browser.",
   "category": "productivity",
   "icon": "whiteboard",
   "relationship": {
@@ -38,13 +38,19 @@
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/export-menu": "0.1.0",
       "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
       "@lacuna/color-palette": "0.1.0"
     }
   },
   "capabilities": [
     "create:shape",
     "edit:shape",
-    "export:png"
+    "edit:connector",
+    "view:layers",
+    "export:png",
+    "export:svg",
+    "export:json",
+    "import:json"
   ],
   "permissions": {
     "records": [

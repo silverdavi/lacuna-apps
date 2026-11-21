@@ -208,9 +208,15 @@ importers:
       '@lacuna/export-menu':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/export-menu/0.1.0
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/file-save-open/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
