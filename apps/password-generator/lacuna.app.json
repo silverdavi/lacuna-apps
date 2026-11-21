@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.password-generator",
+  "name": "Password Generator",
+  "version": "0.1.0",
+  "summary": "Make random passwords of a chosen length and character mix.",
+  "description": "Choose a length and the kinds of characters to use, press Generate, and see the password and how strong it is. The chosen settings survive reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/password-generator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/combobox": "0.1.0",
+      "@lacuna/code-area": "0.1.0",
+      "@lacuna/codecs": "0.1.0",
+      "@lacuna/text-transforms": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/password-generate": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:settings"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "settings",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the chosen length and character sets between visits"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "settings"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts",
+      "tests/00-readonly-matcher.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
