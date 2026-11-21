@@ -1,4 +1,5 @@
 import type { CorrectionLevel } from './host'
+import { QR_DARK } from './colors'
 
 const MODULUS = 0x11d
 const EC_PER_BLOCK: Record<CorrectionLevel, number[]> = {
@@ -455,7 +456,7 @@ export function toSvgMarkup(matrix: number[][]): string {
   const size = matrix.length
   const parts: string[] = []
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges">`)
-  parts.push(`<path fill="rgb(0,0,0)" d="${cellPath(matrix)}"/>`)
+  parts.push(`<path fill="${QR_DARK}" d="${cellPath(matrix)}"/>`)
   parts.push('</svg>')
   return parts.join('')
 }
