@@ -1,85 +1,47 @@
-.chess-app {
-  display: flex;
-  flex-direction: column;
-  gap: calc(8px * var(--sf));
-}
-
-.chess-heading {
-  margin: 0;
-  font-family: var(--serif);
-  font-size: calc(22px * var(--tf));
-  line-height: 1.2;
-  color: var(--ink);
-}
-
-.chess-board {
+/* Chess board grid: matches the Board kit's visual style but with
+   proper ARIA grid/row/gridcell structure. */
+.chess-board-grid {
+  --cell-size: min(calc(44px * var(--sf)), calc((100vw - calc(56px * var(--sf))) / 8));
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: calc(4px * var(--sf));
+  grid-template-columns: repeat(8, var(--cell-size));
+  grid-auto-rows: var(--cell-size);
+  gap: calc(1px * var(--sf));
+  padding: calc(1px * var(--sf));
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--ui-line2);
+  border: calc(1px * var(--sf)) solid var(--ink);
+  box-shadow: calc(4px * var(--sf)) calc(4px * var(--sf)) 0 var(--ink);
 }
 
-.chess-row {
+.chess-board-grid > [role='row'] {
   display: contents;
 }
 
-.chess-sq {
-  position: relative;
-  aspect-ratio: 1;
+.chess-board-grid > [role='row'] > [role='gridcell'] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
   padding: 0;
-  border: calc(1px * var(--sf)) solid var(--soft);
-  border-radius: calc(4px * var(--sf));
-  cursor: pointer;
-  font-family: var(--mono);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.chess-sq.light {
-  background: var(--paper);
+  border: 0 !important;
+  border-radius: 0 !important;
+  aspect-ratio: auto !important;
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: calc(var(--cell-size) * 0.55);
+  line-height: 1;
   color: var(--ink);
+  cursor: pointer;
 }
 
-.chess-sq.dark {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.chess-sq.selected {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--paper);
-}
-
-.chess-sq.target {
-  border-color: var(--accent);
-}
-
-.chess-sq:focus-visible {
+.chess-board-grid > [role='row'] > [role='gridcell']:focus-visible {
   outline: calc(2px * var(--sf)) solid var(--accent);
-  outline-offset: calc(1px * var(--sf));
-}
-
-.chess-glyph {
-  font-size: calc(22px * var(--tf));
-  line-height: 1;
-  pointer-events: none;
-}
-
-.chess-label {
-  position: absolute;
-  left: calc(3px * var(--sf));
-  bottom: calc(2px * var(--sf));
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: calc(7px * var(--tf));
-  line-height: 1;
-  opacity: 0.75;
-  pointer-events: none;
+  outline-offset: 0;
+  z-index: 1;
 }
 
 .chess-sr {

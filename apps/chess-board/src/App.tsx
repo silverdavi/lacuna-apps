@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { Body, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { AppShell, Button, Card, Keys, Kpi, KpiRow, Rail } from '@lacuna/ui'
 import {
   computerReply,
   host,
@@ -46,10 +46,33 @@ const naturalAdvance = (board: (Piece | null)[], index: number): number | null =
   return null
 }
 
+let onBoardKey: ((row: number, col: number, key: string) => void) | null = null
+
+window.addEventListener('keydown', (event) => {
+  const el = event.target
+  if (!(el instanceof HTMLElement)) return
+  if (!el.closest?.('.chess-board-grid')) return
+  const row = Number(el.dataset.boardRow)
+  const col = Number(el.dataset.boardCol)
+  if (Number.isNaN(row) || Number.isNaN(col)) return
+  const key = event.key
+  if (
+    key === 'ArrowRight' ||
+    key === 'ArrowLeft' ||
+    key === 'ArrowUp' ||
+    key === 'ArrowDown' ||
+    key === 'Enter' ||
+    key === ' '
+  ) {
+    event.preventDefault()
+    onBoardKey?.(row, col, key)
+  }
+})
+
 export function App() {
   const [game, setGame] = useState<GameState>(() => host.loadState() ?? initialState())
   const [selected, setSelected] = useState<number | null>(null)
-  const refs = useRef<Array<HTMLButtonElement | null>>([])
+  const refs = useRef<Array<HTMLDivElement | null>>([])
   const timers = useRef<number[]>([])
 
   useEffect(() => {
@@ -63,7 +86,10 @@ export function App() {
   }, [])
 
   const status = game.turn === 'white' ? 'White to move' : 'Black to move'
-  const targets = useMemo(() => (selected === null ? [] : legalMoves(game.board, selected)), [game.board, selected])
+  const targets = useMemo(
+    () => (selected === null ? [] : legalMoves(game.board, selected)),
+    [game.board, selected],
+  )
 
   const makeMove = (from: number, to: number) => {
     if (!legalMoves(game.board, from).includes(to)) return
@@ -124,29 +150,32 @@ export function App() {
 
   const focus = (row: number, col: number) => {
     if (row < 0 || row > 7 || col < 0 || col > 7) return
-    refs.current[row * 8 + col]?.focus()
+    const index = (7 - row) * 8 + col
+    refs.current[index]?.focus()
   }
 
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const row = Math.floor(index / 8)
-    const col = index % 8
-    if (event.key === 'ArrowRight') {
-      event.preventDefault()
-      focus(row, col + 1)
-    } else if (event.key === 'ArrowLeft') {
-      event.preventDefault()
-      focus(row, col - 1)
-    } else if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      focus(row + 1, col)
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      focus(row - 1, col)
-    } else if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      select(index, true)
+  const handleKey = (row: number, col: number, key: string) => {
+    switch (key) {
+      case 'ArrowRight':
+        focus(row, col + 1)
+        break
+      case 'ArrowLeft':
+        focus(row, col - 1)
+        break
+      case 'ArrowDown':
+        focus(row + 1, col)
+        break
+      case 'ArrowUp':
+        focus(row - 1, col)
+        break
+      case 'Enter':
+      case ' ':
+        select((7 - row) * 8 + col, true)
+        break
     }
   }
+
+  onBoardKey = handleKey
 
   const newGame = () => {
     timers.current.forEach((id) => window.clearTimeout(id))
@@ -173,61 +202,101 @@ export function App() {
     setSelected(null)
   }
 
+  const makeCell = (row: number, col: number): ReactNode => {
+    // Standard orientation: a8 is top-left, a1 is bottom-left.
+    const index = (7 - row) * 8 + col
+    const piece = game.board[index]
+    const name = squareName(index)
+    const dark = (row + col) % 2 === 1
+    const isSelected = selected === index
+    const isTarget = targets.includes(index)
+    const bg = isSelected
+      ? 'var(--accent)'
+      : dark
+        ? 'var(--ink)'
+        : piece
+          ? piece.color === 'white'
+            ? 'var(--geo-comm)'
+            : 'var(--geo-verm)'
+          : 'var(--ui-bg)'
+    return (
+      <div
+        key={name}
+        role="gridcell"
+        aria-label={name}
+        tabIndex={0}
+        data-board-row={row}
+        data-board-col={col}
+        className={isSelected ? 'selected' : ''}
+        style={{ background: bg }}
+        ref={(el) => {
+          refs.current[index] = el
+        }}
+        onClick={() => select(index)}
+      >
+        {piece ? (
+          <span aria-hidden="true">{GLYPHS[pieceLabel(piece)]}</span>
+        ) : isTarget ? (
+          <span
+            aria-hidden="true"
+            style={{
+              width: 'calc(10px * var(--sf))',
+              height: 'calc(10px * var(--sf))',
+              borderRadius: '50%',
+              border: 'calc(1px * var(--sf)) solid var(--accent)',
+            }}
+          />
+        ) : null}
+        {piece ? <span className="chess-sr">{pieceLabel(piece)}</span> : null}
+      </div>
+    )
+  }
+
+  const rows: ReactNode[] = []
+  for (let row = 0; row < 8; row++) {
+    const gridcells: ReactNode[] = []
+    for (let col = 0; col < 8; col++) {
+      gridcells.push(makeCell(row, col))
+    }
+    rows.push(
+      <div key={`row-${row}`} role="row">
+        {gridcells}
+      </div>,
+    )
+  }
+
   return (
-    <main className="chess-app">
-      <Card mono="Board">
-        <h1 className="chess-heading">Chess Board Game</h1>
-        <Stack>
-          <MonoLabel sm accent>{status}</MonoLabel>
-          <div className="chess-board" role="grid" aria-label="Chess board">
-            {Array.from({ length: 8 }, (_, row) => (
-              <div role="row" className="chess-row" key={row}>
-                {Array.from({ length: 8 }, (_, col) => {
-                  // Rendered from Black's perspective: a1 is the top-left cell,
-                  // so e2 and f2 (row 7) hold white pawns as the acceptance checks require.
-                  const index = (7 - row) * 8 + (7 - col)
-                  const piece = game.board[index]
-                  const name = squareName(index)
-                  const dark = (row + col) % 2 === 1
-                  const classes = [
-                    'chess-sq',
-                    dark ? 'dark' : 'light',
-                    selected === index ? 'selected' : '',
-                    targets.includes(index) ? 'target' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                  return (
-                    <button
-                      key={name}
-                      type="button"
-                      ref={(el) => {
-                        refs.current[index] = el
-                      }}
-                      role="gridcell"
-                      aria-label={name}
-                      className={classes}
-                      onClick={() => select(index)}
-                      onKeyDown={(event) => onKeyDown(event, index)}
-                    >
-                      <span className="chess-glyph" aria-hidden="true">
-                        {piece ? GLYPHS[pieceLabel(piece)] : null}
-                      </span>
-                      <span className="chess-label" aria-hidden="true">
-                        {name}
-                      </span>
-                      {piece ? <span className="chess-sr">{pieceLabel(piece)}</span> : null}
-                    </button>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
-          <Body sm>
-            Click a piece and then a highlighted square, or use the arrow keys and Enter. The position is kept
-            on this page.
-          </Body>
-          <Stack>
+    <AppShell
+      name="Chess Board Game"
+      icon="grid"
+      hue="cobalt"
+      category="Personal"
+      meta="8 × 8"
+      status="Position saved on this device"
+      side={
+        <Rail
+          title="Chess Board Game"
+          note="One board · local"
+          chips={['Click or keys', 'Works offline']}
+        >
+          <KpiRow>
+            <Kpi value={status} label="Turn" accent />
+            <Kpi value={game.mode === 'computer' ? 'Computer' : 'Local'} label="Mode" />
+          </KpiRow>
+          <Keys
+            items={[
+              ['← → ↑ ↓', 'Move focus'],
+              ['Enter', 'Select · move'],
+            ]}
+          />
+        </Rail>
+      }
+    >
+      <Card
+        mono="Board"
+        title="Chess board"
+        actions={
+          <>
             <Button kind="primary" onClick={newGame}>
               New Game
             </Button>
@@ -240,9 +309,13 @@ export function App() {
             >
               {game.mode === 'computer' ? 'Play vs Human' : 'Play vs Computer'}
             </Button>
-          </Stack>
-        </Stack>
+          </>
+        }
+      >
+        <div role="grid" aria-label="Chess board" className="chess-board-grid">
+          {rows}
+        </div>
       </Card>
-    </main>
+    </AppShell>
   )
 }

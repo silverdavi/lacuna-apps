@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export type Color = 'white' | 'black'
 export type PieceType = 'pawn' | 'knight' | 'rook' | 'bishop' | 'queen' | 'king'
 export interface Piece {
@@ -45,36 +47,39 @@ export function initialState(): GameState {
   return { board: startBoard(), turn: 'white', mode: 'computer', history: [] }
 }
 
+function validateGameState(value: unknown): value is GameState {
+  if (typeof value !== 'object' || value === null) return false
+  const data = value as Partial<GameState>
+  if (!Array.isArray(data.board) || data.board.length !== 64) return false
+  for (const square of data.board) {
+    if (square === null) continue
+    if (typeof square !== 'object') return false
+    const piece = square as Partial<Piece>
+    if (!COLORS.includes(piece.color as Color)) return false
+    if (!TYPES.includes(piece.type as PieceType)) return false
+  }
+  if (!COLORS.includes(data.turn as Color)) return false
+  if (data.mode !== 'local' && data.mode !== 'computer') return false
+  if (!Array.isArray(data.history)) return false
+  for (const m of data.history) {
+    if (typeof m?.from !== 'number' || typeof m?.to !== 'number') return false
+  }
+  return true
+}
+
+const store = createMockValue<GameState>({
+  key: KEY,
+  fallback: initialState(),
+  validate: validateGameState,
+})
+
 export const mockHost: Host = {
   loadState() {
-    try {
-      const raw = window.localStorage.getItem(KEY)
-      if (!raw) return null
-      const data = JSON.parse(raw) as Partial<GameState>
-      if (!Array.isArray(data.board) || data.board.length !== 64) return null
-      const board: Square[] = data.board.map((square) => {
-        if (square === null) return null
-        const piece = square as Partial<Piece>
-        if (!COLORS.includes(piece.color as Color) || !TYPES.includes(piece.type as PieceType)) return null
-        return { color: piece.color as Color, type: piece.type as PieceType }
-      })
-      const turn = COLORS.includes(data.turn as Color) ? (data.turn as Color) : 'white'
-      const mode: Mode = data.mode === 'local' ? 'local' : 'computer'
-      const history = Array.isArray(data.history)
-        ? data.history
-            .filter((m) => typeof m?.from === 'number' && typeof m?.to === 'number')
-            .map((m) => ({ from: m.from, to: m.to }))
-        : []
-      return { board, turn, mode, history }
-    } catch {
-      return null
-    }
+    const s = store.get()
+    if (!s || s.board.length !== 64) return null
+    return s
   },
   saveState(state: GameState) {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(state))
-    } catch {
-      // storage unavailable; state stays in memory only
-    }
+    store.set(state)
   },
 }
