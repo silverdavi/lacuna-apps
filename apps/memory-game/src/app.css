@@ -1,0 +1,67 @@
+.mg-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(4px * var(--sf));
+  padding: calc(8px * var(--sf));
+  background: var(--paper-deep);
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(8px * var(--sf));
+}
+
+.mg-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(40px * var(--sf));
+  height: calc(40px * var(--sf));
+  box-sizing: border-box;
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(6px * var(--sf));
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--sans);
+  font-size: calc(14px * var(--tf));
+  outline: none;
+}
+
+.mg-card:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(-calc(2px * var(--sf)));
+}
+
+.mg-card-up {
+  font-weight: 600;
+}
+
+@keyframes mg-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-0.25em); }
+  40% { transform: translateX(0.25em); }
+  60% { transform: translateX(-0.18em); }
+  80% { transform: translateX(0.18em); }
+}
+
+.mg-card-mismatch {
+  animation: mg-shake 0.4s ease-in-out;
+  border-color: var(--geo-verm);
+}
+
+.mg-score {
+  display: flex;
+  gap: calc(12px * var(--sf));
+  margin-top: calc(12px * var(--sf));
+}
+
+.mg-score-item {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+}
+
+.mg-rule-text {
+  margin: calc(4px * var(--sf)) 0 calc(12px * var(--sf));
+  font-size: calc(14px * var(--tf));
+  color: var(--ink);
+}
