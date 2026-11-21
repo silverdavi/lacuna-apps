@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ca12cd257b22bee10d3a58d370b957d9274789217d05b2199414ee56735a49ce",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Tournament Bracket\" and the tab labelled \"Bracket\" is active by default."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Players\" tab, typing \"Alice\" in the field labelled \"Player name\" and clicking \"Add player\" adds a row in the table with the text \"Alice\" and the seed number \"1\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding players \"Alice\", \"Bob\", \"Carol\", and \"Dave\", the \"Bracket\" tab displays four match slots in the first round: \"Alice vs Bob\", \"Carol vs Dave\", and two empty slots for the second round."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Bracket\" tab, clicking the button labelled \"Winner: Alice\" in the first match slot highlights \"Alice\" and moves her name into the first slot of the second round."
+    },
+    {
+      "id": "A5",
+      "text": "After setting \"Alice\" as the winner of the first match and \"Dave\" as the winner of the second match, the second round slot displays \"Alice vs Dave\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Winner: Alice\" in the final match slot displays the text \"Champion: Alice\" in the results area."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"Results\" tab, the table shows a row for the final match with columns \"Match\", \"Winner\", and \"Score\", displaying \"Final\", \"Alice\", and \"1-0\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labelled \"Export CSV\" copies the text \"Match,Winner,Score\\nFinal,Alice,1-0\" to the clipboard."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the champion: after setting \"Alice\" as the champion, reloading the page still displays \"Champion: Alice\" in the results area."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "90881421ee57013d3d97b3252880f8a9c33844fb440d70fedd9eb69379ec1fb4"
+    }
+  ]
+}
