@@ -3,7 +3,6 @@ import { Chart, type ChartDataPoint } from '@lacuna/chart'
 import { Heatmap, type HeatmapCell } from '@lacuna/heatmap'
 import { toCsv } from '@lacuna/csv-parse'
 import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
-import { openFile } from '@lacuna/file-save-open'
 import { exportBackup, importBackup } from '@lacuna/json-backup'
 import {
   Actions,
@@ -14,10 +13,12 @@ import {
   EmptyState,
   ErrorState,
   FormGrid,
+  Kpi,
+  KpiRow,
   List,
+  MonoLabel,
   Rail,
   Row,
-  Select,
   Stack,
   TextInput,
 } from '@lacuna/ui'
@@ -88,6 +89,19 @@ function csvRows(entries: SleepEntry[]): string[][] {
   ]
 }
 
+function friendlyImportError(message: string): string {
+  if (message.includes('missing required top-level fields')) {
+    return 'That file is not a valid Sleep Tracker backup. It may have been edited or exported from a different app.'
+  }
+  if (message.includes('not valid JSON')) {
+    return 'Could not read that file — it does not appear to be a valid JSON document.'
+  }
+  if (message.includes('malformed records')) {
+    return 'That backup contains records in an unexpected format. Some entries may have been skipped.'
+  }
+  return message
+}
+
 export function App() {
   const [state, setState] = useState<SleepState>(() => host.read())
   const [date, setDate] = useState(today())
@@ -96,6 +110,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState('')
   const [importError, setImportError] = useState('')
+  const [importSuccess, setImportSuccess] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -136,8 +151,12 @@ export function App() {
     setToast('Entry deleted')
   }
 
-  function onExport(id: string) {
-    setToast(id === 'json' ? 'Backup exported' : 'CSV exported')
+  function clearAll() {
+    host.clear()
+    setState(host.read())
+    setImportError('')
+    setImportSuccess('')
+    setToast('All entries cleared')
   }
 
   function pickImport() {
@@ -148,31 +167,28 @@ export function App() {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
-    const result = await openFile(file, 'json')
-    if (!result.ok) {
-      setImportError(`Could not read ${file.name}: ${result.error}`)
-      return
-    }
+    setImportError('')
+    setImportSuccess('')
     try {
-      const imported = importBackup<BackupRecord>(JSON.stringify(result.data), {
+      const text = await file.text()
+      const imported = importBackup<BackupRecord>(text, {
         currentVersion: 1,
         validate: (record) =>
           typeof record.data.date === 'string' &&
-          record.data.date.length === 10 &&
+          /^\d{4}-\d{2}-\d{2}$/.test(record.data.date) &&
           Number.isFinite(record.data.minutes) &&
           record.data.minutes > 0 &&
           isQuality(record.data.quality)
             ? null
-            : 'record is not a sleep entry',
+            : 'record is not a valid sleep entry',
       })
-      if (imported.droppedCount > 0) {
-        setImportError(`Imported ${imported.records.length} entries, dropped ${imported.droppedCount}`)
-      } else {
-        setImportError('')
-        setToast(`Imported ${imported.records.length} entries`)
+      if (imported.records.length === 0) {
+        setImportError('No valid sleep entries found in that file.')
+        return
       }
       const current = host.read()
       const existing = new Set(current.entries.map((e) => e.id))
+      let added = 0
       for (const record of imported.records) {
         if (existing.has(record.id)) continue
         const d = isValidDate(record.data.date) ? record.data.date : today()
@@ -183,11 +199,20 @@ export function App() {
           quality: isQuality(record.data.quality) ? record.data.quality : 'Good',
           createdAt: Number.isFinite(record.createdAt) ? record.createdAt : Date.now(),
         })
+        added += 1
       }
       host.write(current)
       setState(current)
+      if (added > 0) {
+        setImportSuccess(`Imported ${added} ${added === 1 ? 'entry' : 'entries'}.`)
+      } else {
+        setImportSuccess('All entries in that file were already present.')
+      }
+      if (imported.droppedCount > 0) {
+        setImportError(`Imported ${imported.records.length} entries, dropped ${imported.droppedCount} invalid.`)
+      }
     } catch (err) {
-      setImportError(err instanceof Error ? err.message : 'Could not import that file')
+      setImportError(friendlyImportError(err instanceof Error ? err.message : 'Could not read that file.'))
     }
   }
 
@@ -235,6 +260,8 @@ export function App() {
   )
 
   const hasEntries = entries.length > 0
+  const latest = entries.length ? entries[entries.length - 1] : null
+  const year = new Date().getFullYear()
 
   return (
     <AppShell
@@ -252,135 +279,174 @@ export function App() {
         />
       }
     >
-      <Card
-        mono="New"
-        title="Log a night"
-        actions={
-          hasEntries ? (
+      <Stack lg>
+        <Card
+          mono="New"
+          title="Log a night"
+          actions={
+            hasEntries ? (
+              <Actions>
+                <ExportMenu options={exportOptions} fileName="sleep-tracker" ariaLabel="Export" onExport={(id) => setToast(id === 'json' ? 'Backup exported' : 'CSV exported')} />
+                <Button kind="secondary" onClick={pickImport} ariaLabel="Import backup">
+                  Import
+                </Button>
+              </Actions>
+            ) : undefined
+          }
+        >
+          <Stack>
+            <FormGrid>
+              <TextInput label="Date" value={date} onChange={setDate} />
+              <TextInput label="Duration" value={duration} onChange={setDuration} placeholder="7h 30m" error={error} />
+              <select
+                aria-label="Quality"
+                value={quality}
+                onChange={(e) => setQuality(e.target.value as Quality)}
+                style={{
+                  fontFamily: 'var(--mono)',
+                  fontSize: 'calc(13px * var(--tf))',
+                  padding: 'calc(6px * var(--sf)) calc(8px * var(--sf))',
+                  border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+                  borderRadius: 'calc(4px * var(--sf))',
+                  background: 'var(--ui-card)',
+                  color: 'var(--ink)',
+                }}
+              >
+                {QUALITIES.map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+              </select>
+            </FormGrid>
             <Actions>
-              <ExportMenu options={exportOptions} fileName="sleep-tracker" ariaLabel="Export" onExport={onExport} />
-              <Button kind="secondary" onClick={pickImport} ariaLabel="Import backup">
-                Import
+              <Button kind="primary" onClick={logSleep}>
+                Log sleep
               </Button>
             </Actions>
-          ) : undefined
-        }
-      >
-        <Stack>
-          <FormGrid>
-            <TextInput label="Date" value={date} onChange={setDate} />
-            <TextInput label="Duration" value={duration} onChange={setDuration} placeholder="7h 30m" />
-            <Select
-              label="Quality"
-              value={quality}
-              onChange={(v) => setQuality(v as Quality)}
-              options={QUALITIES.map((q) => ({ value: q, label: q }))}
-              error={error}
-            />
-          </FormGrid>
+            {toast ? <Body sm style={{ marginTop: 'calc(4px * var(--sf))', color: 'var(--accent)' }}>{toast}</Body> : null}
+          </Stack>
+        </Card>
+
+        <Card mono={`${entries.length} saved`} title="Summary">
+          <Stack>
+            <KpiRow>
+              <Kpi value={entries.length} label="Total nights" accent />
+              <Kpi value={formatDuration(avg)} label="Average duration" />
+              <Kpi value={`${streak} days`} label="Streak" />
+              {latest && <Kpi value={formatDuration(latest.minutes)} label="Most recent" />}
+            </KpiRow>
+            <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)', marginTop: 'calc(8px * var(--sf))' }}>
+              Total nights: <span style={{ color: 'var(--ink)' }}>{entries.length}</span>
+            </div>
+            <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
+              Average duration: <span style={{ color: 'var(--ink)' }}>{formatDuration(avg)}</span>
+            </div>
+            <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
+              Streak: <span style={{ color: 'var(--accent)' }}>{streak} days</span>
+            </div>
+          </Stack>
+        </Card>
+
+        <Card mono={hasEntries ? `${entries.length} entries` : 'Empty'} title="Entries">
+          {entries.length === 0 ? (
+            <EmptyState mono="Empty" title="No sleep entries yet" detail="Log your first night to see the pattern." />
+          ) : (
+            <List label="Sleep entries">
+              {entries.map((e) => (
+                <Row
+                  key={e.id}
+                  title={e.date}
+                  meta={e.quality}
+                  value={formatDuration(e.minutes)}
+                  action={
+                    <Button kind="ghost" onClick={() => remove(e.id)}>
+                      Delete {e.date}
+                    </Button>
+                  }
+                />
+              ))}
+            </List>
+          )}
+          {importError ? (
+            <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+              <ErrorState title={importError} detail="The log is unchanged. You can keep importing." />
+            </div>
+          ) : null}
+          {importSuccess ? (
+            <Body sm style={{ marginTop: 'calc(8px * var(--sf))', color: 'var(--accent)' }}>{importSuccess}</Body>
+          ) : null}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            style={{ display: 'none' }}
+            aria-hidden
+            tabIndex={-1}
+            onChange={onImportFile}
+          />
+        </Card>
+
+        <Card mono="Pattern" title="Heatmap">
+          {hasEntries ? (
+            <section aria-label="heatmap">
+              <Heatmap
+                data={heatmapData}
+                year={year}
+                label={`Nightly sleep, ${entries.length} ${entries.length === 1 ? 'night' : 'nights'}`}
+              />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(8px * var(--sf))', marginTop: 'calc(8px * var(--sf))' }}>
+                {heatmapCells(entries).map((cell) => (
+                  <div
+                    key={cell.date}
+                    title={`${cell.date}: ${cell.label}`}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'calc(4px * var(--sf))',
+                      padding: 'calc(8px * var(--sf))',
+                      border: 'calc(1px * var(--sf)) solid var(--ui-line)',
+                      borderRadius: 'calc(2px * var(--sf))',
+                      background: 'var(--ui-bright)',
+                    }}
+                  >
+                    <span style={{ font: '400 calc(10.5px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
+                    <span style={{ font: '600 calc(12px * var(--tf)) var(--mono)', color: 'var(--accent)' }}>{cell.label}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <Body sm>Log nights to see the heatmap.</Body>
+          )}
+        </Card>
+
+        <Card mono="Pattern" title="Trend">
+          {hasEntries ? (
+            <section aria-label="trend chart">
+              <Chart
+                type="line"
+                data={trend}
+                title="Trend of nights logged"
+                width={560}
+                height={180}
+                ariaLabel="Trend of nights logged"
+              />
+            </section>
+          ) : (
+            <Body sm>Log nights to see the trend chart.</Body>
+          )}
+        </Card>
+
+        <Card mono="Danger" title="Reset">
+          <Body sm>Permanently delete every entry on this device. This cannot be undone.</Body>
           <Actions>
-            <Button kind="primary" onClick={logSleep}>
-              Log sleep
+            <Button kind="ghost" onClick={clearAll} disabled={entries.length === 0}>
+              Clear all entries
             </Button>
           </Actions>
-          {toast ? <Body>{toast}</Body> : null}
-        </Stack>
-      </Card>
-
-      <Card mono={`${entries.length} saved`} title="Summary">
-        <Stack>
-          <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
-            Total nights: <span style={{ color: 'var(--ink)' }}>{entries.length}</span>
-          </div>
-          <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
-            Average duration: <span style={{ color: 'var(--ink)' }}>{formatDuration(avg)}</span>
-          </div>
-          <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
-            Streak: <span style={{ color: 'var(--accent)' }}>{streak} days</span>
-          </div>
-        </Stack>
-      </Card>
-
-      <Card mono={hasEntries ? `${entries.length} entries` : 'Empty'} title="Entries">
-        {entries.length === 0 ? (
-          <EmptyState mono="Empty" title="No sleep entries yet" detail="Log your first night to see the pattern." />
-        ) : (
-          <List label="Sleep entries">
-            {entries.map((e) => (
-              <Row
-                key={e.id}
-                title={e.date}
-                meta={e.quality}
-                value={formatDuration(e.minutes)}
-                action={
-                  <Button kind="ghost" onClick={() => remove(e.id)}>
-                    Delete {e.date}
-                  </Button>
-                }
-              />
-            ))}
-          </List>
-        )}
-        {importError ? (
-          <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
-            <ErrorState title={importError} detail="The log is unchanged. You can keep importing." />
-          </div>
-        ) : null}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json,.json"
-          style={{ display: 'none' }}
-          onChange={onImportFile}
-        />
-      </Card>
-
-      {hasEntries ? (
-        <Card mono="Pattern" title="Heatmap">
-          <section aria-label="heatmap">
-            <Heatmap
-              data={heatmapData}
-              year={Number(entries[0].date.slice(0, 4))}
-              label={`Nightly sleep, ${entries.length} ${entries.length === 1 ? 'night' : 'nights'}`}
-            />
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(8px * var(--sf))', marginTop: 'calc(8px * var(--sf))' }}>
-              {heatmapCells(entries).map((cell) => (
-                <div
-                  key={cell.date}
-                  title={`${cell.date}: ${cell.label}`}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'calc(4px * var(--sf))',
-                    padding: 'calc(8px * var(--sf))',
-                    border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                    borderRadius: 'calc(2px * var(--sf))',
-                    background: 'var(--ui-bright)',
-                  }}
-                >
-                  <span style={{ font: '400 calc(10.5px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
-                  <span style={{ font: '600 calc(12px * var(--tf)) var(--mono)', color: 'var(--accent)' }}>{cell.label}</span>
-                </div>
-              ))}
-            </div>
-          </section>
         </Card>
-      ) : null}
-
-      {hasEntries ? (
-        <Card mono="Pattern" title="Trend">
-          <section aria-label="trend chart">
-            <Chart
-              type="line"
-              data={trend}
-              title="Trend of nights logged"
-              width={560}
-              height={180}
-              ariaLabel="Trend of nights logged"
-            />
-          </section>
-        </Card>
-      ) : null}
+      </Stack>
     </AppShell>
   )
 }
