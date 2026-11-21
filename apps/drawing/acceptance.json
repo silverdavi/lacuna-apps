@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "29a4afb91155c271953c50e3e2a9a42525f7f881ebc57ab9a310f5da5ca95aa8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Sketch Pad\" and a canvas area with the text \"Infinite Canvas\" visible in the center."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button labelled \"New Layer\" adds a new item to the layer list with the exact text \"Layer 1\". Clicking it again adds \"Layer 2\"."
+    },
+    {
+      "id": "A3",
+      "text": "With \"Layer 1\" selected, clicking the button labelled \"Delete Layer\" removes \"Layer 1\" from the list and selects \"Layer 2\" if it exists, or shows \"No layers\" if the list becomes empty."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting the tool \"Brush\" and the color \"Red\" from the color picker, then drawing a stroke on the canvas, results in a red stroke visible on the active layer."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Export PNG\" triggers a file download with the filename \"sketch.png\"."
+    },
+    {
+      "id": "A6",
+      "text": "Switching to the \"Layers\" tab via the tab labelled \"Layers\" shows a list of all created layers, including \"Layer 1\" and \"Layer 2\" if they were created."
+    },
+    {
+      "id": "A7",
+      "text": "Changing the brush size slider to \"5\" and drawing a new stroke results in a stroke with a visible thickness corresponding to size 5, distinct from the default size."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labelled \"Clear Canvas\" removes all strokes from the active layer, leaving the canvas blank while preserving the layer structure."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the layer list containing \"Layer 1\" and \"Layer 2\" and the strokes drawn on them, with the \"Layers\" tab still showing the same items."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "421c54f9a51529dddc3140122d955c81a1dd3583c2fadb556f7baead7d213202"
+    }
+  ]
+}
