@@ -81,6 +81,7 @@ export function App() {
   const [lastResult, setLastResult] = useState<LoanResult | null>(null)
   useEffect(() => {
     if (pErr || rErr || yErr) return
+    host.save({ principal, rate, years })
     const r = calculateLoan({ principal, rate, years })
     if (r) setLastResult(r)
   }, [principal, rate, years, pErr, rErr, yErr])
@@ -234,6 +235,31 @@ export function App() {
         {savedMsg && <p role="status">Saved.</p>}
       </Card>
 
+      <Card mono="Result" title="Results">
+        {result ? (
+          <KpiRow>
+            <Kpi value={formatMoney(result.monthlyPayment)} label="Monthly payment" accent />
+            <Kpi value={formatMoney(result.totalInterest)} label="Total interest" />
+            <Kpi value={formatMoney(result.totalPaid)} label="Total paid" />
+          </KpiRow>
+        ) : (
+          <SectionLabel>Enter a loan to see results</SectionLabel>
+        )}
+      </Card>
+
+      {result && (
+        <Card mono={`Balance · ${result.rows.length} payments`} title="Balance over time">
+          <Chart
+            type="line"
+            data={chartData}
+            title="Outstanding balance"
+            ariaLabel="Loan balance over time"
+            width={720}
+            height={220}
+          />
+        </Card>
+      )}
+
       <Card mono={`Saved · ${saved.length}`} title="Saved loans">
         {saved.length === 0 ? (
           <EmptyState title="No saved loans yet" detail="Set a principal, rate, and term, then choose Save loan." />
@@ -284,31 +310,6 @@ export function App() {
         )}
       </Card>
 
-      <Card mono="Result" title="Results">
-        {result ? (
-          <KpiRow>
-            <Kpi value={formatMoney(result.monthlyPayment)} label="Monthly payment" accent />
-            <Kpi value={formatMoney(result.totalInterest)} label="Total interest" />
-            <Kpi value={formatMoney(result.totalPaid)} label="Total paid" />
-          </KpiRow>
-        ) : (
-          <SectionLabel>Enter a loan to see results</SectionLabel>
-        )}
-      </Card>
-
-      {result && (
-        <Card mono={`Balance · ${result.rows.length} payments`} title="Balance over time">
-          <Chart
-            type="line"
-            data={chartData}
-            title="Outstanding balance"
-            ariaLabel="Loan balance over time"
-            width={720}
-            height={220}
-          />
-        </Card>
-      )}
-
       {result && (
         <Card
           mono={`Amortization · ${result.rows.length} payments`}
@@ -320,26 +321,34 @@ export function App() {
           }
         >
           {showSchedule ? (
-            <Table
-              label="Amortization schedule"
-              columns={[
-                { key: 'n', label: '#' },
-                { key: 'payment', label: 'Payment', num: true },
-                { key: 'interest', label: 'Interest', num: true },
-                { key: 'principal', label: 'Principal', num: true },
-                { key: 'balance', label: 'Balance', num: true },
-              ]}
-              rows={result.rows.map((row, i) => ({
-                cells: {
-                  n: i + 1,
-                  payment: formatMoney(row.payment),
-                  principal: formatMoney(row.principalPart),
-                  interest: formatMoney(row.interest),
-                  balance: formatMoney(row.balance),
-                },
-              }))}
-            />
-          ) : (
+            <div
+              style={{
+                overflowX: 'auto',
+                overflowY: 'auto',
+                maxHeight: '70vh',
+              }}
+            >
+              <Table
+                label="Amortization schedule"
+                columns={[
+                  { key: 'n', label: 'Pmt' },
+                  { key: 'payment', label: 'Payment', num: true },
+                  { key: 'interest', label: 'Interest', num: true },
+                  { key: 'principal', label: 'Principal', num: true },
+                  { key: 'balance', label: 'Balance', num: true },
+                ]}
+                rows={result.rows.map((row, i) => ({
+                  cells: {
+                    n: `${i + 1} `,
+                    payment: formatMoney(row.payment),
+                    principal: formatMoney(row.principalPart),
+                    interest: formatMoney(row.interest),
+                    balance: formatMoney(row.balance),
+                  },
+                }))}
+              />
+            </div>
+            ) : (
             <SectionLabel>Use Show schedule to reveal the amortization table</SectionLabel>
           )}
         </Card>

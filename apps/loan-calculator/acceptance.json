@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "cd94ebb1ed79d4fc09a961f326d0c1c3898e1236b6a6995f309c75227010d976",
+  "spec_sha256": "1facbcfafa3c53ef6a64e393f9029da131f9697d60537f19e981bea1dc75782f",
   "checks": [
     {
       "id": "A1",
@@ -36,13 +36,17 @@
     },
     {
       "id": "A9",
-      "text": "Reload keeps the work: after typing 25000 in \"Principal\", 7.5 in \"Annual rate %\" and 5 in \"Years\", clicking \"Save loan\" and reloading, the results show \"Monthly payment\" $500.95 and the saved loans list contains $500.95."
+      "text": "Reload keeps the inputs without saving: after typing 25000 in \"Principal\", 7.5 in \"Annual rate %\" and 5 in \"Years\" and reloading (no button pressed), the three fields hold 25000, 7.5 and 5 and the results show \"Monthly payment\" $500.95 with an empty saved loans list (\"No saved loans yet\")."
+    },
+    {
+      "id": "A10",
+      "text": "Reload keeps saved loans: after clicking \"Save loan\" on first open and reloading, the list labelled \"Saved loans\" still contains $536.82."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "dd79d4788ba8546977ab9cef1214bd94f795194f620e53f88ce05df9a82763ea"
+      "sha256": "b10477614e349318aea6882faf989435f735193a857fac946d2221aa05eff997"
     }
   ]
 }
