@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, PointerEvent as ReactPointerEvent } from 'react'
-import { AppShell, Button, SectionLabel, Select, Stack, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, SectionLabel, Select, Stack, TextInput } from '@lacuna/ui'
 import { BeforeAfter } from '@lacuna/before-after'
 import { RangeSlider } from '@lacuna/range-slider'
 import { saveBlob } from '@lacuna/file-save-open'
@@ -431,15 +431,24 @@ export function App() {
               <div
                 style={{
                   position: 'absolute',
-                  left: `${(crop.x / session.width) * 100}%`,
-                  top: `${(crop.y / session.height) * 100}%`,
-                  width: `${(crop.w / session.width) * 100}%`,
-                  height: `${(crop.h / session.height) * 100}%`,
-                  border: 'calc(2px * var(--sf)) solid var(--accent)',
-                  boxShadow: '0 0 0 calc(1000px * var(--sf)) color-mix(in oklab, var(--ink) 35%, transparent)',
+                  inset: 0,
+                  overflow: 'hidden',
                   pointerEvents: 'none',
                 }}
-              />
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: `${(crop.x / session.width) * 100}%`,
+                    top: `${(crop.y / session.height) * 100}%`,
+                    width: `${(crop.w / session.width) * 100}%`,
+                    height: `${(crop.h / session.height) * 100}%`,
+                    border: 'calc(2px * var(--sf)) solid var(--accent)',
+                    boxShadow: '0 0 0 calc(1000px * var(--sf)) color-mix(in oklab, var(--ink) 35%, transparent)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
               <div
                 role="slider"
                 aria-label="Crop size handle"
@@ -607,27 +616,21 @@ export function App() {
 
 function EmptyStage({ onLoad, onDemo }: { onLoad: () => void; onDemo: () => void }) {
   return (
-    <Stack>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: 'var(--sans)',
-          fontSize: 'calc(16px * var(--tf))',
-          color: 'var(--ink-60)',
-          textAlign: 'center',
-          padding: 'calc(24px * var(--sf))',
-        }}
+    <Card>
+      <EmptyState
+        mono="READY"
+        title="No image loaded"
+        detail="Load a photo to crop, resize, and export it."
       >
-        No image loaded
-      </p>
-      <div style={{ display: 'flex', gap: 'calc(10px * var(--sf))', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Button kind="primary" onClick={onLoad}>
-          Load image
-        </Button>
-        <Button kind="secondary" onClick={onDemo}>
-          Use demo image
-        </Button>
-      </div>
-    </Stack>
+        <div style={{ display: 'flex', gap: 'calc(10px * var(--sf))', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Button kind="primary" onClick={onLoad}>
+            Load image
+          </Button>
+          <Button kind="secondary" onClick={onDemo}>
+            Use demo image
+          </Button>
+        </div>
+      </EmptyState>
+    </Card>
   )
 }
