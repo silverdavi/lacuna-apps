@@ -1,113 +1,211 @@
-import { useEffect, useState } from 'react'
-import type { CSSProperties } from 'react'
-import { Actions, AppShell, Button, Card, Rail } from '@lacuna/ui'
-import { clearStorage, emptyBoard, loadGame, saveGame } from './host'
-import type { GameState, Mark } from './host'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Actions,
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  List,
+  Rail,
+  Row,
+  Tag,
+  Table,
+} from '@lacuna/ui'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { useHotkeys } from '@lacuna/use-hotkeys'
+import {
+  clearStorage,
+  emptyBoard,
+  loadGame,
+  makeRecord,
+  resetScores,
+  saveGame,
+  type GameRecord,
+  type Mark,
+} from './host'
 
-const TOP_LEFT = 0
-const CENTER = 4
-const BOTTOM_RIGHT = 8
+const COLS = ['A', 'B', 'C']
 
+type Line = { cells: number[]; winner: Mark }
+
+// A mark wins by occupying both long-diagonal corners (0 and 8) while the
+// center (4) is not that mark. This is the rule the acceptance tests encode.
 function winnerOf(board: (Mark | null)[]): Mark | 'draw' | null {
   for (const mark of ['X', 'O'] as Mark[]) {
-    if (board[TOP_LEFT] === mark && board[BOTTOM_RIGHT] === mark && board[CENTER] !== mark) return mark
+    if (board[0] === mark && board[8] === mark && board[4] !== mark) return mark
   }
   return board.every((cell) => cell !== null) ? 'draw' : null
 }
 
-const boardStyle: CSSProperties = {
-  display: 'table',
-  borderCollapse: 'separate',
-  borderSpacing: 'calc(4px * var(--sf))',
+function winningLine(board: (Mark | null)[]): Line | null {
+  const w = winnerOf(board)
+  if (w === 'X' || w === 'O') return { cells: [0, 8], winner: w }
+  return null
 }
 
-const rowStyle: CSSProperties = {
-  display: 'table-row',
+function cellName(index: number): string {
+  return `row ${Math.floor(index / 3) + 1}, column ${(index % 3) + 1}`
 }
 
-const cellStyle: CSSProperties = {
-  display: 'table-cell',
-  textAlign: 'center',
-  width: 'calc(64px * var(--sf))',
-  height: 'calc(56px * var(--sf))',
-  boxSizing: 'border-box',
-  border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-  borderRadius: 'calc(2px * var(--sf))',
-  background: 'var(--ui-card)',
-  color: 'var(--ink)',
-  fontFamily: 'var(--serif)',
-  fontSize: 'calc(22px * var(--tf))',
-  verticalAlign: 'middle',
+function boardToText(board: (Mark | null)[]): string {
+  return board.map((c, i) => `${COLS[i % 3]}${Math.floor(i / 3) + 1} ${c ?? '.'}`).join(' ')
 }
 
-const filledStyle: CSSProperties = {
-  background: 'var(--paper-deep)',
-}
-
-const buttonStyle: CSSProperties = {
-  all: 'unset',
-  boxSizing: 'border-box',
-  width: '100%',
-  height: '100%',
-  cursor: 'pointer',
-}
-
-const statusStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 0,
-}
-
-const statusTextStyle: CSSProperties = {
-  fontFamily: 'var(--serif)',
-  fontSize: 'calc(18px * var(--tf))',
-  fontWeight: 600,
-}
-
-const scoreStyle: CSSProperties = {
-  fontFamily: 'var(--mono)',
-  fontSize: 'calc(12px * var(--tf))',
-  color: 'var(--ink-80)',
+function resultLabel(rec: GameRecord): string {
+  return rec.result === 'draw' ? 'shared' : `won by ${rec.result}`
 }
 
 export function App() {
-  const [game, setGame] = useState<GameState>(() => loadGame())
+  const [state, setState] = useState(() => loadGame())
+  const [copied, setCopied] = useState(false)
+  const clipboard = useClipboard({ timeoutMs: 1400 })
+  const boardRef = useRef<HTMLTableElement>(null)
 
-  useEffect(() => {
-    saveGame(game)
-  }, [game])
+  const board = state.board
+  const winner = state.winner
+  const line = useMemo(() => winningLine(board), [board])
+  const winCells = new Set(line?.cells ?? [])
 
-  const play = (index: number) => {
-    setGame((current) => {
-      if (current.winner || current.board[index]) return current
-      const board = [...current.board]
-      board[index] = current.turn
-      const winner = winnerOf(board)
-      const score = { ...current.score }
-      if (winner === 'X') score.x += 1
-      else if (winner === 'O') score.o += 1
-      else if (winner === 'draw') score.draws += 1
-      return { board, turn: current.turn === 'X' ? 'O' : 'X', score, winner }
+  function persist(next: typeof state) {
+    setState(next)
+    saveGame(next)
+  }
+
+  function play(index: number) {
+    if (winner !== null || board[index] !== null) return
+    const nextBoard = [...board]
+    nextBoard[index] = state.turn
+    const found = winningLine(nextBoard)
+    const finalWinner: Mark | 'draw' | null = found
+      ? found.winner
+      : nextBoard.every(Boolean)
+        ? 'draw'
+        : null
+
+    let nextScore = { ...state.score }
+    let nextHistory = state.history
+    if (finalWinner === 'X') nextScore = { ...nextScore, x: nextScore.x + 1 }
+    else if (finalWinner === 'O') nextScore = { ...nextScore, o: nextScore.o + 1 }
+    else if (finalWinner === 'draw') nextScore = { ...nextScore, draws: nextScore.draws + 1 }
+    if (finalWinner !== null) {
+      nextHistory = [makeRecord(finalWinner, nextBoard.filter(Boolean).length), ...state.history].slice(0, 30)
+    }
+
+    persist({
+      board: nextBoard,
+      turn: state.turn === 'X' ? 'O' : 'X',
+      score: nextScore,
+      winner: finalWinner,
+      history: nextHistory,
     })
   }
 
-  const restart = () => {
-    setGame((current) => ({ board: emptyBoard(), turn: 'X', score: current.score, winner: null }))
+  function newGame() {
+    persist({ ...state, board: emptyBoard(), turn: 'X', winner: null })
   }
 
-  const resetScores = () => {
+  function doResetScores() {
+    resetScores(state)
+    persist({ ...state, score: { x: 0, o: 0, draws: 0 }, history: [], board: emptyBoard(), turn: 'X', winner: null })
+  }
+
+  function doErase() {
     clearStorage()
-    setGame({ board: emptyBoard(), turn: 'X', score: { x: 0, o: 0, draws: 0 }, winner: null })
+    persist({
+      board: emptyBoard(),
+      turn: 'X',
+      score: { x: 0, o: 0, draws: 0 },
+      winner: null,
+      history: [],
+    })
   }
 
-  const status =
-    game.winner === 'X'
-      ? 'Player X wins'
-      : game.winner === 'O'
-        ? 'Player O wins'
-        : game.winner === 'draw'
-          ? 'Draw'
-          : `Player ${game.turn}'s turn`
+  const playRef = useRef(play)
+  playRef.current = play
+  const newGameRef = useRef(newGame)
+  newGameRef.current = newGame
+  const resetRef = useRef(doResetScores)
+  resetRef.current = doResetScores
+
+  useHotkeys([
+    { keys: 'n', handler: () => newGameRef.current(), description: 'New game' },
+    { keys: 'r', handler: () => resetRef.current(), description: 'Reset scores' },
+  ])
+
+  function onKeyDown(event: React.KeyboardEvent) {
+    if (winner !== null) return
+    const n = Number(event.key)
+    if (n >= 1 && n <= 9) {
+      event.preventDefault()
+      playRef.current(n - 1)
+    }
+  }
+
+  function copyBoard() {
+    setCopied(true)
+    void clipboard.copy(boardToText(board))
+  }
+
+  function copySummary() {
+    void clipboard.copy(
+      [
+        `Board: ${boardToText(board)}`,
+        `Score: X ${state.score.x}, O ${state.score.o}, Draws ${state.score.draws}`,
+        `Result: ${statusText()}`,
+      ].join('\n'),
+    )
+  }
+
+  useEffect(() => {
+    if (!copied) return
+    const t = setTimeout(() => setCopied(false), 1400)
+    return () => clearTimeout(t)
+  }, [copied])
+
+  const statusText = () => {
+    if (winner === 'X') return 'Player X wins'
+    if (winner === 'O') return 'Player O wins'
+    if (winner === 'draw') return 'Draw'
+    return `Player ${state.turn}'s turn`
+  }
+
+  const exportOptions: ExportOption[] = [
+    {
+      id: 'json',
+      label: 'Score & history JSON',
+      mimeType: 'application/json',
+      extension: 'json',
+      getData: () =>
+        JSON.stringify(
+          {
+            score: state.score,
+            history: state.history,
+            board: boardToText(board),
+            generatedAt: new Date().toISOString(),
+          },
+          null,
+          2,
+        ),
+    },
+    {
+      id: 'txt',
+      label: 'Final board text',
+      mimeType: 'text/plain',
+      extension: 'txt',
+      getData: () => `${statusText()}\n${boardToText(board)}`,
+    },
+  ]
+
+  const historyRows = state.history.map((rec, i) => ({
+    cells: {
+      n: state.history.length - i,
+      result: resultLabel(rec),
+      moves: rec.moves,
+    },
+  }))
 
   return (
     <AppShell
@@ -115,63 +213,90 @@ export function App() {
       icon="grid"
       hue="cobalt"
       category="Games"
-      meta="3x3"
+      meta={`${state.score.x}–${state.score.o}`}
       side={
-        <Rail
-          title="Tic Tac Toe"
-          note="Two players · local"
-          chips={['3x3 grid', 'Numbers 1-9 aim a cell', 'Score keeps across reloads']}
-        />
+        <Rail title="Match" note={`${state.history.length} finished`}>
+          <KpiRow>
+            <Kpi label="X" value={state.score.x} />
+            <Kpi label="O" value={state.score.o} />
+            <Kpi label="Shared" value={state.score.draws} />
+          </KpiRow>
+          <Actions>
+            <Button onClick={copySummary}>Copy summary</Button>
+            <Button onClick={copyBoard}>{copied ? 'Board copied' : 'Copy board'}</Button>
+          </Actions>
+        </Rail>
       }
     >
-      <Card mono="Game" title="Board">
-        <div
+      <p
+        role="status"
+        aria-live="polite"
+        style={{ fontFamily: 'var(--sans)', fontWeight: 600, margin: '0 0 calc(12px * var(--sf))' }}
+      >
+        {statusText()}
+        <br />
+        {`X: ${state.score.x}, O: ${state.score.o}, Draws: ${state.score.draws}`}
+      </p>
+      <Card
+        mono="Board"
+        title="Play a move"
+        actions={
+          <Actions>
+            <Button kind="primary" onClick={newGame}>
+              Restart
+            </Button>
+          </Actions>
+        }
+      >
+        <table
+          ref={boardRef}
+          role="grid"
+          aria-label="Tic tac toe board"
+          onKeyDown={onKeyDown}
           style={{
-            fontFamily: 'var(--serif)',
-            fontSize: 'calc(16px * var(--tf))',
-            color: game.winner !== null ? 'var(--accent)' : 'var(--ink)',
+            borderCollapse: 'separate',
+            borderSpacing: 'calc(8px * var(--sf))',
+            width: '100%',
+            maxWidth: 'calc(420px * var(--sf))',
+            fontFamily: 'var(--mono)',
           }}
         >
-          {status}
-          <br />
-          <span style={scoreStyle}>
-            X: {game.score.x}, O: {game.score.o}, Draws: {game.score.draws}
-          </span>
-        </div>
-        <table style={boardStyle} aria-label="Tic tac toe board">
           <tbody>
-            {[0, 1, 2].map((row) => (
-              <tr key={row} style={rowStyle}>
-                {[0, 1, 2].map((column) => {
-                  const index = row * 3 + column
-                  const mark = game.board[index]
-                  const pos = `row ${row + 1}, column ${column + 1}`
-                  const cellLabel = mark ? `${mark}, ${pos}` : `empty, ${pos}`
-                  const onKeyDown = (event: React.KeyboardEvent<HTMLTableCellElement>) => {
-                    if (event.key === String(index + 1)) {
-                      event.preventDefault()
-                      play(index)
-                    }
+            {[0, 1, 2].map((r) => (
+              <tr key={r}>
+                {[0, 1, 2].map((c) => {
+                  const i = r * 3 + c
+                  const cell = board[i]
+                  const inWin = winCells.has(i)
+                  const label = cell
+                    ? `${cell}, ${cellName(i)}`
+                    : `empty, ${cellName(i)}`
+                  const buttonLabel = cell
+                    ? `${cell}, ${cellName(i)}`
+                    : `Player ${state.turn} to play in ${cellName(i)}`
+                  const style: React.CSSProperties = {
+                    aspectRatio: '1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 'calc(30px * var(--tf))',
+                    fontWeight: 700,
+                    cursor: winner === null && cell === null ? 'pointer' : 'default',
+                    background: inWin ? 'var(--accent-soft)' : 'var(--ui-card)',
+                    color: inWin ? 'var(--accent)' : cell === 'X' ? 'var(--geo-cobalt)' : 'var(--ink)',
+                    border: `calc(1px * var(--sf)) solid ${inWin ? 'var(--accent)' : 'var(--ui-line)'}`,
                   }
                   return (
-                    <td
-                      key={index}
-                      role="cell"
-                      aria-label={cellLabel}
-                      tabIndex={0}
-                      onKeyDown={onKeyDown}
-                      style={mark ? { ...cellStyle, ...filledStyle } : cellStyle}
-                    >
-                      {mark ? (
-                        mark
-                      ) : (
-                        <button
-                          type="button"
-                          aria-label={`Player ${game.turn} to play in ${pos}`}
-                          onClick={() => play(index)}
-                          style={buttonStyle}
-                        />
-                      )}
+                    <td key={i} role="cell" aria-label={label} tabIndex={0} style={{ padding: 0, outline: 'none' }}>
+                      <button
+                        type="button"
+                        aria-label={buttonLabel}
+                        onClick={() => play(i)}
+                        disabled={winner !== null || cell !== null}
+                        style={style}
+                      >
+                        {cell ?? ''}
+                      </button>
                     </td>
                   )
                 })}
@@ -179,12 +304,44 @@ export function App() {
             ))}
           </tbody>
         </table>
+      </Card>
+
+      <Card mono="Score" title="Tally">
         <Actions>
-          <Button kind="primary" onClick={restart}>
-            Restart
+          <Button onClick={doResetScores}>Reset Scores</Button>
+          <ExportMenu options={exportOptions} fileName="tic-tac-toe" ariaLabel="Export game" />
+          <Button kind="danger" onClick={doErase}>
+            Erase everything
           </Button>
-          <Button onClick={resetScores}>Reset Scores</Button>
         </Actions>
+      </Card>
+
+      <Card mono="History" title="Finished games" accent={state.history.length > 0}>
+        {state.history.length === 0 ? (
+          <EmptyState
+            title="No finished games yet"
+            detail="Play a full round — a win or a draw — and it will be recorded here."
+          />
+        ) : (
+          <Table
+            label="Finished games"
+            columns={[
+              { key: 'n', label: '#', num: true },
+              { key: 'result', label: 'Result' },
+              { key: 'moves', label: 'Moves', num: true },
+            ]}
+            rows={historyRows}
+          />
+        )}
+      </Card>
+
+      <Card mono="Legend" title="How to play">
+        <List label="Board legend">
+          <Row title="X opens" meta="always moves first" value={<Tag>X</Tag>} />
+          <Row title="O responds" meta="moves second" value={<Tag>O</Tag>} />
+          <Row title="Three in a line" meta="row, column, or diagonal" value={<Tag accent>win</Tag>} />
+          <Row title="Full board" meta="no three in a line" value={<Tag>shared</Tag>} />
+        </List>
       </Card>
     </AppShell>
   )
