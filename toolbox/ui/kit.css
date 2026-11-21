@@ -109,6 +109,29 @@
 /* Buttons that sit next to each other never touch. */
 .lk-shell .lc-btn + .lc-btn { margin-left: calc(8px * var(--sf)); }
 
+/* ---------------------------------------------------------------- native range, colour and file inputs
+   Apps may use these raw; the kit makes them flat and square like everything else. */
+.lk-shell input[type='range'] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: calc(20px * var(--sf)); margin: 0; background: transparent; accent-color: var(--accent);
+}
+.lk-shell input[type='range']::-webkit-slider-runnable-track { height: 4px; background: var(--ink); border: 0; border-radius: 0; }
+.lk-shell input[type='range']::-moz-range-track { height: 4px; background: var(--ink); border: 0; border-radius: 0; }
+.lk-shell input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 18px; margin-top: -7px; background: var(--accent); border: 1px solid var(--ink); border-radius: 0; box-shadow: 2px 2px 0 var(--ink);
+}
+.lk-shell input[type='range']::-moz-range-thumb { width: 14px; height: 18px; background: var(--accent); border: 1px solid var(--ink); border-radius: 0; }
+.lk-shell input[type='color'] {
+  -webkit-appearance: none; appearance: none; width: calc(48px * var(--sf)); height: calc(34px * var(--sf)); padding: 3px; background: var(--ui-card);
+  border: 1px solid var(--ink); border-radius: 0; box-shadow: 2px 2px 0 var(--ink); cursor: pointer;
+}
+.lk-shell input[type='color']::-webkit-color-swatch-wrapper { padding: 0; }
+.lk-shell input[type='color']::-webkit-color-swatch { border: 0; border-radius: 0; }
+.lk-shell input[type='file'] { font-family: var(--mono); font-size: calc(11px * var(--tf)); color: var(--ink-60); max-width: 100%; }
+.lk-shell input[type='file']::file-selector-button {
+  font-family: var(--sans); font-size: calc(12.5px * var(--tf)); font-weight: 600; color: var(--ink); background: var(--ui-card);
+  border: 1px solid var(--ink); border-radius: 0; padding: calc(6px * var(--sf)) calc(12px * var(--sf)); margin-right: calc(10px * var(--sf)); cursor: pointer;
+}
+
 /* ---------------------------------------------------------------- board and keys
    A board is a grid of square cells of one fixed size. The grid lines are the gaps; cells carry only a background. */
 .lk-board {
