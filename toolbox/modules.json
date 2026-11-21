@@ -1426,6 +1426,51 @@
       }
     },
     {
+      "id": "@lacuna/data-grid",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "An editable spreadsheet grid with typed columns, keyboard navigation, range selection, paste, and undo/redo.",
+      "today": [
+        "toolbox/modules/data-grid/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-undo-stack"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "DataGrid"
+      ],
+      "public": true,
+      "path": "toolbox/modules/data-grid/0.1.0",
+      "bridge": {
+        "component": "DataGrid",
+        "kind": "widget",
+        "exports": [
+          "DataGrid"
+        ],
+        "types": [
+          "DataGridCellType",
+          "DataGridColumn",
+          "DataGridRow",
+          "DataGridProps"
+        ],
+        "signature": "DataGrid({ columns, rows, label, onCellChange, onSelectionChange, style, }: DataGridProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "f51540974ef97c51ef50e5190d651f50ffdf2ca4",
+            "source": "ea18fd9f15949370",
+            "lines": 393,
+            "dependencies": {
+              "@lacuna/use-undo-stack": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/date-math",
       "layer": 3,
       "status": "exists",
