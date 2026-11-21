@@ -1,9 +1,55 @@
 import { useState } from 'react'
-import { AppShell, Button, Card, Stack } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  Rail,
+  Stack,
+  Table,
+  Tag,
+} from '@lacuna/ui'
 import { host, type GradeState } from './host/mock'
 import { fmt2, fmtPct, sumWeights, validateComponent, weightedTotal, weightsWarning } from './engine'
 
 const emptyFields = { name: '', score: '', weight: '' }
+
+/** Wraps the kit field so the app can reach the native input's blur (the kit TextInput has no onBlur prop). */
+function BlurField({
+  label,
+  value,
+  inputMode,
+  error,
+  onChange,
+  onBlur,
+}: {
+  label: string
+  value: string
+  inputMode?: 'text' | 'decimal'
+  error?: string | null
+  onChange: (value: string) => void
+  onBlur?: () => void
+}) {
+  return (
+    <label className="lc-field">
+      <span className="lc-field-label">{label}</span>
+      <input
+        className="lc-input"
+        inputMode={inputMode}
+        value={value}
+        aria-invalid={error ? true : undefined}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+      />
+      {error ? <span className="lk-field-error" role="alert">{error}</span> : null}
+    </label>
+  )
+}
 
 export function App() {
   const [state, setState] = useState<GradeState>(() => host.read())
@@ -31,8 +77,7 @@ export function App() {
     if (!v.ok) setError(v.message)
   }
 
-  const removeComponent = (id: string, name: string) => {
-    void name
+  const removeComponent = (id: string) => {
     setState(host.deleteComponent(id))
   }
 
@@ -42,149 +87,99 @@ export function App() {
 
   const total = weightedTotal(state)
   const weights = sumWeights(state)
-  const warning = state.components.length > 0 ? weightsWarning(state) : null
+  const count = state.components.length
+  const warning = count > 0 ? weightsWarning(state) : null
 
   return (
     <AppShell
       name="Grade Calculator"
       icon="school"
       hue="green"
-      meta={state.components.length > 0 ? `${state.components.length} components` : undefined}
-      status={`Weighted total ${state.components.length > 0 ? fmt2(total) : '—'} · local, no network`}
+      category="Productivity"
+      meta={count > 0 ? `${count} components` : undefined}
+      status={`Weighted total ${count > 0 ? fmt2(total) : '—'} · local, no network`}
+      side={<Rail title="Grade Calculator" note="One course · local" chips={['Add', 'Remove', 'Works offline']} />}
     >
       <Stack>
         <Card title="Add a component" mono="New">
-          <div style={{ display: 'grid', gap: 'calc(10px * var(--sf))' }}>
-            <label className="lc-field">
-              <span className="lc-field-label">Component Name</span>
-              <input
-                className="lc-input"
-                value={fields.name}
-                onChange={(e) => setField('name', e.target.value)}
-              />
-            </label>
-            <label className="lc-field">
-              <span className="lc-field-label">Score</span>
-              <input
-                className="lc-input"
-                value={fields.score}
-                inputMode="decimal"
-                aria-invalid={error ? true : undefined}
-                onChange={(e) => setField('score', e.target.value)}
-                onBlur={onScoreBlur}
-              />
-            </label>
-            <label className="lc-field">
-              <span className="lc-field-label">Weight</span>
-              <input
-                className="lc-input"
-                value={fields.weight}
-                inputMode="decimal"
-                onChange={(e) => setField('weight', e.target.value)}
-              />
-            </label>
-            {error ? (
-              <div
-                role="alert"
-                style={{
-                  gridColumn: '1 / -1',
-                  color: 'var(--danger)',
-                  fontSize: 'calc(13px * var(--tf))',
-                }}
-              >
-                {error}
-              </div>
-            ) : null}
-          </div>
-          <div style={{ marginTop: 'calc(12px * var(--sf))' }}>
+          <FormGrid>
+            <BlurField
+              label="Component Name"
+              value={fields.name}
+              onChange={(v) => setField('name', v)}
+            />
+            <BlurField
+              label="Score"
+              value={fields.score}
+              inputMode="decimal"
+              error={error}
+              onChange={(v) => setField('score', v)}
+              onBlur={onScoreBlur}
+            />
+            <BlurField
+              label="Weight"
+              value={fields.weight}
+              inputMode="decimal"
+              onChange={(v) => setField('weight', v)}
+            />
+          </FormGrid>
+          <Actions>
             <Button kind="primary" ariaLabel="Add component" onClick={commit}>
               Add component
             </Button>
-          </div>
+          </Actions>
         </Card>
 
         <Card title="Summary" mono="Grade">
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 'calc(8px * var(--sf))',
-              padding: 'calc(8px * var(--sf)) 0 calc(12px * var(--sf))',
-            }}
-          >
-            <span
-              style={{ fontSize: 'calc(28px * var(--tf))', fontVariantNumeric: 'tabular-nums' }}
-              aria-hidden="true"
-            >
-              {state.components.length > 0 ? fmt2(total) : '—'}
-            </span>
-            <span aria-hidden="true" style={{ fontSize: 'calc(16px * var(--tf))', color: 'var(--mid)' }}>
-              / 100
-            </span>
-            <span style={{ marginLeft: 'auto', color: 'var(--mid)' }}>Weights add to {fmtPct(weights)}.</span>
-          </div>
-          <div>Weighted Grade: {fmt2(total)}%</div>
-          {warning ? (
-            <div style={{ color: 'var(--mid)' }}>{warning}</div>
-          ) : null}
+          {count === 0 ? (
+            <EmptyState mono="Empty" title="No components yet" detail="Add a component above to see its contribution." />
+          ) : (
+            <KpiRow>
+              <Kpi value={`${fmt2(total)}%`} label="Weighted Grade" accent />
+            </KpiRow>
+          )}
+          <Body>Weighted Grade: {fmt2(total)}%</Body>
+          {warning ? <Tag>{warning}</Tag> : null}
         </Card>
 
-        {state.components.length === 0 ? (
-          <div style={{ color: 'var(--mid)' }}>No components yet</div>
-        ) : (
-          <Card mono="Breakdown">
-            <table className="lc-table">
-              <thead>
-                <tr>
-                  <th scope="col">Component</th>
-                  <th scope="col" style={{ textAlign: 'right' }}>Score</th>
-                  <th scope="col" style={{ textAlign: 'right' }}>Weight</th>
-                  <th scope="col" style={{ textAlign: 'right' }}>Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {state.components.map((c) => (
-                  <tr key={c.id}>
-                    <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
-                        {c.name}
-                        <button
-                          type="button"
-                          className="lc-btn"
-                          aria-label={`Delete ${c.name}`}
-                          onClick={() => removeComponent(c.id, c.name)}
-                          style={{ padding: 0, fontSize: 'calc(12px * var(--tf))', color: 'var(--mid)' }}
-                        >
-                          Remove
-                        </button>
-                      </span>
-                    </td>
-                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmt2(c.score)}</td>
-                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmtPct(c.weight)}</td>
-                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
-                      {fmt2((c.score * c.weight) / 100)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td>Total</td>
-                  <td />
-                  <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmtPct(weights)}</td>
-                  <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{fmt2(total)}</td>
-                </tr>
-              </tfoot>
-            </table>
+        {count > 0 ? (
+          <Card title="Breakdown" mono={`${count} components`}>
+            <Table
+              label="Breakdown"
+              columns={[
+                { key: 'name', label: 'Component' },
+                { key: 'score', label: 'Score', num: true },
+                { key: 'weight', label: 'Weight', num: true },
+                { key: 'points', label: 'Points', num: true },
+              ]}
+              rows={state.components.map((c) => ({
+                cells: {
+                  name: (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
+                      {c.name}
+                      <Button kind="ghost" ariaLabel={`Delete ${c.name}`} onClick={() => removeComponent(c.id)}>
+                        Remove
+                      </Button>
+                    </span>
+                  ),
+                  score: fmt2(c.score),
+                  weight: fmtPct(c.weight),
+                  points: fmt2((c.score * c.weight) / 100),
+                },
+              }))}
+              foot={{
+                name: 'Total',
+                score: ' ',
+                weight: fmtPct(weights),
+                points: fmt2(total),
+              }}
+            />
+            <Actions>
+              <Button kind="secondary" ariaLabel="Clear all components" onClick={clearAll}>
+                Clear all
+              </Button>
+            </Actions>
           </Card>
-        )}
-
-        {state.components.length > 0 ? (
-          <div>
-            <Button kind="secondary" ariaLabel="Clear all components" onClick={clearAll}>
-              Clear all
-            </Button>
-          </div>
         ) : null}
       </Stack>
     </AppShell>
