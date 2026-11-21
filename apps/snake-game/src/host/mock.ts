@@ -1,25 +1,21 @@
-export interface GameState {
-  id: string
-  score: number
-  best: number
-}
+import { createMockValue } from '@lacuna/host-mock'
 
-const BEST_KEY = 'lacuna.snake-game.best'
+export type GameState = { id: string; score: number; best: number }
 
-function loadBest(): number {
-  const raw = window.localStorage.getItem(BEST_KEY)
-  const value = raw ? Number(raw) : 0
-  return Number.isFinite(value) && value >= 0 ? Math.floor(value) : 0
-}
+const KEY = 'lacuna.snake-game.best'
+
+const isValid = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0
+
+const best = createMockValue<number>({ key: KEY, fallback: 0, validate: isValid })
 
 export const store = {
-  load(): GameState {
-    return { id: 'game', score: 0, best: loadBest() }
+  load() {
+    return { id: 'game', score: 0, best: best.get() }
   },
-  saveBest(best: number) {
-    window.localStorage.setItem(BEST_KEY, String(Math.max(0, Math.floor(best))))
+  saveBest(score: number) {
+    if (score > best.get()) best.set(score)
   },
   reset() {
-    // The run score is in-memory only; nothing to clear on the host.
+    best.clear()
   },
 }
