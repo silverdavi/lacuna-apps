@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "35b739073fe909c481bf4b093a905761f6ce1755db0403cd8ab8263d3c3a2fd3",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Vigenere Cipher\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"HELLO\" in the field labelled \"Message\" and \"KEY\" in the field labelled \"Key\", with the radio button \"Encode\" selected, shows \"RIJVS\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"RIJVS\" in the field labelled \"Message\" and \"KEY\" in the field labelled \"Key\", with the radio button \"Decode\" selected, shows \"HELLO\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"hello\" in the field labelled \"Message\" and \"key\" in the field labelled \"Key\", with the radio button \"Encode\" selected, shows \"rijvs\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"HELLO WORLD\" in the field labelled \"Message\" and \"KEY\" in the field labelled \"Key\", with the radio button \"Encode\" selected, shows \"RIJVS UYVJH\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Copy\" when the field labelled \"Result\" contains \"RIJVS\" changes the button label to \"Copied\" for 2 seconds, then back to \"Copy\"."
+    },
+    {
+      "id": "A7",
+      "text": "After encoding \"HELLO\" with key \"KEY\" to get \"RIJVS\", clicking the button \"Add to history\" adds a list item containing \"HELLO\" and \"RIJVS\". Clicking the \"Delete\" button on that item removes it from the list."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"History\" shows the list of previous conversions. After adding one conversion, the list contains one item with the text \"HELLO\" and \"RIJVS\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history list item containing \"HELLO\" and \"RIJVS\" after the page is reloaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "5f4efc887c5713999310262d345c1d50d50f0753c716b0730fb6cee4d7869e36"
+    }
+  ]
+}
