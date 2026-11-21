@@ -1,14 +1,34 @@
 import { useState } from 'react'
-import { Body, Button, Card, Stack, TextInput } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  List,
+  Rail,
+  Row,
+  SectionLabel,
+  Select,
+  Stack,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { ExportMenu } from '@lacuna/export-menu'
 import { host, type Units } from './host'
 
 type Category = 'Underweight' | 'Normal weight' | 'Overweight' | 'Obese'
 
-const CATEGORIES: { key: Category; range: string; short: string }[] = [
-  { key: 'Underweight', range: 'Below 18.5', short: 'Under' },
-  { key: 'Normal weight', range: '18.5 - 24.9', short: 'Normal' },
-  { key: 'Overweight', range: '25.0 - 29.9', short: 'Over' },
-  { key: 'Obese', range: '30.0 and above', short: 'Obese' },
+const CATEGORIES: { key: Category; range: string }[] = [
+  { key: 'Underweight', range: 'Below 18.5' },
+  { key: 'Normal weight', range: '18.5 - 24.9' },
+  { key: 'Overweight', range: '25.0 - 29.9' },
+  { key: 'Obese', range: '30.0 and above' },
 ]
 
 function categoryOf(bmi: number): Category {
@@ -26,9 +46,28 @@ function calculate(units: Units, heightText: string, weightText: string): number
     const m = height / 100
     return weight / (m * m)
   }
-  const feet = height
-  const lbs = weight
-  return (54.5 * lbs) / (feet * feet)
+  return (54.5 * weight) / (height * height)
+}
+
+function resultText(bmi: number, category: Category, units: Units, height: string, weight: string): string {
+  const [h, w] = units === 'metric' ? ['cm', 'kg'] : ['ft', 'lbs']
+  return `BMI: ${bmi.toFixed(1)} - ${category} (height ${height} ${h}, weight ${weight} ${w})`
+}
+
+function BandBar({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div className="bmi-band">
+      <div className="bmi-band-track">
+        <div
+          className={active ? 'bmi-band-fill bmi-band-fill--on' : 'bmi-band-fill'}
+          role="img"
+          aria-label="BMI band"
+        >
+          <span className="bmi-band-label">{label}</span>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function App() {
@@ -40,6 +79,8 @@ export function App() {
   const [result, setResult] = useState<{ bmi: number; category: Category } | null>(
     initial ? { bmi: initial.bmi, category: categoryOf(initial.bmi) } : null,
   )
+  const [history, setHistory] = useState(host.history())
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
   function onUnits(value: Units) {
     setUnits(value)
@@ -65,282 +106,195 @@ export function App() {
     const rounded = Math.round(bmi * 10) / 10
     const category = categoryOf(rounded)
     host.saveLast(units, height, weight, rounded)
+    setHistory(host.history())
     setError(null)
     setResult({ bmi: rounded, category })
+  }
+
+  function removeRecord(at: number) {
+    setHistory(host.remove(at))
+  }
+
+  function copyResult() {
+    if (result) void copy(resultText(result.bmi, result.category, units, height, weight))
   }
 
   const heightLabel = units === 'metric' ? 'Height (cm)' : 'Height (ft)'
   const weightLabel = units === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
 
-  return (
-    <main style={{ display: 'block', width: '100%', padding: 'calc(20px * var(--sf))' }}>
-      <Card mono="HEALTH" title="BMI Calculator" accent>
-        <Stack lg>
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                font: '600 calc(22px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-                letterSpacing: 'calc(-0.01em * var(--tf))',
-              }}
-            >
-              BMI Calculator
-            </h1>
-            <Body>Enter your height and weight to calculate BMI</Body>
-          </div>
+  const exportJson = () =>
+    JSON.stringify(
+      {
+        last: result
+          ? { units, height, weight, bmi: result.bmi, category: result.category }
+          : null,
+        history: history.map((r) => ({ units: r.units, height: r.height, weight: r.weight, bmi: r.bmi, category: categoryOf(r.bmi) })),
+      },
+      null,
+      2,
+    )
 
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 'calc(12px * var(--sf))',
-              alignItems: 'flex-end',
-            }}
-          >
-            <label
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'calc(4px * var(--sf))',
-                font: '500 calc(12px * var(--tf)) var(--sans)',
-                color: 'var(--ink-60)',
-              }}
-            >
-              Units
-              <select
+  return (
+    <AppShell
+      name="BMI Calculator"
+      icon="clinic"
+      hue="teal"
+      category="Health"
+      meta={result ? `BMI ${result.bmi.toFixed(1)}` : undefined}
+      status="Saved in your space"
+      side={
+        <Rail
+          title="BMI Calculator"
+          note="Last calculation kept in your space"
+          chips={units === 'metric' ? ['cm', 'kg'] : ['ft', 'lbs']}
+        />
+      }
+    >
+      <Stack lg>
+        <Card mono="Input" title="Your measurements">
+          <Body>Enter your height and weight to calculate BMI</Body>
+          <div style={{ marginTop: 'calc(12px * var(--sf))', marginBottom: 'calc(12px * var(--sf))' }}>
+            <FormGrid>
+              <Select
+                label="Units"
                 value={units}
-                onChange={(event) => onUnits(event.target.value as Units)}
-                style={{
-                  font: '400 calc(13px * var(--tf)) var(--sans)',
-                  color: 'var(--ink)',
-                  background: 'var(--ui-bright)',
-                  border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                  borderRadius: 'calc(6px * var(--sf))',
-                  padding: 'calc(8px * var(--sf))',
+                onChange={(value) => onUnits(value as Units)}
+                options={[
+                  { value: 'metric', label: 'Metric (cm, kg)' },
+                  { value: 'imperial', label: 'Imperial (ft, lbs)' },
+                ]}
+              />
+              <TextInput
+                label={heightLabel}
+                value={height}
+                onChange={(value) => {
+                  setHeight(value)
+                  setError(null)
                 }}
-              >
-                <option value="metric">Metric (cm, kg)</option>
-                <option value="imperial">Imperial (ft, lbs)</option>
-              </select>
-            </label>
-            <TextInput
-              label={heightLabel}
-              value={height}
-              onChange={(value) => {
-                setHeight(value)
-                setError(null)
-              }}
-            />
-            <TextInput
-              label={weightLabel}
-              value={weight}
-              onChange={(value) => {
-                setWeight(value)
-                setError(null)
-              }}
-            />
+                inputMode="decimal"
+              />
+              <TextInput
+                label={weightLabel}
+                value={weight}
+                onChange={(value) => {
+                  setWeight(value)
+                  setError(null)
+                }}
+                inputMode="decimal"
+              />
+            </FormGrid>
+          </div>
+          <Actions>
             <Button kind="primary" onClick={onCalculate}>
               Calculate
             </Button>
-          </div>
-
+          </Actions>
           {error && (
             <div
               role="alert"
               style={{
-                color: 'var(--danger)',
-                font: '500 calc(12px * var(--tf)) var(--mono)',
+                marginTop: 'calc(12px * var(--sf))',
+                fontFamily: 'var(--mono)',
+                fontSize: 'calc(12px * var(--tf))',
                 letterSpacing: 'calc(0.3px * var(--sf))',
+                color: 'var(--danger)',
               }}
             >
               {error}
             </div>
           )}
+        </Card>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 'calc(12px * var(--sf))',
-              padding: 'calc(16px * var(--sf))',
-              border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-              borderRadius: 'calc(6px * var(--sf))',
-              background: 'var(--paper-deep)',
-            }}
-          >
-            <span
-              style={{
-                font: '700 calc(28px * var(--tf)) var(--mono)',
-                color: result ? 'var(--ink)' : 'var(--ink-60)',
-              }}
-            >
-              BMI: {result ? result.bmi.toFixed(1) : '—'}
-            </span>
-            {result && (
-              <span
-                style={{
-                  font: '600 calc(15px * var(--tf)) var(--sans)',
-                  color: 'var(--accent)',
-                }}
-              >
-                {result.category}
-              </span>
-            )}
-          </div>
+        <Card
+          mono="Result"
+          title="Your BMI"
+          actions={
+            result ? (
+              <Actions>
+                <Button kind="ghost" onClick={copyResult}>
+                  {copied ? 'Copied' : 'Copy result'}
+                </Button>
+                <ExportMenu
+                  ariaLabel="Export BMI"
+                  fileName="bmi-calculator"
+                  options={[
+                    {
+                      id: 'json',
+                      label: 'JSON',
+                      mimeType: 'application/json',
+                      extension: 'json',
+                      getData: exportJson,
+                    },
+                  ]}
+                />
+              </Actions>
+            ) : undefined
+          }
+        >
+          {result ? (
+            <KpiRow>
+              <div>
+                <Kpi value={`BMI: ${result.bmi.toFixed(1)}`} label={result.category} accent />
+              </div>
+            </KpiRow>
+          ) : (
+            <EmptyState
+              mono="No result yet"
+              title="BMI: —"
+              detail="Enter your height and weight and press Calculate."
+            />
+          )}
+        </Card>
 
-          <div>
-            <h2
-              style={{
-                margin: 0,
-                font: '600 calc(14px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-              }}
-            >
-              BMI categories
-            </h2>
-            <table
-              style={{
-                width: '100%',
-                marginTop: 'calc(8px * var(--sf))',
-                borderCollapse: 'collapse',
-                font: '400 calc(13px * var(--tf)) var(--sans)',
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      textAlign: 'left',
-                      padding: 'calc(8px * var(--sf))',
-                      borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                      color: 'var(--ink-60)',
-                      font: '500 calc(11px * var(--tf)) var(--mono)',
-                      letterSpacing: 'calc(0.4px * var(--sf))',
-                    }}
-                  >
-                    Category
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'left',
-                      padding: 'calc(8px * var(--sf))',
-                      borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                      color: 'var(--ink-60)',
-                      font: '500 calc(11px * var(--tf)) var(--mono)',
-                      letterSpacing: 'calc(0.4px * var(--sf))',
-                    }}
-                  >
-                    BMI range
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {CATEGORIES.map((c) => {
-                  const active = result !== null && result.category === c.key
-                  return (
-                    <tr
-                      key={c.key}
-                      aria-current={active ? 'true' : undefined}
-                      style={{
-                        background: active ? 'var(--accent-soft, var(--ui-bright))' : 'transparent',
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: 'calc(8px * var(--sf))',
-                          borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                          color: 'var(--ink)',
-                          fontWeight: active ? 700 : 400,
-                        }}
-                      >
-                        {c.key}
-                      </td>
-                      <td
-                        style={{
-                          padding: 'calc(8px * var(--sf))',
-                          borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                          color: 'var(--ink-60)',
-                        }}
-                      >
-                        {c.range}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+        <Card mono="Breakdown" title="BMI categories">
+          <SectionLabel>Where you fall</SectionLabel>
+          <div className="bmi-bands" style={{ margin: 'calc(8px * var(--sf)) 0 calc(14px * var(--sf))' }}>
+            {CATEGORIES.map((c) => (
+              <BandBar key={c.key} label={c.key} active={result?.category === c.key} />
+            ))}
           </div>
+          <SectionLabel>Categories</SectionLabel>
+          <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+            <Table
+              label="BMI categories"
+              columns={[
+                { key: 'category', label: 'Category' },
+                { key: 'range', label: 'BMI range', num: true },
+              ]}
+              rows={CATEGORIES.map((c) => ({
+                cells: { category: c.key, range: c.range },
+                hot: result?.category === c.key,
+              }))}
+            />
+          </div>
+        </Card>
 
-          <div>
-            <h2
-              style={{
-                margin: 0,
-                font: '600 calc(14px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-              }}
-            >
-              Where you fall
-            </h2>
-            <div
-              style={{
-                marginTop: 'calc(10px * var(--sf))',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'calc(26px * var(--sf))',
-              }}
-            >
-              {CATEGORIES.map((c) => {
-                const active = result !== null && result.category === c.key
-                return (
-                  <div
-                    key={c.key}
-                    style={{
-                      position: 'relative',
-                      height: 'calc(10px * var(--sf))',
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'var(--ui-line)',
-                        borderRadius: 'calc(5px * var(--sf))',
-                        overflow: 'hidden',
-                      }}
-                    />
-                    <div
-                      role="img"
-                      aria-label={`${c.short} band`}
-                      style={{
-                        position: 'relative',
-                        width: active ? '100%' : '0.1%',
-                        height: 'calc(10px * var(--sf))',
-                        background: 'var(--accent)',
-                        borderRadius: 'calc(5px * var(--sf))',
-                        overflow: 'visible',
-                      }}
-                    >
-                      <span
-                        style={{
-                          position: 'absolute',
-                          left: 0,
-                          top: 'calc(14px * var(--sf))',
-                          font: '400 calc(12px * var(--tf)) var(--sans)',
-                          color: 'var(--ink-60)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {c.key}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </Stack>
-      </Card>
-    </main>
+        <Card mono={`${history.length} kept`} title="Your last calculations">
+          {history.length === 0 ? (
+            <EmptyState
+              mono="No history yet"
+              title="Nothing saved yet"
+              detail="Each calculation is kept here so you can compare them."
+            />
+          ) : (
+            <List label="History">
+              {history.map((r) => (
+                <Row
+                  key={r.at}
+                  title={`BMI ${r.bmi.toFixed(1)} · ${categoryOf(r.bmi)}`}
+                  meta={`${r.height} ${r.units === 'metric' ? 'cm' : 'ft'} · ${r.weight} ${r.units === 'metric' ? 'kg' : 'lbs'}`}
+                  value={new Date(r.at).toLocaleDateString()}
+                  action={
+                    <Button kind="ghost" ariaLabel={`Remove ${r.bmi.toFixed(1)}`} onClick={() => removeRecord(r.at)}>
+                      Remove
+                    </Button>
+                  }
+                />
+              ))}
+            </List>
+          )}
+        </Card>
+      </Stack>
+    </AppShell>
   )
 }
