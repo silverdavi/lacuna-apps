@@ -1,5 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Body, Button, Card, EmptyState, MonoLabel, Stack, TextInput, Title } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  List,
+  Rail,
+  Row,
+  Select,
+  Stack,
+  TextInput,
+} from '@lacuna/ui'
 import { host } from './host/mock'
 import {
   QUALITIES,
@@ -55,15 +68,12 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
   const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
   return (
     <section aria-label="trend chart">
-      <MonoLabel sm style={{ color: 'var(--ink-60)' }}>
-        TREND
-      </MonoLabel>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"
         role="img"
         aria-label="Trend of nights logged"
-        style={{ display: 'block', marginTop: 'calc(8px * var(--sf))' }}
+        style={{ display: 'block' }}
       >
         <path
           d={d}
@@ -82,7 +92,7 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
             x={p.x.toFixed(2)}
             y={(p.y - 8).toFixed(2)}
             textAnchor="middle"
-            fontSize="calc(8.5px * var(--tf))"
+            fontSize="calc(10px * var(--tf))"
             fill="var(--ink-40)"
             fontFamily="var(--mono)"
           >
@@ -95,7 +105,7 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
             x={p.x.toFixed(2)}
             y={(height - 8).toFixed(2)}
             textAnchor="middle"
-            fontSize="calc(8.5px * var(--tf))"
+            fontSize="calc(10px * var(--tf))"
             fill="var(--ink-40)"
             fontFamily="var(--mono)"
           >
@@ -111,43 +121,32 @@ function Heatmap({ entries }: { entries: SleepEntry[] }) {
   const cells = heatmapCells(entries)
   return (
     <section aria-label="heatmap">
-      <MonoLabel sm style={{ color: 'var(--ink-60)' }}>
-        HEATMAP
-      </MonoLabel>
       <div
         style={{
           display: 'flex',
           flexWrap: 'wrap',
           gap: 'calc(4px * var(--sf))',
-          marginTop: 'calc(8px * var(--sf))',
         }}
       >
         {cells.map((cell) => (
-            <div
-              key={cell.date}
-              title={`${cell.date}: ${cell.label}`}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 'calc(2px * var(--sf))',
-                padding: 'calc(6px * var(--sf))',
-                border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                borderRadius: 'calc(4px * var(--sf))',
-                background: 'var(--ui-bright)',
-              }}
-            >
-              <span style={{ font: '400 calc(9px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
-              <span
-                style={{
-                  font: '600 calc(11px * var(--tf)) var(--mono)',
-                  color: 'var(--accent)',
-                }}
-              >
-                {cell.label}
-              </span>
-            </div>
-          ))}
+          <div
+            key={cell.date}
+            title={`${cell.date}: ${cell.label}`}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'calc(2px * var(--sf))',
+              padding: 'calc(6px * var(--sf))',
+              border: 'calc(1px * var(--sf)) solid var(--ui-line)',
+              borderRadius: 'calc(4px * var(--sf))',
+              background: 'var(--ui-bright)',
+            }}
+          >
+            <span style={{ font: '400 calc(9px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
+            <span style={{ font: '600 calc(11px * var(--tf)) var(--mono)', color: 'var(--accent)' }}>{cell.label}</span>
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -168,7 +167,7 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  const entries = state.entries
+  const entries = sortEntries(state.entries)
   const avg = averageMinutes(entries)
   const streak = computeStreak(entries)
 
@@ -193,149 +192,95 @@ export function App() {
   }
 
   return (
-    <main style={{ display: 'block', width: '100%', padding: 'calc(20px * var(--sf))' }}>
-      <Card mono="Sleep" accent>
-        <Stack lg>
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                font: '600 calc(22px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-                letterSpacing: 'calc(-0.01em * var(--tf))',
-              }}
-            >
-              Sleep Tracker
-            </h1>
-            <Body>Log your nightly sleep and watch the pattern form.</Body>
-          </div>
-
-          <div
-            style={{
-              padding: 'calc(14px * var(--sf))',
-              border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-              borderRadius: 'calc(6px * var(--sf))',
-              background: 'var(--ui-bright)',
-            }}
-          >
-            <Stack>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 'calc(12px * var(--sf))',
-                  alignItems: 'flex-end',
-                }}
-              >
-                <TextInput label="Date" value={date} onChange={(v) => setDate(v)} />
-                <TextInput label="Duration" value={duration} onChange={(v) => setDuration(v)} />
-                <label className="lc-field" style={{ marginBottom: 0 }}>
-                  <span className="lc-field-label">Quality</span>
-                  <select
-                    className="lc-input"
-                    value={quality}
-                    onChange={(e) => setQuality(e.target.value as Quality)}
-                  >
-                    {QUALITIES.map((q) => (
-                      <option key={q} value={q}>
-                        {q}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              {error && (
-                <div
-                  role="alert"
-                  style={{
-                    color: 'var(--danger)',
-                    font: '500 calc(11px * var(--tf)) var(--mono)',
-                    letterSpacing: 'calc(0.4px * var(--sf))',
-                  }}
-                >
-                  {error}
-                </div>
-              )}
-              <Button kind="primary" onClick={logSleep}>
-                Log sleep
-              </Button>
-            </Stack>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 'calc(20px * var(--sf))',
-              padding: 'calc(12px * var(--sf))',
-              border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-              borderRadius: 'calc(4px * var(--sf))',
-              background: 'var(--paper-deep)',
-            }}
-          >
-            <Body>Total nights: {entries.length}</Body>
-            <Body>Average duration: {formatDuration(avg)}</Body>
-            <Body>Streak: {streak} days</Body>
-          </div>
-
-          {entries.length === 0 ? (
-            <EmptyState title="No sleep entries yet" detail="Log your first night to see the pattern." />
-          ) : (
-            <>
-              <div>
-                <MonoLabel sm style={{ color: 'var(--ink-60)' }}>
-                  ENTRIES
-                </MonoLabel>
-                <ul
-                  style={{
-                    listStyle: 'none',
-                    margin: 'calc(8px * var(--sf)) 0 0',
-                    padding: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'calc(6px * var(--sf))',
-                  }}
-                >
-                  {entries.map((e) => (
-                    <li
-                      key={e.id}
-                      role="listitem"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 'calc(10px * var(--sf))',
-                        padding: 'calc(8px * var(--sf))',
-                        border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                        borderRadius: 'calc(4px * var(--sf))',
-                        background: 'var(--ui-bright)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 'calc(12px * var(--sf))' }}>
-                        <span style={{ font: '400 calc(13px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
-                          {e.date}
-                        </span>
-                        <span style={{ font: '600 calc(15px * var(--tf)) var(--sans)', color: 'var(--ink)' }}>
-                          {formatDuration(e.minutes)}
-                        </span>
-                        <span style={{ font: '400 calc(13px * var(--tf)) var(--sans)', color: 'var(--ink-60)' }}>
-                          {e.quality}
-                        </span>
-                      </div>
-                      <Button kind="ghost" onClick={() => remove(e.id)}>
-                        Delete {e.date}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <Heatmap entries={entries} />
-              <TrendChart entries={entries} />
-            </>
-          )}
+    <AppShell
+      name="Sleep Tracker"
+      icon="calendar"
+      hue="teal"
+      category="Personal"
+      meta={`${entries.length} ${entries.length === 1 ? 'night' : 'nights'}`}
+      status="Saved on this device"
+      side={
+        <Rail
+          title="Sleep Tracker"
+          note="Log nightly sleep"
+          chips={['Date', 'Duration', 'Quality', 'Offline']}
+        />
+      }
+    >
+      <Card mono="New" title="Log a night">
+        <Stack>
+          <FormGrid>
+            <TextInput label="Date" value={date} onChange={setDate} />
+            <TextInput label="Duration" value={duration} onChange={setDuration} />
+            <Select
+              label="Quality"
+              value={quality}
+              onChange={(v) => setQuality(v as Quality)}
+              options={QUALITIES.map((q) => ({ value: q, label: q }))}
+            />
+          </FormGrid>
+          {error ? (
+            <div role="alert" style={{ color: 'var(--danger)' }}>{error}</div>
+          ) : null}
+          <Actions>
+            <Button kind="primary" onClick={logSleep}>
+              Log sleep
+            </Button>
+          </Actions>
         </Stack>
       </Card>
-    </main>
+
+      <Card mono={`${entries.length} saved`} title="Summary">
+        <div
+          style={{
+            display: 'flex',
+            gap: 'calc(16px * var(--sf))',
+          }}
+        >
+          <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
+            Total nights: <span style={{ color: 'var(--ink)' }}>{entries.length}</span>
+          </div>
+          <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
+            Average duration: <span style={{ color: 'var(--ink)' }}>{formatDuration(avg)}</span>
+          </div>
+          <div style={{ font: '500 calc(12px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
+            Streak: <span style={{ color: 'var(--accent)' }}>{streak} days</span>
+          </div>
+        </div>
+      </Card>
+
+      <Card mono={entries.length ? `${entries.length} entries` : 'Empty'} title="Entries">
+        {entries.length === 0 ? (
+          <EmptyState mono="Empty" title="No sleep entries yet" detail="Log your first night to see the pattern." />
+        ) : (
+          <List label="Sleep entries">
+            {entries.map((e) => (
+              <Row
+                key={e.id}
+                title={e.date}
+                meta={e.quality}
+                value={formatDuration(e.minutes)}
+                action={
+                  <Button kind="ghost" onClick={() => remove(e.id)}>
+                    Delete {e.date}
+                  </Button>
+                }
+              />
+            ))}
+          </List>
+        )}
+      </Card>
+
+      {entries.length > 0 ? (
+        <>
+          <Card mono="Pattern" title="Heatmap">
+            <Heatmap entries={entries} />
+          </Card>
+          <Card mono="Pattern" title="Trend">
+            <TrendChart entries={entries} />
+          </Card>
+        </>
+      ) : null}
+    </AppShell>
   )
 }
