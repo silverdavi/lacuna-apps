@@ -2,3 +2,4 @@ packages:
   - toolbox
   - template
   - apps/*
+  - toolbox/modules/*/*

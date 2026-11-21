@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/money",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Integer minor-unit currency arithmetic with exact rounding, largest-remainder allocation, and Intl formatting.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "money",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "ec90b51d96d0c639",
+    "lines": 182,
+    "exports": [
+      "toMinorUnits",
+      "fromMinorUnits",
+      "add",
+      "sub",
+      "mul",
+      "div",
+      "roundMinor",
+      "allocate",
+      "format"
+    ],
+    "types": [
+      "MinorUnits",
+      "MoneyOptions"
+    ],
+    "signature": "toMinorUnits(major: number, _currency?: string); fromMinorUnits(minor: MinorUnits, _currency?: string); add(a: MinorUnits, b: MinorUnits); sub(a: MinorUnits, b: MinorUnits)"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/heatmap",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A year-long grid of daily values in contribution-style columns for visualizing consistency over time.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Heatmap",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "e16f29810f486f67",
+    "lines": 240,
+    "exports": [
+      "Heatmap"
+    ],
+    "types": [
+      "HeatmapCell",
+      "HeatmapProps"
+    ],
+    "signature": "Heatmap(props: HeatmapProps)"
+  }
+}

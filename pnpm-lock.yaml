@@ -924,6 +924,579 @@ importers:
         specifier: ^19
         version: 19.3.0
 
+  toolbox/modules/before-after/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/big-clock/0.1.0:
+    dependencies:
+      '@lacuna/format-duration':
+        specifier: workspace:0.1.0
+        version: link:../../format-duration/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/board-grid/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/calculator-kit/0.1.0:
+    dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../chart/0.1.0
+      '@lacuna/number-input':
+        specifier: workspace:0.1.0
+        version: link:../../number-input/0.1.0
+      '@lacuna/record-table':
+        specifier: workspace:0.1.0
+        version: link:../../record-table/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/chart/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/code-area/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/color-math/0.1.0: {}
+
+  toolbox/modules/color-palette/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/combobox/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/confirm-dialog/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/converter-kit/0.1.0:
+    dependencies:
+      '@lacuna/combobox':
+        specifier: workspace:0.1.0
+        version: link:../../combobox/0.1.0
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../use-clipboard/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../use-local-record/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/csv-parse/0.1.0: {}
+
+  toolbox/modules/date-math/0.1.0: {}
+
+  toolbox/modules/date-picker/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/dialog/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/draw-canvas/0.1.0:
+    dependencies:
+      '@lacuna/use-pointer-draw':
+        specifier: workspace:0.1.0
+        version: link:../../use-pointer-draw/0.1.0
+      '@lacuna/use-undo-stack':
+        specifier: workspace:0.1.0
+        version: link:../../use-undo-stack/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/export-menu/0.1.0:
+    dependencies:
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../file-save-open/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/file-save-open/0.1.0: {}
+
+  toolbox/modules/file-tool-kit/0.1.0:
+    dependencies:
+      '@lacuna/before-after':
+        specifier: workspace:0.1.0
+        version: link:../../before-after/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../export-menu/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/filter-bar/0.1.0:
+    dependencies:
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../date-picker/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/format-duration/0.1.0: {}
+
+  toolbox/modules/fuzzy-search/0.1.0: {}
+
+  toolbox/modules/game-kit/0.1.0:
+    dependencies:
+      '@lacuna/board-grid':
+        specifier: workspace:0.1.0
+        version: link:../../board-grid/0.1.0
+      '@lacuna/use-hotkeys':
+        specifier: workspace:0.1.0
+        version: link:../../use-hotkeys/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../use-local-record/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/grid-utils/0.1.0: {}
+
+  toolbox/modules/heatmap/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/ics-calendar/0.1.0: {}
+
+  toolbox/modules/image-ops/0.1.0: {}
+
+  toolbox/modules/json-backup/0.1.0: {}
+
+  toolbox/modules/kanban-columns/0.1.0:
+    dependencies:
+      '@lacuna/use-drag-reorder':
+        specifier: workspace:0.1.0
+        version: link:../../use-drag-reorder/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/money-input/0.1.0:
+    dependencies:
+      '@lacuna/money':
+        specifier: workspace:0.1.0
+        version: link:../../money/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/money/0.1.0: {}
+
+  toolbox/modules/number-input/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/progress-ring/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/query-spec/0.1.0: {}
+
+  toolbox/modules/quiz-engine/0.1.0:
+    dependencies:
+      '@lacuna/random':
+        specifier: workspace:0.1.0
+        version: link:../../random/0.1.0
+
+  toolbox/modules/random/0.1.0: {}
+
+  toolbox/modules/range-slider/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/record-form/0.1.0:
+    dependencies:
+      '@lacuna/combobox':
+        specifier: workspace:0.1.0
+        version: link:../../combobox/0.1.0
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../date-picker/0.1.0
+      '@lacuna/schema-validate':
+        specifier: workspace:0.1.0
+        version: link:../../schema-validate/0.1.0
+      '@lacuna/use-form':
+        specifier: workspace:0.1.0
+        version: link:../../use-form/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/record-table/0.1.0:
+    dependencies:
+      '@lacuna/query-spec':
+        specifier: workspace:0.1.0
+        version: link:../../query-spec/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/recurrence/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+
+  toolbox/modules/schema-validate/0.1.0: {}
+
+  toolbox/modules/search-box/0.1.0:
+    dependencies:
+      '@lacuna/fuzzy-search':
+        specifier: workspace:0.1.0
+        version: link:../../fuzzy-search/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/spaced-repetition/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+
+  toolbox/modules/streak-calc/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+
+  toolbox/modules/tag-input/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/toolbar/0.1.0:
+    dependencies:
+      '@lacuna/use-hotkeys':
+        specifier: workspace:0.1.0
+        version: link:../../use-hotkeys/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/tracker-kit/0.1.0:
+    dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../chart/0.1.0
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../date-picker/0.1.0
+      '@lacuna/heatmap':
+        specifier: workspace:0.1.0
+        version: link:../../heatmap/0.1.0
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../use-collection/0.1.0
+      '@lacuna/use-streak':
+        specifier: workspace:0.1.0
+        version: link:../../use-streak/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-clipboard/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-collection/0.1.0:
+    dependencies:
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../use-local-record/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-drag-reorder/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-form/0.1.0:
+    dependencies:
+      '@lacuna/schema-validate':
+        specifier: workspace:0.1.0
+        version: link:../../schema-validate/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-hotkeys/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-local-record/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-pointer-draw/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-selection/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-streak/0.1.0:
+    dependencies:
+      '@lacuna/streak-calc':
+        specifier: workspace:0.1.0
+        version: link:../../streak-calc/0.1.0
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../use-collection/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-timer/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-undo-stack/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-wake-lock/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
 packages:
 
   /@axe-core/playwright@4.14.0(playwright-core@1.65.1):
