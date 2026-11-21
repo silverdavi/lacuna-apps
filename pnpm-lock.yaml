@@ -1140,6 +1140,19 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/confirm-dialog/0.2.0:
+    dependencies:
+      '@lacuna/dialog':
+        specifier: workspace:0.1.0
+        version: link:../../dialog/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/converter-kit/0.1.0:
     dependencies:
       '@lacuna/combobox':
@@ -1284,6 +1297,8 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/host-mock/0.1.0: {}
+
   toolbox/modules/ics-calendar/0.1.0: {}
 
   toolbox/modules/image-ops/0.1.0: {}
@@ -1302,6 +1317,8 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/markdown-to-html/0.1.0: {}
 
   toolbox/modules/money-input/0.1.0:
     dependencies:
@@ -1327,6 +1344,8 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/pdf-ops/0.1.0: {}
 
   toolbox/modules/progress-ring/0.1.0:
     dependencies:
@@ -1435,6 +1454,8 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/text-transforms/0.1.0: {}
 
   toolbox/modules/toolbar/0.1.0:
     dependencies:

@@ -1106,20 +1106,22 @@
       "id": "@lacuna/confirm-dialog",
       "layer": 2,
       "status": "exists",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "summary": "A modal that asks the person to confirm or cancel a destructive or committing action.",
       "today": [
-        "toolbox/modules/confirm-dialog/0.1.0/src/index.ts"
+        "toolbox/modules/confirm-dialog/0.2.0/src/index.ts"
       ],
       "gap": "",
-      "dependsOn": [],
+      "dependsOn": [
+        "@lacuna/dialog"
+      ],
       "formats": [],
       "keywords": [
         "widget",
         "ConfirmDialog"
       ],
       "public": true,
-      "path": "toolbox/modules/confirm-dialog/0.1.0",
+      "path": "toolbox/modules/confirm-dialog/0.2.0",
       "bridge": {
         "component": "ConfirmDialog",
         "kind": "widget",
@@ -1136,6 +1138,14 @@
             "source": "41c6310e0b96fbd3",
             "lines": 180,
             "dependencies": {}
+          },
+          "0.2.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "8c2d6a39d0f1bd19",
+            "lines": 97,
+            "dependencies": {
+              "@lacuna/dialog": "0.1.0"
+            }
           }
         }
       }
@@ -1803,6 +1813,48 @@
       }
     },
     {
+      "id": "@lacuna/host-mock",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "localStorage-backed mock record and value stores, safe against corrupt or missing storage.",
+      "today": [
+        "toolbox/modules/host-mock/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "hostMock"
+      ],
+      "public": true,
+      "path": "toolbox/modules/host-mock/0.1.0",
+      "bridge": {
+        "component": "hostMock",
+        "kind": "logic",
+        "exports": [
+          "createMemoryStorage",
+          "createMockRecordStore",
+          "createMockValue"
+        ],
+        "types": [
+          "StorageLike",
+          "MockRecordStore",
+          "MockValue"
+        ],
+        "signature": "createMemoryStorage(); createMockRecordStore(options: { key: string; validate?: (value: unknown) => value is T; idPrefix?: string;...); createMockValue(options: { key: string; fallback: T; validate?: (value: unknown) => value is T; stora...",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "53b96338a8fe030b",
+            "lines": 181,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/ics-calendar",
       "layer": 3,
       "status": "exists",
@@ -1979,6 +2031,46 @@
       }
     },
     {
+      "id": "@lacuna/markdown-to-html",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Converts a CommonMark subset to sanitized HTML strings",
+      "today": [
+        "toolbox/modules/markdown-to-html/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "markdownToHtml"
+      ],
+      "public": true,
+      "path": "toolbox/modules/markdown-to-html/0.1.0",
+      "bridge": {
+        "component": "markdownToHtml",
+        "kind": "logic",
+        "exports": [
+          "markdownToHtml",
+          "parseMarkdown",
+          "sanitizeHtml"
+        ],
+        "types": [
+          "MarkdownToHtmlOptions"
+        ],
+        "signature": "sanitizeHtml(html: string); parseMarkdown(source: string); markdownToHtml(source: string, options?: import('./index').MarkdownToHtmlOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "1896ababcae34606",
+            "lines": 204,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/money",
       "layer": 3,
       "status": "exists",
@@ -2100,6 +2192,52 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "f93ff2554ebb824c",
             "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/pdf-ops",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions to merge, split, reorder, and extract PDF pages and convert images into PDF documents.",
+      "today": [
+        "toolbox/modules/pdf-ops/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "pdfOps"
+      ],
+      "public": true,
+      "path": "toolbox/modules/pdf-ops/0.1.0",
+      "bridge": {
+        "component": "pdfOps",
+        "kind": "logic",
+        "exports": [
+          "mergePdfs",
+          "splitPdf",
+          "extractPages",
+          "reorderPages",
+          "imageToPdf",
+          "imagesToPdf"
+        ],
+        "types": [
+          "PdfPage",
+          "PdfDocument",
+          "MergeOptions",
+          "SplitResult"
+        ],
+        "signature": "mergePdfs(docs: PdfDocument[], options?: MergeOptions); splitPdf(doc: PdfDocument); extractPages(doc: PdfDocument, start: number, end: number); reorderPages(doc: PdfDocument, order: number[])",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "e2303b4072932513",
+            "lines": 143,
             "dependencies": {}
           }
         }
@@ -2673,6 +2811,53 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "625de40486f07da3",
             "lines": 279,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/text-transforms",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure text utilities: case conversion, slugify, line trim/dedupe/sort, Lorem Ipsum",
+      "today": [
+        "toolbox/modules/text-transforms/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "textTransforms"
+      ],
+      "public": true,
+      "path": "toolbox/modules/text-transforms/0.1.0",
+      "bridge": {
+        "component": "textTransforms",
+        "kind": "logic",
+        "exports": [
+          "toUpper",
+          "toLower",
+          "toTitleCase",
+          "toSnakeCase",
+          "toKebabCase",
+          "toCamelCase",
+          "toPascalCase",
+          "slugify",
+          "trimLines",
+          "dedupeLines",
+          "sortLines",
+          "loremIpsum"
+        ],
+        "types": [],
+        "signature": "toUpper(text: string); toLower(text: string); toTitleCase(text: string); toSnakeCase(text: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "cee13edc953ad6dd",
+            "lines": 92,
             "dependencies": {}
           }
         }
