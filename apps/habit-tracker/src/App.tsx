@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack, TextInput, Title } from '@lacuna/ui'
+import { AppShell, Body, Button, Card, EmptyState, MonoLabel, Stack, TextInput, Title } from '@lacuna/ui'
 import { addHabit, deleteHabit, listHabits, renameHabit, toggleDay } from './host'
 import { isDone, lastSeven, streak, toggleDone, validateName, type Habit } from './engine'
 
@@ -17,11 +17,6 @@ export function App() {
   const [renameValue, setRenameValue] = useState('')
   const [confirm, setConfirm] = useState('')
   const renameInputRef = useRef<HTMLInputElement>(null)
-  const cancelRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (confirm) cancelRef.current?.focus()
-  }, [confirm])
 
   useEffect(() => {
     if (renaming) {
@@ -87,7 +82,7 @@ export function App() {
   const toRename = habits.find((h) => h.id === renaming)
 
   return (
-    <main style={{ maxWidth: 'calc(720px * var(--sf))' }}>
+    <AppShell name="Habit Tracker" icon="calendar" hue="teal" category="Apps">
       <Card title="Habit tracker">
         <Stack>
           <form
@@ -97,20 +92,15 @@ export function App() {
             }}
           >
             <div style={{ display: 'flex', gap: SP, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-              <TextInput label="Habit name" value={name} onChange={(v) => { setName(v); setError('') }} />
+              <TextInput label="Habit name" value={name} onChange={(v) => { setName(v); setError('') }} error={error || null} />
               <Button kind="primary" onClick={onAdd} style={{ flex: 'none' }}>
                 Add habit
               </Button>
             </div>
-            {error && (
-              <p role="alert" style={{ margin: `${SP} 0 0`, color: 'var(--accent)' }}>
-                {error}
-              </p>
-            )}
           </form>
           <MonoLabel sm>Habits</MonoLabel>
           {habits.length === 0 ? (
-            <Body sm>No habits yet. Add one above.</Body>
+            <EmptyState title="No habits yet" detail="Add one above." />
           ) : (
             <ul role="list" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: SP }}>
               {habits.map((h) => (
@@ -197,7 +187,7 @@ export function App() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
+            background: 'color-mix(in srgb, var(--ink) 40%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -243,12 +233,8 @@ export function App() {
                 justifyContent: 'flex-end',
               }}
             >
-              <button type="button" className="lc-btn" onClick={onRenameCancel}>
-                Cancel
-              </button>
-              <button type="button" className="lc-btn lc-btn-primary" onClick={onRenameSave}>
-                Save
-              </button>
+              <Button kind="secondary" onClick={onRenameCancel}>Cancel</Button>
+              <Button kind="primary" onClick={onRenameSave}>Save</Button>
             </div>
           </div>
         </div>
@@ -259,7 +245,7 @@ export function App() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
+            background: 'color-mix(in srgb, var(--ink) 40%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -291,16 +277,16 @@ export function App() {
                 justifyContent: 'flex-end',
               }}
             >
-              <button ref={cancelRef} type="button" className="lc-btn" onClick={() => setConfirm('')}>
+              <Button kind="secondary" onClick={() => setConfirm('')}>
                 Cancel
-              </button>
-              <button type="button" className="lc-btn lc-btn-primary" onClick={onConfirmDelete}>
+              </Button>
+              <Button kind="primary" onClick={onConfirmDelete}>
                 Confirm delete
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
-    </main>
+    </AppShell>
   )
 }
