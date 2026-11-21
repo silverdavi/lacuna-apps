@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { Chart, type ChartDataPoint } from '@lacuna/chart'
 import { Heatmap } from '@lacuna/heatmap'
 import { addDays } from '@lacuna/date-math'
 import { toCsv } from '@lacuna/csv-parse'
@@ -103,6 +104,15 @@ export function App() {
     }
     return days
   }, [byDay])
+
+  const trend = useMemo<ChartDataPoint[]>(
+    () =>
+      entries.slice(0, 14).map((entry) => ({
+        label: entry.day.slice(5),
+        value: MOOD_VALUE[entry.mood] ?? 0,
+      })),
+    [entries],
+  )
 
   const exportOptions = useMemo<ExportOption[]>(
     () => [
@@ -273,6 +283,21 @@ export function App() {
             </div>
           ))}
         </div>
+      </Card>
+
+      <Card mono="Trend" title="Mood trend">
+        {entries.length === 0 ? (
+          <Body>Log moods to plot the trend.</Body>
+        ) : (
+          <Chart
+            type="line"
+            data={trend}
+            title="Mood value, last 14 entries"
+            width={560}
+            height={180}
+            ariaLabel="Value trend over the last 14 entries"
+          />
+        )}
       </Card>
 
       <Card mono="Year" title="Activity">
