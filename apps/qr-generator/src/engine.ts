@@ -470,3 +470,8 @@ function cellPath(matrix: number[][]): string {
   }
   return out.join('')
 }
+
+export function qrFileName(content: string): string {
+  const slug = content.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  return `qr-${slug || 'code'}.svg`
+}
