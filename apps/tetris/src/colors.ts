@@ -1,3 +1,4 @@
-export const CELL_FILLED = 'var(--ink)'
-export const CELL_EMPTY = 'var(--ui-bright)'
-export const CELL_BORDER = 'var(--ui-line)'
+export const PIECE_COLOR = 'var(--ink)'
+export const NEXT_PIECE_COLOR = 'var(--accent)'
+export const BOARD_BG = 'var(--paper-deep)'
+export const BOARD_BORDER = 'var(--ui-line2)'
