@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "834e67de2f13e256ae5903be4c0b024cffcb6ed177c76c86eef7a500e2e9905b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page shows the heading \"Coin Flip\", a button labelled \"Flip\", a card showing \"Tails\", and the text \"Streak: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Flip\" changes the card to show either \"Heads\" or \"Tails\" and updates the text \"Streak: 1\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking \"Flip\" again, if the result matches the previous result, the text updates to \"Streak: 2\"; if it differs, the text updates to \"Streak: 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "After achieving a streak of 3, the text \"Best: 3\" is visible on the page."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Reset\" changes the text \"Streak: 0\" and \"Best: 0\" and the card shows \"Tails\"."
+    },
+    {
+      "id": "A6",
+      "text": "The card has a button labelled \"Grade\". Clicking it when the card shows \"Heads\" adds the text \"Correct\" below the card."
+    },
+    {
+      "id": "A7",
+      "text": "The card has a button labelled \"Grade\". Clicking it when the card shows \"Tails\" adds the text \"Incorrect\" below the card."
+    },
+    {
+      "id": "A8",
+      "text": "After clicking \"Flip\" to get \"Heads\" and \"Streak: 1\", reloading the page still shows the card with \"Heads\" and the text \"Streak: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ea545167527b7930f9076597a84ecfbef7dc2220141b0831b3bd0c740483b278"
+    }
+  ]
+}
