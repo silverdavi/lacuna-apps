@@ -1,44 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "5236f4dbbae6700de7fcff3526a0381b785c59ba131740fcf4330fae6865f361",
+  "spec_sha256": "6d0656a87242c73efd6bdf2bbd47209481215fb61eccd401f2c10fc484a320df",
   "checks": [
     {
       "id": "A1",
-      "text": "Length: typing 1 in Meters shows 3.28084 in Feet (five significant decimals at most)."
+      "text": "Typing 1 in the field labelled \"Meters\" shows 3.28084 in the field labelled \"Feet\"."
     },
     {
       "id": "A2",
-      "text": "Typing in the second field updates the first (two-way)."
+      "text": "Typing 10 in the field labelled \"Feet\" shows 3.048 in the field labelled \"Meters\"."
     },
     {
       "id": "A3",
-      "text": "Temperature: 100 Celsius shows 212 Fahrenheit; -40 Celsius shows -40 Fahrenheit."
+      "text": "After clicking the tab \"Temperature\", typing 100 in \"Celsius\" shows 212 in \"Fahrenheit\"; replacing it with -40 shows -40 in \"Fahrenheit\"."
     },
     {
       "id": "A4",
-      "text": "Switching category resets units to that category's defaults and clears the fields."
+      "text": "After typing 1 in \"Meters\", clicking the tab \"Mass\" shows the empty fields \"Kilograms\" and \"Pounds\" and no field labelled \"Meters\"."
     },
     {
       "id": "A5",
-      "text": "The swap button exchanges the two units and keeps the value."
+      "text": "After typing 1 in \"Meters\", clicking \"Swap units\" shows 1 in the field labelled \"Feet\" (now first) and 0.3048 in the field labelled \"Meters\"."
     },
     {
       "id": "A6",
-      "text": "Non-numeric input shows an inline message and does not show `NaN` anywhere."
+      "text": "Typing abc in \"Meters\" shows the text \"Enter a number\", leaves \"Feet\" empty, and the page text contains no \"NaN\"."
     },
     {
       "id": "A7",
-      "text": "Each completed conversion is added to a Recent list (newest first, at most 10); clicking one restores it."
+      "text": "Typing 1, 2 and 3 in \"Meters\", clicking \"Save conversion\" after each, shows 3 recent items, the first \"3 Meters = 9.84252 Feet\" and the last \"1 Meters = 3.28084 Feet\"; clicking \"1 Meters = 3.28084 Feet\" puts 1 in \"Meters\" and 3.28084 in \"Feet\"."
     },
     {
       "id": "A8",
-      "text": "Reload keeps the Recent list."
+      "text": "Saving the values 1 to 11 in \"Meters\" in order keeps 10 recent items: the first \"11 Meters = 36.08924 Feet\", the second \"10 Meters = 32.8084 Feet\", the last \"2 Meters = 6.56168 Feet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the Recent list: after saving 1 in \"Meters\" and reloading, the recent item \"1 Meters = 3.28084 Feet\" is shown."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "72bb9b542f84ddd401aa8b47b181e9603568826daea221352979a725fc0f6763"
+      "sha256": "5a46451e610581da6e4bb75bec8885bd3e87ee949b5142178a37779d484ae9e5"
     }
   ]
 }

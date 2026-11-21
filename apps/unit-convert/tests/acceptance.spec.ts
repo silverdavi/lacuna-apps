@@ -1,105 +1,91 @@
-// Acceptance tests for unit-convert, one per check A1..A8 in the spec.
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-const length = { from: 'Meters', to: 'Feet' }
-
-function sourceUnit(page: import('@playwright/test').Page, name: string) {
-  return page.getByLabel(new RegExp(`^${name}$`, 'i'))
+async function saveConversion(page: Page, value: string) {
+  await page.getByLabel('Meters').fill(value)
+  await page.getByRole('button', { name: 'Save conversion', exact: true }).click()
 }
 
-test('[A1] Length: typing 1 in Meters shows 3.28084 in Feet', async ({ page }) => {
+test('[A1] typing 1 in Meters shows 3.28084 in Feet', async ({ page }) => {
   await page.goto('/')
-  await sourceUnit(page, length.from).fill('1')
-  await expect(sourceUnit(page, length.to)).toHaveValue('3.28084')
+  await page.getByLabel('Meters', { exact: true }).fill('1')
+  await expect(page.getByLabel('Feet', { exact: true })).toHaveValue('3.28084')
 })
 
-test('[A2] typing in the second field updates the first (two-way)', async ({ page }) => {
+test('[A2] typing 10 in Feet shows 3.048 in Meters', async ({ page }) => {
   await page.goto('/')
-  await sourceUnit(page, length.to).fill('3.28084')
-  await expect(sourceUnit(page, length.from)).toHaveValue('1')
+  await page.getByLabel('Feet', { exact: true }).fill('10')
+  await expect(page.getByLabel('Meters', { exact: true })).toHaveValue('3.048')
 })
 
-test('[A3] Temperature: 100 Celsius shows 212 Fahrenheit; -40 Celsius shows -40 Fahrenheit', async ({
-  page,
-}) => {
+test('[A3] Temperature: 100 Celsius shows 212 Fahrenheit; -40 shows -40', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: /temperature/i }).click()
-  await page.getByLabel(/celsius/i).fill('100')
-  await expect(page.getByLabel(/fahrenheit/i)).toHaveValue('212')
-  await page.getByLabel(/celsius/i).fill('-40')
-  await expect(page.getByLabel(/fahrenheit/i)).toHaveValue('-40')
+  await page.getByRole('tab', { name: 'Temperature', exact: true }).click()
+  await page.getByLabel('Celsius', { exact: true }).fill('100')
+  await expect(page.getByLabel('Fahrenheit', { exact: true })).toHaveValue('212')
+  await page.getByLabel('Celsius', { exact: true }).fill('-40')
+  await expect(page.getByLabel('Fahrenheit', { exact: true })).toHaveValue('-40')
 })
 
-test("[A4] switching category resets units to that category's defaults and clears the fields", async ({
-  page,
-}) => {
+test('[A4] switching to Mass clears fields and hides Meters', async ({ page }) => {
   await page.goto('/')
-  // Establish a value in the default (length) category first.
-  await sourceUnit(page, length.from).fill('5')
-  await expect(sourceUnit(page, length.to)).not.toHaveValue('')
-  await page.getByRole('button', { name: /mass/i }).click()
-  // Mass defaults (Kilograms and Pounds) are now the only unit labels shown,
-  // and neither field carries the old length value.
-  const fields = page.getByRole('textbox').or(page.getByRole('spinbutton'))
-  expect(await fields.count()).toBeGreaterThan(0)
-  for (const field of await fields.all()) {
-    await expect(field).toHaveValue('')
-  }
-  // The fields are now labelled with Mass defaults, not length units.
-  await expect(sourceUnit(page, 'Kilograms')).toHaveValue('')
-  await expect(sourceUnit(page, 'Pounds')).toHaveValue('')
-  await expect(sourceUnit(page, 'Meters')).toHaveCount(0)
-  await expect(sourceUnit(page, 'Feet')).toHaveCount(0)
+  await page.getByLabel('Meters', { exact: true }).fill('1')
+  await page.getByRole('tab', { name: 'Mass', exact: true }).click()
+  await expect(page.getByLabel('Kilograms', { exact: true })).toHaveValue('')
+  await expect(page.getByLabel('Pounds', { exact: true })).toHaveValue('')
+  await expect(page.getByLabel('Meters', { exact: true })).toHaveCount(0)
 })
 
-test('[A5] the swap button exchanges the two units and keeps the value', async ({ page }) => {
+test('[A5] Swap units puts 1 in Feet and 0.3048 in Meters', async ({ page }) => {
   await page.goto('/')
-  await sourceUnit(page, length.from).fill('5')
-  const converted = (await sourceUnit(page, length.to).inputValue()) ?? ''
-  expect(converted).not.toBe('')
-  await page.getByRole('button', { name: /swap/i }).click()
-  // One field is now labelled Feet and one Meters (exchanged). The entered
-  // value of 5 follows its unit (now Feet), and the other field keeps the
-  // value it held, so the same quantity is expressed in the swapped pair.
-  await expect(sourceUnit(page, length.to)).toHaveValue('5')
-  await expect(sourceUnit(page, length.from)).toHaveValue(converted)
+  await page.getByLabel('Meters', { exact: true }).fill('1')
+  await page.getByRole('button', { name: 'Swap units', exact: true }).click()
+  await expect(page.getByLabel('Feet', { exact: true })).toHaveValue('1')
+  await expect(page.getByLabel('Meters', { exact: true })).toHaveValue('0.3048')
 })
 
-test('[A6] non-numeric input shows an inline message and no NaN anywhere', async ({ page }) => {
+test('[A6] typing abc in Meters shows "Enter a number" and leaves Feet empty', async ({ page }) => {
   await page.goto('/')
-  await sourceUnit(page, length.from).fill('abc')
-  await expect(page.getByText(/NaN/i)).toHaveCount(0)
-  const message = page.getByRole('alert').or(page.getByText(/(enter|input|type) (a |a valid |a valid numeric )?(number|value)/i)).or(page.getByText(/(invalid|not a) (number|value)/i))
-  await expect(message.first()).toBeVisible()
+  await page.getByLabel('Meters', { exact: true }).fill('abc')
+  await expect(page.getByText('Enter a number', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Feet', { exact: true })).toHaveValue('')
+  const bodyText = await page.locator('body').innerText()
+  expect(bodyText).not.toContain('NaN')
 })
 
-test('[A7] conversions land in Recent (newest first, at most 10) and clicking one restores it', async ({
-  page,
-}) => {
+test('[A7] saving three conversions shows 3 recent items in order and restore works', async ({ page }) => {
   await page.goto('/')
-  const items = () => page.getByRole('list').getByRole('listitem')
+  await saveConversion(page, '1')
+  await saveConversion(page, '2')
+  await saveConversion(page, '3')
+
+  const items = page.getByRole('list', { name: 'Recent' }).getByRole('button')
+  await expect(items).toHaveCount(3)
+  await expect(items.nth(0)).toHaveText('3 Meters = 9.84252 Feet')
+  await expect(items.nth(1)).toHaveText('2 Meters = 6.56168 Feet')
+  await expect(items.nth(2)).toHaveText('1 Meters = 3.28084 Feet')
+
+  await items.nth(2).click()
+  await expect(page.getByLabel('Meters', { exact: true })).toHaveValue('1')
+  await expect(page.getByLabel('Feet', { exact: true })).toHaveValue('3.28084')
+})
+
+test('[A8] saving 1 through 11 keeps 10 recent items', async ({ page }) => {
+  await page.goto('/')
   for (let i = 1; i <= 11; i++) {
-    await sourceUnit(page, length.from).fill(String(i))
-    await expect(sourceUnit(page, length.to)).not.toHaveValue('')
-    await page.keyboard.press('Enter')
-    expect(await items().count(), `recent list after conversion ${i}`).toBe(Math.min(i, 10))
-    await expect(items().first()).toContainText(String(i))
+    await saveConversion(page, String(i))
   }
-  // Click a recorded conversion to restore it. The list is newest-first, so
-  // with 1..10 held the second item is the 9 conversion.
-  await items().nth(1).click()
-  await expect(sourceUnit(page, length.from)).toHaveValue('9')
-  await expect(sourceUnit(page, length.to)).not.toHaveValue('')
+
+  const items = page.getByRole('list', { name: 'Recent' }).getByRole('button')
+  await expect(items).toHaveCount(10)
+  await expect(items.nth(0)).toHaveText('11 Meters = 36.08924 Feet')
+  await expect(items.nth(1)).toHaveText('10 Meters = 32.8084 Feet')
+  await expect(items.nth(9)).toHaveText('2 Meters = 6.56168 Feet')
 })
 
-test('[A8] reload keeps the Recent list', async ({ page }) => {
+test('[A9] recent items survive a reload', async ({ page }) => {
   await page.goto('/')
-  await sourceUnit(page, length.from).fill('7')
-  await expect(sourceUnit(page, length.to)).not.toHaveValue('')
-  await page.keyboard.press('Enter')
-  const items = page.getByRole('list').getByRole('listitem')
-  expect(await items.count()).toBe(1)
-  await expect(items.first()).toContainText('7')
+  await saveConversion(page, '1')
   await page.reload()
-  await expect(items.first()).toContainText('7')
+  const item = page.getByRole('list', { name: 'Recent' }).getByRole('button', { name: '1 Meters = 3.28084 Feet', exact: true })
+  await expect(item).toHaveCount(1)
 })
