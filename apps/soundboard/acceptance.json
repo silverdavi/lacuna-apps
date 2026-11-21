@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8f3045f2d647a98bcf69dc41e20c3d9666cef732987fa22d394535b957d9fbbb",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Soundboard\" and the text \"No clips yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Record clip\" starts the recorder; after 2 seconds, clicking the button \"Stop recording\" adds a list item containing \"Clip 1\" and the text \"00:02\". The text \"No clips yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Clip 1\", clicking the button \"Record clip\" and then \"Stop recording\" after 3 seconds adds a list item containing \"Clip 2\" and the text \"00:03\". The list now contains two items."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Play Clip 1\" increments the score display to \"Score: 1\" and the best score display to \"Best: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Pressing the keyboard shortcut \"1\" (mapped to the first clip) increments the score display to \"Score: 2\" and the best score display to \"Best: 2\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete Clip 1\" removes that item from the list. The list now contains only \"Clip 2\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Restart\" resets the score display to \"Score: 0\" while keeping the best score display at \"Best: 2\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export list\" copies the text \"Clip 1, Clip 2\" to the clipboard."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the list of clips: after reloading, the list still contains \"Clip 2\" and the best score display shows \"Best: 2\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7d3473d55daa7cad83a653f172f2751144af8ed77f8dc6521d793dea64015b6f"
+    }
+  ]
+}
