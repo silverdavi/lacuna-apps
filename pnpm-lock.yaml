@@ -1138,9 +1138,15 @@ importers:
       '@lacuna/file-save-open':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/file-save-open/0.1.0
+      '@lacuna/image-ops':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/image-ops/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-clipboard/0.1.0
       '@lacuna/use-local-record':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/use-local-record/0.1.0
