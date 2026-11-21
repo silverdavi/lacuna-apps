@@ -14,23 +14,50 @@ import {
   Rail,
   Row,
   Stack,
+  Tabs,
+  Table,
   TextInput,
 } from '@lacuna/ui'
+import { ExportMenu } from '@lacuna/export-menu'
+import { Heatmap } from '@lacuna/heatmap'
+import { DatePicker } from '@lacuna/date-picker'
+import { toCsv } from '@lacuna/csv-parse'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
+import { computeStreaks } from '@lacuna/streak-calc'
+import { toISODate } from '@lacuna/date-math'
 import { host } from './host/mock'
 import type { WeightEntry } from './host'
 
+const APP_ID = 'lacuna.weight-tracker'
+const BACKUP_VERSION = 1
+const KG_TO_LB = 2.20462
+
+type Unit = 'kg' | 'lb'
+
+type TabId = 'Overview' | 'History' | 'Insights' | 'Data'
+const TABS: TabId[] = ['Overview', 'History', 'Insights', 'Data']
+
+type FormState = {
+  open: boolean
+  date: string
+  weight: string
+  error: string | null
+}
+
 function today(): string {
-  const d = new Date()
-  const m = `${d.getMonth() + 1}`.padStart(2, '0')
-  const day = `${d.getDate()}`.padStart(2, '0')
-  return `${d.getFullYear()}-${m}-${day}`
+  return toISODate(new Date())
 }
 
-function fmtWeight(value: number): string {
-  return `${Math.round(value * 10) / 10}`
+function fmtWeight(value: number, unit: Unit): string {
+  const v = unit === 'lb' ? value * KG_TO_LB : value
+  return `${Math.round(v * 10) / 10}`
 }
 
-function WeightChart({ entries }: { entries: WeightEntry[] }) {
+function unitLabel(unit: Unit): string {
+  return unit === 'lb' ? 'lb' : 'kg'
+}
+
+function WeightChart({ entries, unit }: { entries: WeightEntry[]; unit: Unit }) {
   const width = 340
   const height = 150
   const padX = 30
@@ -90,22 +117,41 @@ function WeightChart({ entries }: { entries: WeightEntry[] }) {
   )
 }
 
-type FormState = {
-  open: boolean
-  date: string
-  weight: string
-  error: string | null
-}
-
 export function App() {
   const [state, setState] = useState(() => host.read())
   const [form, setForm] = useState<FormState>({ open: false, date: '', weight: '', error: null })
+  const [tab, setTab] = useState<TabId>('Overview')
+  const [unit, setUnit] = useState<Unit>(() => {
+    try {
+      const raw = window.localStorage.getItem(`${APP_ID}.settings`)
+      if (!raw) return 'kg'
+      const parsed = JSON.parse(raw) as { unit?: string }
+      return parsed.unit === 'lb' ? 'lb' : 'kg'
+    } catch {
+      return 'kg'
+    }
+  })
+  const [importMsg, setImportMsg] = useState<string | null>(null)
+  const [importFile, setImportFile] = useState<string | null>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
-
+  const importInputRef = useRef<HTMLInputElement>(null)
 
   const entries = state.entries
   const latest = entries.length ? entries[entries.length - 1] : null
   const change = entries.length >= 2 ? entries[entries.length - 1].weight - entries[0].weight : null
+  const unitLbl = unitLabel(unit)
+  const changeText =
+    change !== null
+      ? `${change < 0 ? '-' : '+'}${Math.abs(Math.round(change * 10) / 10).toFixed(1)}`
+      : null
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(`${APP_ID}.settings`, JSON.stringify({ unit }))
+    } catch {
+      // ignore
+    }
+  }, [unit])
 
   useEffect(() => {
     if (!form.open) return
@@ -119,7 +165,6 @@ export function App() {
 
   function closeForm() {
     setForm((f) => ({ ...f, open: false, error: null }))
-    document.querySelector<HTMLButtonElement>('.lc-btn.primary')?.focus()
   }
 
   function save() {
@@ -151,6 +196,305 @@ export function App() {
     setState(host.deleteEntry(id))
   }
 
+  function clearAll() {
+    setState(host.clear())
+    setImportMsg(null)
+    setImportFile(null)
+  }
+
+  function pickImport() {
+    importInputRef.current?.click()
+  }
+
+  async function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    try {
+      const text = await file.text()
+      setImportFile(text)
+      const result = importBackup<{ date: string; weight: number }>(text, {
+        currentVersion: BACKUP_VERSION,
+        validate: (record) => {
+          const d = record.data
+          if (typeof d?.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.date)) {
+            return 'missing valid date'
+          }
+          if (typeof d?.weight !== 'number' || d.weight <= 0) {
+            return 'missing valid weight'
+          }
+          return null
+        },
+      })
+      if (result.records.length === 0) {
+        setImportMsg('No valid entries found in that file.')
+        return
+      }
+      const merged = [...entries]
+      const seen = new Set(merged.map((en) => en.id))
+      let added = 0
+      for (const record of result.records) {
+        const id = record.id
+        if (seen.has(id)) continue
+        seen.add(id)
+        merged.push({
+          id,
+          date: record.data.date,
+          weight: Math.round(record.data.weight * 10) / 10,
+          createdAt: record.createdAt || Date.now(),
+        })
+        added += 1
+      }
+      setState(host.write({ entries: merged }))
+      setImportMsg(`Imported ${added} new ${added === 1 ? 'entry' : 'entries'}.`)
+    } catch (err) {
+      setImportMsg(err instanceof Error ? err.message : 'Could not read that file.')
+    }
+  }
+
+  const csvText = () =>
+    toCsv([
+      ['date', 'weight_kg'],
+      ...entries.map((e) => [e.date, String(e.weight)]),
+    ])
+
+  const backupText = () =>
+    exportBackup({
+      appId: APP_ID,
+      version: BACKUP_VERSION,
+      filename: 'weight-tracker',
+      records: entries.map((e) => ({
+        id: e.id,
+        data: { date: e.date, weight: e.weight },
+        createdAt: e.createdAt,
+        updatedAt: e.createdAt,
+      })),
+    })
+
+  const streak = computeStreaks(entries.map((e) => e.date), { today: today() })
+  const avg = entries.length ? entries.reduce((s, e) => s + e.weight, 0) / entries.length : null
+  const hi = entries.length ? Math.max(...entries.map((e) => e.weight)) : null
+  const lo = entries.length ? Math.min(...entries.map((e) => e.weight)) : null
+  const year = new Date().getFullYear()
+  const pickableDate = form.date || today()
+  const pickedDates = new Set(entries.map((e) => e.date))
+  function onPickDate(v: string | [string, string] | null) {
+    if (typeof v === 'string') {
+      setForm((f) => ({ ...f, date: v, error: null }))
+    }
+  }
+
+  const entryTableRows = entries.map((e) => {
+    const i = entries.indexOf(e)
+    const prev = i > 0 ? entries[i - 1].weight : null
+    const delta = prev === null ? null : e.weight - prev
+    return {
+      cells: {
+        date: e.date,
+        weight: `${fmtWeight(e.weight, unit)} ${unitLbl}`,
+        delta:
+          delta === null ? '—' : `${delta < 0 ? '-' : '+'}${Math.abs(Math.round(delta * 10) / 10).toFixed(1)}`,
+      },
+    }
+  })
+
+  const exportOptions = [
+    {
+      id: 'csv',
+      label: 'CSV (weights)',
+      mimeType: 'text/csv',
+      extension: 'csv',
+      getData: csvText,
+    },
+    {
+      id: 'json',
+      label: 'JSON (full backup)',
+      mimeType: 'application/json',
+      extension: 'json',
+      getData: backupText,
+    },
+  ]
+
+  const tabBody =
+    tab === 'Overview' ? (
+      <Stack lg>
+        <Card mono="Entry" title="Add a reading">
+          <Body sm>Log your weight on a date and watch the trend.</Body>
+          <Actions>
+            <Button kind="primary" onClick={openForm}>
+              Add entry
+            </Button>
+          </Actions>
+        </Card>
+
+        <Card
+          mono={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}
+          title="Entries"
+        >
+          {entries.length === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No entries yet"
+              detail="Add your first reading to start the trend."
+            />
+          ) : (
+            <Stack>
+              <List label="Entries">
+                {entries.map((e) => (
+                  <Row
+                    key={e.id}
+                    title={e.date}
+                    value={`${fmtWeight(e.weight, unit)} ${unitLbl}`}
+                    action={
+                      <Button kind="ghost" ariaLabel={`Delete ${e.date}`} onClick={() => remove(e.id)}>
+                        Delete {e.date}
+                      </Button>
+                    }
+                  />
+                ))}
+              </List>
+              <WeightChart entries={entries} unit={unit} />
+              <KpiRow>
+                {latest && (
+                  <Kpi
+                    value={`Latest: ${fmtWeight(latest.weight, unit)} ${unitLbl}`}
+                    label="Most recent reading"
+                    accent
+                  />
+                )}
+                {changeText !== null && <Kpi value={`Change: ${changeText} ${unitLbl}`} label="Since first entry" />}
+              </KpiRow>
+            </Stack>
+          )}
+        </Card>
+      </Stack>
+    ) : tab === 'History' ? (
+      <Card mono={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`} title="History">
+        {entries.length === 0 ? (
+          <EmptyState mono="Empty" title="No entries yet" detail="Add a reading to build the table." />
+        ) : (
+          <Table
+            label="Weight history"
+            columns={[
+              { key: 'date', label: 'Date' },
+              { key: 'weight', label: `Weight (${unitLbl})`, num: true },
+              { key: 'delta', label: 'Change', num: true },
+            ]}
+            rows={entryTableRows}
+            empty="No entries yet"
+          />
+        )}
+      </Card>
+    ) : tab === 'Insights' ? (
+      <Stack lg>
+        <Card mono="Stats" title="At a glance">
+          {entries.length === 0 ? (
+            <EmptyState mono="Empty" title="No entries yet" detail="Add readings to unlock insights." />
+          ) : (
+            <KpiRow>
+              <Kpi value={streak.current} label="Day streak" accent />
+              <Kpi value={streak.longest} label="Longest streak" />
+              <Kpi
+                value={avg !== null ? `${fmtWeight(avg, unit)} ${unitLbl}` : '—'}
+                label="Average"
+              />
+              <Kpi
+                value={hi !== null ? `${fmtWeight(hi, unit)} ${unitLbl}` : '—'}
+                label="Highest"
+              />
+              <Kpi
+                value={lo !== null ? `${fmtWeight(lo, unit)} ${unitLbl}` : '—'}
+                label="Lowest"
+              />
+            </KpiRow>
+          )}
+        </Card>
+        <Card mono="Consistency" title="Activity this year">
+          {entries.length === 0 ? (
+            <Body sm>Add readings to see a day-by-day activity map.</Body>
+          ) : (
+            <Heatmap
+              data={entries.map((e) => ({ date: e.date, value: e.weight }))}
+              year={year}
+              label={`Weight recorded · ${year}`}
+            />
+          )}
+          <div style={{ marginTop: 'calc(14px * var(--sf))' }}>
+            <MonoLabel sm style={{ color: 'var(--ink-60)' }}>
+              PICK A DATE
+            </MonoLabel>
+            <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+              <DatePicker value={pickableDate} onChange={onPickDate} ariaLabel="Jump to a date" />
+            </div>
+            {pickedDates.has(pickableDate) && (
+              <Body sm style={{ marginTop: 'calc(8px * var(--sf))' }}>
+                Recorded on {pickableDate}.
+              </Body>
+            )}
+          </div>
+        </Card>
+      </Stack>
+    ) : (
+      <Stack lg>
+        <Card mono="Units" title="Settings">
+          <Body sm>Choose how weights are displayed. Entries are always stored in kilograms.</Body>
+          <Actions>
+            <Tabs items={['kg', 'lb']} active={unit} onSelect={(v) => setUnit(v as Unit)} />
+          </Actions>
+        </Card>
+
+        <Card mono="Data" title="Export & import">
+          <Body sm>Download your data, or merge a previous backup. Importing adds new entries without duplicating existing ones.</Body>
+          <Actions>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'calc(8px * var(--sf))',
+                fontFamily: 'var(--mono)',
+                fontSize: 'calc(11px * var(--tf))',
+                color: 'var(--ink-60)',
+              }}
+            >
+              <span>EXPORT</span>
+              <ExportMenu
+                options={exportOptions}
+                fileName="weight-tracker"
+                ariaLabel="Export"
+                disabled={entries.length === 0}
+              />
+            </div>
+            <Button kind="ghost" onClick={pickImport} disabled={importFile === null}>
+              Import backup
+            </Button>
+          </Actions>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept="application/json,.json"
+            style={{ display: 'none' }}
+            aria-hidden
+            tabIndex={-1}
+            onChange={onImportFile}
+          />
+          {importMsg && (
+            <Body sm style={{ marginTop: 'calc(8px * var(--sf))', color: 'var(--mid)' }}>
+              {importMsg}
+            </Body>
+          )}
+        </Card>
+
+        <Card mono="Danger" title="Reset">
+          <Body sm>Permanently delete every entry on this device. This cannot be undone.</Body>
+          <Actions>
+            <Button kind="ghost" onClick={clearAll} disabled={entries.length === 0}>
+              Clear all entries
+            </Button>
+          </Actions>
+        </Card>
+      </Stack>
+    )
+
   return (
     <AppShell
       name="Weight Tracker"
@@ -163,49 +507,19 @@ export function App() {
         <Rail
           title="Weight Tracker"
           note="Dated readings · local"
-          chips={['Line chart', 'Offline']}
+          chips={['Line chart', 'Heatmap', 'Export', 'Offline']}
         />
       }
     >
       <Stack lg>
-        <Card mono="Entry" title="Add a reading">
-          <Body sm>
-            Log your weight on a date and watch the trend.
-          </Body>
-          <Actions>
-            <Button kind="primary" onClick={openForm}>
-              Add entry
+        <Actions>
+          {TABS.map((t) => (
+            <Button key={t} kind={t === tab ? 'primary' : 'secondary'} onClick={() => setTab(t)}>
+              {t}
             </Button>
-          </Actions>
-        </Card>
-
-        <Card mono={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`} title="Entries">
-          {entries.length === 0 ? (
-            <EmptyState mono="Empty" title="No entries yet" detail="Add your first reading to start the trend." />
-          ) : (
-            <Stack>
-              <List label="Entries">
-                {entries.map((e) => (
-                  <Row
-                    key={e.id}
-                    title={e.date}
-                    value={`${fmtWeight(e.weight)} kg`}
-                    action={
-                      <Button kind="ghost" ariaLabel={`Delete ${e.date}`} onClick={() => remove(e.id)}>
-                        Delete {e.date}
-                      </Button>
-                    }
-                  />
-                ))}
-              </List>
-              <WeightChart entries={entries} />
-              <KpiRow>
-                {latest && <Kpi value={`Latest: ${fmtWeight(latest.weight)} kg`} label="Most recent reading" accent />}
-                {change !== null && <Kpi value={`Change: ${fmtWeight(change)} kg`} label="Since first entry" />}
-              </KpiRow>
-            </Stack>
-          )}
-        </Card>
+          ))}
+        </Actions>
+        {tabBody}
       </Stack>
 
       {form.open && (
