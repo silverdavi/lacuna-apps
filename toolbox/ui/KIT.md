@@ -8,7 +8,7 @@ Every app is one `AppShell` with `Card` panels inside. All of it comes from `@la
 
 | Component | Props | Draws |
 |---|---|---|
-| `AppShell` | `name`, `icon`, `hue`, `category`, `meta`, `status`, `actions`, `side` | Dark band, top bar with breadcrumb, the framed app window with its title bar (the page `h1`), optional right rail, status strip |
+| `AppShell` | `name`, `icon`, `hue`, `category`, `meta`, `status`, `actions`, `side` | Dark band, top bar with breadcrumb, the framed app window with its title bar (the page `h1`), optional right rail, status strip. The mark, the APPS chip and the category link to the Lacuna desktop; the app name is the current page. Do not add your own home link. |
 | `Rail` | `title`, `note`, `chips` | One box in the right rail (`side`): serif title, rust mono note, tag chips |
 | `Card` | `mono`, `title`, `actions`, `accent`, `flush` | A panel: mono label, serif title, hairline border |
 | `SectionLabel` | `accent` | Small uppercase mono `h2` above a group |

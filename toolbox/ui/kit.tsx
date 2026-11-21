@@ -33,10 +33,16 @@ export function Plate({ icon, hue = 'rust', size = 28 }: { icon: IconName; hue?:
   )
 }
 
+/** Where the top bar leads: the Lacuna desktop, which lists the apps. Plain links; nothing is requested at load. */
+const HOME = 'https://lacunaos.com/'
+
 /**
  * The page frame. Every app renders exactly one AppShell at the top of App.tsx.
  * It draws the dark band, the top bar (mark, APPS chip, breadcrumb), the framed app window with its
  * title bar, an optional right rail, and the status strip. Put panels (Card) inside it.
+ * The mark, the APPS chip and the category are links to the Lacuna desktop; the app name is the current
+ * page and is not a link. They open in the top window (target="_top"), so an app shown inside the
+ * launcher's frame takes the visitor to the desktop instead of loading the desktop inside the frame.
  * It owns the page landmarks (header, main, footer) and the h1: do not add another <main> or <h1>.
  */
 export function AppShell({ name, icon = 'grid', hue = 'rust', category = 'Apps', meta, status, actions, side, children }: {
@@ -64,13 +70,13 @@ export function AppShell({ name, icon = 'grid', hue = 'rust', category = 'Apps',
           <span className="lc-persona-detail">Runs in your browser · stays on this device</span>
         </div>
         <div className="lc-desk-head">
-          <span className="lc-brand-home">
+          <a className="lc-brand-home" href={HOME} target="_top" aria-label="Lacuna home">
             <Mark size={17} />
             <span className="lc-brandname">Lacuna</span>
-          </span>
-          <span className="lc-spacechip">APPS</span>
+          </a>
+          <a className="lc-spacechip" href={HOME} target="_top" aria-label="Apps on Lacuna">APPS</a>
           <nav className="lc-cv-crumbs" aria-label="Breadcrumb">
-            <span className="lc-crumb-seg"><span className="lk-crumb">{category}</span></span>
+            <span className="lc-crumb-seg"><a className="lk-crumb" href={HOME} target="_top">{category}</a></span>
             <span className="lc-crumb-seg">
               <span className="lc-crumb-sep" aria-hidden>/</span>
               <span className="here" aria-current="page">{name}</span>

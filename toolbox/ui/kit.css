@@ -27,6 +27,12 @@
   font-family: var(--mono); font-size: calc(10px * var(--tf)); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--mid); padding: 2px 4px;
 }
+/* The mark, the APPS chip and the category are links to the Lacuna desktop. Same look as before, as links. */
+.lk-shell a.lc-spacechip, .lk-shell a.lk-crumb { text-decoration: none; cursor: pointer; }
+.lk-shell a.lc-spacechip:hover, .lk-shell a.lk-crumb:hover { color: var(--ink); }
+.lk-shell .lc-brand-home:focus-visible, .lk-shell a.lc-spacechip:focus-visible, .lk-shell a.lk-crumb:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
 .lk-win {
   flex: 0 1 auto; width: calc(100% - calc(48px * var(--sf))); max-width: 1120px;
   margin: calc(24px * var(--sf)) auto; overflow: visible;
