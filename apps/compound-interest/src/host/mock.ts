@@ -8,8 +8,11 @@ export type Scenario = {
   rate: number
   years: number
   compounding: string
+  contribution: number
+  contributionType: string
   finalBalance: number
   totalInterest: number
+  totalContributed: number
   savedAt: number
 }
 
@@ -28,8 +31,11 @@ function isScenario(value: unknown): value is Scenario {
     isFiniteNumber(v.rate) &&
     isFiniteNumber(v.years) &&
     typeof v.compounding === 'string' &&
+    isFiniteNumber(v.contribution) &&
+    typeof v.contributionType === 'string' &&
     isFiniteNumber(v.finalBalance) &&
-    isFiniteNumber(v.totalInterest)
+    isFiniteNumber(v.totalInterest) &&
+    isFiniteNumber(v.totalContributed)
   )
 }
 
@@ -41,7 +47,9 @@ function isInputs(value: unknown): value is CompoundInputs {
     typeof v.principal === 'string' &&
     typeof v.rate === 'string' &&
     typeof v.years === 'string' &&
-    typeof v.compounding === 'string'
+    typeof v.compounding === 'string' &&
+    typeof v.contribution === 'string' &&
+    typeof v.contributionType === 'string'
   )
 }
 

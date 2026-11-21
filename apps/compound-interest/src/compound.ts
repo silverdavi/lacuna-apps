@@ -2,11 +2,17 @@ export type Compounding = 'Annual' | 'Semi-annual' | 'Quarterly' | 'Monthly'
 
 export const COMPOUNDING_OPTIONS: Compounding[] = ['Annual', 'Semi-annual', 'Quarterly', 'Monthly']
 
+export type Contribution = 'None' | 'Monthly' | 'Annual'
+
+export const CONTRIBUTION_OPTIONS: Contribution[] = ['None', 'Monthly', 'Annual']
+
 export type CompoundInputs = {
   principal: string
   rate: string
   years: string
   compounding: Compounding
+  contribution: string
+  contributionType: Contribution
 }
 
 export const DEFAULT_INPUTS: CompoundInputs = {
@@ -14,6 +20,8 @@ export const DEFAULT_INPUTS: CompoundInputs = {
   rate: '0',
   years: '1',
   compounding: 'Annual',
+  contribution: '0',
+  contributionType: 'None',
 }
 
 export type YearRow = {
@@ -27,8 +35,11 @@ export type CompoundResult = {
   rate: number
   years: number
   compounding: Compounding
+  contribution: number
+  contributionType: Contribution
   finalBalance: number
   totalInterest: number
+  totalContributed: number
   schedule: YearRow[]
 }
 
@@ -55,6 +66,10 @@ export function calculateCompound(inputs: CompoundInputs): { result: CompoundRes
   const principal = Number(inputs.principal)
   const rate = Number(inputs.rate)
   const years = Number(inputs.years)
+  const contribution = inputs.contribution === '' ? 0 : Number(inputs.contribution)
+  const contributionType: Contribution = (['None', 'Monthly', 'Annual'] as const).includes(inputs.contributionType as Contribution)
+    ? inputs.contributionType
+    : 'None'
 
   if (inputs.principal === '' || Number.isNaN(principal) || principal < 0) {
     return { result: null, error: 'Principal must be 0 or more' }
@@ -65,13 +80,35 @@ export function calculateCompound(inputs: CompoundInputs): { result: CompoundRes
   if (inputs.years === '' || Number.isNaN(years) || years < 1 || years > 100) {
     return { result: null, error: 'Years must be between 1 and 100' }
   }
+  if (Number.isNaN(contribution) || contribution < 0) {
+    return { result: null, error: 'Contribution must be 0 or more' }
+  }
 
   const perYear = periodsForCalculation(inputs.compounding)
   const r = rate / 100 / perYear
   const n = perYear * years
 
-  const finalBalance = n === 0 ? principal : principal * Math.pow(1 + r, n)
-  const totalInterest = finalBalance - principal
+  const principalFinal = n === 0 ? principal : principal * Math.pow(1 + r, n)
+
+  let contributionFinal = 0
+  let totalContributed = 0
+  if (contribution > 0 && contributionType !== 'None') {
+    totalContributed =
+      contributionType === 'Monthly' ? contribution * 12 * years : contribution * years
+    if (rate === 0) {
+      contributionFinal = totalContributed
+    } else {
+      const contributionsPerYear = contributionType === 'Monthly' ? 12 : 1
+      const periodCount = contributionsPerYear * years
+      const perPeriodRate = rate / 100 / contributionsPerYear
+      contributionFinal =
+        contribution *
+        ((Math.pow(1 + perPeriodRate, periodCount) - 1) / perPeriodRate)
+    }
+  }
+
+  const finalBalance = principalFinal + contributionFinal
+  const totalInterest = finalBalance - principal - totalContributed
 
   const annualRate = rate / 100
   const schedule: YearRow[] = []
@@ -94,8 +131,11 @@ export function calculateCompound(inputs: CompoundInputs): { result: CompoundRes
       rate,
       years,
       compounding: inputs.compounding,
+      contribution,
+      contributionType,
       finalBalance,
       totalInterest,
+      totalContributed,
       schedule,
     },
     error: null,

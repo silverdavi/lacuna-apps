@@ -19,7 +19,7 @@ import {
 import { LineChart } from './Chart'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { host, type Scenario } from './host'
-import { calculateCompound, COMPOUNDING_OPTIONS, money, type CompoundInputs, type CompoundResult, type YearRow } from './compound'
+import { calculateCompound, COMPOUNDING_OPTIONS, CONTRIBUTION_OPTIONS, money, type CompoundInputs, type CompoundResult, type YearRow } from './compound'
 
 type Tab = 'Breakdown' | 'Chart'
 
@@ -82,7 +82,7 @@ export function App() {
 
 
 
-  function validateField(key: 'principal' | 'rate' | 'years', value: string): string | null {
+  function validateField(key: 'principal' | 'rate' | 'years' | 'contribution', value: string): string | null {
     if (key === 'principal') {
       if (value === '' || Number.isNaN(Number(value)) || Number(value) < 0) return 'Principal must be 0 or more'
     }
@@ -94,6 +94,11 @@ export function App() {
     if (key === 'years') {
       if (value === '' || Number.isNaN(Number(value)) || Number(value) < 1 || Number(value) > 100) {
         return 'Years must be between 1 and 100'
+      }
+    }
+    if (key === 'contribution') {
+      if (value !== '' && (Number.isNaN(Number(value)) || Number(value) < 0)) {
+        return 'Contribution must be 0 or more'
       }
     }
     return null
@@ -119,8 +124,11 @@ export function App() {
       rate: result.rate,
       years: result.years,
       compounding: result.compounding,
+      contribution: result.contribution,
+      contributionType: result.contributionType,
       finalBalance: result.finalBalance,
       totalInterest: result.totalInterest,
+      totalContributed: result.totalContributed,
       savedAt: Date.now(),
     })
     setScenarioName('')
@@ -136,26 +144,22 @@ export function App() {
     const compounding = (COMPOUNDING_OPTIONS as string[]).includes(record.compounding)
       ? (record.compounding as CompoundInputs['compounding'])
       : 'Annual'
-    setInputs({
+    const contributionType = (CONTRIBUTION_OPTIONS as string[]).includes(record.contributionType)
+      ? (record.contributionType as CompoundInputs['contributionType'])
+      : 'None'
+    const nextInputs: CompoundInputs = {
       principal: String(record.principal),
       rate: String(record.rate),
       years: String(record.years),
       compounding,
-    })
-    const { result } = calculateCompound({
-      principal: String(record.principal),
-      rate: String(record.rate),
-      years: String(record.years),
-      compounding,
-    })
-    setResult(result)
+      contribution: String(record.contribution),
+      contributionType,
+    }
+    setInputs(nextInputs)
+    const { result } = calculateCompound(nextInputs)
+    if (result) setResult(result)
     setError(null)
-    host.saveInputs({
-      principal: String(record.principal),
-      rate: String(record.rate),
-      years: String(record.years),
-      compounding,
-    })
+    host.saveInputs(nextInputs)
     setTab('Breakdown')
   }
 
@@ -238,6 +242,20 @@ export function App() {
             options={COMPOUNDING_OPTIONS.map((value) => ({ value, label: value }))}
             value={inputs.compounding}
             onChange={(value) => setField('compounding', value)}
+          />
+          <TextInput
+            label="Contribution"
+            type="number"
+            inputMode="decimal"
+            value={inputs.contribution}
+            error={validateField('contribution', inputs.contribution)}
+            onChange={(v) => setField('contribution', v)}
+          />
+          <Select
+            label="Contribution frequency"
+            options={CONTRIBUTION_OPTIONS.map((value) => ({ value, label: value }))}
+            value={inputs.contributionType}
+            onChange={(value) => setField('contributionType', value)}
           />
         </FormGrid>
         <Actions>
