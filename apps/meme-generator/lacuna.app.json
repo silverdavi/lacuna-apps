@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.meme-generator",
+  "name": "Meme Maker",
+  "version": "0.1.0",
+  "summary": "Upload an image, add top and bottom text, rotate, flip, filter, and export a PNG meme.",
+  "description": "Load an image, overlay top and bottom text in white with a black outline, rotate, flip, apply a grayscale filter, and export the result as meme.png. The state stays on this page.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/meme-generator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/image-ops": "^0.1.0",
+      "@lacuna/file-save-open": "^0.1.0",
+      "@lacuna/use-local-record": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:meme-generator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "meme-generator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the loaded image and the meme settings"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "meme-generator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
