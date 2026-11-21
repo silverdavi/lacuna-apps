@@ -1122,6 +1122,31 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/canvas-kit/0.1.0:
+    dependencies:
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../export-menu/0.1.0
+      '@lacuna/range-slider':
+        specifier: workspace:0.1.0
+        version: link:../../range-slider/0.1.0
+      '@lacuna/toolbar':
+        specifier: workspace:0.1.0
+        version: link:../../toolbar/0.1.0
+      '@lacuna/use-pointer-draw':
+        specifier: workspace:0.1.0
+        version: link:../../use-pointer-draw/0.1.0
+      '@lacuna/use-undo-stack':
+        specifier: workspace:0.1.0
+        version: link:../../use-undo-stack/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/chart/0.1.0:
     dependencies:
       react:
@@ -1141,6 +1166,8 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/codecs/0.1.0: {}
 
   toolbox/modules/color-math/0.1.0: {}
 
@@ -1333,6 +1360,8 @@ importers:
 
   toolbox/modules/host-mock/0.1.0: {}
 
+  toolbox/modules/html-to-markdown/0.1.0: {}
+
   toolbox/modules/ics-calendar/0.1.0: {}
 
   toolbox/modules/image-ops/0.1.0: {}
@@ -1351,6 +1380,12 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/line-items/0.1.0:
+    dependencies:
+      '@lacuna/money':
+        specifier: workspace:0.1.0
+        version: link:../../money/0.1.0
 
   toolbox/modules/markdown-to-html/0.1.0: {}
 
@@ -1379,6 +1414,14 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/passphrase-crypto/0.1.0: {}
+
+  toolbox/modules/password-generate/0.1.0:
+    dependencies:
+      '@lacuna/random':
+        specifier: workspace:0.1.0
+        version: link:../../random/0.1.0
+
   toolbox/modules/pdf-ops/0.1.0: {}
 
   toolbox/modules/progress-ring/0.1.0:
@@ -1390,6 +1433,8 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/quantity-parse/0.1.0: {}
 
   toolbox/modules/query-spec/0.1.0: {}
 
@@ -1532,6 +1577,16 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/use-camera/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/use-clipboard/0.1.0:
     dependencies:
       react:
@@ -1589,6 +1644,16 @@ importers:
         version: 19.3.0
 
   toolbox/modules/use-local-record/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-media-recorder/0.1.0:
     dependencies:
       react:
         specifier: ^19.0.0

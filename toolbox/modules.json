@@ -897,6 +897,56 @@
       }
     },
     {
+      "id": "@lacuna/canvas-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A drawing application shell that composes a drawing surface, tool palette, color picker, brush-size slider, and PNG export menu into a ready-to-use layout.",
+      "today": [
+        "toolbox/modules/canvas-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/export-menu",
+        "@lacuna/range-slider",
+        "@lacuna/toolbar",
+        "@lacuna/use-pointer-draw",
+        "@lacuna/use-undo-stack"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "CanvasKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/canvas-kit/0.1.0",
+      "bridge": {
+        "component": "CanvasKit",
+        "kind": "kit",
+        "exports": [
+          "CanvasKit"
+        ],
+        "types": [
+          "CanvasKitProps"
+        ],
+        "signature": "CanvasKit({ swatches, showLayers = false, showZoom = false, defaultBrushSize = 5, onCommit, }: ...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "36bfb2c5f69f6bad",
+            "lines": 399,
+            "dependencies": {
+              "@lacuna/export-menu": "0.1.0",
+              "@lacuna/range-slider": "0.1.0",
+              "@lacuna/toolbar": "0.1.0",
+              "@lacuna/use-pointer-draw": "0.1.0",
+              "@lacuna/use-undo-stack": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/chart",
       "layer": 2,
       "status": "exists",
@@ -968,6 +1018,51 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "097ecd308968fb92",
             "lines": 389,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/codecs",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure encode/decode functions for Base64, URL encoding, hex, arbitrary number bases, and Roman numerals.",
+      "today": [
+        "toolbox/modules/codecs/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "codecs"
+      ],
+      "public": true,
+      "path": "toolbox/modules/codecs/0.1.0",
+      "bridge": {
+        "component": "codecs",
+        "kind": "logic",
+        "exports": [
+          "base64Encode",
+          "base64Decode",
+          "urlEncode",
+          "urlDecode",
+          "toHex",
+          "fromHex",
+          "toBase",
+          "fromBase",
+          "toRoman",
+          "fromRoman"
+        ],
+        "types": [],
+        "signature": "base64Encode(input: string); base64Decode(input: string); urlEncode(input: string); urlDecode(input: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "4d66a552a3f8a59e",
+            "lines": 199,
             "dependencies": {}
           }
         }
@@ -1855,6 +1950,44 @@
       }
     },
     {
+      "id": "@lacuna/html-to-markdown",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Converts a sanitized HTML string into a Markdown string, stripping scripts and unsafe attributes.",
+      "today": [
+        "toolbox/modules/html-to-markdown/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "htmlToMarkdown"
+      ],
+      "public": true,
+      "path": "toolbox/modules/html-to-markdown/0.1.0",
+      "bridge": {
+        "component": "htmlToMarkdown",
+        "kind": "logic",
+        "exports": [
+          "htmlToMarkdown"
+        ],
+        "types": [
+          "HtmlToMarkdownOptions"
+        ],
+        "signature": "htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "391b6a142b6a0d10",
+            "lines": 268,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/ics-calendar",
       "layer": 3,
       "status": "exists",
@@ -2031,6 +2164,52 @@
       }
     },
     {
+      "id": "@lacuna/line-items",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions that compute subtotals, discounts, tax, and grand totals for line items in integer minor units.",
+      "today": [
+        "toolbox/modules/line-items/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/money"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "lineItems"
+      ],
+      "public": true,
+      "path": "toolbox/modules/line-items/0.1.0",
+      "bridge": {
+        "component": "lineItems",
+        "kind": "logic",
+        "exports": [
+          "computeLineItem",
+          "computeOrderTotals",
+          "formatMinorUnits"
+        ],
+        "types": [
+          "LineItem",
+          "LineItemResult",
+          "OrderTotals"
+        ],
+        "signature": "computeLineItem(item: LineItem); computeOrderTotals(items: readonly LineItem[]); formatMinorUnits(amount: number, currency: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "c077225018184c76",
+            "lines": 94,
+            "dependencies": {
+              "@lacuna/money": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/markdown-to-html",
       "layer": 3,
       "status": "exists",
@@ -2198,6 +2377,95 @@
       }
     },
     {
+      "id": "@lacuna/passphrase-crypto",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "AES-GCM encryption and decryption with PBKDF2-derived keys for passphrase-protected local data.",
+      "today": [
+        "toolbox/modules/passphrase-crypto/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "passphraseCrypto"
+      ],
+      "public": true,
+      "path": "toolbox/modules/passphrase-crypto/0.1.0",
+      "bridge": {
+        "component": "passphraseCrypto",
+        "kind": "logic",
+        "exports": [
+          "encrypt",
+          "decrypt",
+          "verifyPassphrase",
+          "generateSalt",
+          "generateIv"
+        ],
+        "types": [
+          "EncryptedPayload",
+          "CryptoOptions"
+        ],
+        "signature": "encrypt(plaintext: string, passphrase: string, options?: CryptoOptions); decrypt(payload: EncryptedPayload, passphrase: string); verifyPassphrase(payload: EncryptedPayload, passphrase: string); generateSalt(length?: number)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "09ffa3a5fcb5061c",
+            "lines": 105,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/password-generate",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Generate random passwords and passphrases with configurable character rules and an entropy estimate in bits.",
+      "today": [
+        "toolbox/modules/password-generate/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/random"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "passwordGenerate"
+      ],
+      "public": true,
+      "path": "toolbox/modules/password-generate/0.1.0",
+      "bridge": {
+        "component": "passwordGenerate",
+        "kind": "logic",
+        "exports": [
+          "generatePassword",
+          "generatePassphrase",
+          "estimateEntropy"
+        ],
+        "types": [
+          "PasswordRules",
+          "PassphraseOptions",
+          "GenerateResult"
+        ],
+        "signature": "generatePassword( length: number, rules: PasswordRules, seed?: number, ); generatePassphrase( options: PassphraseOptions, seed?: number, ); estimateEntropy(value: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "df17aa297372b517",
+            "lines": 139,
+            "dependencies": {
+              "@lacuna/random": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/pdf-ops",
       "layer": 3,
       "status": "exists",
@@ -2276,6 +2544,48 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "0f213fbaa3438445",
             "lines": 147,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/quantity-parse",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Parse, normalize, and scale quantities expressed as whole numbers, decimals, fractions, or mixed numbers with optional units.",
+      "today": [
+        "toolbox/modules/quantity-parse/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "quantityParse"
+      ],
+      "public": true,
+      "path": "toolbox/modules/quantity-parse/0.1.0",
+      "bridge": {
+        "component": "quantityParse",
+        "kind": "logic",
+        "exports": [
+          "parseQuantity",
+          "scaleQuantity",
+          "addQuantities",
+          "toFractionString",
+          "isValidQuantity"
+        ],
+        "types": [
+          "ParsedQuantity"
+        ],
+        "signature": "parseQuantity(input: string); scaleQuantity(qty: ParsedQuantity, factor: number); addQuantities(a: ParsedQuantity, b: ParsedQuantity); toFractionString(value: number, maxDenominator = 16)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "3c765fecc3540191",
+            "lines": 123,
             "dependencies": {}
           }
         }
@@ -2960,6 +3270,45 @@
       }
     },
     {
+      "id": "@lacuna/use-camera",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Manages a live camera stream: start, stop, device selection, and single-frame capture to a canvas.",
+      "today": [
+        "toolbox/modules/use-camera/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useCamera"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-camera/0.1.0",
+      "bridge": {
+        "component": "useCamera",
+        "kind": "hook",
+        "exports": [
+          "useCamera"
+        ],
+        "types": [
+          "UseCameraOptions",
+          "UseCameraReturn"
+        ],
+        "signature": "useCamera(options?: UseCameraOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "bdae24e3ff2ba347",
+            "lines": 146,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/use-clipboard",
       "layer": 3,
       "status": "exists",
@@ -3209,6 +3558,47 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "e1b260088ca68f80",
             "lines": 131,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-media-recorder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Records microphone, camera, or screen media into a Blob with state, elapsed time, and pause/resume/stop controls.",
+      "today": [
+        "toolbox/modules/use-media-recorder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useMediaRecorder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-media-recorder/0.1.0",
+      "bridge": {
+        "component": "useMediaRecorder",
+        "kind": "hook",
+        "exports": [
+          "useMediaRecorder"
+        ],
+        "types": [
+          "MediaSource",
+          "UseMediaRecorderOptions",
+          "UseMediaRecorderReturn",
+          "UseMediaRecorderStatus"
+        ],
+        "signature": "useMediaRecorder(options?: UseMediaRecorderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "b40b837a3a3f192f",
+            "lines": 184,
             "dependencies": {}
           }
         }
