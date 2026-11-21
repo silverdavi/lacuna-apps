@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/color-picker",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A color selection widget with a hue/saturation area, hex/RGB/HSL fields, and an eyedropper hook.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/color-math": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "ColorPicker",
+    "kind": "widget",
+    "commit": "8aeeaa85549f99a4effa97da90fc67209d204198",
+    "source": "b72a6f882b0336ce",
+    "lines": 243,
+    "exports": [
+      "ColorPicker"
+    ],
+    "types": [
+      "ColorValue",
+      "ColorPickerProps"
+    ],
+    "signature": "ColorPicker({ value, onChange, onEyedrop, disabled = false, label, className, style, children, }:...)"
+  }
+}

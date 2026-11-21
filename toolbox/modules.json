@@ -1205,6 +1205,51 @@
       }
     },
     {
+      "id": "@lacuna/color-picker",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A color selection widget with a hue/saturation area, hex/RGB/HSL fields, and an eyedropper hook.",
+      "today": [
+        "toolbox/modules/color-picker/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/color-math",
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "ColorPicker"
+      ],
+      "public": true,
+      "path": "toolbox/modules/color-picker/0.1.0",
+      "bridge": {
+        "component": "ColorPicker",
+        "kind": "widget",
+        "exports": [
+          "ColorPicker"
+        ],
+        "types": [
+          "ColorValue",
+          "ColorPickerProps"
+        ],
+        "signature": "ColorPicker({ value, onChange, onEyedrop, disabled = false, label, className, style, children, }:...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "8aeeaa85549f99a4effa97da90fc67209d204198",
+            "source": "b72a6f882b0336ce",
+            "lines": 243,
+            "dependencies": {
+              "@lacuna/color-math": "0.1.0",
+              "@lacuna/ui": "*"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/combobox",
       "layer": 2,
       "status": "exists",
@@ -2456,6 +2501,44 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "f93ff2554ebb824c",
             "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/paged-reader",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Paginated text reader with progress indicator, page navigation, and bookmark toggling.",
+      "today": [
+        "toolbox/modules/paged-reader/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "PagedReader"
+      ],
+      "public": true,
+      "path": "toolbox/modules/paged-reader/0.1.0",
+      "bridge": {
+        "component": "PagedReader",
+        "kind": "widget",
+        "exports": [
+          "PagedReader"
+        ],
+        "types": [
+          "PagedReaderProps"
+        ],
+        "signature": "PagedReader({ pages, page, onPageChange, bookmarks, onToggleBookmark, label = 'PagedReader', }: P...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "8aeeaa85549f99a4effa97da90fc67209d204198",
+            "source": "dd27f9ed3bbce08f",
+            "lines": 153,
             "dependencies": {}
           }
         }

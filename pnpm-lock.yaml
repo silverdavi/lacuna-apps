@@ -1243,6 +1243,22 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/color-picker/0.1.0:
+    dependencies:
+      '@lacuna/color-math':
+        specifier: workspace:0.1.0
+        version: link:../../color-math/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/combobox/0.1.0:
     dependencies:
       react:
@@ -1477,6 +1493,16 @@ importers:
   toolbox/modules/money/0.1.0: {}
 
   toolbox/modules/number-input/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/paged-reader/0.1.0:
     dependencies:
       react:
         specifier: ^19.0.0
