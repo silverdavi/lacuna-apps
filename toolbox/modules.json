@@ -978,6 +978,52 @@
       }
     },
     {
+      "id": "@lacuna/image-ops",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for canvas image manipulation: resize, crop, rotate, flip, CSS-like filters, and format encoding.",
+      "today": [
+        "toolbox/modules/image-ops/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "imageOps"
+      ],
+      "public": true,
+      "path": "toolbox/modules/image-ops/0.1.0",
+      "bridge": {
+        "component": "imageOps",
+        "kind": "logic",
+        "exports": [
+          "ImageData",
+          "resizeImageData",
+          "cropImageData",
+          "rotateImageData",
+          "flipImageData",
+          "applyFilter",
+          "encodeCanvas"
+        ],
+        "types": [
+          "CropRect",
+          "FilterParams",
+          "EncodeOptions"
+        ],
+        "signature": "resizeImageData(src: ImageData, width: number, height: number); cropImageData(src: ImageData, rect: CropRect); rotateImageData(src: ImageData, degrees: 90 | 180 | 270); flipImageData(src: ImageData, axis: 'horizontal' | 'vertical')",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "604b284be089503f",
+            "lines": 335,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/password-generate",
       "layer": 3,
       "status": "exists",
