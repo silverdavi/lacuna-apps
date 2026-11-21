@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, PointerEvent as ReactPointerEvent } from 'react'
-import { AppShell, Button, Card, EmptyState, SectionLabel, Select, Stack, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, FormGrid, Rail, Stack, TextInput, Select } from '@lacuna/ui'
 import { BeforeAfter } from '@lacuna/before-after'
 import { RangeSlider } from '@lacuna/range-slider'
 import { saveBlob } from '@lacuna/file-save-open'
@@ -403,6 +403,13 @@ export function App() {
       category="Productivity"
       meta={loaded ? `${session.width} × ${session.height}` : 'empty'}
       status={status ?? 'Local · no network'}
+      side={
+        <Rail
+          title="Image Cropper"
+          note={loaded ? `${session.width} × ${session.height}px` : 'No image'}
+          chips={['Crop', 'Resize', 'Rotate', 'Filter', 'PNG export']}
+        />
+      }
     >
       <input
         ref={fileRef}
@@ -415,139 +422,144 @@ export function App() {
       />
       <Stack lg>
         {!loaded ? (
-          <EmptyStage onLoad={pickFile} onDemo={demoImage} />
+          <Card mono="READY" title="Image">
+            <EmptyState
+              mono="READY"
+              title="No image loaded"
+              detail="Load a photo to crop, resize, and export it."
+            >
+              <div style={{ display: 'flex', gap: 'calc(10px * var(--sf))', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Button kind="primary" onClick={pickFile}>
+                  Load image
+                </Button>
+                <Button kind="secondary" onClick={demoImage}>
+                  Use demo image
+                </Button>
+              </div>
+            </EmptyState>
+          </Card>
         ) : (
           <>
-            <div
-              ref={stageRef}
-              style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: 'calc(640px * var(--sf))',
-                margin: '0 auto',
-              }}
-            >
-              <canvas ref={(el) => { canvasRef.current = el }} width={session.width} height={session.height} style={{ display: 'block', width: '100%', height: 'auto' }} />
+            <Card mono="SOURCE" title="Image">
               <div
+                ref={stageRef}
                 style={{
-                  position: 'absolute',
-                  inset: 0,
-                  overflow: 'hidden',
-                  pointerEvents: 'none',
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: 'calc(640px * var(--sf))',
+                  margin: '0 auto',
                 }}
               >
+                <canvas ref={(el) => { canvasRef.current = el }} width={session.width} height={session.height} style={{ display: 'block', width: '100%', height: 'auto' }} />
                 <div
                   style={{
                     position: 'absolute',
-                    left: `${(crop.x / session.width) * 100}%`,
-                    top: `${(crop.y / session.height) * 100}%`,
-                    width: `${(crop.w / session.width) * 100}%`,
-                    height: `${(crop.h / session.height) * 100}%`,
-                    border: 'calc(2px * var(--sf)) solid var(--accent)',
-                    boxShadow: '0 0 0 calc(1000px * var(--sf)) color-mix(in oklab, var(--ink) 35%, transparent)',
+                    inset: 0,
+                    overflow: 'hidden',
                     pointerEvents: 'none',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: `${(crop.x / session.width) * 100}%`,
+                      top: `${(crop.y / session.height) * 100}%`,
+                      width: `${(crop.w / session.width) * 100}%`,
+                      height: `${(crop.h / session.height) * 100}%`,
+                      border: 'calc(2px * var(--sf)) solid var(--accent)',
+                      boxShadow: '0 0 0 calc(1000px * var(--sf)) color-mix(in oklab, var(--ink) 35%, transparent)',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                </div>
+                <div
+                  role="slider"
+                  aria-label="Crop size handle"
+                  aria-valuenow={Math.round((crop.w / Math.max(1, session.width)) * 100)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  tabIndex={0}
+                  onPointerDown={onHandleDown}
+                  onPointerMove={onHandleMove}
+                  onPointerUp={onHandleUp}
+                  style={{
+                    position: 'absolute',
+                    left: `${((crop.x + crop.w) / session.width) * 100}%`,
+                    top: `${((crop.y + crop.h) / session.height) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: 'calc(22px * var(--sf))',
+                    height: 'calc(22px * var(--sf))',
+                    borderRadius: '50%',
+                    background: 'var(--accent)',
+                    border: 'calc(2px * var(--sf)) solid var(--on-accent)',
+                    cursor: 'nwse-resize',
+                    pointerEvents: 'auto',
+                    touchAction: 'none',
                   }}
                 />
               </div>
               <div
-                role="slider"
-                aria-label="Crop size handle"
-                aria-valuenow={Math.round((crop.w / Math.max(1, session.width)) * 100)}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                tabIndex={0}
-                onPointerDown={onHandleDown}
-                onPointerMove={onHandleMove}
-                onPointerUp={onHandleUp}
-                style={{
-                  position: 'absolute',
-                  left: `${((crop.x + crop.w) / session.width) * 100}%`,
-                  top: `${((crop.y + crop.h) / session.height) * 100}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: 'calc(22px * var(--sf))',
-                  height: 'calc(22px * var(--sf))',
-                  borderRadius: '50%',
-                  background: 'var(--accent)',
-                  border: 'calc(2px * var(--sf)) solid var(--on-accent)',
-                  cursor: 'nwse-resize',
-                  pointerEvents: 'auto',
-                  touchAction: 'none',
-                }}
-              />
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 'calc(10px * var(--sf))',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'var(--mono)',
-                  fontSize: 'calc(14px * var(--tf))',
-                  color: 'var(--ink)',
-                }}
-              >
-                {session.width} x {session.height} px
-              </span>
-              <Button kind="primary" onClick={applyCrop}>
-                Apply crop
-              </Button>
-            </div>
-
-            <Stack>
-              <SectionLabel>Resize</SectionLabel>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(12px * var(--sf))', alignItems: 'flex-end' }}>
-                <TextInput
-                  label="Width"
-                  type="number"
-                  inputMode="numeric"
-                  value={widthText}
-                  onChange={setWidthText}
-                  placeholder={String(session.width)}
-                />
-                <TextInput
-                  label="Height"
-                  type="number"
-                  inputMode="numeric"
-                  value={heightText}
-                  onChange={setHeightText}
-                  placeholder={String(session.height)}
-                />
-                <Button kind="secondary" onClick={resizeImage}>
-                  Resize
-                </Button>
-              </div>
-            </Stack>
-
-            <Stack>
-              <SectionLabel>Transform</SectionLabel>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(10px * var(--sf))' }}>
-                <Button kind="secondary" onClick={rotate90}>
-                  Rotate 90
-                </Button>
-                <Button kind="secondary" onClick={flipHorizontal}>
-                  Flip horizontal
-                </Button>
-              </div>
-            </Stack>
-
-            <Stack>
-              <SectionLabel>Adjust</SectionLabel>
-              <div
                 style={{
                   display: 'flex',
                   flexWrap: 'wrap',
-                  gap: 'calc(16px * var(--sf))',
-                  alignItems: 'flex-end',
-                  width: '100%',
-                  maxWidth: 'calc(480px * var(--sf))',
+                  gap: 'calc(10px * var(--sf))',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                <div style={{ flex: '1 1 calc(200px * var(--sf))' }}>
+                <span
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 'calc(14px * var(--tf))',
+                    color: 'var(--ink)',
+                  }}
+                >
+                  {session.width} x {session.height} px
+                </span>
+                <Button kind="primary" onClick={applyCrop}>
+                  Apply crop
+                </Button>
+              </div>
+            </Card>
+
+            <Card mono="EDIT" title="Adjust">
+              <FormGrid>
+                <div>
+                  <TextInput
+                    label="Width"
+                    type="number"
+                    inputMode="numeric"
+                    value={widthText}
+                    onChange={setWidthText}
+                    placeholder={String(session.width)}
+                  />
+                </div>
+                <div>
+                  <TextInput
+                    label="Height"
+                    type="number"
+                    inputMode="numeric"
+                    value={heightText}
+                    onChange={setHeightText}
+                    placeholder={String(session.height)}
+                  />
+                </div>
+                <div>
+                  <Button kind="secondary" onClick={resizeImage}>
+                    Resize
+                  </Button>
+                </div>
+                <div>
+                  <Button kind="secondary" onClick={rotate90}>
+                    Rotate 90
+                  </Button>
+                </div>
+                <div>
+                  <Button kind="secondary" onClick={flipHorizontal}>
+                    Flip horizontal
+                  </Button>
+                </div>
+                <div>
                   <Select
                     label="Filter"
                     value={session.filter}
@@ -555,7 +567,7 @@ export function App() {
                     options={FILTERS}
                   />
                 </div>
-                <div style={{ flex: '1 1 calc(200px * var(--sf))' }}>
+                <div>
                   <RangeSlider
                     label="Crop size"
                     value={Math.round(crop.w)}
@@ -572,13 +584,20 @@ export function App() {
                     }}
                   />
                 </div>
-              </div>
-            </Stack>
+              </FormGrid>
+            </Card>
 
-            <Stack>
-              <SectionLabel>Export</SectionLabel>
+            <Card mono="RESULT" title="Before and after">
+              {session.original !== null && session.image !== null && session.original !== session.image ? (
+                <BeforeAfter
+                  mode="side-by-side"
+                  ariaLabel="Original and edited image"
+                  before={<img src={session.original} alt="Original image" style={{ display: 'block', width: '100%', height: 'auto', maxHeight: 'calc(420px * var(--sf))' }} />}
+                  after={<img src={session.image} alt="Edited image" style={{ display: 'block', width: '100%', height: 'auto', maxHeight: 'calc(420px * var(--sf))' }} />}
+                />
+              ) : null}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(10px * var(--sf))' }}>
-                <Button kind="ink" onClick={exportPng}>
+                <Button kind="primary" onClick={exportPng}>
                   Export PNG
                 </Button>
                 <Button kind="secondary" onClick={copyPng}>
@@ -588,21 +607,9 @@ export function App() {
                   {clipboard.copied ? 'Copied' : ''}
                 </span>
               </div>
-            </Stack>
+            </Card>
           </>
         )}
-
-        {loaded && session.original !== null && session.image !== null && session.original !== session.image ? (
-          <Stack>
-            <SectionLabel>Before / after</SectionLabel>
-            <BeforeAfter
-              mode="side-by-side"
-              ariaLabel="Original and edited image"
-              before={<img src={session.original} alt="Original image" style={{ display: 'block', width: '100%', height: 'auto' }} />}
-              after={<img src={session.image} alt="Edited image" style={{ display: 'block', width: '100%', height: 'auto' }} />}
-            />
-          </Stack>
-        ) : null}
 
         {status ? (
           <p role="alert" style={{ margin: 0, fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)' }}>
@@ -614,23 +621,3 @@ export function App() {
   )
 }
 
-function EmptyStage({ onLoad, onDemo }: { onLoad: () => void; onDemo: () => void }) {
-  return (
-    <Card>
-      <EmptyState
-        mono="READY"
-        title="No image loaded"
-        detail="Load a photo to crop, resize, and export it."
-      >
-        <div style={{ display: 'flex', gap: 'calc(10px * var(--sf))', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Button kind="primary" onClick={onLoad}>
-            Load image
-          </Button>
-          <Button kind="secondary" onClick={onDemo}>
-            Use demo image
-          </Button>
-        </div>
-      </EmptyState>
-    </Card>
-  )
-}
