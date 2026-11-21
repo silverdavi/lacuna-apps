@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d83c8b70c4cfaf2179d4be10552ad6f99da70a4bdce4f277938d8a808152c747",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no polls, the page shows the heading \"Poll Maker\" and the text \"No polls yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Favorite Color?\" in the field labelled \"Question\", typing \"Red\" in the first field labelled \"Choice 1\", typing \"Blue\" in the field labelled \"Choice 2\", and clicking the button \"Create poll\" adds a poll card containing \"Favorite Color?\" and two choice rows \"Red\" and \"Blue\", each with a vote count of \"0\"; the text \"No polls yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After creating the poll \"Favorite Color?\" with choices \"Red\" and \"Blue\", clicking the button \"Vote Red\" increments the vote count for \"Red\" to \"1\" and the total votes displayed for that poll to \"1\"."
+    },
+    {
+      "id": "A4",
+      "text": "After voting once for \"Red\" and once for \"Blue\" in the poll \"Favorite Color?\", the donut chart for that poll shows two segments, and the text \"Total votes: 2\" is visible."
+    },
+    {
+      "id": "A5",
+      "text": "After voting twice for \"Red\" and once for \"Blue\" in the poll \"Favorite Color?\", the bar chart for that poll shows a bar for \"Red\" with a value label \"2\" and a bar for \"Blue\" with a value label \"1\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete poll\" on the poll \"Favorite Color?\" removes that poll card from the page; if no other polls exist, the text \"No polls yet\" reappears."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"Best Fruit?\" in the field labelled \"Question\", typing \"Apple\" in the field labelled \"Choice 1\", typing \"Banana\" in the field labelled \"Choice 2\", typing \"Cherry\" in the field labelled \"Choice 3\", and clicking the button \"Create poll\" adds a poll card containing \"Best Fruit?\" and three choice rows \"Apple\", \"Banana\", and \"Cherry\", each with a vote count of \"0\"."
+    },
+    {
+      "id": "A8",
+      "text": "After creating the poll \"Best Fruit?\" with choices \"Apple\", \"Banana\", and \"Cherry\", voting once for \"Apple\" and twice for \"Banana\", the donut chart for that poll shows three segments, and the text \"Total votes: 3\" is visible."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the poll \"Favorite Color?\" with choices \"Red\" and \"Blue\" and their vote counts, and the poll \"Best Fruit?\" with choices \"Apple\", \"Banana\", and \"Cherry\" and their vote counts."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f47ed8d20cfb4f91d5706c1df48739bc8a469f9a7d721776905fbcd762c72f30"
+    }
+  ]
+}

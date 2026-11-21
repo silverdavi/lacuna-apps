@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.poll-maker",
+  "name": "Poll Maker",
+  "version": "0.1.0",
+  "summary": "Create quick polls, cast votes, and watch the results in charts.",
+  "description": "A list of small polls. Create a poll with two or three choices, cast votes, and see a donut chart of the breakdown and a bar chart of the counts. The data stays on this device.",
+  "category": "productivity",
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/poll-maker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/confirm-dialog": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:poll"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "poll",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the poll questions, choices, and vote counts"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "poll"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
