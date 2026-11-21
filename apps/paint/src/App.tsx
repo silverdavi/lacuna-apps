@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack, Title } from '@lacuna/ui'
-import { host, type PaintRecord } from './host'
+import { RangeSlider } from '@lacuna/range-slider'
+import { AppShell, Body, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { ERASER_STROKE, SKETCH_STROKE, SWATCHES } from './colors'
+import { host } from './host'
 import './app.css'
 
 const CANVAS_W = 900
@@ -14,24 +16,13 @@ function drawDefaultSketch(ctx: CanvasRenderingContext2D) {
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
   ctx.lineWidth = 10
-  ctx.strokeStyle = 'rgb(24, 24, 24)'
+  ctx.strokeStyle = SKETCH_STROKE
   ctx.beginPath()
   ctx.moveTo(40, 40)
   ctx.lineTo(160, 40)
   ctx.stroke()
   ctx.restore()
 }
-
-const SWATCHES = [
-  { label: 'Black', color: 'rgb(24, 24, 24)' },
-  { label: 'Rust', color: 'rgb(181, 80, 42)' },
-  { label: 'Indigo', color: 'rgb(74, 90, 158)' },
-  { label: 'Moss', color: 'rgb(74, 122, 90)' },
-  { label: 'Gold', color: 'rgb(201, 151, 30)' },
-  { label: 'Violet', color: 'rgb(124, 111, 232)' },
-  { label: 'Teal', color: 'rgb(46, 184, 166)' },
-  { label: 'Red', color: 'rgb(235, 61, 49)' },
-] as const
 
 type Tool = 'brush' | 'eraser'
 
@@ -70,35 +61,21 @@ export function App() {
     ctxRef.current = ctx
 
     const record = host.loadPaint()
-    if (record?.image) {
-      const img = new Image()
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(img, 0, 0)
-        const snap = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        undoStackRef.current = [snap]
-        pristineRef.current = snap
-      }
-      img.src = record.image
+    if (record?.pixels) {
+      host.applyRecordToCanvas(canvas, record)
     } else {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       drawDefaultSketch(ctx)
-      const snap = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      undoStackRef.current = [snap]
-      pristineRef.current = snap
     }
+    const snap = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    undoStackRef.current = [snap]
+    pristineRef.current = snap
   }, [])
 
   const persist = () => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const record: PaintRecord = {
-      id: 'paint-1',
-      image: canvas.toDataURL('image/png'),
-      width: canvas.width,
-      height: canvas.height,
-      savedAt: new Date().toISOString(),
-    }
+    const record = host.recordFromCanvas(canvas)
     host.savePaint(record)
   }
 
@@ -139,8 +116,8 @@ export function App() {
     if (!canvas) return null
     const rect = canvas.getBoundingClientRect()
     return {
-      x: (e.clientX - rect.left) * (canvas.width / rect.width),
-      y: (e.clientY - rect.top) * (canvas.height / rect.height),
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     }
   }
 
@@ -152,7 +129,7 @@ export function App() {
     ctx.lineWidth = sizeRef.current
     if (toolRef.current === 'eraser') {
       ctx.globalCompositeOperation = 'destination-out'
-      ctx.strokeStyle = 'rgb(0, 0, 0)'
+      ctx.strokeStyle = ERASER_STROKE
     } else {
       ctx.globalCompositeOperation = 'source-over'
       ctx.strokeStyle = colorRef.current
@@ -222,7 +199,14 @@ export function App() {
   }, [])
 
   return (
-    <main className="paint-app">
+    <AppShell
+      name="Paint"
+      icon="paint"
+      hue="rust"
+      category="Productivity"
+      meta="Local · no network"
+      status="Saved on this device"
+    >
       <Card flush>
         <Stack>
           <div className="paint-canvas-wrap">
@@ -239,11 +223,7 @@ export function App() {
               onPointerCancel={onPointerUp}
             />
           </div>
-          <div className="paint-head">
-            <MonoLabel sm>Studio</MonoLabel>
-            <Title size="md">Paint</Title>
-          </div>
-          <Body>
+          <Body sm>
             Pick a brush, a color, and a size. Draw with the mouse, a pen, or a finger. Undo a mistake, clear the
             surface, and export a PNG. The drawing survives a reload.
           </Body>
@@ -282,22 +262,7 @@ export function App() {
                 ))}
               </div>
             </div>
-            <label className="paint-size">
-              Size
-              <input
-                type="range"
-                min={MIN}
-                max={MAX}
-                step={1}
-                value={size}
-                aria-valuenow={size}
-                aria-valuemin={MIN}
-                aria-valuemax={MAX}
-                aria-label="Size"
-                onChange={(e) => setSize(Number(e.target.value))}
-              />
-              <span aria-hidden>{size}</span>
-            </label>
+            <RangeSlider label="Size" value={size} onChange={setSize} min={MIN} max={MAX} step={1} />
             <div className="paint-actions">
               <Button onClick={undo}>Undo</Button>
               <Button onClick={redo}>Redo</Button>
@@ -309,6 +274,6 @@ export function App() {
           </div>
         </Stack>
       </Card>
-    </main>
+    </AppShell>
   )
 }

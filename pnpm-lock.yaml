@@ -849,6 +849,12 @@ importers:
 
   apps/paint:
     dependencies:
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/range-slider':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/range-slider/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox

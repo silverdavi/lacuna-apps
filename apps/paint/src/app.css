@@ -69,25 +69,6 @@
   outline-offset: calc(1px * var(--sf));
 }
 
-.paint-size {
-  display: flex;
-  align-items: center;
-  gap: calc(8px * var(--sf));
-  font-family: var(--mono);
-  font-size: calc(10px * var(--tf));
-  color: var(--ink);
-}
-
-.paint-size input[type='range'] {
-  width: calc(100px * var(--sf));
-  accent-color: var(--accent);
-}
-
-.paint-size input[type='range']:focus-visible {
-  outline: calc(2px * var(--sf)) solid var(--accent);
-  outline-offset: calc(1px * var(--sf));
-}
-
 .paint-actions {
   display: flex;
   align-items: center;

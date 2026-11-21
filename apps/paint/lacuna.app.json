@@ -33,6 +33,8 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0"
     }
