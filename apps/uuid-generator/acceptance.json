@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "dc64e4cce15ad4d28b10ff1a98ea456720edd93e7a111c8bd36c1a8511121ac3",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"UUID Generator\" and the text \"No IDs generated yet\" in the history section."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting \"v4\" in the dropdown labelled \"Version\" and clicking the button \"Generate\" adds a list item in the history section containing a 36-character string matching the pattern `[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}`; the text \"No IDs generated yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "Selecting \"v1\" in the dropdown labelled \"Version\" and clicking the button \"Generate\" adds a list item containing a 36-character string where the 13th character (version digit) is \"1\" and the 17th character (variant digit) is one of \"8\", \"9\", \"a\", or \"b\"."
+    },
+    {
+      "id": "A4",
+      "text": "Entering \"5\" in the field labelled \"Batch size\" and clicking the button \"Generate\" adds exactly 5 new list items to the history section, each with a unique 36-character UUID."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Copy all\" copies the text of all current history items to the clipboard, separated by newlines, and the button label changes to \"Copied\" for 2 seconds before reverting to \"Copy all\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Clear history\" removes all list items from the history section and displays the text \"No IDs generated yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "Selecting \"v4\" in the dropdown labelled \"Version\", clicking \"Generate\" to add one item, then reloading the page still shows that same UUID string in the history section."
+    },
+    {
+      "id": "A8",
+      "text": "After generating one v4 UUID, clicking the button \"Delete <first 8 chars of UUID>\" removes that specific item from the history section; if it was the only item, the text \"No IDs generated yet\" reappears."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1fc526d26313caeebdde66a6af7745ce6cfe5202327bdc46f3b6aac422f2db65"
+    }
+  ]
+}

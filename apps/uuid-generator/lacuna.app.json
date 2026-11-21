@@ -1,0 +1,85 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.uuid-generator",
+  "name": "UUID Generator",
+  "version": "0.1.0",
+  "summary": "Generate v1 and v4 UUIDs, one or a batch at a time.",
+  "description": "Pick a version and a batch size, press Generate, and keep the result on this page. Copy all, clear, or delete any ID. The history is stored on this device and survives reloads.",
+  "category": "productivity",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/uuid-generator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:settings"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "settings",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the generated UUID history on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "settings"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
