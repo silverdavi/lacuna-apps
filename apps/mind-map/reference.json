@@ -1,0 +1,20 @@
+{
+  "repo": "anteriovieira/vue-mindmap",
+  "url": "https://github.com/anteriovieira/vue-mindmap",
+  "sha": "89dfcd08dc527ee1132acd8c9028d729b895de80",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2018 Ant\u00e9rio vieira"
+  ],
+  "files": [
+    "src/index.js",
+    "src/Mindmap.js",
+    "src/parser/emojis.js",
+    "src/parser/regex.js",
+    "src/utils/dimensions.js",
+    "src/utils/nodeToHTML.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "8a8a69761a1cba6a177c8e8f25a67ca9fe6e09397ce888af28b4a6cff4640be7"
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "9cd2fcd8721b5ec7adf4d267146c6f3371612c8c8bcf11b42252542b192d4e72",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Mind Map\" and the toolbar contains buttons labeled \"Add Node\", \"Connect\", \"Brush\", \"Eraser\", \"Export PNG\", and \"Auto Layout\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add Node\" creates a new node on the canvas with the default label \"New Idea\" and a unique ID visible in the node's title attribute."
+    },
+    {
+      "id": "A3",
+      "text": "Double-clicking a node with the label \"New Idea\" and typing \"Strategy\" then pressing Enter changes the node's visible text to \"Strategy\"."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting the \"Connect\" tool, clicking a node labeled \"Strategy\", then clicking a node labeled \"Goal\" creates a visible edge between them; the status bar shows \"1 connection\"."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting the \"Brush\" tool, drawing a stroke on the canvas, and then clicking the button \"Export PNG\" triggers a file download with the name \"mind-map.png\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Auto Layout\" rearranges the nodes so that no two nodes overlap, and the status bar shows \"Layout updated\"."
+    },
+    {
+      "id": "A7",
+      "text": "Selecting a node labeled \"Strategy\" and pressing the Delete key removes the node and any connected edges; the status bar shows \"0 connections\" if it was the only connected node."
+    },
+    {
+      "id": "A8",
+      "text": "Changing the brush size slider to \"5\" and drawing a stroke results in a line with a width of 5 pixels, verifiable by inspecting the canvas element's data attributes."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the node labeled \"Strategy\" and the edge connecting it to \"Goal\" visible on the canvas."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ad7ed6505205c1e70287267b556e99dd400eb50c2bef4841b7d5c56a5184aee2"
+    }
+  ]
+}
