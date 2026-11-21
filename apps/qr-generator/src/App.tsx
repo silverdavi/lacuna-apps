@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 import { Body, Button, Card, Stack } from '@lacuna/ui'
 import { host } from './host'
 import type { CorrectionLevel } from './host'
-import { encodeQr, toSvgMarkup } from './qr'
+import { encodeQr, qrFileName, toSvgMarkup } from './engine'
 
 const LEVELS: CorrectionLevel[] = ['L', 'M', 'Q', 'H']
 const TOOLTIP_MS = 2000
@@ -83,7 +83,7 @@ export function App() {
     const blob = new Blob([generated.svg], { type: 'image/svg+xml' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.download = `qr-${generated.content.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'code'}.svg`
+    link.download = qrFileName(generated.content)
     link.href = url
     document.body.appendChild(link)
     link.click()
