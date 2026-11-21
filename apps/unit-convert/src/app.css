@@ -1,7 +1,8 @@
-/* App-level overrides. The shared kit's inactive tabs and faint labels fall
-   below the WCAG AA contrast floor, so this app lifts them to var(--ink-60).
-   Selectors are written more specific than the kit's compound classes so the
-   lift wins the cascade. */
+/* App-level overrides for unit-convert. The shared kit's inactive tabs and
+   faint labels fall below the WCAG AA contrast floor, so this app lifts them to
+   var(--ink-60). Selectors are written more specific than the kit's compound
+   classes so the lift wins the cascade. All lengths use the calc(Npx * var)
+   form the hex/px lint allows. */
 
 main .lc-tab {
   color: var(--ink-60);
@@ -24,4 +25,242 @@ main ul li > button {
   display: block;
   width: 100%;
   text-align: left;
+}
+
+/* ------------------------------------------------------------- window */
+.uc-shell {
+  min-height: calc(100% * 1);
+  background:
+    radial-gradient(var(--hair) calc(1px * var(--sf)), transparent 0) 0 0 /
+      calc(22px * var(--sf)) calc(22px * var(--sf)),
+    var(--paper);
+}
+
+.uc-topbar {
+  height: calc(52px * var(--sf));
+}
+
+.uc-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(28px * var(--sf));
+  padding: 0 calc(12px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(4px * var(--sf));
+  background: var(--ui-card);
+  transition: border-color 160ms var(--zoom-rect-ease), background 160ms var(--zoom-rect-ease);
+}
+
+.uc-status.saved {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.uc-status .lc-mono {
+  color: var(--ink-60);
+}
+
+.uc-status.saved .lc-mono {
+  color: var(--accent);
+}
+
+.uc-page {
+  padding-top: calc(28px * var(--sf));
+}
+
+.uc-cardcount {
+  margin-left: auto;
+}
+
+.uc-cardcount .lc-mono {
+  color: var(--ink-60);
+}
+
+/* ------------------------------------------------------------- tabs */
+.uc-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(6px * var(--sf));
+  padding: calc(4px * var(--sf));
+  background: var(--ui-bg);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(6px * var(--sf));
+}
+
+.uc-tab {
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink-60);
+  background: transparent;
+  border: calc(1px * var(--sf)) solid transparent;
+  border-radius: calc(4px * var(--sf));
+  padding: 0 calc(14px * var(--sf));
+  min-height: calc(44px * var(--sf));
+  cursor: pointer;
+  transition: color 140ms var(--zoom-rect-ease), background 140ms var(--zoom-rect-ease),
+    border-color 140ms var(--zoom-rect-ease);
+}
+
+.uc-tab:hover {
+  color: var(--ink);
+  background: var(--accent-soft);
+}
+
+.uc-tab:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}
+
+.uc-tab.on {
+  color: var(--ink);
+  background: var(--ui-card);
+  border-color: var(--ink-40);
+  box-shadow: var(--shadow);
+}
+
+/* ------------------------------------------------------------- fields */
+.uc-fieldrow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: calc(10px * var(--sf));
+}
+
+.uc-fieldrow .lc-field {
+  min-width: 0;
+}
+
+.uc-fieldrow .lc-input {
+  min-height: calc(44px * var(--sf));
+  font-size: calc(15px * var(--tf));
+}
+
+.uc-swap {
+  display: inline-flex;
+  align-items: flex-end;
+  padding-bottom: calc(2px * var(--sf));
+}
+
+.uc-swap .lc-btn {
+  min-height: calc(44px * var(--sf));
+  min-width: calc(120px * var(--sf));
+}
+
+/* ------------------------------------------------------------- error */
+.uc-error {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  padding: calc(10px * var(--sf)) calc(12px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--danger);
+  border-left-width: calc(3px * var(--sf));
+  border-radius: calc(4px * var(--sf));
+  background: color-mix(in srgb, var(--danger) 9%, var(--ui-card));
+}
+
+.uc-error .lc-mono {
+  color: var(--danger);
+}
+
+/* ------------------------------------------------------------- kpis */
+.uc-shell .lc-kpirow {
+  padding: calc(14px * var(--sf));
+  background: var(--ui-bg);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(6px * var(--sf));
+}
+
+/* ------------------------------------------------------------- actions */
+.uc-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--sf));
+}
+
+.uc-save .lc-btn {
+  min-height: calc(44px * var(--sf));
+  min-width: calc(180px * var(--sf));
+}
+
+.uc-saved {
+  display: inline-flex;
+  align-items: center;
+  animation: uc-pulse 160ms var(--zoom-rect-ease);
+}
+
+.uc-saved .lc-mono {
+  color: var(--accent);
+}
+
+@keyframes uc-pulse {
+  from {
+    opacity: 0;
+    transform: translateY(calc(2px * var(--sf)));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------- recents */
+.uc-recents-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(10px * var(--sf));
+  margin-bottom: calc(10px * var(--sf));
+}
+
+.uc-recents-head .lc-mono {
+  color: var(--ink-60);
+}
+
+.uc-clear .lc-btn {
+  min-height: calc(40px * var(--sf));
+}
+
+.uc-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uc-recent-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--ui-card);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(4px * var(--sf));
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  min-height: calc(44px * var(--sf));
+  cursor: pointer;
+  transition: border-color 140ms var(--zoom-rect-ease), background 140ms var(--zoom-rect-ease);
+}
+
+.uc-recent-item:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.uc-recent-item:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}
+
+/* ------------------------------------------------------------- narrow */
+@media (max-width: calc(640px * var(--sf))) {
+  .uc-fieldrow {
+    grid-template-columns: 1fr;
+  }
+
+  .uc-swap {
+    justify-self: start;
+  }
 }
