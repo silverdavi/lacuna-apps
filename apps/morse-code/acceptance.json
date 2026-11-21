@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d794a14893bc09d983d5755ef7c2ed66a91636e351113dd8f1a9be9c9061abd7",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Morse Code Translator\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"SOS\" in the input pane and clicking the button \"Convert\" shows \"\u2026\u2013\u2013 \u2026\u2013\u2013 \u2026\u2013\u2013\" in the output pane."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Swap\" moves \"\u2026\u2013\u2013 \u2026\u2013\u2013 \u2026\u2013\u2013\" to the input pane and \"SOS\" to the output pane."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"HELLO\" in the input pane and clicking \"Convert\" shows \"\u2026\u2026 .\u2013. .\u2013. \u2013\u2013\u2013\" in the output pane."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"123\" in the input pane and clicking \"Convert\" shows \"\u2013\u2013\u2013\u2013\u2013 \u2013\u2013\u2013\u2013\u2013 \u2026\u2013\u2013\u2013\u2013\" in the output pane."
+    },
+    {
+      "id": "A6",
+      "text": "After converting \"SOS\", clicking the button \"Copy\" copies \"\u2026\u2013\u2013 \u2026\u2013\u2013 \u2026\u2013\u2013\" to the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "After converting \"SOS\" and \"HELLO\", the history list shows two items containing \"SOS\" and \"HELLO\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear history\" removes all items from the history list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history items \"SOS\" and \"HELLO\" visible in the history list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "747ab3fce44d91fb1c30f3fd752c92d210a217d47b40638546f36a73de2d4ae1"
+    }
+  ]
+}
