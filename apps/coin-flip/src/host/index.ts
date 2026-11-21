@@ -8,12 +8,14 @@ export type FlipState = {
   side: Side
   streak: number
   best: number
+  history: Side[]
 }
 
 export const initialState = (): FlipState => ({
   side: 'Tails',
   streak: 0,
   best: 0,
+  history: [],
 })
 
 const KEY = 'lacuna.coin-flip.state'
@@ -21,6 +23,9 @@ const KEY = 'lacuna.coin-flip.state'
 export function isValidState(value: unknown): value is FlipState {
   if (!value || typeof value !== 'object') return false
   const v = value as Record<string, unknown>
+  const historyOk =
+    Array.isArray(v.history) &&
+    v.history.every((s) => s === 'Heads' || s === 'Tails')
   return (
     (v.side === 'Heads' || v.side === 'Tails') &&
     typeof v.streak === 'number' &&
@@ -28,6 +33,7 @@ export function isValidState(value: unknown): value is FlipState {
     v.streak >= 0 &&
     typeof v.best === 'number' &&
     Number.isFinite(v.best) &&
-    v.best >= 0
+    v.best >= 0 &&
+    historyOk
   )
 }

@@ -3,10 +3,10 @@
   "id": "lacuna.coin-flip",
   "name": "Coin Flip",
   "version": "0.1.0",
-  "summary": "Flip a coin, watch the streak, keep the best.",
-  "description": "Flip a virtual coin to make a quick decision. The card shows the result, the streak counts matching flips, and the best streak is remembered. Nothing leaves the browser.",
+  "summary": "Flip a coin or roll a die, track streaks, and keep the best.",
+  "description": "Flip a virtual coin or roll a six-sided die to break a tie. The result card shows the face, the streak counts matching flips, and the best streak is remembered across sessions. A history tab lists every flip with a running streak, and you can copy or export the log. Nothing leaves the browser.",
   "category": "personal",
-  "tags": ["random", "decisions", "streaks"],
+  "tags": ["random", "decisions", "streaks", "coin", "die"],
   "icon": "grid",
   "relationship": {
     "kind": "standalone"
@@ -33,11 +33,16 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
-      "@lacuna/host-mock": "0.1.0"
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
     }
   },
   "capabilities": [
-    "create:flip"
+    "create:flip",
+    "view:history-table",
+    "export:flip-log",
+    "view:coin-vs-die"
   ],
   "permissions": {
     "records": [
@@ -48,7 +53,7 @@
           "write",
           "create"
         ],
-        "purpose": "Store the latest flip, the current streak, and the best streak"
+        "purpose": "Store the latest flip, the current streak, the best streak, and the full flip history"
       }
     ],
     "platform": [],
