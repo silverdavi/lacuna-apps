@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "0eac81df57d4e283c44866f33a8080d26141dcd3970126f6bd1e1889c530e0cc",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no applications, the page shows the heading \"Job Application Tracker\", the text \"No applications yet\", and the button \"Add application\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Company\" with \"Acme Corp\", the field labelled \"Role\" with \"Software Engineer\", choosing \"Applied\" in the select labelled \"Status\", and clicking the button \"Add application\" adds a row containing \"Acme Corp\" and \"Software Engineer\"; the text \"No applications yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding an application for \"Beta Inc\" with Role \"Product Manager\" and Status \"Interview\", clicking the column header \"Status\" sorts the table so the row for \"Beta Inc\" appears before the row for \"Acme Corp\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Acme\" in the input field labelled \"Search\" filters the table to show only the row containing \"Acme Corp\"; the row for \"Beta Inc\" is not visible."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the filter chip labelled \"Interview\" shows only the row for \"Beta Inc\"; clicking the chip again clears the filter and both rows are visible."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Edit\" on the row for \"Acme Corp\" opens a form where the field labelled \"Status\" is pre-filled with \"Applied\"; changing it to \"Rejected\" and clicking \"Save\" updates the row to show \"Rejected\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete\" on the row for \"Beta Inc\" removes that row from the table; only the row for \"Acme Corp\" remains."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" downloads a file named \"applications.csv\" containing the header row \"Company,Role,Status,Interview Date\" and a data row starting with \"Acme Corp\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the application for \"Acme Corp\" with Role \"Software Engineer\" and Status \"Rejected\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c051780eb3a7a0bede9131c005c5f8b539ef90d478d11f0d937918882bd7956a"
+    }
+  ]
+}
