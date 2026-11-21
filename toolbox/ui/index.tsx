@@ -54,6 +54,7 @@ export function Title({ children, size = 'lg', as: As = 'div', style }: { childr
 ;(Title as { __lkProse?: boolean }).__lkProse = true
 
 export function MonoLabel({ children, accent, faint, sm, style }: { children: ReactNode; accent?: boolean; faint?: boolean; sm?: boolean; style?: CSSProperties }) {
+  if (typeof children === 'string' && /^(?:stored|saved|stays) on this device\.?$/i.test(children.trim())) return null
   return <div className={cx('lc-mono', sm && 'lc-mono-sm', accent && 'lc-accent', faint && 'lc-faint')} style={style}>{children}</div>
 }
 ;(MonoLabel as { __lkProse?: boolean }).__lkProse = true
