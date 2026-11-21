@@ -1,0 +1,61 @@
+.loan-app {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16px * var(--sf));
+  padding: calc(16px * var(--sf));
+  font-family: var(--sans);
+  color: var(--ink);
+}
+
+.loan-heading {
+  font-family: var(--serif);
+  font-size: calc(22px * var(--tf));
+  margin: 0;
+}
+
+.loan-form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+.loan-error {
+  font-size: calc(13.5px * var(--tf));
+  color: var(--accent);
+}
+
+.loan-summary {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+.lc-value {
+  font-family: var(--mono);
+  font-size: calc(14px * var(--tf));
+  color: var(--ink);
+  min-height: 1em;
+}
+
+.loan-actions {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+.loan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(13.5px * var(--tf));
+}
+
+.loan-table th,
+.loan-table td {
+  border: 0.0625rem solid var(--mid);
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  text-align: left;
+}
+
+.loan-table .num {
+  text-align: right;
+  font-family: var(--mono);
+}
