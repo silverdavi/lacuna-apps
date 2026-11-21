@@ -4,7 +4,7 @@
   "name": "BMI Calculator",
   "version": "0.1.0",
   "summary": "Enter your height and weight to calculate your BMI and see which category you fall into.",
-  "description": "A body-mass-index calculator. Pick metric or imperial, enter height and weight, and get your BMI, its category, a category breakdown, and a visual of where you fall. The last calculation is kept in the space so it is still there after a reload. Nothing leaves the browser.",
+  "description": "A body-mass-index calculator. Pick metric or imperial, enter height and weight, and get your BMI, its category, a category breakdown, and a visual of where you fall. The last calculation is kept in the space so it is still there after a reload, with a history of your last calculations you can compare and clear. Copy a result to the clipboard or export everything as JSON. Nothing leaves the browser.",
   "category": "healthcare",
   "tags": ["bmi", "health", "calculator"],
   "icon": "clinic",
@@ -34,13 +34,17 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/export-menu": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
-    "create:bmi"
+    "create:bmi",
+    "view:bmi",
+    "export:bmi"
   ],
   "permissions": {
     "records": [
@@ -49,9 +53,10 @@
         "access": [
           "read",
           "write",
-          "create"
+          "create",
+          "delete"
         ],
-        "purpose": "Store the last BMI calculation"
+        "purpose": "Store the last BMI calculation and a history of your calculations"
       }
     ],
     "platform": [
