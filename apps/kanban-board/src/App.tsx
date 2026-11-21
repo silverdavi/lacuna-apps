@@ -5,7 +5,8 @@ import {
   AppShell,
   Button,
   Card,
-  Divider,
+  EmptyState,
+  Rail,
   Stack,
   TextInput,
 } from '@lacuna/ui'
@@ -27,6 +28,12 @@ const COLUMNS: { id: ColumnId; title: string }[] = [
   { id: 'todo', title: 'To Do' },
   { id: 'doing', title: 'In Progress' },
   { id: 'done', title: 'Done' },
+]
+
+const SAMPLE_CARDS: CardRec[] = [
+  { id: 'kb-sample-1', title: 'Plan sprint', column: 'todo' },
+  { id: 'kb-sample-2', title: 'Write user stories', column: 'doing' },
+  { id: 'kb-sample-3', title: 'Draft release notes', column: 'done' },
 ]
 
 const store = createMockRecordStore<CardRec>({
@@ -63,7 +70,6 @@ function CardEditor({
     <Stack>
       <TextInput label="Title" value={title} onChange={setTitle} placeholder="What needs doing?" />
       <TextInput label="Column" value={column} onChange={(v) => setColumn(v as ColumnId)} />
-      <Divider />
       <Stack>
         <Button
           kind="primary"
@@ -134,6 +140,11 @@ export function App() {
     setDragFrom(null)
   }
 
+  const byColumn = (id: ColumnId) => cards.filter((c) => c.column === id)
+  const todoCount = byColumn('todo').length
+  const doingCount = byColumn('doing').length
+  const doneCount = byColumn('done').length
+
   return (
     <AppShell
       name="Kanban Board"
@@ -142,15 +153,29 @@ export function App() {
       category="Productivity"
       meta={`${cards.length} cards`}
       status={copied ? 'Copied to clipboard' : 'Local · no network'}
+      side={
+        <Rail
+          title="Kanban Board"
+          note="Three columns · drag to move"
+          chips={[`${cards.length} cards total`, `${todoCount} to do`, `${doingCount} in progress`, `${doneCount} done`]}
+        />
+      }
       actions={
         <Button kind="secondary" ariaLabel="Export JSON" onClick={() => void copy(JSON.stringify(cards))}>
           Export JSON
         </Button>
       }
     >
-      <Stack>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          gap: 'calc(8px * var(--sf))',
+          alignItems: 'start',
+        }}
+      >
         {COLUMNS.map((col) => {
-          const colCards = cards.filter((c) => c.column === col.id)
+          const colCards = byColumn(col.id)
           const open = editing !== null && editing.column === col.id
           const editingCard =
             open && editing !== null && editing.cardId !== undefined
@@ -175,6 +200,9 @@ export function App() {
                     <span>{col.title}</span>
                     <span aria-hidden="true">{colCards.length}</span>
                   </h2>
+                  {colCards.length === 0 && !open ? (
+                    <EmptyState mono="Empty" title="No cards yet" detail={`Nothing in ${col.title}. Add a card to get started.`} />
+                  ) : null}
                   {colCards.map((c) => (
                     <div
                       key={c.id}
@@ -193,11 +221,11 @@ export function App() {
                         onClick={() => openCard(col.id, c.id)}
                         style={{
                           background: 'none',
-                           border: 'thin solid var(--ui-line2)',
-                          borderRadius: 'calc(6px * var(--sf))',
+                          border: 'thin solid var(--ui-line2)',
+                          borderRadius: 'calc(2px * var(--sf))',
                           padding: 'calc(8px * var(--sf)) calc(10px * var(--sf))',
-                          fontFamily: 'inherit',
-                          fontSize: 'calc(14px * var(--tf))',
+                          fontFamily: 'var(--sans)',
+                          fontSize: 'calc(13px * var(--tf))',
                           color: 'var(--ink)',
                           cursor: 'grab',
                         }}
@@ -242,7 +270,7 @@ export function App() {
             </Card>
           )
         })}
-      </Stack>
+      </div>
     </AppShell>
   )
 }
