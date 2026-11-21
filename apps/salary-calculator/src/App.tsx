@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Kpi, KpiRow, List, Rail, Row, Table, TextInput } from '@lacuna/ui'
 import { add, format, sub, toMinorUnits } from '@lacuna/money'
 import { useLocalRecord } from '@lacuna/use-local-record'
 
@@ -58,87 +59,56 @@ function computeResult(state: StoredState) {
   return { grossMinor, rows, totalDeduction, netMinor }
 }
 
+// One token hue per segment: net pay first, then the deductions in table order.
+const SEGMENT_HUES = ['var(--geo-green)', 'var(--geo-verm)', 'var(--geo-cobalt)', 'var(--geo-gold)']
+
 function DonutChart({ result }: { result: ReturnType<typeof computeResult> }) {
-  const segments = [
-    { label: 'Net Pay', minor: result.netMinor },
-    ...result.rows,
-  ]
+  const segments = [{ label: 'Net Pay', minor: result.netMinor }, ...result.rows]
   const total = segments.reduce((acc, s) => add(acc, s.minor), 0)
-  const size = 200
-  const cx = size / 2
-  const cy = size / 2
-  const outerR = 84
-  const innerR = 52
+  const size = 168
+  const c = size / 2
+  const outerR = 80
+  const innerR = 50
   let angle = 0
-  const donutSegments = total > 0 ? segments.filter((s) => s.minor > 0).map((s) => {
-    const sweep = (s.minor / total) * 360
+  const arcs = segments.map((s, i) => {
+    const sweep = total > 0 ? (s.minor / total) * 360 : 0
     const a0 = ((angle - 90) * Math.PI) / 180
     const a1 = ((angle + sweep - 90) * Math.PI) / 180
     angle += sweep
-    const x0 = cx + outerR * Math.cos(a0)
-    const y0 = cy + outerR * Math.sin(a0)
-    const x1 = cx + outerR * Math.cos(a1)
-    const y1 = cy + outerR * Math.sin(a1)
-    const xi1 = cx + innerR * Math.cos(a1)
-    const yi1 = cy + innerR * Math.sin(a1)
-    const xi0 = cx + innerR * Math.cos(a0)
-    const yi0 = cy + innerR * Math.sin(a0)
+    const pt = (r: number, a: number) => `${c + r * Math.cos(a)} ${c + r * Math.sin(a)}`
     const large = sweep > 180 ? 1 : 0
-    const d = total === s.minor
-      ? `M ${cx + outerR} ${cy} A ${outerR} ${outerR} 0 1 1 ${cx - outerR} ${cy} A ${outerR} ${outerR} 0 1 1 ${cx + outerR} ${cy} Z M ${cx + innerR} ${cy} A ${innerR} ${innerR} 0 1 0 ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 1 0 ${cx + innerR} ${cy} Z`
-      : `M ${x0} ${y0} A ${outerR} ${outerR} 0 ${large} 1 ${x1} ${y1} L ${xi1} ${yi1} A ${innerR} ${innerR} 0 ${large} 0 ${xi0} ${yi0} Z`
-    return { ...s, d, percent: Math.round((s.minor / total) * 100) }
-  }) : []
+    const d = sweep >= 360
+      ? `M ${c + outerR} ${c} A ${outerR} ${outerR} 0 1 1 ${c - outerR} ${c} A ${outerR} ${outerR} 0 1 1 ${c + outerR} ${c} Z M ${c + innerR} ${c} A ${innerR} ${innerR} 0 1 0 ${c - innerR} ${c} A ${innerR} ${innerR} 0 1 0 ${c + innerR} ${c} Z`
+      : `M ${pt(outerR, a0)} A ${outerR} ${outerR} 0 ${large} 1 ${pt(outerR, a1)} L ${pt(innerR, a1)} A ${innerR} ${innerR} 0 ${large} 0 ${pt(innerR, a0)} Z`
+    return { ...s, d, hue: SEGMENT_HUES[i % SEGMENT_HUES.length], percent: total > 0 ? Math.round((s.minor / total) * 100) : 0 }
+  })
   return (
     <div style={{ display: 'flex', gap: 'calc(24px * var(--sf))', alignItems: 'center', flexWrap: 'wrap' }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Pay composition">
-        <g fillRule="evenodd" fill="var(--ink)">
-          {donutSegments.map((seg, i) => (
-            <path key={seg.label} d={seg.d} opacity={i === 0 ? 1 : 0.45 - Math.min(i - 1, 3) * 0.1} />
-          ))}
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Pay composition" style={{ flex: 'none' }}>
+        <g fillRule="evenodd" stroke="var(--ink)" strokeWidth={1}>
+          {arcs.filter((a) => a.minor > 0).map((a) => <path key={a.label} d={a.d} fill={a.hue} />)}
         </g>
       </svg>
-      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'calc(8px * var(--sf))' }}>
-        {segments.map((s, i) => (
-          <li
-            key={s.label}
-            role="listitem"
-            style={{ display: 'flex', alignItems: 'center', gap: 'calc(10px * var(--sf))', fontSize: 'calc(13px * var(--tf))' }}
-          >
-            <span
-              aria-hidden
-              style={{
-                width: 'calc(12px * var(--sf))',
-                height: 'calc(12px * var(--sf))',
-                borderRadius: 'calc(3px * var(--sf))',
-                background: 'var(--ink)',
-                opacity: i === 0 ? 1 : 0.45 - Math.min(i - 1, 3) * 0.1,
-                display: 'inline-block',
-              }}
+      <div style={{ flex: '1 1 calc(220px * var(--sf))', minWidth: 0 }}>
+        <List label="Pay composition">
+          {arcs.map((a) => (
+            <Row
+              key={a.label}
+              title={
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
+                  <span aria-hidden style={{ width: 'calc(10px * var(--sf))', height: 'calc(10px * var(--sf))', background: a.hue, border: 'calc(1px * var(--sf)) solid var(--ink)', flex: 'none' }} />
+                  {a.label}
+                </span>
+              }
+              meta={`${a.percent}% of gross`}
+              value={format(a.minor)}
             />
-            <span>{s.label}</span>
-            <span style={{ fontFamily: 'var(--mono)', color: 'var(--ink-60)' }}>{format(s.minor)}</span>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </List>
+      </div>
     </div>
   )
 }
-
-const inputStyle = {
-  font: 'inherit',
-  fontSize: 'calc(14px * var(--tf))',
-  color: 'var(--ink)',
-  background: 'var(--paper)',
-  borderWidth: 'calc(1px * var(--sf))',
-  borderStyle: 'solid' as const,
-  borderColor: 'var(--hair-strong)',
-  borderRadius: 'calc(4px * var(--sf))',
-  padding: 'calc(8px * var(--sf)) calc(12px * var(--sf))',
-  width: 'calc(140px * var(--sf))',
-}
-
-const labelStyle = { fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)', display: 'block', marginBottom: 'calc(4px * var(--sf))' }
 
 export function App() {
   const { value, set } = useLocalRecord<StoredState>({
@@ -153,8 +123,7 @@ export function App() {
   }
 
   function onNumberChange(field: 'gross' | DeductionId) {
-    return (event: React.ChangeEvent<HTMLInputElement>) => {
-      const text = event.target.value
+    return (text: string) => {
       if (text === '') {
         patch({ [field]: null })
         return
@@ -191,113 +160,58 @@ export function App() {
   const result = active ? computeResult(value) : computeResult(DEFAULT_STATE)
   const grossForCalc = active ? (value.gross ?? 0) : 0
 
+  const field = (id: 'gross' | DeductionId) => (value[id] === null ? '' : String(value[id]))
+
   return (
-    <main style={{ display: 'block', width: '100%', maxWidth: 'calc(760px * var(--sf))', margin: '0 auto', padding: 'calc(24px * var(--sf))' }}>
-      <h1 style={{ font: '600 calc(24px * var(--tf)) var(--sans)', color: 'var(--ink)', margin: '0 0 calc(4px * var(--sf))' }}>
-        Salary Calculator
-      </h1>
-      <p style={{ margin: '0 0 calc(24px * var(--sf))', fontSize: 'calc(14px * var(--tf))', color: 'var(--ink-60)' }}>
-        Enter your gross annual salary and standard deductions to see your net pay.
-      </p>
+    <AppShell
+      name="Salary Calculator"
+      icon="payroll"
+      hue="green"
+      category="Finance"
+      meta="Annual · USD"
+      status={active ? 'Last calculation saved on this device' : 'Nothing calculated yet'}
+      side={
+        <Rail title="Net pay" note="Gross minus deductions" chips={['Federal 25% by default', 'State tax', 'Other deductions', 'Saved on this device']}>
+          Leave Federal Tax empty to use 25% of gross. Amounts are whole dollars per year.
+        </Rail>
+      }
+    >
+      <Card mono="Input" title="Salary and deductions">
+        <FormGrid>
+          <TextInput label="Gross Annual Salary" inputMode="numeric" value={field('gross')} onChange={onNumberChange('gross')} error={error} />
+          {DEDUCTION_FIELDS.map((f) => (
+            <TextInput key={f.id} label={f.label} inputMode="numeric" value={field(f.id)} onChange={onNumberChange(f.id)} />
+          ))}
+        </FormGrid>
+        <Actions>
+          <Button kind="primary" onClick={calculate}>Calculate</Button>
+        </Actions>
+      </Card>
 
-      <section
-        aria-label="Inputs"
-        style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(16px * var(--sf))', alignItems: 'flex-end', marginBottom: 'calc(8px * var(--sf))' }}
-      >
-        <label style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={labelStyle}>Gross Annual Salary</span>
-          <input
-            aria-label="Gross Annual Salary"
-            inputMode="numeric"
-            value={value.gross === null ? '' : String(value.gross)}
-            onChange={onNumberChange('gross')}
-            style={inputStyle}
-          />
-        </label>
-        {DEDUCTION_FIELDS.map((field) => (
-          <label key={field.id} style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={labelStyle}>{field.label}</span>
-            <input
-              aria-label={field.label}
-              inputMode="numeric"
-              value={value[field.id] === null ? '' : String(value[field.id])}
-              onChange={onNumberChange(field.id)}
-              style={inputStyle}
-            />
-          </label>
-        ))}
-        <button
-          type="button"
-          onClick={calculate}
-          style={{
-            font: '600 calc(14px * var(--tf)) var(--sans)',
-            color: 'var(--paper)',
-            background: 'var(--ink)',
-            border: 'none',
-            borderRadius: 'calc(4px * var(--sf))',
-            padding: 'calc(9px * var(--sf)) calc(18px * var(--sf))',
-            cursor: 'pointer',
-          }}
-        >
-          Calculate
-        </button>
-      </section>
-
-      {error !== null && (
-        <p role="alert" style={{ margin: '0 0 calc(16px * var(--sf))', color: 'var(--danger)', fontSize: 'calc(13px * var(--tf))' }}>
-          {error}
-        </p>
-      )}
-
-      <section
-        aria-label="Result"
-        style={{ border: 'calc(1px * var(--sf)) solid var(--hair-strong)', borderRadius: 'calc(8px * var(--sf))', padding: 'calc(16px * var(--sf))', marginBottom: 'calc(16px * var(--sf))' }}
-      >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 'calc(16px * var(--sf))', flexWrap: 'wrap', marginBottom: 'calc(16px * var(--sf))' }}>
-          <span style={{ font: '600 calc(20px * var(--tf)) var(--sans)', color: 'var(--ink)' }}>
-            Net Pay: {format(result.netMinor)}
-          </span>
-          <span style={{ fontSize: 'calc(13px * var(--tf))', color: 'var(--ink-60)', fontFamily: 'var(--mono)' }}>
-            Gross: {format(result.grossMinor)}
-          </span>
-        </div>
-        {grossForCalc > 0 && <DonutChart result={result} />}
-      </section>
-
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'calc(14px * var(--tf))', color: 'var(--ink)' }}>
-        <thead>
-          <tr>
-            <th style={{ textAlign: 'left', padding: 'calc(8px * var(--sf))', borderBottom: 'calc(1px * var(--sf)) solid var(--hair-strong)' }}>Deduction</th>
-            <th style={{ textAlign: 'right', padding: 'calc(8px * var(--sf))', borderBottom: 'calc(1px * var(--sf)) solid var(--hair-strong)' }}>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result.rows.length === 0 ? (
-            <tr>
-              <td colSpan={2} style={{ padding: 'calc(12px * var(--sf))', color: 'var(--ink-60)', fontStyle: 'italic' }}>
-                No deductions
-              </td>
-            </tr>
+      <Card mono="Result" title="Take-home pay">
+        <KpiRow>
+          <Kpi value={`Net Pay: ${format(result.netMinor)}`} label="Per year, after deductions" accent />
+          <Kpi value={format(result.grossMinor)} label="Gross" />
+          <Kpi value={format(result.totalDeduction)} label="Total deductions" />
+        </KpiRow>
+        <div style={{ marginTop: 'calc(16px * var(--sf))' }}>
+          {grossForCalc > 0 ? (
+            <DonutChart result={result} />
           ) : (
-            result.rows.map((row) => (
-              <tr key={row.id}>
-                <td style={{ padding: 'calc(8px * var(--sf))', borderBottom: 'calc(1px * var(--sf)) solid var(--hair)' }}>{row.label}</td>
-                <td style={{ padding: 'calc(8px * var(--sf))', borderBottom: 'calc(1px * var(--sf)) solid var(--hair)', textAlign: 'right', fontFamily: 'var(--mono)' }}>
-                  {format(row.minor)}
-                </td>
-              </tr>
-            ))
+            <EmptyState mono="Empty" title="No result yet" detail="Enter a gross annual salary and press Calculate to see where it goes." />
           )}
-          {result.rows.length > 0 && (
-            <tr>
-              <td style={{ padding: 'calc(8px * var(--sf))', font: '600 calc(14px * var(--tf)) var(--sans)' }}>Total Deductions</td>
-              <td style={{ padding: 'calc(8px * var(--sf))', textAlign: 'right', fontFamily: 'var(--mono)', font: '600 calc(14px * var(--tf)) var(--mono)' }}>
-                {format(result.totalDeduction)}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </main>
+        </div>
+      </Card>
+
+      <Card mono={`${result.rows.length} ${result.rows.length === 1 ? 'line' : 'lines'}`} title="Breakdown">
+        <Table
+          label="Deductions"
+          columns={[{ key: 'label', label: 'Deduction' }, { key: 'amount', label: 'Amount', num: true }]}
+          rows={result.rows.map((row) => ({ cells: { label: row.label, amount: format(row.minor) } }))}
+          empty="No deductions"
+          foot={result.rows.length > 0 ? { label: 'Total Deductions', amount: format(result.totalDeduction) } : undefined}
+        />
+      </Card>
+    </AppShell>
   )
 }
