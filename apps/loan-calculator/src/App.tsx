@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Chart } from '@lacuna/chart'
 import {
   Actions,
@@ -13,29 +13,81 @@ import {
   TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { calculateLoan, formatMoney, loanError, type LoanInput } from './loan'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
+import { parseCsv, toRecords } from '@lacuna/csv-parse'
+import {
+  calculateLoan,
+  formatMoney,
+  principalError,
+  rateError,
+  yearsError,
+  type LoanResult,
+} from './loan'
 import { host } from './host'
+
+const CHART_MAX_LABELS = 6
+
+function buildChartData(r: LoanResult) {
+  const rows = r.rows
+  if (rows.length === 0) return []
+  const step = Math.max(1, Math.ceil(rows.length / CHART_MAX_LABELS))
+  const seen = new Set<number>()
+  const picks: { idx: number; row: (typeof rows)[number] }[] = []
+  for (let i = 0; i < rows.length; i += step) {
+    if (!seen.has(i)) {
+      seen.add(i)
+      picks.push({ idx: i, row: rows[i] })
+    }
+  }
+  const last = rows.length - 1
+  if (!seen.has(last)) {
+    seen.add(last)
+    picks.push({ idx: last, row: rows[last] })
+  }
+  return picks.map((p) => ({
+    label: `Pmt ${p.idx + 1}`,
+    value: p.row.balance,
+  }))
+}
 
 export function App() {
   const [principal, setPrincipal] = useState('')
   const [rate, setRate] = useState('')
   const [years, setYears] = useState('')
   const [showSchedule, setShowSchedule] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null)
 
   useEffect(() => {
     const saved = host.load()
-    setPrincipal(saved.principal)
-    setRate(saved.rate)
-    setYears(saved.years)
+    if (saved.principal !== '' || saved.rate !== '' || saved.years !== '') {
+      setPrincipal(saved.principal)
+      setRate(saved.rate)
+      setYears(saved.years)
+    } else {
+      setPrincipal('100000')
+      setRate('5')
+      setYears('30')
+    }
+    setLoaded(true)
   }, [])
 
-  const input: LoanInput = { principal, rate, years }
-  const error = loanError(input)
-  const result = error ? null : calculateLoan(input)
+  const pErr = principalError(principal)
+  const rErr = rateError(rate)
+  const yErr = yearsError(years)
+
+  const result = useMemo(() => {
+    if (pErr || rErr || yErr) return null
+    return calculateLoan({ principal, rate, years })
+  }, [principal, rate, years, pErr, rErr, yErr])
 
   useEffect(() => {
-    if (!error && result) host.save({ principal, rate, years })
-  }, [error, result, principal, rate, years])
+    if (loaded && result) host.save({ principal, rate, years })
+  }, [loaded, result, principal, rate, years])
+
+  const displayed = result
+  const showEmpty = !displayed && !loaded
 
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
@@ -52,15 +104,65 @@ export function App() {
     void copy(lines.join('\n'))
   }
 
-  const stride = Math.max(1, Math.floor((result?.rows.length ?? 0) / 12))
-  const balanceData = result
-    ? result.rows
-        .filter((_, i) => i % stride === 0 || i === result.rows.length - 1)
-        .map((row, idx) => ({
-          label: `Pmt ${(idx * stride) + 1}`,
-          value: row.balance,
-        }))
+  function applyImported(record: Record<string, string>) {
+    const p = (record['principal'] ?? '').trim()
+    const r = (record['rate'] ?? '').trim()
+    const y = (record['years'] ?? '').trim()
+    setPrincipal(p)
+    setRate(r)
+    setYears(y)
+    const err = principalError(p) ?? rateError(r) ?? yearsError(y)
+    if (err) {
+      setImportMsg({ ok: false, text: err })
+      return
+    }
+    setImportMsg({ ok: true, text: `Loaded a loan: ${p} at ${r}% over ${y} years` })
+  }
+
+  function runImport() {
+    const text = importText.trim()
+    if (text === '') {
+      setImportMsg({ ok: false, text: 'Paste a row like "100000,5,30" to load a loan.' })
+      return
+    }
+    const parsed = parseCsv(text, { header: true })
+    if (parsed.errors.length > 0) {
+      setImportMsg({ ok: false, text: `Could not read the CSV: ${parsed.errors[0]?.message ?? 'invalid row'}` })
+      return
+    }
+    if (parsed.header === null || parsed.rows.length === 0) {
+      setImportMsg({ ok: false, text: 'No data rows to load.' })
+      return
+    }
+    const records = toRecords(parsed)
+    const record = records[0]
+    if (!record) {
+      setImportMsg({ ok: false, text: 'No data rows to load.' })
+      return
+    }
+    applyImported(record)
+  }
+
+  const exportOptions: ExportOption[] = result
+    ? [
+        {
+          id: 'csv',
+          label: 'Amortization CSV',
+          mimeType: 'text/csv',
+          extension: 'csv',
+          getData: () => scheduleCsv(result),
+        },
+        {
+          id: 'json',
+          label: 'Result JSON',
+          mimeType: 'application/json',
+          extension: 'json',
+          getData: () => JSON.stringify(result, null, 2),
+        },
+      ]
     : []
+
+  const chartData = displayed ? buildChartData(displayed) : []
 
   return (
     <AppShell
@@ -86,7 +188,7 @@ export function App() {
             onChange={setPrincipal}
             inputMode="decimal"
             placeholder="100000"
-            error={error}
+            error={pErr ?? undefined}
           />
           <TextInput
             label="Annual rate %"
@@ -94,6 +196,7 @@ export function App() {
             onChange={setRate}
             inputMode="decimal"
             placeholder="5"
+            error={rErr ?? undefined}
           />
           <TextInput
             label="Years"
@@ -101,6 +204,7 @@ export function App() {
             onChange={setYears}
             inputMode="decimal"
             placeholder="30"
+            error={yErr ?? undefined}
           />
         </FormGrid>
         <Actions>
@@ -110,32 +214,85 @@ export function App() {
         </Actions>
       </Card>
 
+      <Card mono="Import · Export" title="Bring in a loan">
+        <FormGrid>
+          <TextInput
+            label="Import"
+            value={importText}
+            onChange={setImportText}
+            inputMode="text"
+            placeholder="principal,rate,years"
+            error={importMsg && !importMsg.ok ? importMsg.text : undefined}
+          />
+        </FormGrid>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Button kind="secondary" onClick={runImport}>
+            Load loan
+          </Button>
+          {result && (
+            <ExportMenu
+              options={exportOptions}
+              fileName={`loan-${principal || 'calc'}`}
+              ariaLabel="Export loan result"
+            />
+          )}
+        </div>
+        {importMsg && importMsg.ok && (
+          <SectionLabel>{importMsg.text}</SectionLabel>
+        )}
+      </Card>
+
       <Card mono="Result" title="Results">
-        <KpiRow>
-          <label aria-label="Monthly payment" style={{ display: 'flex', flexDirection: 'column' }}>
-            <span className="lc-kpi-value accent">{result ? formatMoney(result.monthlyPayment) : ''}</span>
-            <input value={result ? formatMoney(result.monthlyPayment) : ''} readOnly />
-          </label>
-          <label aria-label="Total interest" style={{ display: 'flex', flexDirection: 'column' }}>
-            <span className="lc-kpi-value">{result ? formatMoney(result.totalInterest) : ''}</span>
-            <input value={result ? formatMoney(result.totalInterest) : ''} readOnly />
-          </label>
-          <label aria-label="Total paid" style={{ display: 'flex', flexDirection: 'column' }}>
-            <span className="lc-kpi-value">{result ? formatMoney(result.totalPaid) : ''}</span>
-            <input value={result ? formatMoney(result.totalPaid) : ''} readOnly />
-          </label>
-        </KpiRow>
+        {showEmpty ? (
+          <SectionLabel>Enter a loan to see results</SectionLabel>
+        ) : (
+          <KpiRow>
+            <div>
+              <textarea
+                aria-label="Monthly payment"
+                readOnly
+                rows={1}
+                value={displayed ? formatMoney(displayed.monthlyPayment) : ''}
+                className="lc-kpi-value accent"
+                style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', lineHeight: 'inherit' }}
+              />
+              <div className="lc-kpi-label">Monthly payment</div>
+            </div>
+            <div>
+              <textarea
+                aria-label="Total interest"
+                readOnly
+                rows={1}
+                value={displayed ? formatMoney(displayed.totalInterest) : ''}
+                className="lc-kpi-value"
+                style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', lineHeight: 'inherit' }}
+              />
+              <div className="lc-kpi-label">Total interest</div>
+            </div>
+            <div>
+              <textarea
+                aria-label="Total paid"
+                readOnly
+                rows={1}
+                value={displayed ? formatMoney(displayed.totalPaid) : ''}
+                className="lc-kpi-value"
+                style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', lineHeight: 'inherit' }}
+              />
+              <div className="lc-kpi-label">Total paid</div>
+            </div>
+          </KpiRow>
+        )}
       </Card>
 
       {result && (
         <Card mono={`Balance · ${result.rows.length} payments`} title="Balance over time">
           <Chart
             type="line"
-            data={balanceData}
+            data={chartData}
             title="Outstanding balance"
             ariaLabel="Loan balance over time"
-            width={560}
-            height={200}
+            width={720}
+            height={220}
           />
         </Card>
       )}
@@ -177,4 +334,12 @@ export function App() {
       )}
     </AppShell>
   )
+}
+
+function scheduleCsv(result: LoanResult): string {
+  const head = 'n,payment,interest,principal,balance'
+  const rows = result.rows.map((row, i) =>
+    [i + 1, row.payment.toFixed(2), row.interest.toFixed(2), row.principalPart.toFixed(2), row.balance.toFixed(2)].join(','),
+  )
+  return [head, ...rows].join('\n')
 }
