@@ -127,7 +127,7 @@ export function App() {
           <MonoLabel sm>Converter</MonoLabel>
           <Title size="md">Unit convert</Title>
         </section>
-        <div role="tablist" aria-label="Unit categories" style={{ display: 'flex', gap: 'calc(4px * var(--sf))' }}>
+        <div role="tablist" aria-label="Unit categories" className="lc-tabs">
           {CATEGORY_LABELS.map((label) => {
             const selected = label === category.label
             return (
@@ -138,13 +138,7 @@ export function App() {
                 aria-selected={selected}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => pickCategory(label)}
-                style={{
-                  cursor: 'pointer',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 'calc(4px * var(--sf)) calc(8px * var(--sf))',
-                  color: selected ? 'var(--ink)' : 'var(--ink-60)',
-                }}
+                className={'lc-tab' + (selected ? ' active' : '')}
               >
                 {label}
               </button>
