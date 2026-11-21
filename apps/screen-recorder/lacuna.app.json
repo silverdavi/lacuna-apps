@@ -1,0 +1,98 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.screen-recorder",
+  "name": "Screen Recorder",
+  "version": "0.1.0",
+  "summary": "Record the screen or camera and capture still frames into a local library.",
+  "description": "Record your screen in a chosen resolution, capture still frames from the camera, download clips as WebM, and keep a library that survives reloads. Everything stays on this device.",
+  "category": "productivity",
+  "tags": [
+    "recording",
+    "camera",
+    "media"
+  ],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/screen-recorder"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/format-duration": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-camera": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/use-media-recorder": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:recording",
+    "edit:recording",
+    "export:webm"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "recording",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the library of screen recordings and camera frames"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "recording"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
