@@ -412,6 +412,9 @@ importers:
 
   apps/image-color-extractor:
     dependencies:
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox

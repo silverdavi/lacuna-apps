@@ -25,13 +25,14 @@
    "type": "builtin",
    "route": "/app/image-color-extractor"
   },
- "requires": {
-  "hostApi": "^1.0.0",
-  "modules": {
-   "@lacuna/tokens": "^0.1.0",
-   "@lacuna/ui": "^0.1.0"
-  }
- },
+  "requires": {
+   "hostApi": "^1.0.0",
+   "modules": {
+    "@lacuna/host-mock": "0.1.0",
+    "@lacuna/tokens": "^0.1.0",
+    "@lacuna/ui": "^0.1.0"
+   }
+  },
  "capabilities": [
   "import:image->color",
   "view:image"
