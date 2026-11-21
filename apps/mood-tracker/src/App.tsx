@@ -38,7 +38,7 @@ type BackupRecord = {
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function moodColor(mood: string): string {
-  return MOOD_COLOR[mood] ?? 'var(--accent)'
+  return MOOD_COLOR[mood] ?? 'var(--ink-60)'
 }
 
 function backupRecords(entries: MoodEntry[]): Array<{
@@ -98,7 +98,7 @@ export function App() {
       days.push({
         key,
         label: WEEKDAYS[day.getDay()] ?? 'Day',
-        color: entry ? moodColor(entry.mood) : 'var(--mid)',
+        color: entry ? moodColor(entry.mood) : 'var(--paper-deep)',
         filled: Boolean(entry),
       })
     }
@@ -235,9 +235,8 @@ export function App() {
       >
         <Stack>
           <div aria-label="Streak">
-            <Body>{`Streak: ${streakDays} days`}</Body>
             <KpiRow>
-              <Kpi value={String(streakDays)} label="Streak days" accent />
+              <Kpi value={streakDays} label={`Streak: ${streakDays} days`} accent />
               <Kpi value={`${week.filter((day) => day.filled).length}/7`} label="This week" />
             </KpiRow>
           </div>
