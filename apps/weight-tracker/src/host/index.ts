@@ -1,6 +1,7 @@
-// Space-scoped persistence for the weight tracker.
+// Space-scoped persistence for the weight tracker, backed by @lacuna/host-mock.
 // The app keeps every entry in the space's mock storage (localStorage), so it
 // works with no network. State is rehydrated on load and saved on every change.
+import { createMockRecordStore } from '@lacuna/host-mock'
 
 export type WeightEntry = {
   id: string
@@ -15,7 +16,7 @@ export type WeightState = {
 
 export const emptyState = (): WeightState => ({ entries: [] })
 
-const KEY = 'lacuna.weight-tracker.state'
+export const KEY = 'lacuna.weight-tracker.state'
 
 export function makeId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -24,38 +25,37 @@ export function makeId(): string {
   return `w-${Date.now()}-${Math.floor(Math.random() * 1e9)}`
 }
 
+function isWeightEntry(value: unknown): value is WeightEntry {
+  const e = value as WeightEntry
+  return (
+    e != null &&
+    typeof e === 'object' &&
+    typeof e.date === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(e.date) &&
+    Number.isFinite(e.weight) &&
+    e.weight > 0
+  )
+}
+
+const store = createMockRecordStore<WeightEntry>({
+  key: KEY,
+  idPrefix: 'w-',
+  validate: isWeightEntry,
+})
+
 export function loadState(): WeightState {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return emptyState()
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.entries)) return emptyState()
-    const entries = parsed.entries
-      .filter(
-        (e: unknown) =>
-          e &&
-          typeof e === 'object' &&
-          typeof (e as WeightEntry).date === 'string' &&
-          /^\d{4}-\d{2}-\d{2}$/.test((e as WeightEntry).date) &&
-          Number.isFinite((e as WeightEntry).weight) &&
-          (e as WeightEntry).weight > 0,
-      )
-      .map((e: WeightEntry) => ({
-        id: typeof e.id === 'string' && e.id ? e.id : makeId(),
-        date: e.date,
-        weight: Math.round(e.weight * 10) / 10,
-        createdAt: Number.isFinite(e.createdAt) ? e.createdAt : 0,
-      }))
-    return { entries }
-  } catch {
-    return emptyState()
-  }
+  const entries = store
+    .list()
+    .map((e) => ({
+      id: e.id,
+      date: e.date,
+      weight: Math.round(e.weight * 10) / 10,
+      createdAt: Number.isFinite(e.createdAt) ? e.createdAt : 0,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt)
+  return { entries }
 }
 
 export function saveState(state: WeightState): void {
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(state))
-  } catch {
-    // storage may be unavailable (private mode, quota); the app keeps working in memory
-  }
+  store.replaceAll(state.entries)
 }

@@ -1,14 +1,23 @@
-import { useState } from 'react'
-import { Body, Button, Card, EmptyState, MonoLabel, Stack, TextInput } from '@lacuna/ui'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  List,
+  MonoLabel,
+  Rail,
+  Row,
+  Stack,
+  TextInput,
+} from '@lacuna/ui'
 import { host } from './host/mock'
 import type { WeightEntry } from './host'
-
-type FormState = {
-  open: boolean
-  date: string
-  weight: string
-  error: string | null
-}
 
 function today(): string {
   const d = new Date()
@@ -81,13 +90,28 @@ function WeightChart({ entries }: { entries: WeightEntry[] }) {
   )
 }
 
+type FormState = {
+  open: boolean
+  date: string
+  weight: string
+  error: string | null
+}
+
 export function App() {
   const [state, setState] = useState(() => host.read())
-  const [form, setForm] = useState<FormState>({ open: false, date: today(), weight: '', error: null })
+  const [form, setForm] = useState<FormState>({ open: false, date: '', weight: '', error: null })
+  const dialogRef = useRef<HTMLDivElement>(null)
+
 
   const entries = state.entries
   const latest = entries.length ? entries[entries.length - 1] : null
   const change = entries.length >= 2 ? entries[entries.length - 1].weight - entries[0].weight : null
+
+  useEffect(() => {
+    if (!form.open) return
+    const first = dialogRef.current?.querySelector<HTMLElement>('input, button')
+    first?.focus()
+  }, [form.open])
 
   function openForm() {
     setForm({ open: true, date: today(), weight: '', error: null })
@@ -95,6 +119,7 @@ export function App() {
 
   function closeForm() {
     setForm((f) => ({ ...f, open: false, error: null }))
+    document.querySelector<HTMLButtonElement>('.lc-btn.primary')?.focus()
   }
 
   function save() {
@@ -115,7 +140,11 @@ export function App() {
     const weight = Math.round(value * 10) / 10
     const date = /^\d{4}-\d{2}-\d{2}$/.test(form.date) ? form.date : today()
     setState(host.addEntry(date, weight))
-    setForm({ open: false, date: today(), weight: '', error: null })
+    setForm({ open: false, date: '', weight: '', error: null })
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Escape') closeForm()
   }
 
   function remove(id: string) {
@@ -123,155 +152,123 @@ export function App() {
   }
 
   return (
-    <main style={{ display: 'block', width: '100%', padding: 'calc(20px * var(--sf))' }}>
-      <Card title="Weight Tracker" mono="BODY WEIGHT" accent>
-        <Stack lg>
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                font: '600 calc(22px * var(--tf)) var(--sans)',
-                color: 'var(--ink)',
-                letterSpacing: 'calc(-0.01em * var(--tf))',
-              }}
-            >
-              Weight Tracker
-            </h1>
-            <Body>Log your weight over time and watch the trend.</Body>
-          </div>
-          {!form.open && (
-            <div>
-              <Button kind="secondary" onClick={openForm}>
-                Add entry
-              </Button>
-            </div>
-          )}
+    <AppShell
+      name="Weight Tracker"
+      icon="analytics"
+      hue="teal"
+      category="Personal"
+      meta={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}
+      status="Saved on this device"
+      side={
+        <Rail
+          title="Weight Tracker"
+          note="Dated readings · local"
+          chips={['Line chart', 'Offline']}
+        />
+      }
+    >
+      <Stack lg>
+        <Card mono="Entry" title="Add a reading">
+          <Body sm>
+            Log your weight on a date and watch the trend.
+          </Body>
+          <Actions>
+            <Button kind="primary" onClick={openForm}>
+              Add entry
+            </Button>
+          </Actions>
+        </Card>
 
-          {form.open && (
-            <div
-              style={{
-                padding: 'calc(14px * var(--sf))',
-                border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                borderRadius: 'calc(6px * var(--sf))',
-                background: 'var(--ui-bright)',
-              }}
-            >
-              <Stack>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 'calc(12px * var(--sf))',
-                    alignItems: 'flex-end',
-                  }}
-                >
-                  <TextInput
-                    label="Date"
-                    value={form.date}
-                    onChange={(value) => setForm((f) => ({ ...f, date: value, error: null }))}
-                  />
-                  <TextInput
-                    label="Weight (kg)"
-                    value={form.weight}
-                    onChange={(value) => setForm((f) => ({ ...f, weight: value, error: null }))}
-                  />
-                </div>
-                {form.error && (
-                  <div
-                    role="alert"
-                    style={{
-                      color: 'var(--danger)',
-                      font: '500 calc(11px * var(--tf)) var(--mono)',
-                      letterSpacing: 'calc(0.4px * var(--sf))',
-                    }}
-                  >
-                    {form.error}
-                  </div>
-                )}
-                <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
-                  <Button kind="primary" onClick={save}>
-                    Save
-                  </Button>
-                  <Button kind="ghost" onClick={closeForm}>
-                    Cancel
-                  </Button>
-                </div>
-              </Stack>
-            </div>
-          )}
-
+        <Card mono={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`} title="Entries">
           {entries.length === 0 ? (
-            <EmptyState title="No entries yet" detail="Log your first weight to see the trend." />
+            <EmptyState mono="Empty" title="No entries yet" detail="Add your first reading to start the trend." />
           ) : (
-            <>
-              <div>
-                <MonoLabel sm style={{ color: 'var(--ink-60)' }}>
-                  ENTRIES
-                </MonoLabel>
-                <ul
-                  style={{
-                    listStyle: 'none',
-                    margin: 'calc(8px * var(--sf)) 0 0',
-                    padding: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'calc(6px * var(--sf))',
-                  }}
-                >
-                  {entries.map((e) => (
-                    <li
-                      key={e.id}
-                      role="listitem"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 'calc(10px * var(--sf))',
-                        padding: 'calc(8px * var(--sf))',
-                        border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                        borderRadius: 'calc(4px * var(--sf))',
-                        background: 'var(--ui-bright)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 'calc(12px * var(--sf))' }}>
-                        <span style={{ font: '400 calc(13px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>
-                          {e.date}
-                        </span>
-                        <span style={{ font: '600 calc(15px * var(--tf)) var(--sans)', color: 'var(--ink)' }}>
-                          {fmtWeight(e.weight)} kg
-                        </span>
-                      </div>
-                      <Button kind="ghost" onClick={() => remove(e.id)}>
+            <Stack>
+              <List label="Entries">
+                {entries.map((e) => (
+                  <Row
+                    key={e.id}
+                    title={e.date}
+                    value={`${fmtWeight(e.weight)} kg`}
+                    action={
+                      <Button kind="ghost" ariaLabel={`Delete ${e.date}`} onClick={() => remove(e.id)}>
                         Delete {e.date}
                       </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
+                    }
+                  />
+                ))}
+              </List>
               <WeightChart entries={entries} />
-
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 'calc(20px * var(--sf))',
-                  padding: 'calc(12px * var(--sf))',
-                  border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-                  borderRadius: 'calc(4px * var(--sf))',
-                  background: 'var(--paper-deep)',
-                }}
-              >
-                {latest && (
-                  <Body>Latest: {fmtWeight(latest.weight)} kg</Body>
-                )}
-                {change !== null && (
-                  <Body>Change: {fmtWeight(change)} kg</Body>
-                )}
-              </div>
-            </>
+              <KpiRow>
+                {latest && <Kpi value={`Latest: ${fmtWeight(latest.weight)} kg`} label="Most recent reading" accent />}
+                {change !== null && <Kpi value={`Change: ${fmtWeight(change)} kg`} label="Since first entry" />}
+              </KpiRow>
+            </Stack>
           )}
-        </Stack>
-      </Card>
-    </main>
+        </Card>
+      </Stack>
+
+      {form.open && (
+        <div
+          role="presentation"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--dim-veil)',
+            pointerEvents: 'none',
+          }}
+          onClick={closeForm}
+        >
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Add a reading"
+            onKeyDown={onKeyDown}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              pointerEvents: 'auto',
+              width: 'calc(360px * var(--sf))',
+              padding: 'calc(18px * var(--sf))',
+              background: 'var(--ui-card)',
+              border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+              borderRadius: 'calc(6px * var(--sf))',
+              boxShadow: 'var(--shadow)',
+            }}
+          >
+            <MonoLabel accent>ADD A READING</MonoLabel>
+            <div style={{ marginTop: 'calc(14px * var(--sf))' }}>
+              <FormGrid>
+                <TextInput
+                  label="Date"
+                  value={form.date}
+                  onChange={(value) => setForm((f) => ({ ...f, date: value, error: null }))}
+                />
+                <TextInput
+                  label="Weight (kg)"
+                  value={form.weight}
+                  onChange={(value) => setForm((f) => ({ ...f, weight: value, error: null }))}
+                  error={form.error}
+                />
+              </FormGrid>
+            </div>
+            <div style={{ marginTop: 'calc(16px * var(--sf))' }}>
+              <Actions>
+                <Button kind="primary" onClick={save}>
+                  Save
+                </Button>
+                <Button kind="ghost" onClick={closeForm}>
+                  Cancel
+                </Button>
+              </Actions>
+            </div>
+          </div>
+        </div>
+      )}
+    </AppShell>
   )
 }
