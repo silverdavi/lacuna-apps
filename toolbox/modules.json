@@ -731,6 +731,44 @@
       ]
     },
     {
+      "id": "@lacuna/before-after",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Side-by-side or slider comparison widget that lets users drag a divider to reveal one of two images or text blocks.",
+      "today": [
+        "toolbox/modules/before-after/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "BeforeAfter"
+      ],
+      "public": true,
+      "path": "toolbox/modules/before-after/0.1.0",
+      "bridge": {
+        "component": "BeforeAfter",
+        "kind": "widget",
+        "exports": [
+          "BeforeAfter"
+        ],
+        "types": [
+          "BeforeAfterProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "a1cf0020b48ebd27",
+            "lines": 278,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/chart",
       "layer": 2,
       "status": "exists",
@@ -1241,6 +1279,44 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "42aba2f01db07327",
             "lines": 87,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/range-slider",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A labelled numeric slider with the current value shown next to it; controlled component.",
+      "today": [
+        "toolbox/modules/range-slider/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "RangeSlider"
+      ],
+      "public": true,
+      "path": "toolbox/modules/range-slider/0.1.0",
+      "bridge": {
+        "component": "RangeSlider",
+        "kind": "widget",
+        "exports": [
+          "RangeSlider"
+        ],
+        "types": [
+          "RangeSliderProps"
+        ],
+        "signature": "RangeSlider(props: RangeSliderProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f8c5c7e28e4c81c8",
+            "lines": 193,
             "dependencies": {}
           }
         }
