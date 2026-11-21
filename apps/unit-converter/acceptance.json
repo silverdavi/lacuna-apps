@@ -1,44 +1,52 @@
 {
   "version": 1,
-  "spec_sha256": "b4852ff260986425bca256ecb971b9e2ee3ad46bc6247426bb00bd8e7cb699e3",
+  "spec_sha256": "de0b56126ead8b3157d5e8271e86bff0528e6c6f32aad78eb4440dfffe865cb9",
   "checks": [
     {
       "id": "A1",
-      "text": "Length: typing 1 in Meters shows 3.28084 in Feet (five significant decimals at most)."
+      "text": "Typing 1 in From value shows 3.28084 in To value (From unit Meters, To unit Feet, as the app opens)."
     },
     {
       "id": "A2",
-      "text": "Typing in the second field updates the first (two-way)."
+      "text": "Typing 1 in To value shows 0.3048 in From value."
     },
     {
       "id": "A3",
-      "text": "Temperature: 100 Celsius shows 212 Fahrenheit; -40 Celsius shows -40 Fahrenheit."
+      "text": "Choosing Temperature in Category, then typing 100 in From value shows 212 in To value; replacing it with -40 shows -40 in To value."
     },
     {
       "id": "A4",
-      "text": "Switching category resets units to that category's defaults and clears the fields."
+      "text": "After typing 1 in From value, choosing Mass in Category sets From unit to Kilograms and To unit to Pounds and empties both From value and To value; typing 1 in From value then shows 2.20462 in To value."
     },
     {
       "id": "A5",
-      "text": "The swap button exchanges the two units and keeps the value."
+      "text": "With 1 in From value (Meters to Feet), clicking Swap sets From unit to Feet and To unit to Meters, keeps 1 in From value, and shows 0.3048 in To value."
     },
     {
       "id": "A6",
-      "text": "Non-numeric input shows an inline message and does not show `NaN` anywhere."
+      "text": "Typing abc in From value shows the text \"Enter a number.\" below the field, leaves To value empty, and the page shows the text NaN nowhere."
     },
     {
       "id": "A7",
-      "text": "Each completed conversion is added to a Recent list (newest first, at most 10); clicking one restores it."
+      "text": "Typing 1 in From value and clicking Save adds the entry \"1 Meters = 3.28084 Feet\" to the Recent list; then typing 2 and clicking Save puts \"2 Meters = 6.56168 Feet\" first and \"1 Meters = 3.28084 Feet\" second."
     },
     {
       "id": "A8",
-      "text": "Reload keeps the Recent list."
+      "text": "Saving the values 1 through 11 in turn (type the value in From value, click Save) leaves exactly 10 entries in Recent: the first is \"11 Meters = 36.08924 Feet\", the last is \"2 Meters = 6.56168 Feet\", and no entry reads exactly \"1 Meters = 3.28084 Feet\"."
+    },
+    {
+      "id": "A9",
+      "text": "After saving 11 (Meters to Feet), typing 7 in From value and then clicking the Recent entry \"11 Meters = 36.08924 Feet\" puts 11 in From value and 36.08924 in To value, with Category Length, From unit Meters and To unit Feet."
+    },
+    {
+      "id": "A10",
+      "text": "Reload keeps the Recent list: after saving 1 and then 2 and reloading the page, Recent shows \"2 Meters = 6.56168 Feet\" first and \"1 Meters = 3.28084 Feet\" second."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "fa85b688802315f90fb3d2744b4d043d4522579243f54844d5b204475d17d3bd"
+      "sha256": "fcf4fa0273b79ad909e1be28244d8ae841aa75ab0ff1aa0ca32587ea7fa87ee7"
     }
   ]
 }

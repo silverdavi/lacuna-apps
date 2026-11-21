@@ -82,13 +82,20 @@ export function unitsFor(category: Category): string[] {
   }
 }
 
+const DEFAULTS: Record<Category, [string, string]> = {
+  Length: ['Meters', 'Feet'],
+  Mass: ['Kilograms', 'Pounds'],
+  Volume: ['Liters', 'Gallons'],
+  Temperature: ['Celsius', 'Fahrenheit'],
+  Area: ['Square Meters', 'Square Feet'],
+}
+
 export function defaultUnits(category: Category): [string, string] {
-  const all = unitsFor(category)
-  return [all[0], all[1] ?? all[0]]
+  return DEFAULTS[category]
 }
 
 export function formatValue(value: number): string {
   if (!Number.isFinite(value)) return ''
-  const rounded = Number.parseFloat(value.toPrecision(6))
+  const rounded = Number.parseFloat(value.toFixed(5))
   return String(rounded)
 }

@@ -1,90 +1,115 @@
-// Acceptance tests for unit-converter, one per acceptance check in the spec.
-// The app has not been written yet; it is built against this file and must not change it.
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-test('[A1] Length: typing 1 in Meters shows 3.28084 in Feet', async ({ page }) => {
+const category = (page: Page) => page.getByLabel('Category')
+const fromUnit = (page: Page) => page.getByLabel('From unit')
+const toUnit = (page: Page) => page.getByLabel('To unit')
+const fromValue = (page: Page) => page.getByLabel('From value')
+const toValue = (page: Page) => page.getByLabel('To value')
+const recentList = (page: Page) => page.getByRole('list', { name: 'Recent' })
+
+test('[A1] typing 1 in From value shows 3.28084 in To value', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Value in Meters').fill('1')
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('3.28084')
+  await fromValue(page).fill('1')
+  await expect(toValue(page)).toHaveValue('3.28084')
 })
 
-test('[A2] Typing in the second field updates the first (two-way)', async ({ page }) => {
+test('[A2] typing 1 in To value shows 0.3048 in From value', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Value in Feet').fill('1')
-  await expect(page.getByLabel('Value in Meters')).toHaveValue('0.3048')
+  await toValue(page).fill('1')
+  await expect(fromValue(page)).toHaveValue('0.3048')
 })
 
-test('[A3] Temperature: 100 Celsius shows 212 Fahrenheit; -40 Celsius shows -40 Fahrenheit', async ({ page }) => {
+test('[A3] Temperature: 100 Celsius is 212, -40 Celsius is -40 Fahrenheit', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Temperature' }).click()
-  const celsius = page.getByLabel('Value in Celsius')
-  const fahrenheit = page.getByLabel('Value in Fahrenheit')
-  await celsius.fill('100')
-  await expect(fahrenheit).toHaveValue('212')
-  await celsius.fill('-40')
-  await expect(fahrenheit).toHaveValue('-40')
+  await category(page).selectOption('Temperature')
+  await fromValue(page).fill('100')
+  await expect(toValue(page)).toHaveValue('212')
+  await fromValue(page).fill('-40')
+  await expect(toValue(page)).toHaveValue('-40')
 })
 
-// A4 names no default units; A1 fixes the Length defaults as Meters -> Feet, so returning to Length must restore them.
-test('[A4] Switching category resets units to defaults and clears the fields', async ({ page }) => {
+test('[A4] switching to Mass resets units and values, then converts', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Value in Meters').fill('1')
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('3.28084')
-  await page.getByRole('button', { name: 'Mass' }).click()
-  const inputs = page.locator('input')
-  await expect(inputs.nth(0)).toHaveValue('')
-  await expect(inputs.nth(1)).toHaveValue('')
-  await page.getByRole('button', { name: 'Length' }).click()
-  await expect(page.getByLabel('Value in Meters')).toHaveValue('')
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('')
+  await fromValue(page).fill('1')
+  await category(page).selectOption('Mass')
+  await expect(fromUnit(page)).toHaveValue('Kilograms')
+  await expect(toUnit(page)).toHaveValue('Pounds')
+  await expect(fromValue(page)).toHaveValue('')
+  await expect(toValue(page)).toHaveValue('')
+  await fromValue(page).fill('1')
+  await expect(toValue(page)).toHaveValue('2.20462')
 })
 
-test('[A5] The swap button exchanges the two units and keeps the value', async ({ page }) => {
+test('[A5] Swap exchanges units and reconverts, keeping the From value', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Value in Meters').fill('1')
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('3.28084')
+  await fromValue(page).fill('1')
   await page.getByRole('button', { name: 'Swap' }).click()
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('1')
-  await expect(page.getByLabel('Value in Meters')).toHaveValue('3.28084')
+  await expect(fromUnit(page)).toHaveValue('Feet')
+  await expect(toUnit(page)).toHaveValue('Meters')
+  await expect(fromValue(page)).toHaveValue('1')
+  await expect(toValue(page)).toHaveValue('0.3048')
 })
 
-test('[A6] Non-numeric input shows an inline message and does not show NaN anywhere', async ({ page }) => {
+test('[A6] non-numeric input shows an error and no NaN', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Value in Meters').fill('abc')
-  await expect(page.getByText(/not a number|invalid/i)).toBeVisible()
-  await expect(page.locator('body')).not.toContainText('NaN')
+  await fromValue(page).fill('abc')
+  await expect(page.getByText('Enter a number.')).toBeVisible()
+  await expect(toValue(page)).toHaveValue('')
+  const rootText = await page.locator('#root').innerText()
+  expect(rootText).not.toContain('NaN')
 })
 
-test('[A7] Each completed conversion is added to Recent (newest first, at most 10); clicking one restores it', async ({ page }) => {
+test('[A7] Save adds Recent entries, newest first', async ({ page }) => {
   await page.goto('/')
-  const meters = page.getByLabel('Value in Meters')
-  // More than ten conversions so the cap of 10 is exercised.
+  await fromValue(page).fill('1')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('button', { name: '1 Meters = 3.28084 Feet' })).toBeVisible()
+
+  await fromValue(page).fill('2')
+  await page.getByRole('button', { name: 'Save' }).click()
+  const entries = recentList(page).getByRole('listitem')
+  await expect(entries).toHaveCount(2)
+  await expect(entries.nth(0)).toContainText('2 Meters = 6.56168 Feet')
+  await expect(entries.nth(1)).toContainText('1 Meters = 3.28084 Feet')
+})
+
+test('[A8] Recent keeps only the 10 newest entries', async ({ page }) => {
+  await page.goto('/')
   for (let i = 1; i <= 11; i++) {
-    await meters.fill(String(i))
-    await page.waitForTimeout(0)
+    await fromValue(page).fill(String(i))
+    await page.getByRole('button', { name: 'Save' }).click()
   }
-  const items = page.getByRole('button', { name: /· Length/ })
-  await expect(items).toHaveCount(10)
-  // Newest first: 11 Meters is the first entry, and the oldest (1 Meters) has been evicted.
-  expect(await items.first().innerText()).toContain('11 Meters')
-  expect(await items.last().innerText()).toContain('2 Meters')
-  await expect(items.filter({ hasText: '1 Meters = ' })).toHaveCount(0)
-  // Clicking an entry restores that conversion (the fields currently hold a different value).
-  await meters.fill('7')
-  await items.first().click()
-  await expect(meters).toHaveValue('11')
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('36.09244')
+  const entries = recentList(page).getByRole('listitem')
+  await expect(entries).toHaveCount(10)
+  const texts = []
+  for (let i = 0; i < 10; i++) texts.push(await entries.nth(i).innerText())
+  expect(texts[0]).toContain('11 Meters = 36.08924 Feet')
+  expect(texts[9]).toContain('2 Meters = 6.56168 Feet')
+  expect(texts.some((t) => t.trim() === '1 Meters = 3.28084 Feet')).toBe(false)
 })
 
-test('[A8] Reload keeps the Recent list', async ({ page }) => {
+test('[A9] clicking a Recent entry restores the conversion', async ({ page }) => {
   await page.goto('/')
-  const meters = page.getByLabel('Value in Meters')
-  await meters.fill('1')
-  await expect(page.getByLabel('Value in Feet')).toHaveValue('3.28084')
-  await meters.fill('11')
+  await fromValue(page).fill('11')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await fromValue(page).fill('7')
+  await page.getByRole('button', { name: '11 Meters = 36.08924 Feet' }).click()
+  await expect(fromValue(page)).toHaveValue('11')
+  await expect(toValue(page)).toHaveValue('36.08924')
+  await expect(category(page)).toHaveValue('Length')
+  await expect(fromUnit(page)).toHaveValue('Meters')
+  await expect(toUnit(page)).toHaveValue('Feet')
+})
+
+test('[A10] the Recent list survives a reload', async ({ page }) => {
+  await page.goto('/')
+  await fromValue(page).fill('1')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await fromValue(page).fill('2')
+  await page.getByRole('button', { name: 'Save' }).click()
   await page.reload()
-  const items = page.getByRole('button', { name: /· Length/ })
-  await expect(items).toHaveCount(2)
-  expect(await items.first().innerText()).toContain('11 Meters')
-  expect(await items.last().innerText()).toContain('1 Meters')
+  const entries = recentList(page).getByRole('listitem')
+  await expect(entries).toHaveCount(2)
+  await expect(entries.nth(0)).toContainText('2 Meters = 6.56168 Feet')
+  await expect(entries.nth(1)).toContainText('1 Meters = 3.28084 Feet')
 })

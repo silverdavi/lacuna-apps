@@ -1,48 +1,34 @@
-.uc-row {
+.app-main {
+  min-height: 100vh;
+}
+
+.row {
   display: flex;
   gap: calc(12px * var(--sf));
-  align-items: center;
+  align-items: end;
 }
 
-.uc-pick {
-  display: flex;
-  flex-direction: column;
-  gap: calc(4px * var(--sf));
-}
-
-.uc-pick span {
-  font-family: var(--mono);
-  font-size: calc(10.5px * var(--tf));
-  color: var(--ink-80);
-}
-
-.uc-pick select {
-  border: 1px solid var(--ui-line2);
-  border-radius: 2px;
-  background: var(--ui-card);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: calc(13.5px * var(--tf));
-  padding: calc(6px * var(--sf)) calc(8px * var(--sf));
-}
-
-.uc-field {
-  display: flex;
-  flex-direction: column;
-  gap: calc(4px * var(--sf));
+.row .grow {
   flex: 1;
 }
 
-.uc-field-label {
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.field label {
   font-family: var(--mono);
   font-size: calc(10.5px * var(--tf));
   color: var(--ink);
 }
 
-.uc-input {
+.field select,
+.field input {
   width: 100%;
-  border: 1px solid var(--ui-line2);
-  border-radius: 2px;
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
   background: var(--ui-card);
   color: var(--ink);
   font-family: var(--mono);
@@ -50,26 +36,39 @@
   padding: calc(6px * var(--sf)) calc(8px * var(--sf));
 }
 
-.uc-input:focus {
+.field select:focus,
+.field input:focus {
   outline: none;
   border-color: var(--mid);
 }
 
-.uc-recent {
+.error {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--mid);
+}
+
+.muted {
+  color: var(--ink-80);
+  font-size: calc(12px * var(--tf));
+  padding: calc(12px * var(--sf)) 0;
+}
+
+[role='list'][aria-label='Recent'] {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.uc-recent-row {
-  border-bottom: 1px solid var(--ui-line);
+[role='list'][aria-label='Recent'] li {
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
 }
 
-.uc-recent-row:last-child {
+[role='list'][aria-label='Recent'] li:last-child {
   border-bottom: none;
 }
 
-.uc-recent-item {
+.recent-item {
   display: block;
   width: 100%;
   cursor: pointer;
@@ -82,19 +81,11 @@
   padding: calc(10px * var(--sf)) calc(12px * var(--sf));
 }
 
-.uc-recent-item:focus {
+.recent-item:focus {
   outline: none;
   box-shadow: inset calc(2px * var(--sf)) 0 0 0 var(--mid);
 }
 
-.uc-recent-item:hover {
+.recent-item:hover {
   background: var(--accent-soft);
-}
-
-.uc-recent-main {
-  color: var(--ink);
-}
-
-.uc-recent-empty {
-  padding: calc(12px * var(--sf)) calc(12px * var(--sf));
 }

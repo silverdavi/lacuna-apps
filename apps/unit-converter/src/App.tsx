@@ -1,15 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, Pills, Stack } from '@lacuna/ui'
-import { host, type ConversionRecord } from './host'
+import { useEffect, useState } from 'react'
+import { Button, Card, Stack } from '@lacuna/ui'
 import { CATEGORIES, convertValue, defaultUnits, formatValue, unitsFor, type Category } from './units'
+import { host, type ConversionRecord } from './host'
 
 export function App() {
   const [category, setCategory] = useState<Category>('Length')
-  const [fromUnit, setFromUnit] = useState(defaultUnits('Length')[0])
-  const [toUnit, setToUnit] = useState(defaultUnits('Length')[1])
-  const [fromValue, setFromValue] = useState('')
-  const [toValue, setToValue] = useState('')
-  const [invalid, setInvalid] = useState(false)
+  const [fromUnit, setFromUnit] = useState('Meters')
+  const [toUnit, setToUnit] = useState('Feet')
+  const [fromText, setFromText] = useState('')
+  const [toText, setToText] = useState('')
   const [recent, setRecent] = useState<ConversionRecord[]>([])
 
   useEffect(() => {
@@ -24,215 +23,156 @@ export function App() {
 
   const units = unitsFor(category)
 
-  const refreshRecent = () => {
-    host.listRecent().then((records) => setRecent(records))
+  function selectCategory(next: Category) {
+    const [f, t] = defaultUnits(next)
+    setCategory(next)
+    setFromUnit(f)
+    setToUnit(t)
+    setFromText('')
+    setToText('')
   }
 
-  const recordConversion = (fromVal: number, toVal: number) => {
-    if (!Number.isFinite(fromVal) || !Number.isFinite(toVal)) return
-    const record: ConversionRecord = {
-      id: `${Date.now()}:${Math.random().toString(36).slice(2, 8)}`,
-      category,
-      fromUnit,
-      toUnit,
-      fromValue: fromVal,
-      toValue: toVal,
-    }
-    host.addRecent(record).then(refreshRecent)
+  function selectFromUnit(next: string) {
+    setFromUnit(next)
+    setFromText('')
+    setToText('')
   }
 
-  // Each time a field takes a new valid value, that value is a completed conversion and is added
-  // to Recent (newest first, capped at 10). The last recorded value per field is remembered so
-  // that re-entering or re-focusing the same value does not duplicate an entry, while every
-  // distinct value does add one. fill() emits an input event per value but never blurs, so the
-  // input event — not blur — is what adds the record; this is why the Recent list is populated in
-  // the locked tests, which drive the field with fill().
-  const lastFrom = useRef<number | null>(null)
-  const lastTo = useRef<number | null>(null)
-
-  const clearTrackers = () => {
-    lastFrom.current = null
-    lastTo.current = null
+  function selectToUnit(next: string) {
+    setToUnit(next)
+    setFromText('')
+    setToText('')
   }
 
-  const fill = (which: 'from' | 'to', raw: string) => {
-    const value = raw.trim()
-    const num = Number.parseFloat(raw)
-    if (value === '' || !Number.isFinite(num)) {
-      setInvalid(value !== '')
-      if (which === 'from') {
-        setFromValue(raw)
-        lastFrom.current = null
-      } else {
-        setToValue(raw)
-        lastTo.current = null
-      }
+  function onFromChange(next: string) {
+    setFromText(next)
+    const n = Number.parseFloat(next)
+    if (next.trim() === '' || Number.isNaN(n)) {
+      setToText('')
       return
     }
-    setInvalid(false)
-    const from = which === 'from' ? fromUnit : toUnit
-    const to = which === 'from' ? toUnit : fromUnit
-    const convertedNum = convertValue(category, from, to, num)
-    const converted = formatValue(convertedNum)
-    if (which === 'from') {
-      setFromValue(raw)
-      setToValue(converted)
+    setToText(formatValue(convertValue(category, fromUnit, toUnit, n)))
+  }
+
+  function onToChange(next: string) {
+    setToText(next)
+    const n = Number.parseFloat(next)
+    if (next.trim() === '' || Number.isNaN(n)) {
+      setFromText('')
+      return
+    }
+    setFromText(formatValue(convertValue(category, toUnit, fromUnit, n)))
+  }
+
+  function swap() {
+    const f = fromUnit
+    const t = toUnit
+    setFromUnit(t)
+    setToUnit(f)
+    const n = Number.parseFloat(fromText)
+    if (fromText.trim() !== '' && !Number.isNaN(n)) {
+      setFromText(formatValue(n))
+      setToText(formatValue(convertValue(category, t, f, n)))
     } else {
-      setToValue(raw)
-      setFromValue(converted)
+      setFromText('')
+      setToText('')
     }
-    const prev = which === 'from' ? lastFrom.current : lastTo.current
-    if (prev !== num) {
-      // A new value for this field is a completed conversion, recorded as the freshly computed
-      // pair: the entered value under its unit and the converted value under the other unit.
-      const fromVal = which === 'from' ? num : convertedNum
-      const toVal = which === 'from' ? convertedNum : num
-      recordConversion(fromVal, toVal)
-    }
-    if (which === 'from') lastFrom.current = num
-    else lastTo.current = num
   }
 
-  const changeCategory = (next: Category) => {
-    setCategory(next)
-    const [a, b] = defaultUnits(next)
-    setFromUnit(a)
-    setToUnit(b)
-    setFromValue('')
-    setToValue('')
-    setInvalid(false)
-    clearTrackers()
+  function save() {
+    const n = Number.parseFloat(fromText)
+    const m = Number.parseFloat(toText)
+    if (fromText.trim() === '' || toText.trim() === '' || Number.isNaN(n) || Number.isNaN(m)) return
+    host
+      .addRecent({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        category,
+        fromUnit,
+        toUnit,
+        fromValue: n,
+        toValue: m,
+      })
+      .then(() => host.listRecent())
+      .then(setRecent)
   }
 
-  const changeUnit = (which: 'from' | 'to', unit: string) => {
-    if (which === 'from') setFromUnit(unit)
-    else setToUnit(unit)
-    setFromValue('')
-    setToValue('')
-    setInvalid(false)
-    clearTrackers()
-  }
-
-  // Swap exchanges the two units and keeps each field's number: after swapping, the number that
-  // was read in Meters now sits under the Feet label (and vice versa), which is what "the swap
-  // button exchanges the two units and keeps the value" means here.
-  const swap = () => {
-    setFromUnit(toUnit)
-    setToUnit(fromUnit)
-    setInvalid(false)
-  }
-
-  const restore = (record: ConversionRecord) => {
-    setCategory(record.category as Category)
+  function restore(record: ConversionRecord) {
+    const cat = record.category as Category
+    setCategory(cat)
     setFromUnit(record.fromUnit)
     setToUnit(record.toUnit)
-    setFromValue(formatValue(record.fromValue))
-    setToValue(formatValue(record.toValue))
-    setInvalid(false)
-    lastFrom.current = record.fromValue
-    lastTo.current = record.toValue
+    setFromText(formatValue(record.fromValue))
+    setToText(formatValue(record.toValue))
   }
 
-  // The recent entry's accessible name is the conversion line plus a trailing "· {category}" tag.
-  // The trailing tag is what the A7/A8 selectors search for via the regex /· Length/, but because
-  // the name starts with the conversion line, the A4 selector getByRole('button', { name: 'Length' })
-  // (a substring match) never matches it — only the exact "Length" category pill does.
-  const describeRecord = (record: ConversionRecord) =>
-    `${formatValue(record.fromValue)} ${record.fromUnit} = ${formatValue(record.toValue)} ${record.toUnit} · ${record.category}`
+  const fromInvalid = fromText.trim() !== '' && Number.isNaN(Number.parseFloat(fromText))
 
   return (
-    <main>
-      <Card mono="Units" title="Unit converter">
-        <Stack>
-          <Pills items={CATEGORIES} active={category} onSelect={(item) => changeCategory(item as Category)} />
-          <div className="uc-row">
-            <label className="uc-pick">
-              <span>From</span>
-              <select
-                value={fromUnit}
-                onChange={(event) => changeUnit('from', event.target.value)}
-                aria-label="From unit"
-              >
-                {units.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
+    <main className="app-main">
+      <Stack lg>
+        <Card title="Unit converter" mono="Units">
+          <Stack>
+            <div className="field">
+              <label htmlFor="category">Category</label>
+              <select id="category" value={category} onChange={(e) => selectCategory(e.target.value as Category)}>
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
-            </label>
-            <Button kind="secondary" onClick={swap}>
-              Swap
-            </Button>
-            <label className="uc-pick">
-              <span>To</span>
-              <select
-                value={toUnit}
-                onChange={(event) => changeUnit('to', event.target.value)}
-                aria-label="To unit"
-              >
-                {units.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <div className="uc-row">
-            <label className="uc-field">
-              <span className="uc-field-label">Value in {fromUnit}</span>
-              <input
-                className="uc-input"
-                value={fromValue}
-                inputMode="decimal"
-                aria-label={`Value in ${fromUnit}`}
-                onChange={(event) => fill('from', event.target.value)}
-              />
-            </label>
-            <label className="uc-field">
-              <span className="uc-field-label">Value in {toUnit}</span>
-              <input
-                className="uc-input"
-                value={toValue}
-                inputMode="decimal"
-                aria-label={`Value in ${toUnit}`}
-                onChange={(event) => fill('to', event.target.value)}
-              />
-            </label>
-          </div>
-          {invalid && (
-            <Body sm>
-              <span role="alert">Enter a number, that input is not a number.</span>
-            </Body>
-          )}
-          <Card mono="Recent" title="Recent conversions" flush>
-            <ul className="uc-recent">
-              {recent.map((record) => (
-                <li key={record.id} className="uc-recent-row">
-                  <button
-                    type="button"
-                    className="uc-recent-item"
-                    aria-label={describeRecord(record)}
-                    onClick={() => restore(record)}
-                  >
-                    {/* The visible text is aria-hidden: the accessible name is the aria-label alone,
-                        so the "· Length" tag is present for the A7/A8 selectors while the substring
-                        "Length" the A4 selector matches never sees the conversion line. */}
-                    <span className="uc-recent-main" aria-hidden="true">
-                      {describeRecord(record)}
-                    </span>
+            </div>
+            <div className="row">
+              <div className="field grow">
+                <label htmlFor="from-unit">From unit</label>
+                <select id="from-unit" value={fromUnit} onChange={(e) => selectFromUnit(e.target.value)}>
+                  {units.map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+              <Button kind="ghost" onClick={swap}>Swap</Button>
+              <div className="field grow">
+                <label htmlFor="to-unit">To unit</label>
+                <select id="to-unit" value={toUnit} onChange={(e) => selectToUnit(e.target.value)}>
+                  {units.map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field grow">
+                <label htmlFor="from-value">From value</label>
+                <input id="from-value" value={fromText} onChange={(e) => onFromChange(e.target.value)} inputMode="decimal" placeholder="0" />
+                {fromInvalid && <div className="error">Enter a number.</div>}
+              </div>
+              <div className="field grow">
+                <label htmlFor="to-value">To value</label>
+                <input id="to-value" value={toText} onChange={(e) => onToChange(e.target.value)} inputMode="decimal" placeholder="0" />
+              </div>
+            </div>
+            <div>
+              <Button kind="primary" onClick={save}>Save</Button>
+            </div>
+          </Stack>
+        </Card>
+        <Card title="Recent" mono="Recent conversions">
+          {recent.length === 0 ? (
+            <div>
+              <div className="muted">No conversions yet. Type a value above.</div>
+            </div>
+          ) : (
+            <ul aria-label="Recent">
+              {recent.map((r) => (
+                <li key={r.id}>
+                  <button type="button" className="recent-item" onClick={() => restore(r)}>
+                    {formatValue(r.fromValue)} {r.fromUnit} = {formatValue(r.toValue)} {r.toUnit}
                   </button>
                 </li>
               ))}
-              {recent.length === 0 && (
-                <li className="uc-recent-empty">
-                  <Body sm>No conversions yet. Type a value above.</Body>
-                </li>
-              )}
             </ul>
-          </Card>
-        </Stack>
-      </Card>
+          )}
+        </Card>
+      </Stack>
     </main>
   )
 }
