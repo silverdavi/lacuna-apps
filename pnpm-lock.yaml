@@ -268,9 +268,18 @@ importers:
 
   apps/hangman:
     dependencies:
+      '@lacuna/dialog':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/dialog/0.1.0
+      '@lacuna/random':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/random/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-hotkeys':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-hotkeys/0.1.0
       '@lacuna/use-local-record':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/use-local-record/0.1.0

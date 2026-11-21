@@ -4,7 +4,7 @@
   "name": "Hangman Game",
   "version": "0.1.0",
   "summary": "Guess a hidden word letter by letter before you run out of lives.",
-  "description": "A hidden word, six lives, and the alphabet. Start a round, guess letters, and watch the word appear one letter at a time. The score and best survive a reload.",
+  "description": "A hidden word, six lives, and the alphabet. Start a round, guess letters with your keyboard or the on-screen keypad, and watch the figure rise one stroke at a time. Win to bank points; the score and best survive a reload.",
   "category": "personal",
   "icon": "whiteboard",
   "relationship": {
@@ -34,6 +34,9 @@
     "modules": {
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0",
+      "@lacuna/dialog": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0",
       "@lacuna/use-local-record": "0.1.0"
     }
   },
