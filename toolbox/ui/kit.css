@@ -146,6 +146,23 @@ button.lk-row-text { cursor: pointer; }
 .lk-shell .lc-kpirow { border-top: none; padding-top: 0; }
 .lk-shell .lc-kpi-value { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 
+/* ---------------------------------------------------------------- bold frame
+   The app window is the active Lacuna window: ink border, a hard offset ink shadow, and the app's hue as a
+   thick title band. The hue marks identity (band, plate, rail shadow, section marks, selected row).
+   Rust stays the one action colour. */
+.lk-shell .lk-win { border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); margin-bottom: calc(28px * var(--sf)); }
+:root[data-appearance='dark'] .lk-shell .lk-win { box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.6); }
+.lk-shell .lk-win > .lc-app-bar {
+  height: 42px; border-top-width: 6px; border-bottom: 1px solid var(--ink);
+  background: color-mix(in srgb, var(--win-accent) 22%, var(--ui-card));
+}
+.lk-shell .lk-side .lc-envelope { box-shadow: 3px 3px 0 var(--win-accent); }
+.lk-section::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 7px;
+  background: var(--win-accent); border: 1px solid var(--ink);
+}
+.lk-shell .lk-win .lk-row.hot { background: color-mix(in srgb, var(--win-accent) 14%, transparent); box-shadow: inset 4px 0 0 var(--win-accent); }
+
 /* ---------------------------------------------------------------- tablet and phone */
 @media (max-width: 1000px) {
   .lk-shell .lc-app-body { flex-direction: column; }
@@ -153,7 +170,8 @@ button.lk-row-text { cursor: pointer; }
   .lk-side > * { flex: 1 1 220px; }
 }
 @media (max-width: 720px) {
-  .lk-win { width: calc(100% - calc(16px * var(--sf))); margin: calc(8px * var(--sf)) auto; box-shadow: var(--shadow); }
+  .lk-win { width: calc(100% - calc(16px * var(--sf))); margin: calc(8px * var(--sf)) auto; }
+  .lk-shell .lk-win { box-shadow: 3px 3px 0 var(--ink); margin-bottom: calc(14px * var(--sf)); }
   .lk-main { padding: calc(12px * var(--sf)); }
   .lk-band .lc-persona-detail { display: none; }
   .lk-shell .lc-spacechip { display: none; }
