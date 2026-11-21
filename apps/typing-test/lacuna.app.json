@@ -36,7 +36,10 @@
     "modules": {
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
     }
   },
   "capabilities": [
@@ -77,7 +80,8 @@
   "quality": {
     "tests": [
       "tests/acceptance.spec.ts",
-      "tests/typing.spec.ts"
+      "tests/typing.spec.ts",
+      "tests/features.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
