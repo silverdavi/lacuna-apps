@@ -5,9 +5,13 @@ import {
   AppShell,
   Button,
   Card,
+  EmptyState,
   FormGrid,
+  Kpi,
   KpiRow,
+  List,
   Rail,
+  Row,
   SectionLabel,
   Table,
   TextInput,
@@ -22,6 +26,7 @@ import {
   rateError,
   yearsError,
   type LoanResult,
+  type SavedLoan,
 } from './loan'
 import { host } from './host'
 
@@ -50,44 +55,36 @@ function buildChartData(r: LoanResult) {
   }))
 }
 
+function loadDefaults() {
+  const saved = host.load()
+  if (saved.principal !== '' || saved.rate !== '' || saved.years !== '') {
+    return { principal: saved.principal, rate: saved.rate, years: saved.years }
+  }
+  return { principal: '100000', rate: '5', years: '30' }
+}
+
 export function App() {
-  const [principal, setPrincipal] = useState('')
-  const [rate, setRate] = useState('')
-  const [years, setYears] = useState('')
+  const [defaults] = useState(loadDefaults)
+  const [principal, setPrincipal] = useState(defaults.principal)
+  const [rate, setRate] = useState(defaults.rate)
+  const [years, setYears] = useState(defaults.years)
   const [showSchedule, setShowSchedule] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const [saved, setSaved] = useState<SavedLoan[]>(() => host.listSavedLoans())
+  const [savedMsg, setSavedMsg] = useState(false)
   const [importText, setImportText] = useState('')
   const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null)
-
-  useEffect(() => {
-    const saved = host.load()
-    if (saved.principal !== '' || saved.rate !== '' || saved.years !== '') {
-      setPrincipal(saved.principal)
-      setRate(saved.rate)
-      setYears(saved.years)
-    } else {
-      setPrincipal('100000')
-      setRate('5')
-      setYears('30')
-    }
-    setLoaded(true)
-  }, [])
 
   const pErr = principalError(principal)
   const rErr = rateError(rate)
   const yErr = yearsError(years)
 
-  const result = useMemo(() => {
-    if (pErr || rErr || yErr) return null
-    return calculateLoan({ principal, rate, years })
-  }, [principal, rate, years, pErr, rErr, yErr])
-
+  const [lastResult, setLastResult] = useState<LoanResult | null>(null)
   useEffect(() => {
-    if (loaded && result) host.save({ principal, rate, years })
-  }, [loaded, result, principal, rate, years])
-
-  const displayed = result
-  const showEmpty = !displayed && !loaded
+    if (pErr || rErr || yErr) return
+    const r = calculateLoan({ principal, rate, years })
+    if (r) setLastResult(r)
+  }, [principal, rate, years, pErr, rErr, yErr])
+  const result = lastResult
 
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
@@ -102,6 +99,25 @@ export function App() {
       `Total paid: ${formatMoney(result.totalPaid)}`,
     ]
     void copy(lines.join('\n'))
+  }
+
+  function saveCurrent() {
+    if (!result) return
+    host.addSavedLoan({
+      principal,
+      rate,
+      years,
+      monthlyPayment: result.monthlyPayment,
+      savedAt: Date.now(),
+    })
+    setSaved(host.listSavedLoans())
+    setSavedMsg(true)
+    window.setTimeout(() => setSavedMsg(false), 2000)
+  }
+
+  function removeSaved(id: string) {
+    host.removeSavedLoan(id)
+    setSaved(host.listSavedLoans())
   }
 
   function applyImported(record: Record<string, string>) {
@@ -162,7 +178,7 @@ export function App() {
       ]
     : []
 
-  const chartData = displayed ? buildChartData(displayed) : []
+  const chartData = result ? buildChartData(result) : []
 
   return (
     <AppShell
@@ -176,7 +192,7 @@ export function App() {
         <Rail
           title="Loan Calculator"
           note="Fixed rate · local"
-          chips={['Monthly payment', 'Total interest', 'Amortization', 'Works offline']}
+          chips={['Amortization', 'Saved loans', 'Works offline']}
         />
       }
     >
@@ -208,10 +224,36 @@ export function App() {
           />
         </FormGrid>
         <Actions>
+          <Button onClick={saveCurrent} disabled={!result}>
+            Save loan
+          </Button>
           <Button kind="secondary" onClick={copySummary} disabled={!result}>
             {copied ? 'Copied' : 'Copy summary'}
           </Button>
         </Actions>
+        {savedMsg && <p role="status">Saved.</p>}
+      </Card>
+
+      <Card mono={`Saved · ${saved.length}`} title="Saved loans">
+        {saved.length === 0 ? (
+          <EmptyState title="No saved loans yet" detail="Set a principal, rate, and term, then choose Save loan." />
+        ) : (
+          <List label="Saved loans">
+            {saved.map((loan) => (
+              <Row
+                key={loan.id}
+                title={`${loan.principal} at ${loan.rate}%`}
+                meta={`${loan.years}y`}
+                value={formatMoney(loan.monthlyPayment)}
+                action={
+                  <Button kind="ghost" ariaLabel={`Delete ${loan.principal}`} onClick={() => removeSaved(loan.id)}>
+                    Delete
+                  </Button>
+                }
+              />
+            ))}
+          </List>
+        )}
       </Card>
 
       <Card mono="Import · Export" title="Bring in a loan">
@@ -243,44 +285,14 @@ export function App() {
       </Card>
 
       <Card mono="Result" title="Results">
-        {showEmpty ? (
-          <SectionLabel>Enter a loan to see results</SectionLabel>
-        ) : (
+        {result ? (
           <KpiRow>
-            <div>
-              <textarea
-                aria-label="Monthly payment"
-                readOnly
-                rows={1}
-                value={displayed ? formatMoney(displayed.monthlyPayment) : ''}
-                className="lc-kpi-value accent"
-                style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', lineHeight: 'inherit' }}
-              />
-              <div className="lc-kpi-label">Monthly payment</div>
-            </div>
-            <div>
-              <textarea
-                aria-label="Total interest"
-                readOnly
-                rows={1}
-                value={displayed ? formatMoney(displayed.totalInterest) : ''}
-                className="lc-kpi-value"
-                style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', lineHeight: 'inherit' }}
-              />
-              <div className="lc-kpi-label">Total interest</div>
-            </div>
-            <div>
-              <textarea
-                aria-label="Total paid"
-                readOnly
-                rows={1}
-                value={displayed ? formatMoney(displayed.totalPaid) : ''}
-                className="lc-kpi-value"
-                style={{ resize: 'none', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', lineHeight: 'inherit' }}
-              />
-              <div className="lc-kpi-label">Total paid</div>
-            </div>
+            <Kpi value={formatMoney(result.monthlyPayment)} label="Monthly payment" accent />
+            <Kpi value={formatMoney(result.totalInterest)} label="Total interest" />
+            <Kpi value={formatMoney(result.totalPaid)} label="Total paid" />
           </KpiRow>
+        ) : (
+          <SectionLabel>Enter a loan to see results</SectionLabel>
         )}
       </Card>
 
