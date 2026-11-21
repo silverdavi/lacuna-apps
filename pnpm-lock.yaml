@@ -1041,6 +1041,9 @@ importers:
 
   apps/salary-calculator:
     dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
       '@lacuna/money':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/money/0.1.0
