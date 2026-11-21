@@ -1,15 +1,12 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { AppShell, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { useHotkeys } from '@lacuna/use-hotkeys'
 import { loadState, saveState } from './host'
 import type { GameState } from './host/mock'
-import './app.css'
 
 const GRID = 16
 const SYMBOLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
-// The board is dealt in a fixed order so the game is deterministic: the same
-// cards land in the same slots on every load and on every restart. Position 0
-// and 15 both carry "A", and position 1 carries "B".
 const BOARD: string[] = [
   'A', 'B', 'C', 'D',
   'E', 'F', 'G', 'H',
@@ -39,8 +36,6 @@ export function App() {
   const [state, setState] = useState<GameState>(initial)
   const { symbols, faceUp, locked, score, best } = state
 
-  // Persist on every change so a reload restores the score, best, and the
-  // cards that are currently face-up or matched.
   useLayoutEffect(() => {
     saveState(state)
   }, [state])
@@ -65,7 +60,6 @@ export function App() {
 
   const isUp = (i: number) => faceUp.includes(i) || locked.includes(i)
 
-  // When two mismatched cards are locked, turn both back down after 1 second.
   useEffect(() => {
     if (locked.length !== 2) return
     const id = window.setTimeout(() => {
@@ -80,19 +74,17 @@ export function App() {
     setState((prev) => ({ symbols: deal(), faceUp: [], locked: [], score: 0, best: prev.best }))
   }
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'r' || event.key === 'R') restart()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [restart])
+  useHotkeys([
+    {
+      keys: 'r',
+      handler: () => restart(),
+    },
+  ])
 
   return (
-    <main>
+    <AppShell name="Card Memory Match" icon="grid" hue="cobalt" category="Games">
       <Card mono="Memory">
         <Stack>
-          <h1 className="mg-heading">Card Memory Match</h1>
           <div className="mg-grid" role="group" aria-label="Memory cards">
             {symbols.map((symbol, i) => {
               const up = isUp(i)
@@ -122,6 +114,6 @@ export function App() {
           </div>
         </Stack>
       </Card>
-    </main>
+    </AppShell>
   )
 }

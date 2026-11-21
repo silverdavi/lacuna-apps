@@ -582,9 +582,33 @@ importers:
 
   apps/memory-game:
     dependencies:
+      '@lacuna/board-grid':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/board-grid/0.1.0
+      '@lacuna/dialog':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/dialog/0.1.0
+      '@lacuna/grid-utils':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/grid-utils/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/random':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/random/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-hotkeys':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-hotkeys/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-local-record/0.1.0
+      '@lacuna/use-timer':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-timer/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
