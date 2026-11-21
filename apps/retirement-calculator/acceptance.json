@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1ad47cf072e299e753daa92e7d0f5cc64dbfa02248d6e2bf85ecbe8b8e559223",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Retirement Calculator\" and the text \"Enter your details to estimate your retirement savings.\""
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"30\" in the field labelled \"Current age\", \"65\" in the field labelled \"Retirement age\", \"50000\" in the field labelled \"Current savings\", \"500\" in the field labelled \"Monthly contribution\", and \"7\" in the field labelled \"Annual return %\" then clicking \"Calculate\" shows the result summary line \"Projected savings at retirement: $1,482,532.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After clicking \"Calculate\" with the inputs from A2, the breakdown table shows a row for year 1 with \"Year 1\" and \"$56,000.00\" in the balance column."
+    },
+    {
+      "id": "A4",
+      "text": "After clicking \"Calculate\" with the inputs from A2, the chart tab shows a line chart with 35 data points representing years 1 through 35."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the \"Chart\" tab shows the line chart; clicking the \"Table\" tab shows the breakdown table with the header row \"Year\", \"Contribution\", \"Growth\", \"Balance\"."
+    },
+    {
+      "id": "A6",
+      "text": "Changing the field labelled \"Annual return %\" to \"10\" and clicking \"Calculate\" updates the result summary to \"Projected savings at retirement: $2,138,941.00\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy result\" copies the text \"Projected savings at retirement: $1,482,532.00\" to the clipboard and shows the message \"Copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Save plan\" adds a list item containing \"Plan 1\" and \"Age 30 to 65\" and \"Return 7%\"; clicking \"Save plan\" again adds \"Plan 2\" and \"Age 30 to 65\" and \"Return 7%\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved plans: after saving two plans and reloading, the list still shows \"Plan 1\" and \"Plan 2\" with their details."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2e14ebe663ad808762bb2a5ed7e8dfa64c061b58d41a34bf9c2309ac3e68909c"
+    }
+  ]
+}

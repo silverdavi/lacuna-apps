@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.retirement-calculator",
+  "name": "Retirement Calculator",
+  "version": "0.1.0",
+  "summary": "Estimate your retirement savings from age, savings, monthly contributions, and return.",
+  "description": "Enter your current and retirement ages, your starting savings, your monthly contribution, and an annual return. See the projected savings at retirement, the yearly growth breakdown, and a chart of the balance over the years. Save plans to compare scenarios; everything stays in the browser.",
+  "category": "personal",
+  "tags": [],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/retirement-calculator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:retirement"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "retirement-plan",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the saved retirement plans and their projected totals"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "retirement-plan"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
