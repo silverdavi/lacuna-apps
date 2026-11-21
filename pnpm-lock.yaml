@@ -239,9 +239,9 @@ importers:
       '@lacuna/file-save-open':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/file-save-open/0.1.0
-      '@lacuna/image-ops':
+      '@lacuna/host-mock':
         specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/image-ops/0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
       '@lacuna/ui':
         specifier: workspace:0.1.0
         version: link:../../toolbox
