@@ -43,6 +43,34 @@ importers:
         specifier: ^6.2.0
         version: 6.4.5
 
+  apps/bmi-calculator:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/budget-planner:
     dependencies:
       '@lacuna/ui':
@@ -155,7 +183,63 @@ importers:
         specifier: ^6.2.0
         version: 6.4.5
 
+  apps/grade-calculator:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/habit-tracker:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
+  apps/hangman:
     dependencies:
       '@lacuna/ui':
         specifier: workspace:*
@@ -211,7 +295,81 @@ importers:
         specifier: ^6.2.0
         version: 6.4.5
 
+  apps/image-cropper:
+    dependencies:
+      '@lacuna/before-after':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/before-after/0.1.0
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/file-save-open/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/range-slider':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/range-slider/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-clipboard/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-local-record/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/json-schema:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
+  apps/loan-calculator:
     dependencies:
       '@lacuna/ui':
         specifier: workspace:*
@@ -536,6 +694,40 @@ importers:
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
+  apps/salary-calculator:
+    dependencies:
+      '@lacuna/money':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/money/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-local-record/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -994,6 +1186,22 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/board-kit/0.1.0:
+    dependencies:
+      '@lacuna/tag-input':
+        specifier: workspace:0.1.0
+        version: link:../../tag-input/0.1.0
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../use-collection/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/calculator-kit/0.1.0:
     dependencies:
       '@lacuna/chart':
@@ -1005,6 +1213,31 @@ importers:
       '@lacuna/record-table':
         specifier: workspace:0.1.0
         version: link:../../record-table/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/canvas-kit/0.1.0:
+    dependencies:
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../export-menu/0.1.0
+      '@lacuna/range-slider':
+        specifier: workspace:0.1.0
+        version: link:../../range-slider/0.1.0
+      '@lacuna/toolbar':
+        specifier: workspace:0.1.0
+        version: link:../../toolbar/0.1.0
+      '@lacuna/use-pointer-draw':
+        specifier: workspace:0.1.0
+        version: link:../../use-pointer-draw/0.1.0
+      '@lacuna/use-undo-stack':
+        specifier: workspace:0.1.0
+        version: link:../../use-undo-stack/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -1033,10 +1266,28 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/codecs/0.1.0: {}
+
   toolbox/modules/color-math/0.1.0: {}
 
   toolbox/modules/color-palette/0.1.0:
     dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/color-picker/0.1.0:
+    dependencies:
+      '@lacuna/color-math':
+        specifier: workspace:0.1.0
+        version: link:../../color-math/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -1057,6 +1308,19 @@ importers:
 
   toolbox/modules/confirm-dialog/0.1.0:
     dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/confirm-dialog/0.2.0:
+    dependencies:
+      '@lacuna/dialog':
+        specifier: workspace:0.1.0
+        version: link:../../dialog/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -1209,6 +1473,10 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/host-mock/0.1.0: {}
+
+  toolbox/modules/html-to-markdown/0.1.0: {}
+
   toolbox/modules/ics-calendar/0.1.0: {}
 
   toolbox/modules/image-ops/0.1.0: {}
@@ -1227,6 +1495,24 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/keypad/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/line-items/0.1.0:
+    dependencies:
+      '@lacuna/money':
+        specifier: workspace:0.1.0
+        version: link:../../money/0.1.0
+
+  toolbox/modules/markdown-to-html/0.1.0: {}
 
   toolbox/modules/money-input/0.1.0:
     dependencies:
@@ -1253,6 +1539,26 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/paged-reader/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/passphrase-crypto/0.1.0: {}
+
+  toolbox/modules/password-generate/0.1.0:
+    dependencies:
+      '@lacuna/random':
+        specifier: workspace:0.1.0
+        version: link:../../random/0.1.0
+
+  toolbox/modules/pdf-ops/0.1.0: {}
+
   toolbox/modules/progress-ring/0.1.0:
     dependencies:
       react:
@@ -1262,6 +1568,8 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.3.0
+
+  toolbox/modules/quantity-parse/0.1.0: {}
 
   toolbox/modules/query-spec/0.1.0: {}
 
@@ -1361,6 +1669,8 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/text-transforms/0.1.0: {}
+
   toolbox/modules/toolbar/0.1.0:
     dependencies:
       '@lacuna/use-hotkeys':
@@ -1394,6 +1704,16 @@ importers:
       '@lacuna/use-streak':
         specifier: workspace:0.1.0
         version: link:../../use-streak/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-camera/0.1.0:
+    dependencies:
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -1468,7 +1788,27 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/use-media-recorder/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/use-pointer-draw/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-reminder/0.1.0:
     dependencies:
       react:
         specifier: ^19.0.0
@@ -1525,6 +1865,16 @@ importers:
         version: 19.3.0
 
   toolbox/modules/use-wake-lock/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/waveform/0.1.0:
     dependencies:
       react:
         specifier: ^19.0.0

@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/password-generate",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Generate random passwords and passphrases with configurable character rules and an entropy estimate in bits.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/random": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "passwordGenerate",
+    "kind": "logic",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "df17aa297372b517",
+    "lines": 139,
+    "exports": [
+      "generatePassword",
+      "generatePassphrase",
+      "estimateEntropy"
+    ],
+    "types": [
+      "PasswordRules",
+      "PassphraseOptions",
+      "GenerateResult"
+    ],
+    "signature": "generatePassword( length: number, rules: PasswordRules, seed?: number, ); generatePassphrase( options: PassphraseOptions, seed?: number, ); estimateEntropy(value: string)"
+  }
+}
