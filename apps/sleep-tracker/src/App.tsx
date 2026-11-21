@@ -1,9 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Body, Button, Card, EmptyState, MonoLabel, Stack, TextInput, Title } from '@lacuna/ui'
 import { host } from './host/mock'
-import { formatDuration, QUALITIES, type Quality, type SleepEntry, type SleepState } from './host'
-
-const DAY = 86400000
+import {
+  QUALITIES,
+  addEntry,
+  averageMinutes,
+  computeStreak,
+  deleteEntry,
+  formatDuration,
+  heatmapCells,
+  isLoggable,
+  isValidDate,
+  parseDuration,
+  sortEntries,
+  trendPoints,
+  type Quality,
+  type SleepEntry,
+  type SleepState,
+} from './engine'
 
 function today(): string {
   const d = new Date()
@@ -12,39 +26,11 @@ function today(): string {
   return `${d.getFullYear()}-${m}-${day}`
 }
 
-function dayTime(date: string): number {
-  return Date.parse(`${date}T00:00:00Z`)
-}
-
-function parseDuration(text: string): number | null {
-  const t = text.trim().toLowerCase()
-  if (!t) return null
-  const m = t.match(/^(\d+)\s*h(?:\s*(\d{1,2})\s*m?)?$/)
-  if (m) return Number(m[1]) * 60 + (m[2] ? Number(m[2]) : 0)
-  const h = t.match(/^(\d{1,2})\s*m$/)
-  if (h) return Number(h[1])
-  const all = t.match(/^(\d+)$/)
-  if (all) return Number(all[1])
-  return null
-}
-
-function computeStreak(entries: SleepEntry[]): number {
-  if (!entries.length) return 0
-  const days = new Set(entries.map((e) => dayTime(e.date)))
-  const max = Math.max(...entries.map((e) => dayTime(e.date)))
-  let streak = 0
-  let cursor = max
-  while (days.has(cursor)) {
-    streak += 1
-    cursor -= DAY
+function makeId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
   }
-  return streak
-}
-
-function averageMinutes(entries: SleepEntry[]): number {
-  if (!entries.length) return 0
-  const total = entries.reduce((n, e) => n + e.minutes, 0)
-  return Math.floor(total / entries.length + 0.5)
+  return `s-${Date.now()}-${Math.floor(Math.random() * 1e9)}`
 }
 
 function TrendChart({ entries }: { entries: SleepEntry[] }) {
@@ -60,10 +46,11 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
   const max = Math.max(...hours)
   const span = max - min || 1
   const step = entries.length > 1 ? innerW / (entries.length - 1) : 0
-  const pts = entries.map((e, i) => {
-    const x = entries.length > 1 ? padX + i * step : padX + innerW / 2
-    const y = padTop + innerH - ((e.minutes / 60 - min) / span) * innerH
-    return { x, y, entry: e }
+  const points = trendPoints(entries)
+  const pts = points.map((p, i) => {
+    const x = points.length > 1 ? padX + i * step : padX + innerW / 2
+    const y = padTop + innerH - ((p.hours - min) / span) * innerH
+    return { x, y, point: p }
   })
   const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
   return (
@@ -87,11 +74,11 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
           strokeLinecap="round"
         />
         {pts.map((p) => (
-          <circle key={p.entry.id} cx={p.x.toFixed(2)} cy={p.y.toFixed(2)} r="3.5" fill="var(--accent)" />
+          <circle key={p.point.id} cx={p.x.toFixed(2)} cy={p.y.toFixed(2)} r="3.5" fill="var(--accent)" />
         ))}
         {pts.map((p) => (
           <text
-            key={`v-${p.entry.id}`}
+            key={`v-${p.point.id}`}
             x={p.x.toFixed(2)}
             y={(p.y - 8).toFixed(2)}
             textAnchor="middle"
@@ -99,12 +86,12 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
             fill="var(--ink-40)"
             fontFamily="var(--mono)"
           >
-            {p.entry.minutes / 60}
+            {p.point.hours}
           </text>
         ))}
         {pts.map((p) => (
           <text
-            key={`d-${p.entry.id}`}
+            key={`d-${p.point.id}`}
             x={p.x.toFixed(2)}
             y={(height - 8).toFixed(2)}
             textAnchor="middle"
@@ -112,7 +99,7 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
             fill="var(--ink-40)"
             fontFamily="var(--mono)"
           >
-            {p.entry.date}
+            {p.point.date}
           </text>
         ))}
       </svg>
@@ -121,8 +108,7 @@ function TrendChart({ entries }: { entries: SleepEntry[] }) {
 }
 
 function Heatmap({ entries }: { entries: SleepEntry[] }) {
-  const byDate = new Map(entries.map((e) => [e.date, e]))
-  const dates = [...byDate.keys()].sort()
+  const cells = heatmapCells(entries)
   return (
     <section aria-label="heatmap">
       <MonoLabel sm style={{ color: 'var(--ink-60)' }}>
@@ -136,12 +122,10 @@ function Heatmap({ entries }: { entries: SleepEntry[] }) {
           marginTop: 'calc(8px * var(--sf))',
         }}
       >
-        {dates.map((date) => {
-          const e = byDate.get(date)
-          return (
+        {cells.map((cell) => (
             <div
-              key={date}
-              title={`${date}: ${formatDuration(e?.minutes ?? 0)}`}
+              key={cell.date}
+              title={`${cell.date}: ${cell.label}`}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -153,18 +137,17 @@ function Heatmap({ entries }: { entries: SleepEntry[] }) {
                 background: 'var(--ui-bright)',
               }}
             >
-              <span style={{ font: '400 calc(9px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{date}</span>
+              <span style={{ font: '400 calc(9px * var(--tf)) var(--mono)', color: 'var(--ink-60)' }}>{cell.date}</span>
               <span
                 style={{
                   font: '600 calc(11px * var(--tf)) var(--mono)',
                   color: 'var(--accent)',
                 }}
               >
-                {formatDuration(e?.minutes ?? 0)}
+                {cell.label}
               </span>
             </div>
-          )
-        })}
+          ))}
       </div>
     </section>
   )
@@ -191,18 +174,22 @@ export function App() {
 
   function logSleep() {
     const minutes = parseDuration(duration)
-    if (minutes === null || minutes <= 0) {
+    if (!isLoggable(duration) || minutes === null) {
       setError('Enter a valid duration')
       return
     }
-    const d = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today()
-    setState(host.addEntry(d, minutes, quality))
+    const d = isValidDate(date) ? date : today()
+    const next = addEntry(host.read(), { date: d, minutes, quality, createdAt: Date.now() }, makeId)
+    host.write(next)
+    setState(next)
     setDuration('')
     setError(null)
   }
 
   function remove(id: string) {
-    setState(host.deleteEntry(id))
+    const next = deleteEntry(host.read(), id)
+    host.write(next)
+    setState(next)
   }
 
   return (
