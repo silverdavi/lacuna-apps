@@ -1,15 +1,21 @@
 {
-  "name": "@lacuna/app-habit-tracker",
+  "name": "@lacuna-app/habit-tracker",
   "private": true,
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "check": "node ../../scripts/check-app.mjs"
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
+    "@lacuna/streak-calc": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/use-collection": "workspace:0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
