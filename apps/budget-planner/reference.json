@@ -1,0 +1,15 @@
+{
+  "repo": "dcode-youtube/budget-tracker-with-javascript",
+  "url": "https://github.com/dcode-youtube/budget-tracker-with-javascript",
+  "sha": "04bee8c608573aff55744a5f7e51d5ea0f1ca5bd",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2021 Domenic"
+  ],
+  "files": [
+    "js/BudgetTracker.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "757238ca1562ef26d8187fc4018115f67b97b9e4f960080508bd8835d3886824"
+}

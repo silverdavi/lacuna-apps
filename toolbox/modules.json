@@ -892,6 +892,49 @@
       }
     },
     {
+      "id": "@lacuna/export-menu",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A dropdown menu that exports content as CSV, JSON, PNG or PDF, or prints it, via fileSaveOpen.",
+      "today": [
+        "toolbox/modules/export-menu/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/file-save-open"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "ExportMenu"
+      ],
+      "public": true,
+      "path": "toolbox/modules/export-menu/0.1.0",
+      "bridge": {
+        "component": "ExportMenu",
+        "kind": "widget",
+        "exports": [
+          "ExportMenu"
+        ],
+        "types": [
+          "ExportMenuProps",
+          "ExportOption"
+        ],
+        "signature": "ExportMenu({ options, fileName = 'export', ariaLabel = 'Export', disabled = false, onExport, onE...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "df3b5f263b718669",
+            "lines": 211,
+            "dependencies": {
+              "@lacuna/file-save-open": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/file-save-open",
       "layer": 3,
       "status": "exists",
@@ -1018,6 +1061,96 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "604b284be089503f",
             "lines": 335,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/json-backup",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Serialises app records into a versioned JSON backup and restores them with schema validation and a migration hook.",
+      "today": [
+        "toolbox/modules/json-backup/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "jsonBackup"
+      ],
+      "public": true,
+      "path": "toolbox/modules/json-backup/0.1.0",
+      "bridge": {
+        "component": "jsonBackup",
+        "kind": "logic",
+        "exports": [
+          "exportBackup",
+          "importBackup"
+        ],
+        "types": [
+          "BackupRecord",
+          "BackupFile",
+          "ExportOptions",
+          "ImportOptions",
+          "ImportResult"
+        ],
+        "signature": "exportBackup(options: ExportOptions<T>); importBackup(json: string, options: ImportOptions<T>)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "4fca272b5a31e4cf",
+            "lines": 136,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/money",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Integer minor-unit currency arithmetic with exact rounding, largest-remainder allocation, and Intl formatting.",
+      "today": [
+        "toolbox/modules/money/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "money"
+      ],
+      "public": true,
+      "path": "toolbox/modules/money/0.1.0",
+      "bridge": {
+        "component": "money",
+        "kind": "logic",
+        "exports": [
+          "toMinorUnits",
+          "fromMinorUnits",
+          "add",
+          "sub",
+          "mul",
+          "div",
+          "roundMinor",
+          "allocate",
+          "format"
+        ],
+        "types": [
+          "MinorUnits",
+          "MoneyOptions"
+        ],
+        "signature": "toMinorUnits(major: number, _currency?: string); fromMinorUnits(minor: MinorUnits, _currency?: string); add(a: MinorUnits, b: MinorUnits); sub(a: MinorUnits, b: MinorUnits)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "ec90b51d96d0c639",
+            "lines": 182,
             "dependencies": {}
           }
         }
@@ -1195,6 +1328,52 @@
             "source": "b4b7ec336936288f",
             "lines": 78,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-collection",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Persisted, in-memory list of typed records with add, update, remove, reorder, and archive operations.",
+      "today": [
+        "toolbox/modules/use-collection/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/use-local-record"
+      ],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useCollection"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-collection/0.1.0",
+      "bridge": {
+        "component": "useCollection",
+        "kind": "hook",
+        "exports": [
+          "useCollection"
+        ],
+        "types": [
+          "CollectionItem",
+          "CollectionOptions",
+          "CollectionState",
+          "CollectionActions",
+          "UseCollectionReturn"
+        ],
+        "signature": "useCollection( options: CollectionOptions<T>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "c8084caf7a9a25f3",
+            "lines": 269,
+            "dependencies": {
+              "@lacuna/use-local-record": "0.1.0"
+            }
           }
         }
       }

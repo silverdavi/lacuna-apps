@@ -15,6 +15,52 @@ importers:
         specifier: ^1
         version: 1.65.1
 
+  apps/budget-planner:
+    dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
+      '@lacuna/money':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/money/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-collection/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/json-schema:
     dependencies:
       '@lacuna/ui':
@@ -503,11 +549,28 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/export-menu/0.1.0:
+    dependencies:
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../file-save-open/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/file-save-open/0.1.0: {}
 
   toolbox/modules/host-mock/0.1.0: {}
 
   toolbox/modules/image-ops/0.1.0: {}
+
+  toolbox/modules/json-backup/0.1.0: {}
+
+  toolbox/modules/money/0.1.0: {}
 
   toolbox/modules/password-generate/0.1.0:
     dependencies:
@@ -521,6 +584,19 @@ importers:
 
   toolbox/modules/use-clipboard/0.1.0:
     dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-collection/0.1.0:
+    dependencies:
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../use-local-record/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
