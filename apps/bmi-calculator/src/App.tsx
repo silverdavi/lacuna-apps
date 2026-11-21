@@ -134,8 +134,8 @@ export function App() {
     if (result) void copy(resultText(result.bmi, result.category, units, height, weight))
   }
 
-  const heightHint = units === 'metric' ? 'Centimetres (cm)' : 'Feet (ft)'
-  const weightHint = units === 'metric' ? 'Kilograms (kg)' : 'Pounds (lbs)'
+  const heightLabel = units === 'metric' ? 'Height (cm)' : 'Height (ft)'
+  const weightLabel = units === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
 
   const exportJson = () =>
     JSON.stringify(
@@ -180,28 +180,24 @@ export function App() {
                 ]}
               />
               <MeasureField
-                label="Height"
+                label={heightLabel}
                 value={height}
                 onChange={(value) => {
                   setHeight(value)
                   setError(null)
                   setHeightError(null)
                 }}
-                hint={heightHint}
                 error={heightError}
-                inputMode="decimal"
               />
               <MeasureField
-                label="Weight"
+                label={weightLabel}
                 value={weight}
                 onChange={(value) => {
                   setWeight(value)
                   setError(null)
                   setWeightError(null)
                 }}
-                hint={weightHint}
                 error={weightError}
-                inputMode="decimal"
               />
             </FormGrid>
           </div>
