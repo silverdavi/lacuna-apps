@@ -1,24 +1,12 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { AppShell, Button, Body, Card, Stack } from '@lacuna/ui'
+import { AppShell, Button, Card, Kpi, KpiRow } from '@lacuna/ui'
+import { useHotkeys } from '@lacuna/use-hotkeys'
 import { host } from './host'
-import {
-  COLS,
-  ROWS,
-  type Board,
-  newGame,
-  spawnNext,
-  tryMove,
-  tryRotate,
-  lockPiece,
-  clearLines,
-} from './engine'
+import { COLS, ROWS, type Board, newGame, spawnNext, tryMove, tryRotate, lockPiece, clearLines } from './engine'
+import { CELL_FILLED, CELL_EMPTY, CELL_BORDER } from './colors'
 
 type BoardStatus = 'playing' | 'over'
-
-function key(x: number, y: number) {
-  return y * COLS + x
-}
 
 export function App() {
   const [board, setBoard] = useState<Board>(() => newGame(host.loadGame().best))
@@ -40,37 +28,49 @@ export function App() {
     [],
   )
 
-  const handleKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (status === 'over') return
-      let dir: 'left' | 'right' | 'down' | 'up' | null = null
-      if (e.key === 'ArrowLeft') dir = 'left'
-      else if (e.key === 'ArrowRight') dir = 'right'
-      else if (e.key === 'ArrowDown') dir = 'down'
-      else if (e.key === 'ArrowUp') dir = 'up'
-      if (!dir) return
-      e.preventDefault()
-      applyBoard((prev) => {
-        if (dir === 'down') {
-          const moved = tryMove(prev.grid, prev.piece, 0, 1)
-          if (moved) return { board: { ...prev, piece: moved } }
-          const grid = lockPiece(prev.grid, prev.piece)
-          const { grid: clearedGrid, cleared } = clearLines(grid)
-          const score = prev.score + cleared * 100
-          const best = Math.max(prev.best, score)
-          const after = spawnNext({ ...prev, grid: clearedGrid, score, best })
-          return { board: after.board, over: after.over }
-        }
-        let piece = null
-        if (dir === 'left') piece = tryMove(prev.grid, prev.piece, -1, 0)
-        else if (dir === 'right') piece = tryMove(prev.grid, prev.piece, 1, 0)
-        else piece = tryRotate(prev.grid, prev.piece)
-        if (!piece) return { board: prev }
-        return { board: { ...prev, piece } }
-      })
-    },
-    [status, applyBoard],
-  )
+  const moveLeft = useCallback(() => {
+    applyBoard((prev) => {
+      const piece = tryMove(prev.grid, prev.piece, -1, 0)
+      if (!piece) return { board: prev }
+      return { board: { ...prev, piece } }
+    })
+  }, [applyBoard])
+
+  const moveRight = useCallback(() => {
+    applyBoard((prev) => {
+      const piece = tryMove(prev.grid, prev.piece, 1, 0)
+      if (!piece) return { board: prev }
+      return { board: { ...prev, piece } }
+    })
+  }, [applyBoard])
+
+  const rotate = useCallback(() => {
+    applyBoard((prev) => {
+      const piece = tryRotate(prev.grid, prev.piece)
+      if (!piece) return { board: prev }
+      return { board: { ...prev, piece } }
+    })
+  }, [applyBoard])
+
+  const softDrop = useCallback(() => {
+    applyBoard((prev) => {
+      const moved = tryMove(prev.grid, prev.piece, 0, 1)
+      if (moved) return { board: { ...prev, piece: moved } }
+      const grid = lockPiece(prev.grid, prev.piece)
+      const { grid: clearedGrid, cleared } = clearLines(grid)
+      const score = prev.score + cleared * 100
+      const best = Math.max(prev.best, score)
+      const after = spawnNext({ ...prev, grid: clearedGrid, score, best })
+      return { board: after.board, over: after.over }
+    })
+  }, [applyBoard])
+
+  useHotkeys([
+    { keys: 'ArrowLeft', handler: () => moveLeft(), description: 'Move piece left' },
+    { keys: 'ArrowRight', handler: () => moveRight(), description: 'Move piece right' },
+    { keys: 'ArrowUp', handler: () => rotate(), description: 'Rotate piece' },
+    { keys: 'ArrowDown', handler: () => softDrop(), description: 'Soft drop' },
+  ], { enabled: status === 'playing' })
 
   const restart = useCallback(() => {
     const best = bestRef.current
@@ -79,82 +79,66 @@ export function App() {
     setStatus('playing')
   }, [])
 
-  useLayoutEffect(() => {
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [handleKey])
-
   const filled = new Set<number>()
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      if (board.grid[r][c] !== 0) filled.add(key(c, r))
+      if (board.grid[r][c] !== 0) filled.add(r * COLS + c)
     }
   }
   for (const [cx, cy] of board.piece.cells) {
     const x = board.piece.x + cx
     const y = board.piece.y + cy
-    if (y >= 0 && y < ROWS && x >= 0 && x < COLS) filled.add(key(x, y))
+    if (y >= 0 && y < ROWS && x >= 0 && x < COLS) filled.add(y * COLS + x)
   }
 
   const boardStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-    gridTemplateRows: `repeat(${ROWS}, 1fr)`,
-    width: 'calc(10ch * var(--sf))',
-    aspectRatio: `${COLS} / ${ROWS}`,
+    gap: 'calc(2px * var(--sf))',
+    border: `calc(1px * var(--sf)) solid ${CELL_BORDER}`,
+    borderRadius: 'calc(8px * var(--sf))',
+    padding: 'calc(4px * var(--sf))',
+    background: 'var(--paper-deep)',
   }
 
-  const cellStyle = (isBlock: boolean): CSSProperties => ({
-    border: 'var(--ui-line)',
-    background: isBlock ? 'var(--ink)' : 'var(--ui-bright)',
-  })
+  const cellStyle: CSSProperties = {
+    aspectRatio: '1',
+    borderRadius: 'calc(2px * var(--sf))',
+    border: `calc(1px * var(--sf)) solid ${CELL_BORDER}`,
+  }
 
   return (
     <AppShell name="Classic Tetris" icon="grid" hue="cobalt" category="Personal">
       <Card mono="Personal" actions={<Button kind="primary" onClick={restart}>Restart</Button>}>
-        <Stack>
-          <Body sm>
-            {status === 'playing'
-              ? 'Move with ArrowLeft and ArrowRight, rotate with ArrowUp, and drop with ArrowDown.'
-              : 'The stack reached the top. Click Restart to play again.'}
-          </Body>
-          <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
-            <div>
-              <div className="lc-kpi-value">Score: {board.score}</div>
-              <div className="lc-kpi-label">current</div>
-            </div>
-            <div>
-              <div className="lc-kpi-value">Best: {board.best}</div>
-              <div className="lc-kpi-label">on this device</div>
-            </div>
-          </div>
-          <div
-            role="table"
-            aria-label="Tetris board, 10 columns by 20 rows"
-            style={{ ...boardStyle, gridTemplateColumns: 'none', gridTemplateRows: `repeat(${ROWS}, 1fr)` }}
-          >
-            {Array.from({ length: ROWS }, (_, row) => (
-              <div role="row" key={row} style={{ display: 'grid', gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
-                {Array.from({ length: COLS }, (_, col) => {
-                  const isBlock = filled.has(key(col, row))
-                  return (
-                    <div
-                      key={col}
-                      role="gridcell"
-                      aria-selected={isBlock}
-                      aria-label={`Row ${row + 1}, column ${col + 1}${isBlock ? ', filled' : ''}`}
-                      data-cell=""
-                      data-row={row}
-                      data-col={col}
-                      style={cellStyle(isBlock)}
-                    />
-                  )
-                })}
-              </div>
-            ))}
-          </div>
-          <Body sm>ArrowLeft and ArrowRight move the piece, ArrowUp rotates it, and ArrowDown drops it. Clear a full row to score 100.</Body>
-        </Stack>
+        <KpiRow>
+          <Kpi value={`Score: ${board.score}`} label="Score" />
+          <Kpi value={`Best: ${board.best}`} label="Best" />
+        </KpiRow>
+        <div style={boardStyle} role="group" aria-label={`Tetris board, ${COLS} columns by ${ROWS} rows`}>
+          {Array.from({ length: ROWS }, (_, row) =>
+            Array.from({ length: COLS }, (_, col) => {
+              const isBlock = filled.has(row * COLS + col)
+              return (
+                <div
+                  key={`${row}-${col}`}
+                  data-cell=""
+                  data-row={row}
+                  data-col={col}
+                  data-block={isBlock ? 'true' : 'false'}
+                  style={{
+                    ...cellStyle,
+                    background: isBlock ? CELL_FILLED : CELL_EMPTY,
+                  }}
+                />
+              )
+            }),
+          )}
+        </div>
+        {status === 'over' && (
+          <p style={{ color: 'var(--danger)', fontFamily: 'var(--sans)' }}>
+            Game over. Press Restart to play again.
+          </p>
+        )}
       </Card>
     </AppShell>
   )
