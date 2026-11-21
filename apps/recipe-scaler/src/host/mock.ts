@@ -4,13 +4,10 @@
 import {
   emptyState,
   loadState,
-  makeId,
   saveState,
   type Ingredient,
   type RecipeState,
 } from './index'
-
-const KEY = 'lacuna.recipe-scaler.state'
 
 export const spaceId = 'mock-recipe-scaler'
 
@@ -26,7 +23,12 @@ export const host = {
 
   addIngredient(name: string, quantity: string, unit: string): RecipeState {
     const state = loadState()
-    const ingredient: Ingredient = { id: makeId(), name, quantity, unit }
+    const ingredient: Ingredient = {
+      id: `r-${Date.now()}-${Math.floor(Math.random() * 1e9)}`,
+      name,
+      quantity,
+      unit,
+    }
     const next: RecipeState = {
       ingredients: [...state.ingredients, ingredient],
       originalServings: state.originalServings,
@@ -58,15 +60,6 @@ export const host = {
   clear(): RecipeState {
     return host.write(emptyState())
   },
-
-  reset(): void {
-    try {
-      window.localStorage.removeItem(KEY)
-    } catch {
-      // ignore
-    }
-  },
 }
 
-export { KEY }
 export type { Ingredient, RecipeState }
