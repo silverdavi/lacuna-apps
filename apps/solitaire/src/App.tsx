@@ -1,17 +1,15 @@
-import type { CSSProperties } from 'react'
 import { useEffect, useState } from 'react'
-import { Body, Button, MonoLabel, Stack } from '@lacuna/ui'
-import { loadGame, saveGame, type Card, type GameState, type PileKind, type Rank, type Suit } from './host'
-import './styles.css'
+import { Actions, AppShell, Board, Button, Card, EmptyState, Keys, MonoLabel, Rail, Stack, Tag } from '@lacuna/ui'
+import { FOUNDATION_BG, EMPTY_BG, STOCK_BG, WASTE_BG } from './colors'
+import { loadGame, saveGame, type Card as CardT, type GameState, type Pile, type PileKind, type Rank, type Suit } from './host'
 
 const SUITS: Suit[] = ['s', 'h', 'd', 'c']
-const SUIT_MARK: Record<Suit, string> = { s: 'S', h: 'H', d: 'D', c: 'C' }
 const RANKS: Rank[] = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 const POINTS: Record<Rank, number> = { A: 0, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, J: 10, Q: 10, K: 10 }
 
 const SEED = 56
 
-function seededShuffle(cards: Card[]): Card[] {
+function seededShuffle(cards: CardT[]): CardT[] {
   let state = SEED
   const next = () => {
     state = (state * 1103515245 + 12345) & 0x7fffffff
@@ -28,7 +26,7 @@ function seededShuffle(cards: Card[]): Card[] {
 }
 
 function newGame(): GameState {
-  const deck = SUITS.flatMap((suit) => RANKS.map((rank): Card => ({ suit, rank })))
+  const deck = SUITS.flatMap((suit) => RANKS.map((rank): CardT => ({ suit, rank })))
   const shuffled = seededShuffle(deck)
   const piles: GameState['piles'] = [
     { kind: 'stock', cards: shuffled.slice(0, 24) },
@@ -43,6 +41,30 @@ function newGame(): GameState {
 
 const PILE_LABEL: Record<PileKind, string> = { stock: 'Stock', waste: 'Waste', foundation: 'Foundation', tableau: 'Tableau' }
 
+function pileName(index: number, piles: Pile[]): string {
+  const pile = piles[index]
+  if (pile.kind === 'foundation') return `Foundation ${index - 1}`
+  return PILE_LABEL[pile.kind]
+}
+
+function pileCell(pile: Pile): { bg: string; text: string } {
+  if (pile.kind === 'stock') {
+    return pile.cards.length > 0 ? { bg: STOCK_BG, text: String(pile.cards.length) } : { bg: EMPTY_BG, text: '' }
+  }
+  const top = pile.cards[pile.cards.length - 1]
+  if (!top) return { bg: EMPTY_BG, text: '' }
+  return { bg: pile.kind === 'waste' ? WASTE_BG : FOUNDATION_BG, text: top.rank }
+}
+
+let currentHandler: ((key: string) => void) | null = null
+
+window.addEventListener('keydown', (event) => {
+  if (event.key.startsWith('Arrow')) {
+    event.preventDefault()
+    currentHandler?.(event.key)
+  }
+})
+
 export function App() {
   const [game, setGame] = useState<GameState>(() => loadGame() ?? { piles: [], score: 0, best: 0 })
   const dealt = game.piles.length > 0
@@ -51,10 +73,46 @@ export function App() {
     saveGame(game)
   }, [game])
 
-  const foundations = game.piles.filter((p) => p.kind === 'foundation')
-  const foundationsEmpty = foundations.every((f) => f.cards.length === 0)
+  useEffect(() => {
+    if (!dealt) {
+      currentHandler = null
+      return () => {
+        currentHandler = null
+      }
+    }
+    currentHandler = (key: string) => {
+      const foundations = game.piles.filter((p) => p.kind === 'foundation')
+      const foundationsEmpty = foundations.every((f) => f.cards.length === 0)
+      const free = foundationsEmpty ? 0 : foundations.findIndex((f) => f.cards.length === 0)
+      const focus = document.activeElement as HTMLElement | null
+      const focusedIndex = focus?.dataset?.pileIndex != null ? Number(focus.dataset.pileIndex) : -1
+      const pile = focusedIndex >= 0 ? game.piles[focusedIndex] : undefined
+      const card = pile?.cards[pile?.cards.length - 1]
+      if (!pile || !card) return
+      const moveCard = (target: number, points: number) => {
+        const piles = game.piles.map((p, i) => {
+          if (i === focusedIndex) return { ...p, cards: p.cards.slice(0, -1) }
+          if (i === target) return { ...p, cards: [...p.cards, card] }
+          return p
+        })
+        const score = game.score + points
+        setGame({ piles, score, best: Math.max(game.best, score) })
+      }
+      if (pile.kind === 'stock') {
+        if (key === 'ArrowRight') moveCard(1, 0)
+      } else if (pile.kind === 'waste') {
+        if (key === 'ArrowDown' && free >= 0) moveCard(2 + free, POINTS[card.rank])
+      } else if (pile.kind === 'foundation') {
+        if (key === 'ArrowUp') moveCard(1, -POINTS[card.rank])
+      }
+    }
+    return () => {
+      currentHandler = null
+    }
+  }, [game, dealt])
 
   const best = Math.max(game.best, game.score)
+  const foundationsDone = dealt && game.piles.filter((p) => p.kind === 'foundation').every((f) => f.cards.length === 13)
 
   function deal() {
     const fresh = newGame()
@@ -62,124 +120,56 @@ export function App() {
     setGame(fresh)
   }
 
-  function move(pileIndex: number, key: string) {
-    const pile = game.piles[pileIndex]
-    const card = pile.cards[pile.cards.length - 1]
-    if (!card) return
-    const moveCard = (target: number, points: number) => {
-      const piles = game.piles.map((p, i) => {
-        if (i === pileIndex) return { ...p, cards: p.cards.slice(0, -1) }
-        if (i === target) return { ...p, cards: [...p.cards, card] }
-        return p
-      })
-      const score = game.score + points
-      setGame({ piles, score, best: Math.max(game.best, score) })
-    }
-    if (pile.kind === 'stock') {
-      if (key === 'ArrowRight' && card) moveCard(1, 0)
-    } else if (pile.kind === 'waste') {
-      if (key === 'ArrowDown') {
-        const free = foundationsEmpty ? 0 : foundations.findIndex((f) => f.cards.length === 0)
-        if (free >= 0) moveCard(2 + free, POINTS[card.rank])
-      }
-    } else if (pile.kind === 'foundation') {
-      if (key === 'ArrowUp') moveCard(1, -POINTS[card.rank])
-    }
-  }
-
-  function pileName(index: number): string {
-    const pile = game.piles[index]
-    if (pile.kind === 'foundation') return `Foundation ${index - 1}`
-    return PILE_LABEL[pile.kind]
-  }
-
   return (
-    <main className="sol" style={styles.page}>
-      <header style={styles.head}>
-        <h1 style={styles.title}>Solitaire Game</h1>
-        <Stack style={{ alignSelf: 'flex-end' }}>
-          <MonoLabel sm>Score: {game.score}</MonoLabel>
-          <MonoLabel sm>Best: {best}</MonoLabel>
-        </Stack>
-      </header>
-      <div style={styles.controls}>
-        <Button kind="primary" onClick={deal}>New Game</Button>
-        {!dealt && <Body sm>Deal the board to begin.</Body>}
-      </div>
-      {dealt && (
-        <div role="group" aria-label="Board" style={styles.board}>
-          {game.piles.map((pile, i) => (
-            <div
-              key={i}
-              role="group"
-              aria-label={pileName(i)}
-              className="sol-pile"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key.startsWith('Arrow')) {
-                  e.preventDefault()
-                  move(i, e.key)
-                }
-              }}
-              style={styles.pile}
-            >
-              {pile.kind === 'stock' && pile.cards.length > 0 ? (
-                <div style={styles.count} aria-hidden="true">
-                  {pile.cards.length}
+    <AppShell
+      name="Solitaire Game"
+      icon="grid"
+      hue="cobalt"
+      category="Personal"
+      meta={dealt ? `${best} best` : '52 cards'}
+      status={dealt ? 'Local · no network' : 'Deal to begin · local'}
+      side={
+        <Rail title="Solitaire Game" note="One deck · local" chips={['52 cards', 'Works offline']}>
+          <Stack>
+            <MonoLabel sm>Score: {game.score}</MonoLabel>
+            <MonoLabel sm>Best: {best}</MonoLabel>
+          </Stack>
+          <Keys
+            items={[
+              ['→', 'Draw from stock'],
+              ['↓', 'Waste to foundation'],
+              ['↑', 'Foundation back to waste'],
+            ]}
+          />
+          {foundationsDone ? (
+            <Tag accent>Game won</Tag>
+          ) : null}
+        </Rail>
+      }
+    >
+      <Card mono={dealt ? 'Table' : 'Table'} title="Board" actions={<Actions><Button kind="primary" onClick={deal}>New Game</Button></Actions>}>
+        {!dealt ? (
+          <EmptyState mono="Empty" title="No board yet" detail="Press New Game to deal the deck." />
+        ) : (
+          <Board cols={6} rows={1} cell={56} label="Board">
+            {game.piles.map((pile, i) => {
+              const cell = pileCell(pile)
+              return (
+                <div
+                  key={i}
+                  role="group"
+                  aria-label={pileName(i, game.piles)}
+                  tabIndex={0}
+                  data-pile-index={i}
+                  style={{ background: cell.bg }}
+                >
+                  {cell.text}
                 </div>
-              ) : pile.cards.length > 0 ? (
-                <div style={styles.card} aria-hidden="true">
-                  {pile.cards[pile.cards.length - 1].rank}
-                  <span style={styles.suit}>{SUIT_MARK[pile.cards[pile.cards.length - 1].suit]}</span>
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
-      )}
-    </main>
+              )
+            })}
+          </Board>
+        )}
+      </Card>
+    </AppShell>
   )
-}
-
-const styles: Record<string, CSSProperties> = {
-  page: { display: 'flex', flexDirection: 'column', gap: 'calc(16px * var(--sf))', minHeight: '100vh' },
-  title: { fontSize: 'calc(24px * var(--tf))', fontWeight: 700, color: 'var(--ink)' },
-  head: { display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'calc(16px * var(--sf))' },
-  controls: { display: 'flex', alignItems: 'center', gap: 'calc(16px * var(--sf))' },
-  board: { display: 'grid', gridAutoFlow: 'column', gridAutoColumns: '1fr', gap: 'calc(16px * var(--sf))' },
-  pile: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    gap: 'calc(8px * var(--sf))',
-    padding: 'calc(16px * var(--sf))',
-    background: 'var(--paper-deep)',
-    border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-    borderRadius: 'calc(4px * var(--sf))',
-  },
-  count: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 'calc(64px * var(--sf))',
-    background: 'var(--paper-deep)',
-    border: 'calc(1px * var(--sf)) dashed var(--ink-40)',
-    borderRadius: 'calc(4px * var(--sf))',
-    fontSize: 'calc(20px * var(--tf))',
-    fontWeight: 700,
-    color: 'var(--ink)',
-  },
-  card: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 'calc(4px * var(--sf))',
-    height: 'calc(64px * var(--sf))',
-    background: 'var(--ui-card)',
-    border: 'calc(1px * var(--sf)) solid var(--ink-80)',
-    borderRadius: 'calc(4px * var(--sf))',
-    fontSize: 'calc(18px * var(--tf))',
-    fontWeight: 600,
-  },
-  suit: { fontSize: 'calc(12px * var(--tf))', color: 'var(--mid)' },
 }
