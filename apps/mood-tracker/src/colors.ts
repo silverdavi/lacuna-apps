@@ -7,9 +7,9 @@ export const MOOD_VALUE: Record<string, number> = {
 }
 
 export const MOOD_COLOR: Record<string, string> = {
-  Anxious: 'hsl(350 65% 55%)',
-  Low: 'hsl(30 80% 55%)',
-  Calm: 'hsl(200 60% 50%)',
-  Good: 'hsl(150 55% 45%)',
-  Great: 'hsl(140 70% 40%)',
+  Anxious: 'var(--danger)',
+  Low: 'var(--warn)',
+  Calm: 'var(--ink-60)',
+  Good: 'var(--geo-cobalt)',
+  Great: 'var(--ok)',
 }
