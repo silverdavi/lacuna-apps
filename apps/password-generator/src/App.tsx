@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { AppShell, Button, Card, Checkbox, MonoLabel, Stack, TextInput } from '@lacuna/ui'
 import { DEFAULT_SETTINGS, host } from './host'
 import type { Settings } from './host'
 
@@ -71,41 +71,27 @@ export function App() {
   }
 
   return (
-    <main>
+    <AppShell name="Password Generator" icon="grid" hue="rust" category="Productivity">
       <Card mono="Generator">
         <Stack>
-          <h1 className="lc-title lc-title-lg">Password Generator</h1>
-          <Body>Choose a length and the kinds of characters to use, then press Generate. The settings stay on this device.</Body>
-          <label className="lc-field">
-            <span className="lc-field-label">Length</span>
-            <input
-              className="lc-input"
-              type="number"
-              min={MIN_LENGTH}
-              max={MAX_LENGTH}
-              value={lengthText}
-              onChange={(event) => {
-                setLengthText(event.target.value)
-                setSettings((current) => {
-                  const length = Number(event.target.value)
-                  if (Number.isInteger(length) && length >= MIN_LENGTH && length <= MAX_LENGTH) {
-                    return { ...current, length }
-                  }
-                  return current
-                })
-              }}
-            />
-          </label>
+          <TextInput
+            label="Length"
+            type="number"
+            value={lengthText}
+            onChange={(value) => {
+              setLengthText(value)
+              setSettings((current) => {
+                const length = Number(value)
+                if (Number.isInteger(length) && length >= MIN_LENGTH && length <= MAX_LENGTH) {
+                  return { ...current, length }
+                }
+                return current
+              })
+            }}
+          />
           <Stack>
             {SETS.map((set) => (
-              <label key={set.key} style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
-                <input
-                  type="checkbox"
-                  checked={settings[set.key]}
-                  onChange={() => toggle(set.key)}
-                />
-                <span>{set.label}</span>
-              </label>
+              <Checkbox key={set.key} label={set.label} checked={settings[set.key]} onChange={() => toggle(set.key)} />
             ))}
           </Stack>
           <Button kind="primary" onClick={onGenerate}>
@@ -115,14 +101,10 @@ export function App() {
             <span className="lc-field-label">Password</span>
             <input className="lc-input filled" readOnly value={password} />
           </label>
-          {error && (
-            <MonoLabel accent>{error}</MonoLabel>
-          )}
-          {strength && (
-            <MonoLabel>Strength: {strength}</MonoLabel>
-          )}
+          {error && <MonoLabel accent>{error}</MonoLabel>}
+          {strength && <MonoLabel>Strength: {strength}</MonoLabel>}
         </Stack>
       </Card>
-    </main>
+    </AppShell>
   )
 }
