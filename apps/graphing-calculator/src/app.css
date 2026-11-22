@@ -1,0 +1,28 @@
+/* App-level tab styling for graphing-calculator. The kit's inactive-tab
+   color sits below the WCAG AA contrast floor, so the app draws its own
+   tab strip with a legible inactive state. */
+
+.gc-tabs {
+  display: flex;
+  gap: calc(20px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.gc-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.gc-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+
