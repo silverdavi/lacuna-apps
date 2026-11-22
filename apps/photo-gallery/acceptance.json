@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "56d94b9f9dd754e0eec3d88b6b700b9af9a66a194b390121b7a522ad9fbe6aab",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Local Photo Gallery\" and the text \"No photos yet\" in the main content area."
+    },
+    {
+      "id": "A2",
+      "text": "After dropping a file named \"sunset.jpg\" (simulated via the file input), a grid item appears with the label \"sunset.jpg\" and a thumbnail. The text \"No photos yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the grid item labeled \"sunset.jpg\" opens a full-screen lightbox overlay displaying the image and a close button labeled \"Close\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the lightbox, clicking the button labeled \"Rotate 90\" rotates the displayed image 90 degrees clockwise. The button label remains \"Rotate 90\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the lightbox, clicking the button labeled \"Export\" triggers a download of a file named \"sunset_rotated.jpg\". The lightbox remains open."
+    },
+    {
+      "id": "A6",
+      "text": "Closing the lightbox by clicking \"Close\" returns to the grid view. The grid item \"sunset.jpg\" is still present."
+    },
+    {
+      "id": "A7",
+      "text": "After adding a second file \"beach.png\", the user drags the \"beach.png\" item above the \"sunset.jpg\" item using the drag handle. The grid order becomes \"beach.png\" first, then \"sunset.jpg\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labeled \"Delete beach.png\" on the grid item removes that item from the grid. The grid now contains only \"sunset.jpg\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the remaining photo \"sunset.jpg\" in the grid and the heading \"Local Photo Gallery\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b9f8b543de77676dc844390d3c3791b67d02ca4a8dd10dd47ebc2d87c5aaf0cb"
+    }
+  ]
+}
