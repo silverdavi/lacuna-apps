@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.tax-calculator",
+  "name": "Income Tax Calculator",
+  "version": "0.1.0",
+  "summary": "Estimate the federal income tax on a gross annual income by filing status.",
+  "description": "Enter a gross annual income and a filing status. The calculator applies the standard deduction and the federal bracket table, then shows the tax owed, the effective rate and the taxable income. A bracket breakdown table and a composition chart show how the tax is built up. The last calculation persists across page reloads. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["tax", "income", "calculator", "finance"],
+  "icon": "taxes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/tax-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:tax-calculation",
+    "view:bracket-breakdown"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "tax-calculation",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Income Tax Calculator records"
+      }
+    ],
+    "platform": [
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "tax-calculation"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ede98fadaa9ca5eddb5218b6f676d31c6a575701a47e4661de11e02664324075",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Income Tax Calculator\" and the result summary shows \"Tax: $0.00\", \"Effective rate: 0.00%\", and \"Taxable income: $0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 50000 in the field labelled \"Gross income\", selecting \"Single\" in the select labelled \"Filing status\", and clicking \"Calculate\" shows \"Tax: $5,500.00\", \"Effective rate: 11.00%\", and \"Taxable income: $40,000.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing 100000 in the field labelled \"Gross income\", selecting \"Single\" in the select labelled \"Filing status\", and clicking \"Calculate\" shows \"Tax: $13,200.00\", \"Effective rate: 13.20%\", and \"Taxable income: $90,000.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 50000 in the field labelled \"Gross income\", selecting \"Married filing jointly\" in the select labelled \"Filing status\", and clicking \"Calculate\" shows \"Tax: $4,400.00\", \"Effective rate: 8.80%\", and \"Taxable income: $40,000.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing 200000 in the field labelled \"Gross income\", selecting \"Single\" in the select labelled \"Filing status\", and clicking \"Calculate\" shows \"Tax: $42,900.00\", \"Effective rate: 21.45%\", and \"Taxable income: $190,000.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "After calculating with Gross income 50000 and Filing status \"Single\", the breakdown table contains a row with \"10%\" and \"$4,000.00\" and a row with \"12%\" and \"$1,500.00\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy result\" copies the text \"Tax: $5,500.00\" to the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "Typing 0 in the field labelled \"Gross income\" and clicking \"Calculate\" shows the message \"Enter a gross income greater than 0\" and the result summary remains \"Tax: $0.00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last calculation: after calculating with Gross income 50000 and Filing status \"Single\", reloading the page still shows \"Tax: $5,500.00\" and \"Effective rate: 11.00%\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0a35a2e49cf3d751da7b72963c164ee734b252887df326f3a6952d1187d1157c"
+    }
+  ]
+}
