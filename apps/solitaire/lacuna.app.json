@@ -32,13 +32,16 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/export-menu": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
     "view:game",
-    "edit:game"
+    "edit:game",
+    "export:game"
   ],
   "permissions": {
     "records": [

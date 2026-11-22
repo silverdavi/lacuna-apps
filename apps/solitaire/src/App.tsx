@@ -3,9 +3,9 @@ import type { CSSProperties } from 'react'
 import {
   Actions,
   AppShell,
-  Board,
   Button,
   Card,
+  Divider,
   EmptyState,
   Kpi,
   KpiRow,
@@ -16,9 +16,11 @@ import {
   Stack,
   Tag,
 } from '@lacuna/ui'
+import { ExportMenu } from '@lacuna/export-menu'
+import { useClipboard } from '@lacuna/use-clipboard'
 import { SUIT_SYMBOL, loadGame, saveGame } from './host'
 import type { Card as CardT, GameState, Pile, PileKind, Rank, Suit } from './host'
-import { EMPTY_BG, FOUNDATION_BG, STOCK_BG, WASTE_BG } from './colors'
+import { CARD_BG, CARD_EDGE, EMPTY_BG, PAPER } from './colors'
 
 const SUITS: Suit[] = ['s', 'h', 'd', 'c']
 const RANKS: Rank[] = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
@@ -26,10 +28,6 @@ const POINTS: Record<Rank, number> = { A: 0, '2': 2, '3': 3, '4': 4, '5': 5, '6'
 
 const SEED = 56
 const MAX_HISTORY = 24
-
-const BOARD_COLS = 6
-const BOARD_ROWS = 1
-const BOARD_CELL = 72
 
 function seededShuffle(cards: CardT[]): CardT[] {
   let state = SEED
@@ -93,6 +91,27 @@ function topCard(pile: Pile): CardT | null {
   return pile.cards.length > 0 ? pile.cards[pile.cards.length - 1] : null
 }
 
+function cardName(card: CardT): string {
+  return `${card.rank}${SUIT_SYMBOL[card.suit]}`
+}
+
+function isRed(suit: Suit): boolean {
+  return suit === 'h' || suit === 'd'
+}
+
+const exportText = (view: GameView, best: number, hint: string | null) =>
+  [
+    'Solitaire',
+    `Score: ${view.game.score}`,
+    `Best: ${best}`,
+    hint ? `Last hint: ${hint}` : 'Last hint: none',
+    '',
+    ...view.game.piles.map((p, i) => {
+      const cards = p.cards.length === 0 ? 'empty' : p.cards.map(cardName).join(', ')
+      return `${pileName(i, view.game.piles)}: ${cards}`
+    }),
+  ].join('\n')
+
 let currentHandler: ((key: string) => void) | null = null
 window.addEventListener('keydown', (event) => {
   if (event.key.startsWith('Arrow')) {
@@ -106,10 +125,16 @@ export function App() {
     const saved = loadGame()
     return saved ? { game: saved, log: [] } : { game: { piles: [], score: 0, best: 0 }, log: [] }
   })
+  const [hint, setHint] = useState<string | null>(null)
+  const [copyError, setCopyError] = useState<string | null>(null)
   const dealt = view.game.piles.length > 0
   const best = Math.max(view.game.best, view.game.score)
   const foundationsDone = dealt && view.game.piles.filter((p) => p.kind === 'foundation').every((f) => f.cards.length === 13)
   const foundationsPlaced = dealt ? view.game.piles.filter((p) => p.kind === 'foundation').reduce((n, f) => n + f.cards.length, 0) : 0
+  const { copied, copy } = useClipboard({
+    timeoutMs: 1500,
+    onError: () => setCopyError('Copy failed — the clipboard is not available here.'),
+  })
 
   useEffect(() => {
     saveGame(view.game)
@@ -147,7 +172,13 @@ export function App() {
         if (pile.kind === 'stock') {
           if (key === 'ArrowRight') return move(1, 0, 'stock')
         } else if (pile.kind === 'waste') {
-          if (key === 'ArrowDown' && free >= 0) return move(2 + free, POINTS[card.rank], 'waste')
+          if (key === 'ArrowDown') {
+            if (free < 0) {
+              setHint('Every foundation is full — no card can be sent home.')
+              return prev
+            }
+            return move(2 + free, POINTS[card.rank], 'waste')
+          }
         } else if (pile.kind === 'foundation') {
           if (key === 'ArrowUp') return move(1, -POINTS[card.rank], 'foundation')
         }
@@ -160,6 +191,7 @@ export function App() {
   }, [dealt])
 
   function applyMove(from: number, to: number, points: number) {
+    setHint(null)
     setView((prev) => {
       const pile = prev.game.piles[from]
       const card = pile?.cards[pile?.cards.length - 1]
@@ -185,6 +217,7 @@ export function App() {
   const draw = () => {
     if (!dealt) return
     if (view.game.piles[0].cards.length === 0) return
+    setHint(null)
     applyMove(0, 1, 0)
   }
 
@@ -193,7 +226,11 @@ export function App() {
     const card = topCard(view.game.piles[1])
     if (!card) return
     const free = firstFreeFoundation(view.game.piles)
-    if (free < 0) return
+    if (free < 0) {
+      setHint('Every foundation is full — no card can be sent home.')
+      return
+    }
+    setHint(null)
     applyMove(1, 2 + free, POINTS[card.rank])
   }
 
@@ -202,18 +239,25 @@ export function App() {
     const target = view.game.piles[2]
     const card = topCard(target)
     if (!card) return
+    setHint(null)
     applyMove(2, 1, -POINTS[card.rank])
   }
 
   function deal() {
     const fresh = newGame()
     fresh.best = Math.max(fresh.best, view.game.best, view.game.score)
+    setHint(null)
     setView({ game: fresh, log: [] })
   }
 
   const wasteCount = dealt ? view.game.piles[1].cards.length : 0
   const stockCount = dealt ? view.game.piles[0].cards.length : 0
   const foundationsFull = dealt && foundationsDone
+
+  const onCopy = () => {
+    setCopyError(null)
+    void copy(exportText(view, best, hint)).catch(() => setCopyError('Copy failed — the clipboard is not available here.'))
+  }
 
   return (
     <AppShell
@@ -229,6 +273,10 @@ export function App() {
             <KpiRow>
               <Kpi value={`Score: ${view.game.score}`} label="this deal" accent />
               <Kpi value={`Best: ${best}`} label="on this device" />
+            </KpiRow>
+            <KpiRow>
+              <Kpi value={stockCount} label="in stock" />
+              <Kpi value={wasteCount} label="in waste" />
               <Kpi value={foundationsPlaced} label="cards home" />
             </KpiRow>
             <Actions>
@@ -244,35 +292,86 @@ export function App() {
                 ['↑', 'Foundation back to waste'],
               ]}
             />
-            {foundationsFull ? (
-              <Tag accent>Game won · four foundations</Tag>
-            ) : null}
+            {foundationsFull ? <Tag accent>Game won · four foundations</Tag> : null}
           </Stack>
         </Rail>
       }
     >
-      <Card mono="Table" title="Board" actions={<Actions><Button kind="primary" onClick={deal}>New Game</Button></Actions>}>
+      <Card
+        mono="Table"
+        title="Board"
+        actions={
+          <Actions>
+            <Button kind="primary" onClick={deal}>New Game</Button>
+          </Actions>
+        }
+      >
         {!dealt ? (
-          <EmptyState mono="Empty" title="No board yet" detail="Press New Game to deal the deck, then click the stock to draw or use the arrow keys." />
+          <EmptyState
+            mono="Empty"
+            title="No board yet"
+            detail="Press New Game to deal the deck, then click the stock to draw or use the arrow keys."
+          />
         ) : (
-          <Board cols={BOARD_COLS} rows={BOARD_ROWS} cell={BOARD_CELL} label="Solitaire board">
-            {view.game.piles.map((pile, i) => (
-              <PileCell key={i} pile={pile} index={i} piles={view.game.piles} onClick={() => {
-                if (pile.kind === 'stock') draw()
-                else if (pile.kind === 'waste') sendToFoundation()
-                else if (pile.kind === 'foundation') bringBack()
-              }} />
-            ))}
-          </Board>
+          <div style={boardStyle}>
+            <div style={rowStyle}>
+              <PileCell
+                pile={view.game.piles[0]}
+                index={0}
+                piles={view.game.piles}
+                onClick={draw}
+              />
+              <PileCell pile={view.game.piles[1]} index={1} piles={view.game.piles} onClick={sendToFoundation} />
+              {view.game.piles.slice(2).map((pile, i) => (
+                <PileCell key={i} pile={pile} index={i + 2} piles={view.game.piles} onClick={bringBack} />
+              ))}
+            </div>
+            {hint ? (
+              <EmptyState
+                mono="Hint"
+                title="Not a legal move"
+                detail={hint}
+              />
+            ) : null}
+            {foundationsFull ? (
+              <EmptyState
+                mono="Won"
+                title="All four foundations complete"
+                detail="Press New Game to deal a fresh deck."
+              />
+            ) : null}
+          </div>
         )}
-        {foundationsFull && (
-          <EmptyState mono="Won" title="All four foundations complete" detail="Press New Game to deal a fresh deck." />
-        )}
+        <Divider />
+        <div>
+          <Actions>
+            <Button onClick={onCopy} disabled={!dealt}>{copied ? 'Copied' : 'Copy game'}</Button>
+            <ExportMenu
+              options={[
+                {
+                  id: 'txt',
+                  label: 'Plain text (.txt)',
+                  mimeType: 'text/plain',
+                  extension: 'txt',
+                  getData: () => exportText(view, best, hint),
+                },
+              ]}
+              fileName="solitaire"
+              ariaLabel="Export game"
+              disabled={!dealt}
+            />
+          </Actions>
+          {copyError ? <EmptyState mono="Error" title="Could not copy" detail={copyError} /> : null}
+        </div>
       </Card>
 
       <Card mono="History" title="Moves this deal">
         {view.log.length === 0 ? (
-          <EmptyState mono="Empty" title="No moves yet" detail="Each draw, foundation call and take-back is recorded here." />
+          <EmptyState
+            mono="Empty"
+            title="No moves yet"
+            detail="Each draw, foundation call and take-back is recorded here."
+          />
         ) : (
           <List label="Moves this deal">
             {view.log.map((m) => (
@@ -291,16 +390,31 @@ export function App() {
   )
 }
 
-function cardName(card: CardT): string {
-  return `${card.rank}${SUIT_SYMBOL[card.suit]}`
+const boardStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'calc(14px * var(--sf))',
+}
+
+const rowStyle: CSSProperties = {
+  display: 'flex',
+  gap: 'calc(10px * var(--sf))',
+  flexWrap: 'wrap',
 }
 
 const faceStyle: CSSProperties = {
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
   userSelect: 'none',
+  background: PAPER,
+  border: `calc(1px * var(--sf)) solid ${CARD_EDGE}`,
+  borderRadius: 'calc(8px * var(--sf))',
+  width: 'calc(64px * var(--sf))',
+  height: 'calc(88px * var(--sf))',
+  flex: '0 0 auto',
 }
 
 function PileCell({ pile, index, piles, onClick }: { pile: Pile; index: number; piles: Pile[]; onClick: () => void }) {
@@ -315,10 +429,9 @@ function PileCell({ pile, index, piles, onClick }: { pile: Pile; index: number; 
 
   if (pile.kind === 'stock') {
     const count = pile.cards.length
-    const bg = count > 0 ? STOCK_BG : EMPTY_BG
     return (
-      <div {...common} style={{ ...faceStyle, background: bg }}>
-        <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(20px * var(--tf))', color: count > 0 ? 'var(--ink)' : 'var(--ink-40)' }}>
+      <div {...common} style={{ ...faceStyle, background: count > 0 ? CARD_BG : EMPTY_BG }}>
+        <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(18px * var(--tf))', color: count > 0 ? 'var(--ink)' : 'var(--ink-40)' }}>
           {count > 0 ? String(count) : '—'}
         </span>
       </div>
@@ -327,22 +440,16 @@ function PileCell({ pile, index, piles, onClick }: { pile: Pile; index: number; 
 
   const card = topCard(pile)
   if (!card) {
-    const bg = pile.kind === 'waste' ? WASTE_BG : FOUNDATION_BG
-    return <div {...common} style={{ ...faceStyle, background: bg }} />
+    return <div {...common} style={faceStyle} />
   }
 
-  const bg = pile.kind === 'waste' ? WASTE_BG : FOUNDATION_BG
   const symbolColor = isRed(card.suit) ? 'var(--danger)' : 'var(--ink)'
   return (
-    <div {...common} style={{ ...faceStyle, background: bg }}>
+    <div {...common} style={faceStyle}>
       <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, color: symbolColor }}>
         <span style={{ fontFamily: 'var(--serif)', fontWeight: 700, fontSize: 'calc(20px * var(--tf))' }}>{card.rank}</span>
-        <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))' }}>{SUIT_SYMBOL[card.suit]}</span>
+        <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(14px * var(--tf))' }}>{SUIT_SYMBOL[card.suit]}</span>
       </span>
     </div>
   )
-}
-
-function isRed(suit: Suit): boolean {
-  return suit === 'h' || suit === 'd'
 }

@@ -1,4 +1,5 @@
-export const STOCK_BG = 'var(--geo-verm)'
-export const WASTE_BG = 'var(--geo-cobalt)'
-export const FOUNDATION_BG = 'var(--geo-comm)'
+// The only file where color literals are allowed.
+export const PAPER = 'var(--ui-bright)'
+export const CARD_EDGE = 'var(--ui-line2)'
+export const CARD_BG = 'var(--ui-card)'
 export const EMPTY_BG = 'var(--ui-bg)'
