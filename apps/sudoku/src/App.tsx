@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { AppShell, Button, Card, Kpi, KpiRow, Keys, Rail, Tag } from '@lacuna/ui'
+import { AppShell, Button, Card, Kpi, KpiRow, Keys, Rail, Stack, Tag } from '@lacuna/ui'
 import {
   makeRecord,
   placeDigit,
@@ -14,6 +14,12 @@ import { host, type PuzzleRecord } from './host'
 import './styles.css'
 
 type Status = 'idle' | 'playing' | 'finished'
+
+let keyHandler: ((e: KeyboardEvent) => void) | null = null
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => keyHandler?.(e))
+}
 
 function freshRecord(difficulty: Difficulty, now: number): PuzzleRecord {
   return makeRecord(difficulty, now, `puz-${now}`, Math.floor(now / 1000))
@@ -81,19 +87,14 @@ export function App() {
   }
 
   stateRef.current = { place, start }
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const s = stateRef.current
-      if (e.key >= '1' && e.key <= '9') s.place(Number(e.key))
-      else if (e.key === ' ') {
-        e.preventDefault()
-        s.start()
-      }
+  keyHandler = (e) => {
+    const s = stateRef.current
+    if (e.key >= '1' && e.key <= '9') s.place(Number(e.key))
+    else if (e.key === ' ') {
+      e.preventDefault()
+      s.start()
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }
 
   const selectedBox =
     selected === null ? -1 : Math.floor(selected / 9 / 3) * 3 + Math.floor((selected % 9) / 3)
@@ -108,6 +109,12 @@ export function App() {
       const invalid = conflicts.has(i)
       const isSel = selected === i
       const inBox = Math.floor(r / 3) === selectedBox && Math.floor(c / 3) === selectedBox
+      const cls =
+        'sud-cell' +
+        (given ? ' sud-cell--given' : '') +
+        (isSel ? ' sud-cell--selected' : '') +
+        (invalid ? ' sud-cell--invalid' : '') +
+        (inBox ? ' sud-cell--peer' : '')
       cells.push(
         <button
           key={i}
@@ -122,21 +129,15 @@ export function App() {
           data-answer={record.given[i]}
           data-selected={isSel ? 'true' : undefined}
           data-conflict={invalid ? 'true' : undefined}
-          className={
-            'sud-cell' +
-            (given ? ' sud-cell--given' : '') +
-            (isSel ? ' sud-cell--selected' : '') +
-            (invalid ? ' sud-cell--invalid' : '') +
-            (inBox ? ' sud-cell--peer' : '')
-          }
+          className={cls}
           onClick={() => select(i)}
         >
-          <span className="sud-cell-val" data-val={v || ''}>{v || ''}</span>
+          <span className="sud-sr">{v || '\u00a0'}</span>
         </button>,
       )
     }
     rows.push(
-      <div key={r} role="row" className="sud-row">
+      <div key={r} role="row">
         {cells}
       </div>,
     )
@@ -168,7 +169,29 @@ export function App() {
       </div>
 
       <Card title="Board">
-        <div className="sud-board lk-board" role="grid" aria-label="Board">
+        <div className="sud-controls">
+          <div className="lc-field">
+            <label className="lc-field-label" htmlFor="sud-difficulty">Difficulty</label>
+            <select
+              id="sud-difficulty"
+              className="lc-input"
+              value={difficulty}
+              onChange={(e) => {
+                const d = e.target.value as Difficulty
+                setDifficulty(d)
+                newGame(d)
+              }}
+            >
+              <option value="Practice">Practice</option>
+              <option value="Easy">Easy</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          <Button kind="primary" onClick={() => newGame(difficulty)}>
+            New Game
+          </Button>
+        </div>
+        <div role="grid" aria-label="Board" className="sud-grid">
           {rows}
         </div>
         {statusText ? (
@@ -179,47 +202,27 @@ export function App() {
       </Card>
 
       <Card title="Controls">
-        <div className="sud-digits">
-          {Array.from({ length: 9 }, (_, k) => k + 1).map((n) => (
-            <Button
-              key={n}
-              ariaLabel={String(n)}
-              style={{ width: 'calc(40px * var(--sf))', justifyContent: 'center', fontFamily: 'var(--mono)' }}
-              onClick={() => place(n)}
-              disabled={status !== 'playing' || selected === null}
-            >
-              {n}
-            </Button>
-          ))}
-        </div>
-        <div className="sud-new">
-          <label className="lc-field">
-            <span className="lc-field-label" id="sud-difficulty">Difficulty</span>
-            <select
-              className="lc-input"
-              aria-labelledby="sud-difficulty"
-              value={difficulty}
-              onChange={(event) => {
-                const d = event.target.value as Difficulty
-                setDifficulty(d)
-                newGame(d)
-              }}
-            >
-              <option value="Practice">Practice</option>
-              <option value="Easy">Easy</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </label>
-          <Button kind="primary" onClick={() => newGame(difficulty)}>
-            New Game
-          </Button>
-        </div>
-        <Keys
-          items={[
-            ['1–9', 'Fill the selected cell.'],
-            ['Space', 'Start the timer.'],
-          ]}
-        />
+        <Stack>
+          <div className="sud-digits">
+            {Array.from({ length: 9 }, (_, k) => k + 1).map((n) => (
+              <Button
+                key={n}
+                ariaLabel={String(n)}
+                style={{ width: 'calc(40px * var(--sf))', justifyContent: 'center', fontFamily: 'var(--mono)' }}
+                onClick={() => place(n)}
+                disabled={status !== 'playing' || selected === null}
+              >
+                {n}
+              </Button>
+            ))}
+          </div>
+          <Keys
+            items={[
+              ['1–9', 'Fill the selected cell.'],
+              ['Space', 'Start the timer.'],
+            ]}
+          />
+        </Stack>
       </Card>
     </AppShell>
   )

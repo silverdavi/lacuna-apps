@@ -12,35 +12,42 @@
   color: var(--ink);
 }
 
-.sud-board {
-  --cols: 9;
-  --rows: 9;
+.sud-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(10px * var(--sf));
+  flex-wrap: wrap;
+  margin-bottom: calc(10px * var(--sf));
 }
 
-.sud-board > .sud-row {
-  display: contents;
+.sud-grid {
+  display: grid;
+  grid-template-columns: repeat(9, calc(30px * var(--sf)));
+  gap: calc(1px * var(--sf));
+  background: var(--ink);
+  border: calc(1px * var(--sf)) solid var(--ink);
+  box-shadow: calc(4px * var(--sf)) calc(4px * var(--sf)) 0 var(--ink);
 }
 
 .sud-cell {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  box-sizing: border-box;
+  font-family: var(--mono);
+  font-size: calc(14px * var(--tf));
+  width: calc(30px * var(--sf));
+  height: calc(30px * var(--sf));
   display: grid;
   place-items: center;
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: calc(16px * var(--tf));
-  line-height: 1;
+  border: none;
+  background: var(--paper);
   color: var(--ink);
-  background: var(--ui-bg);
   cursor: pointer;
+  padding: 0;
+  position: relative;
 }
+
+.sud-cell::before {
+  content: attr(data-value);
+}
+
 
 .sud-cell--given {
   color: var(--mid);
@@ -61,30 +68,21 @@
   color: var(--paper-deep);
 }
 
-.sud-cell-val {
-  position: relative;
-  visibility: hidden;
-}
-
-.sud-cell-val::after {
-  visibility: visible;
-  content: attr(data-val, '');
-}
-
-.sud-cell--invalid .sud-cell-val::after {
-  color: var(--paper-deep);
-}
-
 .sud-digits {
   display: flex;
   gap: calc(6px * var(--sf));
   flex-wrap: wrap;
 }
 
-.sud-new {
-  display: flex;
-  align-items: center;
-  gap: calc(10px * var(--sf));
-  flex-wrap: wrap;
-  margin-top: calc(10px * var(--sf));
+.sud-sr {
+  position: absolute;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
 }
