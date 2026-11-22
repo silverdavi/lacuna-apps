@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6d4704c1f08bec35014d48bbac6a5139503013ae936d3b8017afd24a56c8a086",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Timezone Converter\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the source timezone set to \"UTC\" and the target timezone set to \"New York\", entering \"2024-01-15\" in the date field and \"14:30\" in the time field shows \"09:30\" in the output time field."
+    },
+    {
+      "id": "A3",
+      "text": "With the source timezone set to \"New York\" and the target timezone set to \"Tokyo\", entering \"2024-07-15\" in the date field and \"10:00\" in the time field shows \"23:00\" in the output time field."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Save conversion\" with source \"UTC\", target \"London\", date \"2024-03-10\", time \"12:00\" adds a row to the history table containing \"UTC\", \"London\", \"2024-03-10\", \"12:00\", and \"12:00\"."
+    },
+    {
+      "id": "A5",
+      "text": "After saving a conversion, clicking the \"History\" tab shows a table with a column header \"Source\" and a row containing \"UTC\" and \"London\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Copy result\" copies \"12:00\" to the clipboard when the output time is \"12:00\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the source timezone set to \"UTC\" and the target timezone set to \"Sydney\", entering \"2024-01-15\" in the date field and \"00:00\" in the time field shows \"10:00\" in the output time field."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Swap\" exchanges the source and target timezones; if source was \"UTC\" and target was \"New York\", after clicking source becomes \"New York\" and target becomes \"UTC\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved conversion: after saving a conversion with source \"UTC\", target \"London\", date \"2024-03-10\", time \"12:00\" and reloading, the History tab still shows a row containing \"UTC\", \"London\", \"2024-03-10\", \"12:00\", and \"12:00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7f36a8db251f3bc0fb77b6f69b55f60f82abda4cd92cb46844603f6984a62bce"
+    }
+  ]
+}
