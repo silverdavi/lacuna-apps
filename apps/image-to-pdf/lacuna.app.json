@@ -1,0 +1,93 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.image-to-pdf",
+  "name": "Image To PDF",
+  "version": "0.1.0",
+  "summary": "Order a set of images and download them as one PDF.",
+  "description": "Add images to a list, reorder and delete them, pick a page size, and download the set as a single PDF named images.pdf. The list and the page size stay on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "pdf",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/image-to-pdf",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:image-to-pdf"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "image-to-pdf",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the ordered image list and page size on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "image-to-pdf"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
