@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "72418359a6604646be92f074a521fbbafdc160f0eea8094d1757c7f0451fb785",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"CSV Viewer\" and the text \"Drop a CSV file or click to browse\" in the empty state."
+    },
+    {
+      "id": "A2",
+      "text": "After loading a CSV with header \"Name,Age,City\" and one row \"Alice,30,Paris\", the DataGrid shows a column header \"Name\" and the cell value \"Alice\" in the first data row."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"Alice\" in the input labelled \"Filter\" and pressing Enter filters the grid to show only the row containing \"Alice\"; the row count indicator shows \"1 of 1 rows\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Export CSV\" downloads a file named \"export.csv\" containing the text \"Name,Age,City\\nAlice,30,Paris\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Clear Filter\" removes the filter text from the input labelled \"Filter\" and the grid shows all rows again; the row count indicator shows \"1 of 1 rows\"."
+    },
+    {
+      "id": "A6",
+      "text": "After loading a CSV with two rows \"Alice,30,Paris\" and \"Bob,25,London\", clicking the cell containing \"Bob\" selects it; pressing the Down arrow key moves the selection to the next row, and the cell containing \"Alice\" in the second row is now selected."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Reset\" clears the loaded file and returns the page to the empty state showing \"Drop a CSV file or click to browse\"."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the loaded CSV data and the active filter: after loading \"Name,Age,City\" with row \"Alice,30,Paris\" and filtering by \"Alice\", reloading the page still shows the grid with \"Alice\" and the filter input contains \"Alice\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "e3d5da8b046203815ca77a4d45b067af635d9c2faf94bb9e001c37d8e37a451d"
+    }
+  ]
+}
