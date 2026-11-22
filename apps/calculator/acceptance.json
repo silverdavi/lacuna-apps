@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "814a5e6123c1778418f503c8e4bd4100544dcc73b13543a2246b079ea48163e1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Scientific Calculator\" and the text \"Enter an expression\" in the input panel."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"2 + 3 * 4\" in the field labelled \"Expression\" and pressing the button \"Evaluate\" shows \"14\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"sin(30)\" in the field labelled \"Expression\" and pressing the button \"Evaluate\" shows \"0.5\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"log(1000)\" in the field labelled \"Expression\" and pressing the button \"Evaluate\" shows \"3\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"2 ^ 10\" in the field labelled \"Expression\" and pressing the button \"Evaluate\" shows \"1024\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A6",
+      "text": "After evaluating \"sin(x)\" with the setting \"Degrees\" selected in the select labelled \"Angle mode\", the chart tab shows a point at x=30 with y=0.5; switching to \"Radians\" and re-evaluating shows a point at x=30 with y=-0.988."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy result\" after evaluating \"2 + 3\" copies \"5\" to the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "The history list shows \"2 + 3 = 5\" after the first evaluation; clicking the button \"Clear history\" removes all items and shows \"No history\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the expression \"2 + 3\" in the field labelled \"Expression\" and the history item \"2 + 3 = 5\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d624484b8f500773719b393e54fc62f32eff95ec05d291eced31b2939ead8994"
+    }
+  ]
+}
