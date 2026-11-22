@@ -5,6 +5,7 @@ import {
   Card,
   Kpi,
   KpiRow,
+  Rail,
   Stack,
   TextInput,
 } from '@lacuna/ui'
@@ -36,6 +37,14 @@ function emptyDoc(): Doc {
 
 function defaultColorValue(): ColorValue {
   return parseHex(DEFAULT_COLOR)
+}
+
+function isValidHex(input: string): boolean {
+  let hex = input.trim()
+  if (!hex.startsWith('#')) hex = `#${hex}`
+  let h = hex.slice(1)
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('')
+  return /^[0-9a-fA-F]{6}$/.test(h)
 }
 
 function parseHex(input: string): ColorValue {
@@ -82,8 +91,8 @@ export function App() {
   const [doc, setDoc] = useState<Doc>(emptyDoc)
   const [color, setColor] = useState<ColorValue>(defaultColorValue)
   const [hexDraft, setHexDraft] = useState<string>(() => defaultColorValue().hex)
+  const [hexError, setHexError] = useState<string | null>(null)
   const [status, setStatus] = useState<string | null>(null)
-  const [saveMsg, setSaveMsg] = useState<string | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const layerSeq = useRef(1)
 
@@ -218,11 +227,23 @@ export function App() {
   function handleSaveJson() {
     const data = JSON.stringify({ layers: doc.layers, selectedLayerId: doc.selectedLayerId, tool: doc.tool, color })
     saveBlob(new Blob([data], { type: 'application/json' }), { filename: 'pixel-art.json' })
-    setSaveMsg('Saved pixel-art.json')
+    setStatus('Saved pixel-art.json')
   }
 
   return (
-    <AppShell name="Pixel Art Editor" icon="paint" hue="cobalt" category="Productivity" status={status ?? undefined}>
+    <AppShell
+      name="Pixel Art Editor"
+      icon="paint"
+      hue="cobalt"
+      category="Productivity"
+      status={status ?? undefined}
+      side={
+        <Rail
+          title="Editor"
+          chips={[`${doc.layers.length} layer${doc.layers.length === 1 ? '' : 's'}`, doc.tool]}
+        />
+      }
+    >
       <Stack style={{ padding: 20 }}>
         <Card title="Tools">
           <Stack style={{ gap: '0.5rem' }}>
@@ -238,7 +259,17 @@ export function App() {
         </Card>
 
         <Card title={`Canvas ${GRID}x${GRID}`}>
-          <div role="group" aria-label="Pixel canvas" style={{ width: 256, height: 256 }}>
+          <div
+            role="group"
+            aria-label="Pixel canvas"
+            style={{
+              width: 'calc(256px * var(--sf))',
+              height: 'calc(256px * var(--sf))',
+              backgroundImage:
+                'linear-gradient(to right, var(--ui-line2) calc(1px * var(--sf)), transparent calc(1px * var(--sf))), linear-gradient(to bottom, var(--ui-line2) calc(1px * var(--sf)), transparent calc(1px * var(--sf)))',
+              backgroundSize: 'calc(16px * var(--sf)) calc(16px * var(--sf))',
+            }}
+          >
             <canvas
               ref={canvasRef}
               width={GRID}
@@ -246,10 +277,11 @@ export function App() {
               onClick={onCanvasClick}
               style={{
                 display: 'block',
-                width: 256,
-                height: 256,
+                width: 'calc(256px * var(--sf))',
+                height: 'calc(256px * var(--sf))',
                 cursor: 'crosshair',
                 imageRendering: 'pixelated',
+                background: 'transparent',
               }}
             />
           </div>
@@ -262,39 +294,76 @@ export function App() {
               <Button onClick={deleteSelectedLayer}>Delete Layer</Button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              {doc.layers.map((layer) => (
-                <div
-                  key={layer.id}
-                  role="button"
-                  tabIndex={0}
-                  data-selected={layer.id === doc.selectedLayerId ? 'true' : undefined}
-                  onClick={() => selectLayer(layer.id)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectLayer(layer.id) }}
-                  style={{
-                    cursor: 'pointer',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '0.25rem',
-                    border: layer.id === doc.selectedLayerId ? '0.125rem solid var(--accent)' : '0.125rem solid var(--ui-line2)',
-                  }}
-                >
-                  {layer.name}
-                </div>
-              ))}
+              {doc.layers.map((layer) => {
+                const active = layer.id === doc.selectedLayerId
+                return (
+                  <div
+                    key={layer.id}
+                    role="button"
+                    tabIndex={0}
+                    data-selected={active ? 'true' : undefined}
+                    onClick={() => selectLayer(layer.id)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectLayer(layer.id) }}
+                    style={{
+                      cursor: 'pointer',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '0.25rem',
+                      border: active ? '0.125rem solid var(--accent)' : '0.125rem solid var(--ui-line2)',
+                      background: active ? 'var(--ui-card)' : 'transparent',
+                      fontWeight: active ? 600 : 400,
+                      color: active ? 'var(--ink)' : 'var(--mid)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <span aria-hidden="true" style={{ opacity: active ? 1 : 0.4, fontSize: '0.7rem' }}>
+                      {active ? '●' : '○'}
+                    </span>
+                    <span>{layer.name}</span>
+                  </div>
+                )
+              })}
             </div>
           </Stack>
         </Card>
 
         <Card title="Color">
           <div role="group" aria-label="Color" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <TextInput
-              label="Hex"
-              value={hexDraft}
-              onChange={(value) => {
-                setHexDraft(value)
-                if (/^#?[0-9a-fA-F]{6}$/.test(value.trim())) applyHex(value)
-              }}
-              inputMode="text"
-            />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+              <div
+                role="img"
+                style={{
+                  width: 'calc(40px * var(--sf))',
+                  height: 'calc(40px * var(--sf))',
+                  borderRadius: 'calc(4px * var(--sf))',
+                  border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+                  background: color.hex,
+                  flexShrink: 0,
+                  marginTop: 'calc(18px * var(--sf))',
+                }}
+                aria-label={`Color swatch ${color.hex}`}
+              />
+              <div style={{ flex: 1 }}>
+                <TextInput
+                  label="Hex"
+                  value={hexDraft}
+                  onChange={(value) => {
+                    setHexDraft(value)
+                    if (isValidHex(value)) {
+                      applyHex(value)
+                      setHexError(null)
+                    } else if (value.trim().length > 0) {
+                      setHexError('Enter a valid 6-digit hex color')
+                    } else {
+                      setHexError(null)
+                    }
+                  }}
+                  error={hexError}
+                  inputMode="text"
+                />
+              </div>
+            </div>
             <KpiRow>
               <Kpi value={color.hex} label="Hex" />
               <Kpi value={color.hex} label="Active" accent />
@@ -310,7 +379,6 @@ export function App() {
               <Button onClick={exportPng}>Export PNG</Button>
               <Button onClick={handleSaveJson}>Save JSON</Button>
             </div>
-            {saveMsg && <div style={{ color: 'var(--ink-80)' }}>{saveMsg}</div>}
           </Stack>
         </Card>
       </Stack>
