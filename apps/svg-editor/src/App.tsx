@@ -9,7 +9,10 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   List,
+  Rail,
   Row,
   Stack,
   TextInput,
@@ -239,6 +242,19 @@ export function App() {
       category="Productivity"
       meta={`${layers.length} ${layers.length === 1 ? 'layer' : 'layers'} · ${totalShapes} ${totalShapes === 1 ? 'shape' : 'shapes'}`}
       status={`Canvas ${doc.width} × ${doc.height} · stroke ${doc.strokeWidth}`}
+      side={
+        <Rail
+          title="Canvas"
+          note={`${layers.length} ${layers.length === 1 ? 'layer' : 'layers'}`}
+          chips={[`${doc.width} × ${doc.height}`, `Stroke ${doc.strokeWidth}`, 'PNG export']}
+        >
+          <KpiRow>
+            <Kpi value={String(layers.length)} label="Layers" />
+            <Kpi value={String(totalShapes)} label="Shapes" accent />
+            <Kpi value={`${doc.strokeWidth}px`} label="Stroke" />
+          </KpiRow>
+        </Rail>
+      }
       actions={
         <Actions>
           <Button kind="secondary" onClick={onUndo} disabled={!layersStack.canUndo} title="Undo the last change">
