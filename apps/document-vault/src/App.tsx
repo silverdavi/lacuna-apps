@@ -9,10 +9,14 @@ import {
   Button,
   Card,
   EmptyState,
+  Kpi,
+  KpiRow,
   List,
   MonoLabel,
   PrimaryButton,
+  Rail,
   Row,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import * as vault from './host'
@@ -48,6 +52,7 @@ export function App() {
   const [docs, setDocs] = useState<VaultDocument[]>(() => vault.listDocuments())
   const [query, setQuery] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [lastEvent, setLastEvent] = useState<string | null>(null)
   const [viewing, setViewing] = useState<VaultDocument | null>(null)
 
   const matches = useMemo(
@@ -69,6 +74,7 @@ export function App() {
     const content = typeof result.data === 'string' ? result.data : String(result.data)
     setDocs([...docs, vault.addDocument(file.name, file.size, content)])
     setError(null)
+    setLastEvent(`Added ${file.name} (${formatSize(file.size)})`)
   }
 
   function exportBackup() {
@@ -77,6 +83,7 @@ export function App() {
       documents: docs.map(({ name, size, content }) => ({ name, size, content })),
     }
     saveJSON(backup, { filename: 'document-vault-backup.json', mimeType: 'application/json' })
+    setLastEvent('Backup exported')
   }
 
   async function importBackup(file: File) {
@@ -89,9 +96,23 @@ export function App() {
     const records = parsed.documents.map((d) => vault.addDocument(d.name, d.size, d.content))
     setDocs([...docs, ...records])
     setError(null)
+    setLastEvent(`Imported ${records.length} document${records.length === 1 ? '' : 's'}`)
   }
 
   const addAction = () => browse((file) => void pickDocument(file))
+
+  const totalBytes = docs.reduce((n, d) => n + d.size, 0)
+  const status = error
+    ? `Error: ${error}`
+    : viewing
+      ? `Viewing ${viewing.name}`
+      : lastEvent
+        ? lastEvent
+        : query.trim()
+          ? `Searching: ${matches.length} match${matches.length === 1 ? '' : 'es'}`
+          : docs.length
+            ? `Vault ready: ${docs.length} document${docs.length === 1 ? '' : 's'}`
+            : 'Ready: vault is empty'
 
   return (
     <AppShell
@@ -100,7 +121,23 @@ export function App() {
       hue="brown"
       category="Productivity"
       meta={`${docs.length} ${docs.length === 1 ? 'document' : 'documents'}`}
-      status={error ?? undefined}
+      status={status}
+      side={
+        <Rail
+          title="Vault"
+          note={`${formatSize(totalBytes)} total`}
+          chips={[
+            `${docs.length} stored`,
+            `${matches.length} shown`,
+            docs.length ? 'Backup ready' : 'Empty vault',
+          ]}
+        >
+          <KpiRow>
+            <Kpi value={`${docs.length}`} label="Documents" />
+            <Kpi value={formatSize(totalBytes)} label="On disk" />
+          </KpiRow>
+        </Rail>
+      }
     >
       <Card mono="New" title="Add a document">
         <Actions>
@@ -136,7 +173,12 @@ export function App() {
               <Row
                 key={doc.id}
                 title={doc.name}
-                meta={formatSize(doc.size)}
+                meta={
+                  <span>
+                    <Tag>{formatSize(doc.size)}</Tag>
+                  </span>
+                }
+                hot={viewing?.id === doc.id}
                 action={
                   <Actions>
                     <Button kind="secondary" onClick={() => setViewing(doc)}>
@@ -147,6 +189,7 @@ export function App() {
                       onClick={() => {
                         vault.removeDocument(doc.id)
                         setDocs(docs.filter((d) => d.id !== doc.id))
+                        setLastEvent(`Deleted ${doc.name}`)
                       }}
                     >
                       Delete {doc.name}
@@ -189,10 +232,10 @@ export function App() {
           <div
             style={{
               background: 'var(--ui-card)',
-            border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-            borderRadius: 'calc(6px * var(--sf))',
-            padding: 'calc(18px * var(--sf))',
-            maxWidth: 'min(calc(560px * var(--sf)), 90vw)',
+              border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+              borderRadius: 'calc(6px * var(--sf))',
+              padding: 'calc(18px * var(--sf))',
+              maxWidth: 'min(calc(560px * var(--sf)), 90vw)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
