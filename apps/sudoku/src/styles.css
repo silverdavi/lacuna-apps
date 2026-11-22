@@ -1,88 +1,73 @@
-.sud-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: calc(12px * var(--sf));
-  flex-wrap: wrap;
-}
+/* Sudoku-specific styles. The kit handles all shell, card, button, tag chrome. */
 
 .sud-timer {
   font-family: var(--mono);
-  font-size: calc(18px * var(--tf));
-  color: var(--ink);
-}
-
-.sud-controls {
-  display: flex;
-  align-items: flex-end;
-  gap: calc(10px * var(--sf));
-  flex-wrap: wrap;
-  margin-bottom: calc(10px * var(--sf));
+  font-size: calc(26px * var(--tf));
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 .sud-grid {
-  display: grid;
-  grid-template-columns: repeat(9, calc(30px * var(--sf)));
-  gap: calc(1px * var(--sf));
-  background: var(--ink);
-  border: calc(1px * var(--sf)) solid var(--ink);
-  box-shadow: calc(4px * var(--sf)) calc(4px * var(--sf)) 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(6px * var(--sf));
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: fit-content;
 }
 
-.sud-cell {
+.sud-row {
+  display: flex;
+  gap: 0;
+}
+
+.sud-row [role="gridcell"] {
+  width: calc(36px * var(--sf));
+  height: calc(36px * var(--sf));
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--mono);
-  font-size: calc(14px * var(--tf));
-  width: calc(30px * var(--sf));
-  height: calc(30px * var(--sf));
-  display: grid;
-  place-items: center;
-  border: none;
-  background: var(--paper);
+  font-size: calc(16px * var(--tf));
+  font-weight: 500;
   color: var(--ink);
+  background: var(--ui-bg);
+  border: none;
+  border-right: calc(1px * var(--sf)) solid var(--ui-line);
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
   cursor: pointer;
   padding: 0;
-  position: relative;
+  transition: background 120ms ease;
 }
 
-.sud-cell::before {
-  content: attr(data-value);
+.sud-row [role="gridcell"]:nth-child(9n) {
+  border-right: none;
 }
 
-
-.sud-cell--given {
-  color: var(--mid);
-  font-weight: 600;
+.sud-row:nth-child(9n) [role="gridcell"] {
+  border-bottom: none;
 }
 
-.sud-cell--selected {
-  background: var(--accent-soft);
-  outline: calc(2px * var(--sf)) solid var(--accent);
+.sud-row [role="gridcell"][aria-selected="true"] {
+  background: var(--ui-card);
 }
 
-.sud-cell--peer {
-  background: var(--ui-line);
+.sud-row [role="gridcell"][aria-invalid="true"] {
+  background: var(--geo-verm);
+  color: var(--on-accent);
 }
 
-.sud-cell--invalid {
-  background: var(--danger);
-  color: var(--paper-deep);
+.sud-keys {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: calc(8px * var(--sf));
 }
 
-.sud-digits {
-  display: flex;
-  gap: calc(6px * var(--sf));
-  flex-wrap: wrap;
-}
-
-.sud-sr {
-  position: absolute;
-  width: 0;
-  height: 0;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-  pointer-events: none;
+.sud-keys button {
+  min-height: calc(36px * var(--sf));
 }

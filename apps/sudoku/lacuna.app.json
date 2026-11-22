@@ -35,12 +35,14 @@
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/random": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
     "create:puzzle",
-    "fill:puzzle"
+    "fill:puzzle",
+    "view:puzzle"
   ],
   "permissions": {
     "records": [

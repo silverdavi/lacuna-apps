@@ -1,227 +1,218 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { AppShell, Button, Card, Kpi, KpiRow, Keys, Rail, Stack, Tag } from '@lacuna/ui'
+import { CSSProperties, useEffect, useState } from 'react'
 import {
-  makeRecord,
-  placeDigit,
+  Actions,
+  AppShell,
+  Button,
+  Card,
+  Kpi,
+  KpiRow,
+  Rail,
+  Stack,
+  Tag,
+} from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
+import {
   conflictSet,
-  isSolved,
-  statusFor,
   elapsedSeconds,
   formatTime,
+  isSolved,
+  makeRecord,
+  placeDigit,
+  statusFor,
+  type Board as BoardType,
   type Difficulty,
+  type TimerBase,
 } from './engine'
 import { host, type PuzzleRecord } from './host'
-import './styles.css'
 
-type Status = 'idle' | 'playing' | 'finished'
+const ID = 'lacuna.sudoku.save'
 
-let keyHandler: ((e: KeyboardEvent) => void) | null = null
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('keydown', (e) => keyHandler?.(e))
+function cellLabel(index: number): string {
+  const row = Math.floor(index / 9) + 1
+  const col = (index % 9) + 1
+  return `Row ${row}, Column ${col}`
 }
 
-function freshRecord(difficulty: Difficulty, now: number): PuzzleRecord {
-  return makeRecord(difficulty, now, `puz-${now}`, Math.floor(now / 1000))
+function boardToText(board: BoardType): string {
+  const lines: string[] = []
+  for (let r = 0; r < 9; r++) {
+    const row: string[] = []
+    for (let c = 0; c < 9; c++) {
+      row.push(board[r * 9 + c] ? String(board[r * 9 + c]) : '.')
+    }
+    lines.push(row.join(' '))
+  }
+  return lines.join('\n')
 }
 
 export function App() {
-  const [difficulty, setDifficulty] = useState<Difficulty>('Easy')
-  const [record, setRecord] = useState<PuzzleRecord>(() => host.loadPuzzle() ?? freshRecord('Easy', Date.now()))
+  const [record, setRecord] = useState<PuzzleRecord | null>(() => host.loadPuzzle())
   const [selected, setSelected] = useState<number | null>(null)
-  const [status, setStatus] = useState<Status>('idle')
-  const [base, setBase] = useState({ at: Date.now(), seconds: 0 })
-  const [now, setNow] = useState(() => Date.now())
+  const [difficulty, setDifficulty] = useState<Difficulty>('Easy')
+  const [now, setNow] = useState<number>(() => Date.now())
 
-  const seconds = status === 'playing' ? elapsedSeconds(base, now) : record.seconds
-  const time = formatTime(seconds)
-  const statusText = statusFor(record.board)
-  const conflicts = conflictSet(record.board)
-
-  const stateRef = useRef<{ place: (d: number) => void; start: () => void }>({
-    place: () => {},
-    start: () => {},
-  })
+  const { copy, copied } = useClipboard({ timeoutMs: 1500 })
 
   useEffect(() => {
-    host.savePuzzle({ ...record, seconds })
-  }, [record, seconds])
+    if (!record || isSolved(record.board)) return
+    const id = setInterval(() => setNow(Date.now()), 250)
+    return () => clearInterval(id)
+  }, [record?.id, record?.board, record?.startedAt])
 
-  useEffect(() => {
-    if (status !== 'playing') return
-    const id = window.setInterval(() => setNow(Date.now()), 1000)
-    return () => window.clearInterval(id)
-  }, [status])
+  const board: BoardType = record?.board ?? new Array<number>(81).fill(0)
+  const given: BoardType = record?.given ?? new Array<number>(81).fill(0)
+  const solved = record != null && isSolved(board)
+  const base: TimerBase | null = record ? { at: record.startedAt, seconds: record.seconds } : null
+  const seconds = base ? elapsedSeconds(base, solved ? base.at : now) : 0
+  const status = record ? statusFor(board) : ''
 
-  function select(i: number) {
-    if (status === 'finished') return
-    setSelected(selected === i ? null : i)
-  }
-
-  function place(digit: number) {
-    if (status !== 'playing' || selected === null) return
-    if (record.given[selected] !== 0) return
-    const board = placeDigit(record.given, record.board, selected, digit)
-    if (board === record.board) return
-    if (isSolved(board)) {
-      setRecord({ ...record, board, seconds: elapsedSeconds(base, Date.now()), updatedAt: Date.now() })
-      setStatus('finished')
-    } else {
-      setRecord({ ...record, board, updatedAt: Date.now() })
-    }
-  }
-
-  function start() {
-    if (status === 'finished') return
-    setStatus('playing')
-    setBase({ at: Date.now(), seconds: 0 })
-    setNow(Date.now())
-  }
-
-  function newGame(d: Difficulty) {
-    setRecord(freshRecord(d, Date.now()))
+  function handleNewGame() {
+    const rec = makeRecord(difficulty, Date.now(), ID)
+    host.savePuzzle(rec)
+    setRecord(rec)
     setSelected(null)
-    setStatus('playing')
-    setBase({ at: Date.now(), seconds: 0 })
-    setNow(Date.now())
   }
 
-  stateRef.current = { place, start }
-  keyHandler = (e) => {
-    const s = stateRef.current
-    if (e.key >= '1' && e.key <= '9') s.place(Number(e.key))
-    else if (e.key === ' ') {
-      e.preventDefault()
-      s.start()
-    }
+  function handleSelectCell(index: number) {
+    if (solved || given[index] !== 0) return
+    setSelected(index)
   }
 
-  const selectedBox =
-    selected === null ? -1 : Math.floor(selected / 9 / 3) * 3 + Math.floor((selected % 9) / 3)
-
-  const rows: ReactNode[] = []
-  for (let r = 0; r < 9; r++) {
-    const cells: ReactNode[] = []
-    for (let c = 0; c < 9; c++) {
-      const i = r * 9 + c
-      const v = record.board[i]
-      const given = record.given[i] !== 0
-      const invalid = conflicts.has(i)
-      const isSel = selected === i
-      const inBox = Math.floor(r / 3) === selectedBox && Math.floor(c / 3) === selectedBox
-      const cls =
-        'sud-cell' +
-        (given ? ' sud-cell--given' : '') +
-        (isSel ? ' sud-cell--selected' : '') +
-        (invalid ? ' sud-cell--invalid' : '') +
-        (inBox ? ' sud-cell--peer' : '')
-      cells.push(
-        <button
-          key={i}
-          type="button"
-          role="gridcell"
-          aria-label={`Row ${r + 1}, Column ${c + 1}`}
-          aria-selected={isSel || undefined}
-          aria-invalid={invalid ? 'true' : undefined}
-          data-row={r + 1}
-          data-col={c + 1}
-          data-value={v}
-          data-answer={record.given[i]}
-          data-selected={isSel ? 'true' : undefined}
-          data-conflict={invalid ? 'true' : undefined}
-          className={cls}
-          onClick={() => select(i)}
-        >
-          <span className="sud-sr">{v || '\u00a0'}</span>
-        </button>,
-      )
+  function handleNumber(n: number) {
+    if (selected === null || record == null) return
+    const nextBoard = placeDigit(record.given, record.board, selected, n)
+    if (nextBoard === record.board) return
+    const next = { ...record, board: nextBoard, updatedAt: Date.now() }
+    if (isSolved(nextBoard)) {
+      const elapsed = base ? elapsedSeconds(base, Date.now()) : 0
+      next.seconds = elapsed
+      next.startedAt = 0
     }
-    rows.push(
-      <div key={r} role="row">
-        {cells}
-      </div>,
-    )
+    host.savePuzzle(next)
+    setRecord(next)
+  }
+
+  async function handleCopy() {
+    await copy(boardToText(board))
+  }
+
+  const invalidSet = record ? conflictSet(board) : new Set<number>()
+
+  function cellStyle(i: number): CSSProperties {
+    const value = board[i]
+    const isGiven = given[i] !== 0
+    const isSelected = selected === i
+    const isInvalid = value !== 0 && invalidSet.has(i)
+    if (isInvalid) return { background: 'var(--geo-verm)', color: 'var(--on-accent)' }
+    if (isSelected) return { background: 'var(--ui-card)' }
+    if (isGiven) return { fontWeight: 700 }
+    return {}
   }
 
   return (
     <AppShell
       name="Sudoku"
       icon="grid"
-      hue="gold"
+      hue="cobalt"
       category="Games"
-      meta="9 × 9"
-      status="Local · no network"
+      meta={record ? `${board.filter((v) => v === 0).length} empty` : 'new'}
       side={
-        <Rail title="Game" note={record.difficulty}>
+        <Rail title="Timer" note={solved ? 'clock paused' : 'running'}>
+          <div className="sud-timer" role="timer" aria-label="Time">
+            {formatTime(seconds)}
+          </div>
           <KpiRow>
-            <Kpi label="Status" value={status === 'playing' ? 'playing' : status === 'finished' ? 'solved' : 'ready'} />
-            <Kpi label="Difficulty" value={record.difficulty} />
+            <Kpi label="Difficulty" value={record ? record.difficulty : 'Practice'} />
+            <Kpi label="Empty" value={board.filter((v) => v === 0).length} />
+            <Kpi label="Filled" value={board.filter((v) => v !== 0).length} />
           </KpiRow>
-          {status === 'finished' ? <Tag accent>Solved in {time}</Tag> : null}
+          <Stack>
+            <Tag accent>{solved ? 'Puzzle Solved' : 'In progress'}</Tag>
+          </Stack>
+          <Actions>
+            <Button onClick={handleCopy}>{copied ? 'Copied' : 'Copy board'}</Button>
+          </Actions>
         </Rail>
       }
     >
-      <div className="sud-heading">
-        <h2 className="lc-title lc-title-md">Sudoku Puzzle</h2>
-        <span role="timer" aria-label="Time" className="sud-timer">
-          {time}
-        </span>
-      </div>
-
-      <Card title="Board">
-        <div className="sud-controls">
-          <div className="lc-field">
-            <label className="lc-field-label" htmlFor="sud-difficulty">Difficulty</label>
+      <Card
+        mono="Game"
+        actions={
+          <Actions>
+            <Button kind="primary" onClick={handleNewGame}>
+              New Game
+            </Button>
+          </Actions>
+        }
+      >
+        <h2 style={{ margin: 0, marginBottom: 'calc(12px * var(--sf))', fontFamily: 'var(--sans)', fontSize: 'calc(16px * var(--tf))', fontWeight: 600, color: 'var(--ink)' }}>
+          Sudoku Puzzle
+        </h2>
+        <div style={{ marginBottom: 'calc(12px * var(--sf))' }}>
+          <label className="lc-field">
+            <span className="lc-field-label">Difficulty</span>
             <select
-              id="sud-difficulty"
               className="lc-input"
               value={difficulty}
-              onChange={(e) => {
-                const d = e.target.value as Difficulty
-                setDifficulty(d)
-                newGame(d)
-              }}
+              onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+              aria-label="Difficulty"
             >
               <option value="Practice">Practice</option>
               <option value="Easy">Easy</option>
               <option value="Hard">Hard</option>
             </select>
-          </div>
-          <Button kind="primary" onClick={() => newGame(difficulty)}>
-            New Game
-          </Button>
+          </label>
         </div>
-        <div role="grid" aria-label="Board" className="sud-grid">
-          {rows}
+        <div className="sud-grid" role="grid" aria-label="Board">
+          {Array.from({ length: 9 }, (_, r) => (
+            <div key={r} role="row" className="sud-row">
+              {Array.from({ length: 9 }, (_, c) => {
+                const i = r * 9 + c
+                const value = board[i]
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    role="gridcell"
+                    aria-label={cellLabel(i)}
+                    aria-selected={selected === i || undefined}
+                    aria-invalid={value !== 0 && invalidSet.has(i) ? true : undefined}
+                    onClick={() => handleSelectCell(i)}
+                    style={cellStyle(i)}
+                  >
+                    {value !== 0 ? String(value) : ''}
+                  </button>
+                )
+              })}
+            </div>
+          ))}
         </div>
-        {statusText ? (
-          <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
-            <Tag accent={statusText === 'Invalid move'}>{statusText}</Tag>
+        {status === 'Invalid move' ? (
+          <div style={{ marginTop: 'calc(8px * var(--sf))' }} role="alert">
+            <Tag>Invalid move</Tag>
           </div>
         ) : null}
       </Card>
 
-      <Card title="Controls">
+      <Card mono="Controls" title="Number pad">
+        <div className="sud-keys" role="group" aria-label="Number pad">
+          {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
+            <Button key={n} onClick={() => handleNumber(n)}>
+              {n}
+            </Button>
+          ))}
+          <Button onClick={() => selected !== null && handleNumber(0)}>Erase</Button>
+        </div>
+      </Card>
+
+      <Card mono="Rules" title="How to play">
         <Stack>
-          <div className="sud-digits">
-            {Array.from({ length: 9 }, (_, k) => k + 1).map((n) => (
-              <Button
-                key={n}
-                ariaLabel={String(n)}
-                style={{ width: 'calc(40px * var(--sf))', justifyContent: 'center', fontFamily: 'var(--mono)' }}
-                onClick={() => place(n)}
-                disabled={status !== 'playing' || selected === null}
-              >
-                {n}
-              </Button>
-            ))}
-          </div>
-          <Keys
-            items={[
-              ['1–9', 'Fill the selected cell.'],
-              ['Space', 'Start the timer.'],
-            ]}
-          />
+          <p style={{ margin: 0 }}>
+            Fill the 9 by 9 grid so every row, column and 3 by 3 block contains each digit 1 to 9 exactly once.
+          </p>
+          <p style={{ margin: 0 }}>
+            Click a cell, then a number to place it. Select a filled cell and press Erase to clear it.
+          </p>
         </Stack>
       </Card>
     </AppShell>
