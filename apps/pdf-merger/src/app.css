@@ -1,0 +1,105 @@
+/* App-local layout. Colors are Lacuna tokens only; sizes ride the
+   --tf/--sf scales so the app follows the host's type scale. */
+
+.pm-wrap {
+  display: grid;
+  gap: calc(12px * var(--sf));
+  max-width: calc(520px * var(--sf));
+  margin: 0 auto;
+}
+
+.pm-heading {
+  font-family: var(--sans);
+  font-size: calc(20px * var(--tf));
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.pm-tabs {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+.pm-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.pm-tab[aria-selected='true'],
+.pm-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.pm-tools {
+  display: flex;
+  gap: calc(6px * var(--sf));
+}
+
+.pm-tool {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: calc(4px * var(--sf)) calc(10px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-radius: calc(2px * var(--sf));
+}
+
+.pm-tool.active {
+  color: var(--ink);
+  background: var(--ui-bg);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.pm-tool[aria-pressed='true'] {
+  color: var(--accent);
+  border-bottom: calc(2px * var(--sf)) solid var(--accent);
+}
+
+.pm-drop {
+  display: grid;
+  gap: calc(6px * var(--sf));
+  padding: calc(14px * var(--sf));
+  border: calc(1px * var(--sf)) dashed var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  cursor: pointer;
+}
+
+.pm-drop.is-over {
+  border-color: var(--accent);
+}
+
+.pm-drop-text {
+  color: var(--ink);
+  font-size: calc(13px * var(--tf));
+}
+
+.pm-file-input {
+  display: none;
+}
+
+.pm-queue {
+  margin-top: calc(12px * var(--sf));
+}
+
+.pm-row-actions {
+  display: flex;
+  gap: calc(6px * var(--sf));
+}
+
+.pm-actions {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  flex-wrap: wrap;
+}
