@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "43346bbfe497eae9bba1a80d57c332c513bbf987660a14e1e5f6c0b2d6691c14",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"SVG Editor\" and the canvas area is visible with the tool buttons \"Brush\", \"Eraser\", \"Rectangle\", and \"Ellipse\" in the toolbar."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add layer\" adds a new item to the layer list labelled \"Layer 1\"; clicking \"Add layer\" again adds \"Layer 2\" and the layer list contains both \"Layer 1\" and \"Layer 2\"."
+    },
+    {
+      "id": "A3",
+      "text": "With \"Layer 1\" selected in the layer list, clicking the button \"Delete layer\" removes \"Layer 1\" from the list, leaving only \"Layer 2\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab \"Properties\" shows a field labelled \"Stroke width\" with the value \"5\"; typing \"12\" in that field and pressing Enter changes the value to \"12\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Export PNG\" triggers a download of a file named \"svg-editor.png\"."
+    },
+    {
+      "id": "A6",
+      "text": "After drawing a stroke with the Brush tool on the canvas, clicking the tab \"Layers\" shows the layer list with the active layer name and the text \"1 path\" next to it."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"200\" in the field labelled \"Canvas width\" and \"150\" in the field labelled \"Canvas height\" on the Properties tab, then clicking \"Apply\", changes the canvas dimensions to 200 by 150 pixels."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting the \"Rectangle\" tool, drawing a shape on the canvas, then clicking the button \"Undo\" removes the last drawn shape from the canvas."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the layer list: after adding \"Layer 1\" and \"Layer 2\" and reloading the page, the layer list still contains \"Layer 1\" and \"Layer 2\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "06421fd3a8c444f74434fa1beb98db5c8d2f468efb347c6e59214c8d264c14c8"
+    }
+  ]
+}
