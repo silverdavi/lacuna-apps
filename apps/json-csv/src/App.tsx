@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 import { useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, List, PrimaryButton, Row, Select, Stack } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Kpi, KpiRow, List, PrimaryButton, Rail, Row, Select, Stack } from '@lacuna/ui'
 import { CodeArea } from '@lacuna/code-area'
 import { saveBlob } from '@lacuna/file-save-open'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -220,6 +220,17 @@ export function App() {
     setRecord((prev) => ({ ...prev, delimiter: v }))
   }
 
+  const delimLabel = DELIMITERS.find((d) => d.value === delimiterValue)?.label ?? 'Comma'
+  const inputLines = inputText.trim() ? inputText.trim().split('\n').filter((l) => l.trim()).length : 0
+  const outputLines = outputText ? outputText.split('\n').filter((l) => l.trim()).length : 0
+  const status = error
+    ? `Error: ${error}`
+    : outputText
+      ? `Ready: ${outputLines} output line${outputLines === 1 ? '' : 's'}`
+      : inputText.trim()
+        ? `Ready: ${inputLines} input line${inputLines === 1 ? '' : 's'} to convert`
+        : 'Ready'
+
   return (
     <AppShell
       name="JSON CSV Converter"
@@ -227,7 +238,23 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={`${history.length} ${history.length === 1 ? 'entry' : 'entries'}`}
-      status={error ?? 'Ready'}
+      status={status}
+      side={
+        <Rail
+          title="Converter"
+          note={`${delimLabel} delimiter`}
+          chips={[
+            `${inputLines} input line${inputLines === 1 ? '' : 's'}`,
+            `${outputLines} output line${outputLines === 1 ? '' : 's'}`,
+            `${history.length} ${history.length === 1 ? 'entry' : 'entries'}`,
+          ]}
+        >
+          <KpiRow>
+            <Kpi value={String(history.length)} label="Conversions" />
+            <Kpi value={delimLabel} label="Delimiter" />
+          </KpiRow>
+        </Rail>
+      }
     >
       <Stack lg>
         <Card mono="Input" title="Data">
