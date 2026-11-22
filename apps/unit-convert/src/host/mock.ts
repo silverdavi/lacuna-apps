@@ -11,45 +11,53 @@ export interface ConversionRecord {
   at: number
 }
 
-let cache: ConversionRecord[] = load()
+function isConversionRecord(v: unknown): v is ConversionRecord {
+  if (typeof v !== 'object' || v === null) return false
+  const r = v as Record<string, unknown>
+  return (
+    typeof r.id === 'string' &&
+    typeof r.category === 'string' &&
+    typeof r.fromUnit === 'string' &&
+    typeof r.toUnit === 'string' &&
+    typeof r.fromValue === 'string' &&
+    typeof r.toValue === 'string' &&
+    typeof r.at === 'number'
+  )
+}
 
-function load(): ConversionRecord[] {
+function loadAll(): ConversionRecord[] {
   try {
-    const raw = localStorage.getItem(KEY)
+    const raw = window.localStorage.getItem(KEY)
     if (!raw) return []
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
+    const parsed: unknown = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter(isConversionRecord)
   } catch {
     return []
   }
 }
 
-function save() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(cache))
-  } catch {
-    return
-  }
-}
-
-export function listRecent(): ConversionRecord[] {
-  return [...cache]
-}
-
-export function addRecent(record: Omit<ConversionRecord, 'id' | 'at'>): ConversionRecord[] {
-  const fresh: ConversionRecord = { ...record, id: crypto.randomUUID(), at: Date.now() }
-  const freshKey = keyOf(fresh)
-  const kept = cache.filter((r) => r.category === record.category && keyOf(r) !== freshKey)
-  cache = [fresh, ...kept, ...cache.filter((r) => r.category !== record.category)].slice(0, MAX_RECENT)
-  save()
-  return [...cache]
+function saveAll(records: ConversionRecord[]): void {
+  window.localStorage.setItem(KEY, JSON.stringify(records))
 }
 
 function keyOf(r: ConversionRecord) {
   return [r.category, r.fromUnit, r.toUnit, r.fromValue, r.toValue].join('|')
 }
 
+export function listRecent(): ConversionRecord[] {
+  return loadAll()
+}
+
+export function addRecent(record: Omit<ConversionRecord, 'id' | 'at'>): ConversionRecord[] {
+  const fresh: ConversionRecord = { ...record, id: crypto.randomUUID(), at: Date.now() }
+  const freshKey = keyOf(fresh)
+  const kept = loadAll().filter((r) => r.category === record.category && keyOf(r) !== freshKey)
+  const next = [fresh, ...kept].slice(0, MAX_RECENT)
+  saveAll(next)
+  return next
+}
+
 export function clearRecent(): void {
-  cache = []
-  save()
+  saveAll([])
 }
