@@ -1,0 +1,15 @@
+{
+  "repo": "itsmraga-hub/Base-Number-Converter",
+  "url": "https://github.com/itsmraga-hub/Base-Number-Converter",
+  "sha": "888cde3ad8e4e5d53017234cc05c8f94c43a66d0",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2022 William Raga"
+  ],
+  "files": [
+    "js/app.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "d0eb4b7f86ab75bd835fde79c325f703ac798a8ac46c194d4aec4a6d6d98780d"
+}

@@ -1,0 +1,2 @@
+/* App-local styles for base-converter. No kit overrides, no color literals. */
+.lk-field-hint { color: var(--ink-60); }

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "5fb5b432b947cda2285fe3397afb74f9d5748109c1450b4677acd22e74726988",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Base Converter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"255\" in the field labelled \"Value\" and selecting \"Decimal\" in the select labelled \"From base\" shows \"FF\" in the field labelled \"Result\" when \"Hexadecimal\" is selected in the select labelled \"To base\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"1010\" in the field labelled \"Value\" and selecting \"Binary\" in the select labelled \"From base\" shows \"10\" in the field labelled \"Result\" when \"Decimal\" is selected in the select labelled \"To base\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"XLII\" in the field labelled \"Value\" and selecting \"Roman\" in the select labelled \"From base\" shows \"42\" in the field labelled \"Result\" when \"Decimal\" is selected in the select labelled \"To base\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Copy result\" after converting \"255\" from Decimal to Hexadecimal shows the text \"Copied\" for 2 seconds."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting \"Binary\" in the select labelled \"To base\" and typing \"999\" in the field labelled \"Value\" with \"Decimal\" selected in \"From base\" shows \"1111100111\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A7",
+      "text": "After converting \"255\" from Decimal to Hexadecimal, clicking the button labelled \"Save to history\" adds a row to the table labelled \"History\" containing \"255\", \"Decimal\", \"FF\" and \"Hexadecimal\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labelled \"Clear history\" removes all rows from the table labelled \"History\" and shows the text \"No history yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history row containing \"255\", \"Decimal\", \"FF\" and \"Hexadecimal\" after saving a conversion and reloading the page."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1facfa5b243af03ee772e83756bfbdec1559e58125c98688206ffe28943ab126"
+    }
+  ]
+}
