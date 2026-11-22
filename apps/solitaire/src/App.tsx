@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import {
   Actions,
   AppShell,
+  Board,
   Button,
   Card,
   EmptyState,
@@ -17,6 +18,7 @@ import {
 } from '@lacuna/ui'
 import { SUIT_SYMBOL, loadGame, saveGame } from './host'
 import type { Card as CardT, GameState, Pile, PileKind, Rank, Suit } from './host'
+import { EMPTY_BG, FOUNDATION_BG, STOCK_BG, WASTE_BG } from './colors'
 
 const SUITS: Suit[] = ['s', 'h', 'd', 'c']
 const RANKS: Rank[] = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
@@ -25,12 +27,9 @@ const POINTS: Record<Rank, number> = { A: 0, '2': 2, '3': 3, '4': 4, '5': 5, '6'
 const SEED = 56
 const MAX_HISTORY = 24
 
-const boardGrid: CSSProperties = {
-  display: 'grid',
-  gridAutoFlow: 'column',
-  gridAutoColumns: '1fr',
-  gap: 'calc(16px * var(--sf))',
-}
+const BOARD_COLS = 6
+const BOARD_ROWS = 1
+const BOARD_CELL = 72
 
 function seededShuffle(cards: CardT[]): CardT[] {
   let state = SEED
@@ -256,7 +255,7 @@ export function App() {
         {!dealt ? (
           <EmptyState mono="Empty" title="No board yet" detail="Press New Game to deal the deck, then click the stock to draw or use the arrow keys." />
         ) : (
-          <div style={boardGrid}>
+          <Board cols={BOARD_COLS} rows={BOARD_ROWS} cell={BOARD_CELL} label="Solitaire board">
             {view.game.piles.map((pile, i) => (
               <PileCell key={i} pile={pile} index={i} piles={view.game.piles} onClick={() => {
                 if (pile.kind === 'stock') draw()
@@ -264,7 +263,7 @@ export function App() {
                 else if (pile.kind === 'foundation') bringBack()
               }} />
             ))}
-          </div>
+          </Board>
         )}
         {foundationsFull && (
           <EmptyState mono="Won" title="All four foundations complete" detail="Press New Game to deal a fresh deck." />
@@ -296,79 +295,53 @@ function cardName(card: CardT): string {
   return `${card.rank}${SUIT_SYMBOL[card.suit]}`
 }
 
+const faceStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  userSelect: 'none',
+}
+
 function PileCell({ pile, index, piles, onClick }: { pile: Pile; index: number; piles: Pile[]; onClick: () => void }) {
+  const name = pileName(index, piles)
+  const common = {
+    role: 'group' as const,
+    'aria-label': name,
+    tabIndex: 0,
+    'data-pile-index': index,
+    onClick,
+  }
+
   if (pile.kind === 'stock') {
     const count = pile.cards.length
-    const bg = count > 0 ? 'var(--accent-soft)' : 'var(--ui-bg)'
+    const bg = count > 0 ? STOCK_BG : EMPTY_BG
     return (
-      <div
-        role="group"
-        aria-label={pileName(index, piles)}
-        tabIndex={0}
-        data-pile-index={index}
-        onClick={onClick}
-        style={{
-          background: bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: 'var(--mono)',
-          fontSize: 'calc(16px * var(--tf))',
-          color: count > 0 ? 'var(--accent)' : 'var(--ink-40)',
-          cursor: 'pointer',
-          userSelect: 'none',
-        }}
-      >
-        {count > 0 ? String(count) : '—'}
-      </div>
-    )
-  }
-    const card = topCard(pile)
-    if (!card) {
-      return (
-        <div
-          role="group"
-          aria-label={pileName(index, piles)}
-          tabIndex={0}
-          data-pile-index={index}
-          onClick={onClick}
-          style={{
-            background: 'var(--ui-bg)',
-            border: 'calc(1px * var(--sf)) dashed var(--hair-strong)',
-            borderRadius: 'calc(3px * var(--sf))',
-            cursor: 'pointer',
-            userSelect: 'none',
-          }}
-        />
-      )
-    }
-    const face = pile.kind === 'waste' ? 'var(--ui-card)' : 'var(--paper-deep)'
-    const symbolColor = isRed(card.suit) ? 'var(--danger)' : 'var(--ink)'
-    return (
-      <div
-        role="group"
-        aria-label={pileName(index, piles)}
-        tabIndex={0}
-        data-pile-index={index}
-        onClick={onClick}
-        style={{
-          background: face,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-          borderRadius: 'calc(3px * var(--sf))',
-          cursor: 'pointer',
-          userSelect: 'none',
-        }}
-      >
-        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, color: symbolColor }}>
-          <span style={{ fontFamily: 'var(--serif)', fontWeight: 700, fontSize: 'calc(20px * var(--tf))' }}>{card.rank}</span>
-          <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))' }}>{SUIT_SYMBOL[card.suit]}</span>
+      <div {...common} style={{ ...faceStyle, background: bg }}>
+        <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(20px * var(--tf))', color: count > 0 ? 'var(--ink)' : 'var(--ink-40)' }}>
+          {count > 0 ? String(count) : '—'}
         </span>
       </div>
     )
   }
+
+  const card = topCard(pile)
+  if (!card) {
+    const bg = pile.kind === 'waste' ? WASTE_BG : FOUNDATION_BG
+    return <div {...common} style={{ ...faceStyle, background: bg }} />
+  }
+
+  const bg = pile.kind === 'waste' ? WASTE_BG : FOUNDATION_BG
+  const symbolColor = isRed(card.suit) ? 'var(--danger)' : 'var(--ink)'
+  return (
+    <div {...common} style={{ ...faceStyle, background: bg }}>
+      <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, color: symbolColor }}>
+        <span style={{ fontFamily: 'var(--serif)', fontWeight: 700, fontSize: 'calc(20px * var(--tf))' }}>{card.rank}</span>
+        <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))' }}>{SUIT_SYMBOL[card.suit]}</span>
+      </span>
+    </div>
+  )
+}
 
 function isRed(suit: Suit): boolean {
   return suit === 'h' || suit === 'd'
