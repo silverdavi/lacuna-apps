@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "619d6375143ab8a6a4a4dfeb84effaf3bd23df8644ba912a29d9fe6dbf1f30bb",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Image Resizer\" and the text \"Drop an image to begin\"."
+    },
+    {
+      "id": "A2",
+      "text": "Dropping a 1000x800 PNG file into the drop zone shows a preview image and the text \"1000 \u00d7 800 px\" in the field labelled \"Original size\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"500\" in the field labelled \"Width\" and clicking the button \"Apply resize\" updates the field labelled \"Output size\" to \"500 \u00d7 400 px\" and enables the button \"Download\"."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting \"JPEG\" in the select labelled \"Format\" and typing \"85\" in the field labelled \"Quality\" then clicking \"Apply resize\" updates the field labelled \"Output size\" to \"500 \u00d7 400 px\" and the field labelled \"Format\" shows \"JPEG\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Download\" triggers a file download named \"resized-image.png\" when the format is PNG, or \"resized-image.jpg\" when the format is JPEG."
+    },
+    {
+      "id": "A6",
+      "text": "After processing an image, a list item appears in the section labelled \"History\" containing the text \"resized-image.png\" and the dimensions \"500 \u00d7 400 px\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete resized-image.png\" in the History section removes that list item and the section shows \"No history yet\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Rotate 90\u00b0\" after loading a 1000x800 image updates the field labelled \"Output size\" to \"800 \u00d7 1000 px\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the History list: after processing an image and reloading the page, the History section still shows the list item with \"resized-image.png\" and \"500 \u00d7 400 px\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c105799831d73c69bc2334d22f32f7b04dd5531a5db330de9e4592b8adccbe9f"
+    }
+  ]
+}
