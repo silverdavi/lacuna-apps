@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "72d6bead3d10011d3a65a947b361e5956a690a31d94e96c096bbd1c5f7b9a4b6",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Whiteboard\" and the text \"Ready to draw\" in the empty state area."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button labelled \"Brush\" in the toolbar shows the text \"Brush active\" in the status bar; clicking the button labelled \"Eraser\" changes the status bar text to \"Eraser active\"."
+    },
+    {
+      "id": "A3",
+      "text": "Selecting the option \"Red\" in the select labelled \"Color\" and the option \"10px\" in the select labelled \"Size\", then drawing a stroke on the canvas, results in the status bar showing \"Stroke added: Red, 10px\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button labelled \"Add layer\" creates a new list item in the layers panel containing the text \"Layer 2\"; clicking the button labelled \"Delete Layer 2\" removes that item, leaving only \"Layer 1\" visible."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Undo\" after drawing a stroke removes the last stroke from the canvas and updates the status bar to \"Undo: stroke removed\"; clicking \"Redo\" restores the stroke and updates the status bar to \"Redo: stroke restored\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Export PNG\" triggers a download of a file named \"whiteboard.png\" and displays the toast message \"PNG exported successfully\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Clear canvas\" removes all strokes from the active layer and displays the toast message \"Canvas cleared\"; the status bar returns to \"Ready to draw\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Zoom in\" in the input field labelled \"Zoom level\" and pressing Enter changes the canvas zoom to 125% and updates the text in the zoom indicator to \"125%\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the drawing state: after drawing a stroke and reloading the page, the canvas still displays the stroke and the status bar shows \"Restored: 1 stroke\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b620fe00cf92459afe34e538323a164ccb8702e84753b1b78d78c19ab2d24854"
+    }
+  ]
+}
