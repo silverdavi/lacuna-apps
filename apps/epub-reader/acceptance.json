@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "f1abe9806fa70e9887239e7e2630342f16515a994fe5124bae98f7ccb84a2285",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"EPUB Reader\" and the text \"No book loaded\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Choose file\" and selecting a file named \"test.epub\" with content \"Hello World\" loads the book; the page shows the text \"test.epub\" and the PagedReader displays the text \"Hello World\" on page 1."
+    },
+    {
+      "id": "A3",
+      "text": "After loading \"test.epub\", clicking the button \"Next page\" advances to page 2; the progress indicator shows \"Page 2 of 5\" and the PagedReader displays the text for page 2."
+    },
+    {
+      "id": "A4",
+      "text": "After loading \"test.epub\" and navigating to page 3, clicking the button \"Add bookmark\" adds a bookmark; the bookmarks list shows an item with the text \"Page 3\" and the text \"No bookmarks\" is gone."
+    },
+    {
+      "id": "A5",
+      "text": "After adding a bookmark on page 3, clicking the button \"Delete Page 3\" in the bookmarks list removes that item; the bookmarks list shows the text \"No bookmarks\"."
+    },
+    {
+      "id": "A6",
+      "text": "After loading \"test.epub\", clicking the button \"Export page\" copies the text \"Hello World\" to the clipboard and shows the message \"Copied page text\"."
+    },
+    {
+      "id": "A7",
+      "text": "After loading \"test.epub\" and navigating to page 2, clicking the select labelled \"Font size\" and choosing \"Large\" changes the PagedReader text size; the PagedReader displays the same text \"Hello World\" but with a larger font size."
+    },
+    {
+      "id": "A8",
+      "text": "After loading \"test.epub\" and navigating to page 3, reloading the page still shows the text \"test.epub\", the PagedReader displays the text for page 3, and the progress indicator shows \"Page 3 of 5\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the loaded book \"test.epub\" and the bookmark on page 3; after reload, the bookmarks list shows an item with the text \"Page 3\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ed74443a6abb263228fc502a5a52688a922bbcc12c0a5c0d49fc5abc1b8370d1"
+    }
+  ]
+}
