@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.pixel-art",
+  "name": "Pixel Art Editor",
+  "version": "0.1.0",
+  "summary": "A 16x16 pixel art editor with layers, brush and eraser tools, and PNG export.",
+  "description": "Draw on a 16x16 grid with a brush or eraser. Pick colors with a full color picker, manage multiple layers, and export your artwork as a PNG sprite. Your drawing survives a reload.",
+  "category": "productivity",
+  "tags": ["pixel-art", "sprite", "drawing", "layers", "export"],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/pixel-art",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/color-picker": "0.1.0",
+      "@lacuna/color-math": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:pixel-art"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "pixel-art",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the pixel art document so it survives a reload"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "pixel-art"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

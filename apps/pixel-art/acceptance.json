@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "e052fec3cad0b7eaa585274e40985c32bd285738bd5bc50db8db6cf23d6278c5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Pixel Art Editor\" and a canvas area with a visible grid of 16x16 pixels."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting the \"Brush\" tool from the toolbar, choosing the color \"#FF0000\" in the ColorPicker, and clicking the center pixel of the canvas changes that pixel to red; the status bar shows \"Pixel (8,8) set to #FF0000\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the \"Add Layer\" button creates a new layer named \"Layer 2\" in the layers panel, which now lists \"Layer 1\" and \"Layer 2\" with \"Layer 2\" selected."
+    },
+    {
+      "id": "A4",
+      "text": "With \"Layer 2\" selected, drawing a pixel at (1,1) with color \"#00FF00\" and then switching to \"Layer 1\" shows the pixel at (1,1) as transparent, while switching back to \"Layer 2\" shows it as green."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the \"Export PNG\" button triggers a download of a file named \"sprite.png\" with dimensions 16x16 pixels."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting the \"Eraser\" tool and clicking the red pixel at (8,8) changes that pixel to transparent; the status bar shows \"Pixel (8,8) erased\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"#0000FF\" in the hex field of the ColorPicker updates the active color to blue, and the RGB fields display \"0\", \"0\", \"255\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the \"Delete Layer\" button while \"Layer 2\" is selected removes it from the layers panel, leaving only \"Layer 1\" selected."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the layer named \"Layer 1\" and the red pixel at (8,8) visible on the canvas after reloading the page."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "921ef889d40809cadaaf21608595655204fb27aa2295c0bdb0b8abdff2d5a7fc"
+    }
+  ]
+}
