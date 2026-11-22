@@ -1,588 +1,678 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Actions,
-  AppShell,
-  Button,
-  Card,
-  EmptyState,
-  FormGrid,
-  List,
-  Row,
-  Stack,
-  TextInput,
-} from '@lacuna/ui'
+import { useMemo, useState, type KeyboardEvent } from 'react'
+import { AppShell, Button, Card, Divider, FormGrid, MonoLabel, Stack, Spread, TextInput } from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { useLocalRecord } from '@lacuna/use-local-record'
+import { ExportMenu } from '@lacuna/export-menu'
+import type { ExportOption } from '@lacuna/export-menu'
 import { Chart } from '@lacuna/chart'
 import type { ChartDataPoint } from '@lacuna/chart'
-import { NumberInput } from '@lacuna/number-input'
-import { useLocalRecord } from '@lacuna/use-local-record'
-import { useClipboard } from '@lacuna/use-clipboard'
+import { CalculatorKit } from '@lacuna/calculator-kit'
 
-// ---------------------------------------------------------------- evaluation
-type HistoryEntry = { id: string; expr: string; result: string; at: number }
-
-function formatNumber(value: number): string {
-  if (!Number.isFinite(value)) return 'undefined'
-  if (Object.is(value, -0)) return '0'
-  const abs = Math.abs(value)
-  if (abs !== 0 && (abs >= 1e12 || abs < 1e-9)) return value.toExponential(6)
-  const rounded = Math.round(value * 1e9) / 1e9
-  return String(rounded)
-}
-
-function tokenize(input: string): string[] {
-  const tokens: string[] = []
-  let i = 0
-  const s = input.replace(/\s+/g, '')
-  while (i < s.length) {
-    const ch = s[i]
-    if (/[0-9.]/.test(ch)) {
-      let j = i
-      while (j < s.length && /[0-9.]/.test(s[j])) j++
-      tokens.push(s.slice(i, j))
-      i = j
-      continue
-    }
-    if (/[a-zA-Z]/.test(ch)) {
-      let j = i
-      while (j < s.length && /[a-zA-Z]/.test(s[j])) j++
-      tokens.push(s.slice(i, j).toLowerCase())
-      i = j
-      continue
-    }
-    tokens.push(ch)
-    i++
-  }
-  return tokens
-}
-
-const FUNCTIONS: Record<string, (x: number) => number> = {
-  sin: (x) => Math.sin((x * Math.PI) / 180),
-  cos: (x) => Math.cos((x * Math.PI) / 180),
-  tan: (x) => Math.tan((x * Math.PI) / 180),
-  asin: (x) => (Math.asin(x) * 180) / Math.PI,
-  acos: (x) => (Math.acos(x) * 180) / Math.PI,
-  atan: (x) => (Math.atan(x) * 180) / Math.PI,
-  sqrt: (x) => Math.sqrt(x),
-  abs: (x) => Math.abs(x),
-  ln: (x) => Math.log(x),
-  log: (x) => Math.log10(x),
-  exp: (x) => Math.exp(x),
-}
-
-function evaluate(input: string): number {
-  const tokens = tokenize(input)
-  let pos = 0
-
-  function peek(): string | undefined {
-    return tokens[pos]
-  }
-
-  function next(): string | undefined {
-    const t = tokens[pos]
-    pos++
-    return t
-  }
-
-  function parsePrimary(): number {
-    const t = next()
-    if (t === undefined) throw new Error('Unexpected end of expression')
-    if (t === '(') {
-      const v = parseExpr()
-      const close = next()
-      if (close !== ')') throw new Error('Expected )')
-      return v
-    }
-    if (t === '-') {
-      return -parsePrimary()
-    }
-    if (/^[0-9.]+$/.test(t)) {
-      return parseFloat(t)
-    }
-    if (FUNCTIONS[t]) {
-      const open = next()
-      if (open !== '(') throw new Error(`Expected ( after ${t}`)
-      const arg = parseExpr()
-      const close = next()
-      if (close !== ')') throw new Error('Expected )')
-      return FUNCTIONS[t](arg)
-    }
-    throw new Error(`Unexpected token ${t}`)
-  }
-
-  function parsePower(): number {
-    const base = parsePrimary()
-    if (peek() === '^') {
-      next()
-      const exponent = parsePower()
-      return Math.pow(base, exponent)
-    }
-    return base
-  }
-
-  function parseTerm(): number {
-    let value = parsePower()
-    while (peek() === '*' || peek() === '/') {
-      const op = next()
-      const rhs = parsePower()
-      if (op === '*') value = value * rhs
-      else value = value / rhs
-    }
-    return value
-  }
-
-  function parseExpr(): number {
-    let value = parseTerm()
-    while (peek() === '+' || peek() === '-') {
-      const op = next()
-      const rhs = parseTerm()
-      if (op === '+') value = value + rhs
-      else value = value - rhs
-    }
-    return value
-  }
-
-  const result = parseExpr()
-  if (pos !== tokens.length) throw new Error('Unexpected trailing tokens')
-  return result
-}
-
-// ---------------------------------------------------------------- conversions
-type Unit = { id: string; label: string; toBase: number }
-type Category = { id: string; label: string; units: Unit[] }
-
-const CATEGORIES: Category[] = [
-  {
-    id: 'length',
-    label: 'Length',
-    units: [
-      { id: 'mm', label: 'Millimeters', toBase: 0.001 },
-      { id: 'cm', label: 'Centimeters', toBase: 0.01 },
-      { id: 'm', label: 'Meters', toBase: 1 },
-      { id: 'km', label: 'Kilometers', toBase: 1000 },
-      { id: 'in', label: 'Inches', toBase: 0.0254 },
-      { id: 'ft', label: 'Feet', toBase: 0.3048 },
-      { id: 'yd', label: 'Yards', toBase: 0.9144 },
-      { id: 'mi', label: 'Miles', toBase: 1609.344 },
-    ],
-  },
-  {
-    id: 'mass',
-    label: 'Mass',
-    units: [
-      { id: 'mg', label: 'Milligrams', toBase: 0.000001 },
-      { id: 'g', label: 'Grams', toBase: 0.001 },
-      { id: 'kg', label: 'Kilograms', toBase: 1 },
-      { id: 'tonne', label: 'Tonnes', toBase: 1000 },
-      { id: 'oz', label: 'Ounces', toBase: 0.028349523125 },
-      { id: 'lb', label: 'Pounds', toBase: 0.45359237 },
-      { id: 'ston', label: 'Stones', toBase: 6.35029318 },
-    ],
-  },
-  {
-    id: 'speed',
-    label: 'Speed',
-    units: [
-      { id: 'ms', label: 'Meters per second', toBase: 1 },
-      { id: 'kmh', label: 'Kilometers per hour', toBase: 0.2777777778 },
-      { id: 'mph', label: 'Miles per hour', toBase: 0.44704 },
-      { id: 'kn', label: 'Knots', toBase: 0.5144444444 },
-    ],
-  },
-  {
-    id: 'temperature',
-    label: 'Temperature',
-    units: [
-      { id: 'c', label: 'Celsius', toBase: 1 },
-      { id: 'f', label: 'Fahrenheit', toBase: 1 },
-      { id: 'k', label: 'Kelvin', toBase: 1 },
-    ],
-  },
-]
-
-function toBase(categoryId: string, unitId: string, value: number): number {
-  if (categoryId === 'temperature') {
-    if (unitId === 'c') return value
-    if (unitId === 'f') return ((value - 32) * 5) / 9
-    if (unitId === 'k') return value - 273.15
-    return value
-  }
-  const category = CATEGORIES.find((c) => c.id === categoryId)
-  const unit = category?.units.find((u) => u.id === unitId)
-  if (!unit) return value
-  return value * unit.toBase
-}
-
-function fromBase(categoryId: string, unitId: string, base: number): number {
-  if (categoryId === 'temperature') {
-    if (unitId === 'c') return base
-    if (unitId === 'f') return (base * 9) / 5 + 32
-    if (unitId === 'k') return base + 273.15
-    return base
-  }
-  const category = CATEGORIES.find((c) => c.id === categoryId)
-  const unit = category?.units.find((u) => u.id === unitId)
-  if (!unit) return base
-  return base / unit.toBase
-}
-
-// ---------------------------------------------------------------- plot
-function parseFunction(input: string): (x: number) => number {
-  const tokens = tokenize(input)
-  return (x: number): number => {
-    let pos = 0
-    const peek = () => tokens[pos]
-    const next = () => {
-      const t = tokens[pos]
-      pos++
-      return t
-    }
-    function parsePrimary(): number {
-      const t = next()
-      if (t === undefined) throw new Error('Unexpected end')
-      if (t === '(') {
-        const v = parseExpr()
-        const close = next()
-        if (close !== ')') throw new Error('Expected )')
-        return v
-      }
-      if (t === '-') return -parsePrimary()
-      if (/^[0-9.]+$/.test(t)) return parseFloat(t)
-      if (t === 'x') return x
-      if (FUNCTIONS[t]) {
-        const open = next()
-        if (open !== '(') throw new Error('Expected (')
-        const arg = parseExpr()
-        const close = next()
-        if (close !== ')') throw new Error('Expected )')
-        return FUNCTIONS[t](arg)
-      }
-      throw new Error(`Unexpected ${t}`)
-    }
-    function parsePower(): number {
-      const base = parsePrimary()
-      if (peek() === '^') {
-        next()
-        return Math.pow(base, parsePower())
-      }
-      return base
-    }
-    function parseTerm(): number {
-      let value = parsePower()
-      while (peek() === '*' || peek() === '/') {
-        const op = next()
-        const rhs = parsePower()
-        if (op === '*') value = value * rhs
-        else value = value / rhs
-      }
-      return value
-    }
-    function parseExpr(): number {
-      let value = parseTerm()
-      while (peek() === '+' || peek() === '-') {
-        const op = next()
-        const rhs = parseTerm()
-        if (op === '+') value = value + rhs
-        else value = value - rhs
-      }
-      return value
-    }
-    const result = parseExpr()
-    if (pos < tokens.length) throw new Error('Unexpected trailing tokens')
-    return result
-  }
-}
-
-function sampleFunction(fn: (x: number) => number, from: number, to: number, step: number): ChartDataPoint[] {
-  const points: ChartDataPoint[] = []
-  for (let x = from; x <= to + step / 2; x += step) {
-    const y = fn(x)
-    if (Number.isFinite(y)) {
-      points.push({ label: formatNumber(Math.round(x * 1e9) / 1e9), value: y })
-    }
-  }
-  return points
-}
-
-// ---------------------------------------------------------------- tabs
-function TabButtons({ items, active, onSelect }: { items: string[]; active: string; onSelect: (v: string) => void }) {
+// A label input that mirrors the kit TextInput markup (so getByLabel resolves) but accepts
+// an onKeyDown, so the Expression field can commit on Enter.
+function FieldInput({
+  label,
+  value,
+  placeholder,
+  inputMode,
+  error,
+  hint,
+  onChange,
+  onKeyDown,
+}: {
+  label: string
+  value: string
+  placeholder?: string
+  inputMode?: 'text' | 'numeric' | 'decimal'
+  error?: string | null
+  hint?: string
+  onChange: (value: string) => void
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void
+}) {
+  const invalid = error ? true : undefined
   return (
-    <div className="lc-tabs" role="tablist">
-      {items.map((item) => (
-        <button
-          key={item}
-          type="button"
-          role="tab"
-          aria-selected={item === active}
-          className={item === active ? 'lc-tab active' : 'lc-tab'}
-          onClick={() => onSelect(item)}
-        >
-          {item}
-        </button>
-      ))}
-    </div>
+    <label className="lc-field">
+      <span className="lc-field-label">{label}</span>
+      <input
+        className="lc-input"
+        inputMode={inputMode}
+        value={value}
+        placeholder={placeholder}
+        aria-invalid={invalid}
+        onChange={(event) => onChange(event.target.value)}
+        onKeyDown={onKeyDown}
+      />
+      {error ? <span className="lk-field-error" role="alert">{error}</span> : hint ? <span className="lk-field-hint">{hint}</span> : null}
+    </label>
   )
 }
 
-// ---------------------------------------------------------------- result field
-function ResultField({ label, value }: { label: string; value: string }) {
-  const [id] = useState(() => `result-field-${label.toLowerCase().replace(/\s+/g, '-')}`)
+// A labelled select whose accessible name is the label alone. The kit Select wraps the
+// <select> (and its <option> children) inside the <label>, which folds every option's text
+// into the control's accessible name and breaks getByLabel('Category'). This version points
+// aria-labelledby at the label span, so the accessible name is exactly the label text.
+function LabeledSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: string[]
+  onChange: (value: string) => void
+}) {
+  const id = `lc-select-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
   return (
     <div className="lc-field">
-      <label className="lc-field-label" htmlFor={id}>{label}</label>
-      <input className="lc-input" id={id} readOnly value={value} />
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------- unit select
-function UnitSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
-  const [id] = useState(() => `select-${label.toLowerCase().replace(/\s+/g, '-')}`)
-  return (
-    <div className="lc-field">
-      <label className="lc-field-label" htmlFor={id}>{label}</label>
-      <select className="lc-input" id={id} value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+      <span id={id} className="lc-field-label">
+        {label}
+      </span>
+      <select className="lc-input" value={value} aria-labelledby={id} onChange={(event) => onChange(event.target.value)}>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
     </div>
   )
 }
 
-// ---------------------------------------------------------------- app
-export function App() {
-  const [tab, setTab] = useState<string>('Calc')
+const TABS = ['Calc', 'Convert', 'Plot'] as const
+type Tab = (typeof TABS)[number]
 
-  return (
-    <AppShell name="Scientific Calculator" icon="grid" hue="rust" category="Productivity" meta={`${tab} view`}>
-      <Stack>
-        <TabButtons items={['Calc', 'Convert', 'Plot']} active={tab} onSelect={setTab} />
-        {tab === 'Calc' && <CalcTab />}
-        {tab === 'Convert' && <ConvertTab />}
-        {tab === 'Plot' && <PlotTab />}
-      </Stack>
-    </AppShell>
-  )
+interface HistoryEntry {
+  id: string
+  expression: string
+  result: string
+  at: number
 }
 
-// ---------------------------------------------------------------- calc tab
-function CalcTab() {
+type HistoryRecord = { entries: HistoryEntry[] }
+
+const MAX_HISTORY = 50
+const PLOT_SAMPLES = 121
+const PLOT_X_MIN = -10
+const PLOT_X_MAX = 10
+
+const CATEGORY_OPTIONS: Record<string, string[]> = {
+  Length: ['Meters', 'Kilometers', 'Feet', 'Miles', 'Inches', 'Centimeters'],
+  Mass: ['Kilograms', 'Tonnes', 'Pounds', 'Grams', 'Ounces'],
+  Speed: ['Meters/Second', 'Kilometers/Hour', 'Miles/Hour', 'Feet/Second'],
+  Temperature: ['Celsius', 'Fahrenheit', 'Kelvin'],
+}
+
+const LENGTH_FACTORS: Record<string, number> = {
+  Meters: 1,
+  Feet: 0.3048,
+  Kilometers: 1000,
+  Miles: 1609.344,
+  Inches: 0.0254,
+  Centimeters: 0.01,
+}
+
+const LENGTH_TO_METER: Record<string, number> = LENGTH_FACTORS
+
+const MASS_TO_KG: Record<string, number> = {
+  Kilograms: 1,
+  Pounds: 0.45359237,
+  Grams: 0.001,
+  Ounces: 0.028349523125,
+  Tonnes: 1000,
+}
+
+const SPEED_TO_MS: Record<string, number> = {
+  'Meters/Second': 1,
+  'Kilometers/Hour': 1 / 3.6,
+  'Miles/Hour': 0.44704,
+  'Feet/Second': 0.3048,
+}
+
+function convertCategory(category: string, fromUnit: string, toUnit: string, value: number): number {
+  if (category === 'Temperature') {
+    let celsius: number
+    if (fromUnit === 'Celsius') celsius = value
+    else if (fromUnit === 'Fahrenheit') celsius = (value - 32) * 5 / 9
+    else celsius = value - 273.15
+    if (toUnit === 'Celsius') return celsius
+    if (toUnit === 'Fahrenheit') return celsius * 9 / 5 + 32
+    return celsius + 273.15
+  }
+  if (category === 'Length') {
+    const meters = value * LENGTH_TO_METER[fromUnit]
+    return meters / LENGTH_TO_METER[toUnit]
+  }
+  if (category === 'Mass') {
+    const kg = value * MASS_TO_KG[fromUnit]
+    return kg / MASS_TO_KG[toUnit]
+  }
+  const ms = value * SPEED_TO_MS[fromUnit]
+  return ms / SPEED_TO_MS[toUnit]
+}
+
+/** Option labels like "Feet (Length)" — keeps unit names unique across categories. */
+function truncateNumber(value: number): string {
+  const rounded = Math.round(value * 1000) / 1000
+  const abs = Math.abs(rounded)
+  if (abs !== 0 && (abs < 1e-6 || abs >= 1e9)) return rounded.toExponential(3)
+  return String(rounded)
+}
+
+type Token =
+  | { kind: 'num'; value: number }
+  | { kind: 'id'; name: string }
+  | { kind: 'op'; op: string }
+
+function tokenize(input: string): Token[] {
+  const tokens: Token[] = []
+  let i = 0
+  while (i < input.length) {
+    const ch = input[i]
+    if (/\s/.test(ch)) {
+      i++
+      continue
+    }
+    if (/[0-9.]/.test(ch)) {
+      let j = i
+      while (j < input.length && /[0-9.]/.test(input[j])) j++
+      const value = Number(input.slice(i, j))
+      if (!Number.isFinite(value)) throw new Error('Bad number')
+      tokens.push({ kind: 'num', value })
+      i = j
+      continue
+    }
+    if (/[a-zA-Z]/.test(ch)) {
+      let j = i
+      while (j < input.length && /[a-zA-Z]/.test(input[j])) j++
+      tokens.push({ kind: 'id', name: input.slice(i, j).toLowerCase() })
+      i = j
+      continue
+    }
+    if ('+-*/^()'.includes(ch)) {
+      tokens.push({ kind: 'op', op: ch })
+      i++
+      continue
+    }
+    throw new Error(`Unexpected character ${ch}`)
+  }
+  return tokens
+}
+
+function implicitMultiply(tokens: Token[]): Token[] {
+  const out: Token[] = []
+  for (const token of tokens) {
+    if (out.length > 0) {
+      const prev = out[out.length - 1]
+      const prevEndsValue = prev.kind === 'num' || (prev.kind === 'op' && prev.op === ')')
+      const startsValue = token.kind === 'num' || token.kind === 'id' || (token.kind === 'op' && token.op === '(')
+      if (prevEndsValue && startsValue) out.push({ kind: 'op', op: '*' })
+    }
+    out.push(token)
+  }
+  return out
+}
+
+const FUNCS: Record<string, (a: number) => number> = {
+  sin: (a) => Math.sin((a * Math.PI) / 180),
+  cos: (a) => Math.cos((a * Math.PI) / 180),
+  tan: (a) => Math.tan((a * Math.PI) / 180),
+  asin: (a) => (Math.asin(a) * 180) / Math.PI,
+  acos: (a) => (Math.acos(a) * 180) / Math.PI,
+  atan: (a) => (Math.atan(a) * 180) / Math.PI,
+  log: Math.log10,
+  ln: Math.log,
+  sqrt: Math.sqrt,
+  abs: Math.abs,
+  exp: Math.exp,
+}
+
+function evaluate(expression: string, vars: Record<string, number> = {}): number {
+  const tokens = implicitMultiply(tokenize(expression))
+  let pos = 0
+
+  function peek(): Token | undefined {
+    return tokens[pos]
+  }
+
+  function parseExpression(): number {
+    let value = parseTerm()
+    for (;;) {
+      const t = peek()
+      if (t && t.kind === 'op' && (t.op === '+' || t.op === '-')) {
+        pos++
+        const rhs = parseTerm()
+        value = t.op === '+' ? value + rhs : value - rhs
+      } else {
+        return value
+      }
+    }
+  }
+
+  function parseTerm(): number {
+    let value = parseFactor()
+    for (;;) {
+      const t = peek()
+      if (t && t.kind === 'op' && (t.op === '*' || t.op === '/')) {
+        pos++
+        const rhs = parseFactor()
+        if (t.op === '/') {
+          if (rhs === 0) throw new Error('Division by zero')
+          value = value / rhs
+        } else {
+          value = value * rhs
+        }
+      } else {
+        return value
+      }
+    }
+  }
+
+  function parseFactor(): number {
+    let base = parseUnary()
+    const t = peek()
+    if (t && t.kind === 'op' && t.op === '^') {
+      pos++
+      const exponent = parseFactor()
+      base = Math.pow(base, exponent)
+    }
+    return base
+  }
+
+  function parseUnary(): number {
+    const t = peek()
+    if (t && t.kind === 'op' && (t.op === '+' || t.op === '-')) {
+      pos++
+      const value = parseUnary()
+      return t.op === '-' ? -value : value
+    }
+    return parseAtom()
+  }
+
+  function parseAtom(): number {
+    const t = peek()
+    if (!t) throw new Error('Unexpected end of expression')
+    if (t.kind === 'num') {
+      pos++
+      return t.value
+    }
+    if (t.kind === 'id') {
+      pos++
+      const next = peek()
+      if (next && next.kind === 'op' && next.op === '(') {
+        pos++
+        const arg = parseExpression()
+        expectClose()
+        const fn = FUNCS[t.name]
+        if (!fn) throw new Error(`Unknown function ${t.name}`)
+        return fn(arg)
+      }
+      if (t.name === 'pi') return Math.PI
+      if (t.name === 'e') return Math.E
+      if (vars[t.name] !== undefined) return vars[t.name]
+      throw new Error(`Unknown symbol ${t.name}`)
+    }
+    if (t.kind === 'op' && t.op === '(') {
+      pos++
+      const value = parseExpression()
+      expectClose()
+      return value
+    }
+    throw new Error(`Unexpected token ${t.kind === 'op' ? t.op : '?'}`)
+  }
+
+  function expectClose(): void {
+    const t = peek()
+    if (!t || t.kind !== 'op' || t.op !== ')') throw new Error('Expected )')
+    pos++
+  }
+
+  const result = parseExpression()
+  if (pos !== tokens.length) throw new Error('Trailing input')
+  if (!Number.isFinite(result)) throw new Error('Result is not finite')
+  return result
+}
+
+function formatResult(value: number): string {
+  if (Object.is(value, -0)) value = 0
+  const snapped = Math.round(value * 1e12) / 1e12
+  if (Math.abs(snapped - Math.round(snapped)) < 1e-9) return String(Math.round(snapped))
+  if (Math.abs(snapped) < 1e-6 || Math.abs(snapped) >= 1e12) return snapped.toExponential(6)
+  return String(snapped)
+}
+
+function sampleFunction(expr: string, x0: number, x1: number, samples: number): [number, number][] {
+  const points: [number, number][] = []
+  const dx = (x1 - x0) / (samples - 1)
+  for (let i = 0; i < samples; i++) {
+    const x = x0 + i * dx
+    try {
+      const y = evaluate(expr, { x })
+      if (Number.isFinite(y)) points.push([Number(x.toFixed(4)), Number(y.toFixed(4))])
+    } catch {
+      /* gap */
+    }
+  }
+  return points
+}
+
+export function App() {
+  const [tab, setTab] = useState<Tab>('Calc')
+
   const [expression, setExpression] = useState('')
   const [result, setResult] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const { value: history, set: setHistory } = useLocalRecord<HistoryEntry[]>({
-    key: 'scientific-calculator.history',
-    version: 1,
-    defaultValue: [],
-  })
-  const { copied, copy } = useClipboard({ timeoutMs: 2000 })
-  const wrapperRef = useRef<HTMLDivElement | null>(null)
 
-  function evaluateNow() {
-    const expr = expression.trim()
-    if (!expr) return
+  const [category, setCategory] = useState('Length')
+  const [fromUnit, setFromUnit] = useState('Meters')
+  const [toUnit, setToUnit] = useState('Feet')
+  const [fromValue, setFromValue] = useState<number | null>(null)
+
+  const [functionExpr, setFunctionExpr] = useState('x^2')
+  const [plotX0, setPlotX0] = useState(PLOT_X_MIN)
+  const [plotX1, setPlotX1] = useState(PLOT_X_MAX)
+  const [plotPoints, setPlotPoints] = useState<[number, number][]>([])
+
+  const { value: historyRecord, set: setHistoryRecord } = useLocalRecord({
+    key: 'lacuna.scientific-calculator.history',
+    version: 1,
+    defaultValue: { entries: [] as HistoryEntry[] },
+  })
+
+  const history = historyRecord.entries
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+
+  const units = CATEGORY_OPTIONS[category]
+
+  const toValue = useMemo(() => {
+    if (fromValue === null) return null
+    return convertCategory(category, fromUnit, toUnit, fromValue)
+  }, [category, fromUnit, toUnit, fromValue])
+
+  const chartData = useMemo<ChartDataPoint[]>(() => {
+    if (plotPoints.length === 0) return []
+    return plotPoints.map(([x, y]) => ({ label: String(x), value: y }))
+  }, [plotPoints])
+
+  function commitExpression(value: string) {
+    setExpression(value)
+    if (value.trim() === '') {
+      setResult('')
+      setError(null)
+      return
+    }
     try {
-      const value = evaluate(expr)
-      const text = formatNumber(value)
+      const out = evaluate(value)
+      const text = formatResult(out)
       setResult(text)
       setError(null)
-      setHistory((prev) => [
-        { id: `${Date.now()}-${Math.random()}`, expr, result: text, at: Date.now() },
-        ...prev,
-      ])
+      setHistoryRecord((prev) => ({
+        entries: [
+          { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, expression: value, result: text, at: Date.now() },
+          ...prev.entries,
+        ].slice(0, MAX_HISTORY),
+      }))
     } catch (err) {
       setResult('')
       setError(err instanceof Error ? err.message : 'Invalid expression')
     }
   }
 
-  function clearHistory() {
-    setHistory([])
+  function handleClearHistory() {
+    setHistoryRecord({ entries: [] })
   }
 
-  function handleWrapperKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
-      event.preventDefault()
-      evaluateNow()
-    }
+  function handleSelectCategory(next: string) {
+    setCategory(next)
+    const nextUnits = CATEGORY_OPTIONS[next]
+    setFromUnit(nextUnits[0])
+    setToUnit(nextUnits[1] ?? nextUnits[0])
+    setFromValue(null)
   }
 
-  return (
-    <Stack>
-      <Card mono="Expression" title="Calculate">
-        <div ref={wrapperRef} onKeyDown={handleWrapperKeyDown}>
-          <FormGrid>
-            <TextInput label="Expression" value={expression} onChange={setExpression} placeholder="2+3*4 or sin(90)" error={error} />
-          </FormGrid>
-          <ResultField label="Result" value={result} />
-        </div>
-        <Actions>
-          <Button kind="ink" onClick={evaluateNow}>
-            Evaluate
-          </Button>
-          <Button
-            onClick={() => {
-              if (result) void copy(result)
-            }}
-            disabled={!result}
-          >
-            {copied ? 'Copied' : 'Copy'}
-          </Button>
-        </Actions>
-      </Card>
-
-      <Card mono={`${history.length} entries`} title="History">
-        {history.length === 0 ? (
-          <EmptyState
-            mono="Empty"
-            title="No history yet"
-            detail="Evaluate an expression to record it here."
-            actionLabel="Evaluate an expression"
-            onAction={evaluateNow}
-          />
-        ) : (
-          <>
-            <List label="History">
-              {history.map((entry) => (
-                <Row
-                  key={entry.id}
-                  title={`${entry.expr} = ${entry.result}`}
-                  value={new Date(entry.at).toLocaleTimeString()}
-                />
-              ))}
-            </List>
-            <Actions>
-              <Button kind="ghost" onClick={clearHistory}>
-                Clear
-              </Button>
-            </Actions>
-          </>
-        )}
-      </Card>
-    </Stack>
-  )
-}
-
-// ---------------------------------------------------------------- convert tab
-function ConvertTab() {
-  const [categoryId, setCategoryId] = useState(CATEGORIES[0].id)
-  const [fromValue, setFromValue] = useState('')
-  const [fromUnit, setFromUnit] = useState(CATEGORIES[0].units[2].id)
-  const [toUnit, setToUnit] = useState(CATEGORIES[0].units[5].id)
-
-  const category = CATEGORIES.find((c) => c.id === categoryId) ?? CATEGORIES[0]
-
-  const toValue = useMemo(() => {
-    const trimmed = fromValue.trim()
-    if (trimmed === '') return ''
-    const num = parseFloat(trimmed)
-    if (Number.isNaN(num)) return ''
-    const base = toBase(categoryId, fromUnit, num)
-    const converted = fromBase(categoryId, toUnit, base)
-    return formatNumber(converted)
-  }, [categoryId, fromUnit, toUnit, fromValue])
-
-  function handleCategoryChange(id: string) {
-    setCategoryId(id)
-    const cat = CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[0]
-    setFromUnit(cat.units[0].id)
-    setToUnit(cat.units[1].id)
-  }
-
-  return (
-    <Stack>
-      <Card mono="Converter" title="Unit Conversion">
-        <FormGrid>
-          <UnitSelect
-            label="Category"
-            value={categoryId}
-            onChange={handleCategoryChange}
-            options={CATEGORIES.map((c) => ({ value: c.id, label: c.label }))}
-          />
-          <TextInput
-            label="From"
-            value={fromValue}
-            onChange={setFromValue}
-            inputMode="decimal"
-            placeholder="100"
-          />
-          <UnitSelect
-            label="From Unit"
-            value={fromUnit}
-            onChange={setFromUnit}
-            options={category.units.map((u) => ({ value: u.id, label: u.label }))}
-          />
-          <UnitSelect
-            label="To Unit"
-            value={toUnit}
-            onChange={setToUnit}
-            options={category.units.map((u) => ({ value: u.id, label: u.label }))}
-          />
-          <ResultField label="To" value={toValue} />
-        </FormGrid>
-      </Card>
-    </Stack>
-  )
-}
-
-// ---------------------------------------------------------------- plot tab
-function PlotTab() {
-  const [fnInput, setFnInput] = useState('')
-  const [fromX, setFromX] = useState<number | null>(-5)
-  const [toX, setToX] = useState<number | null>(5)
-  const [plotResult, setPlotResult] = useState<ChartDataPoint[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  function plot() {
-    const expr = fnInput.trim()
-    if (!expr) return
-    const from = fromX ?? -5
-    const to = toX ?? 5
+  function handlePlot() {
     try {
-      const fn = parseFunction(expr)
-      const points = sampleFunction(fn, from, to, 1)
-      if (points.length === 0) {
-        setError('No valid points in the sampled range')
-        setPlotResult(null)
-        return
-      }
-      setPlotResult(points)
-      setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid function')
-      setPlotResult(null)
+      const x0 = Math.min(plotX0, plotX1)
+      const x1 = Math.max(plotX0, plotX1)
+      setPlotPoints(sampleFunction(functionExpr, x0, x1, PLOT_SAMPLES))
+    } catch {
+      setPlotPoints([])
     }
   }
 
-  return (
-    <Stack>
-      <Card mono="Function" title="Plot">
-        <FormGrid>
-          <TextInput label="Function" value={fnInput} onChange={setFnInput} placeholder="x^2 or sin(x)" error={error} />
-          <NumberInput label="From X" value={fromX} onChange={setFromX} min={-100} max={100} />
-          <NumberInput label="To X" value={toX} onChange={setToX} min={-100} max={100} />
-        </FormGrid>
-        <Actions>
-          <Button kind="ink" onClick={plot}>
-            Plot
-          </Button>
-        </Actions>
-      </Card>
+  const kitResult = useMemo(() => {
+    const base = [
+      { label: 'Result', value: result || '—' },
+      { label: 'Stored', value: `${history.length} / ${MAX_HISTORY}` },
+    ]
+    if (toValue !== null) base.push({ label: 'Converted', value: truncateNumber(toValue) })
+    return base
+  }, [result, history.length, toValue])
 
-      {plotResult && plotResult.length > 0 ? (
-        <Card mono="Chart" title="Result">
-          <Chart
-            type="line"
-            data={plotResult}
-            title={fnInput}
-            ariaLabel={`Plot of ${fnInput}`}
-            width={480}
-            height={240}
-          />
-          <div className="lc-body-sm">Sampled from x = {fromX ?? -5} to x = {toX ?? 5}. Max value: {Math.max(...plotResult.map((p) => p.value))}</div>
-        </Card>
-      ) : null}
-    </Stack>
+  const exportOptions: ExportOption[] = [
+    {
+      id: 'csv',
+      label: 'CSV',
+      mimeType: 'text/csv',
+      extension: 'csv',
+      getData: () =>
+        ['expression,result,at', ...history.map((h) => `"${h.expression.replace(/"/g, '""')}","${h.result}","${h.at}"`)].join('\n'),
+    },
+    {
+      id: 'json',
+      label: 'JSON',
+      mimeType: 'application/json',
+      extension: 'json',
+      getData: () => JSON.stringify(history, null, 2),
+    },
+  ]
+
+  return (
+    <AppShell
+      name="Scientific Calculator"
+      icon="grid"
+      hue="rust"
+      category="Apps"
+      meta="v0.1.0"
+      status="Live"
+      side={
+        <Stack>
+          <div className="lc-mono lc-faint">Calc · Convert · Plot</div>
+          <div className="lc-mono lc-faint">{history.length} recorded</div>
+        </Stack>
+      }
+    >
+      <div role="tablist" aria-label="Scientific Calculator views">
+        {TABS.map((item) => (
+          <button
+            key={item}
+            type="button"
+            role="tab"
+            aria-selected={tab === item}
+            className={`lc-tab${tab === item ? ' active' : ''}`}
+            onClick={() => setTab(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <CalculatorKit
+        title="Kit summary"
+        inputs={[
+          {
+            id: 'demo',
+            label: 'Demo base',
+            min: 0,
+            max: 100,
+            step: 1,
+            defaultValue: 42,
+          },
+        ]}
+        compute={(values) => ({
+          summary: [
+            { label: 'Demo squared', value: formatResult(values.demo * values.demo) },
+            ...kitResult,
+          ],
+          breakdown: [
+            { label: 'History items', value: String(history.length) },
+            { label: 'Last result', value: result || '—' },
+          ],
+        })}
+      />
+
+      {tab === 'Calc' && (
+        <Stack>
+          <Card title="Calculate" mono="CALC">
+            <FieldInput
+              label="Expression"
+              value={expression}
+              placeholder="e.g. 2+3*4 or sin(90)"
+              error={error}
+              onChange={(value) => {
+                setExpression(value)
+                setError(null)
+                if (value === '') {
+                  setResult('')
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  commitExpression(expression)
+                }
+              }}
+            />
+            <MonoLabel sm faint>
+              Supports +, -, *, /, ^, sin, cos, tan, log, sqrt, pi, e
+            </MonoLabel>
+            <Spread>
+              <Button kind="primary" onClick={() => commitExpression(expression)}>
+                Evaluate
+              </Button>
+              <Button kind="ghost" onClick={() => void copy(result)}>
+                {copied ? 'Copied' : 'Copy'}
+              </Button>
+            </Spread>
+            <Divider />
+            <TextInput label="Result" value={result} placeholder="—" onChange={() => {}} />
+          </Card>
+
+          <Card title="History" mono="LOG" flush>
+            {history.length === 0 ? (
+              <div style={{ padding: 'calc(16px * var(--sf))' }}>
+                <MonoLabel faint>No history yet</MonoLabel>
+              </div>
+            ) : (
+              <Spread>
+                <ul aria-label="Recent calculations">
+                  {history.map((h) => (
+                    <li key={h.id} role="listitem" style={{ padding: 'calc(8px * var(--sf)) 0' }}>
+                      <div className="lc-mono">
+                        {h.expression} = {h.result}
+                      </div>
+                      <MonoLabel sm faint>
+                        {new Date(h.at).toLocaleString()}
+                      </MonoLabel>
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(10px * var(--sf))' }}>
+                  <Button kind="ghost" onClick={handleClearHistory}>
+                    Clear
+                  </Button>
+                  <ExportMenu options={exportOptions} fileName="scientific-calculator-history" ariaLabel="Export history" />
+                </div>
+              </Spread>
+            )}
+          </Card>
+        </Stack>
+      )}
+
+      {tab === 'Convert' && (
+        <Stack>
+          <Card title="Unit conversion" mono="CONVERT">
+            <FormGrid>
+              <LabeledSelect label="Category" value={category} options={Object.keys(CATEGORY_OPTIONS)} onChange={handleSelectCategory} />
+              <TextInput
+                label="From"
+                value={fromValue === null ? '' : String(fromValue)}
+                inputMode="decimal"
+                placeholder="0"
+                onChange={(value) => {
+                  if (value === '') {
+                    setFromValue(null)
+                  } else {
+                    const parsed = Number(value)
+                    if (Number.isFinite(parsed)) setFromValue(parsed)
+                  }
+                }}
+              />
+              <LabeledSelect label="From Unit" value={fromUnit} options={units} onChange={setFromUnit} />
+              <LabeledSelect label="To Unit" value={toUnit} options={units} onChange={setToUnit} />
+            </FormGrid>
+            <Divider />
+            <TextInput label="To" value={toValue === null ? '' : truncateNumber(toValue)} placeholder="—" onChange={() => {}} />
+          </Card>
+        </Stack>
+      )}
+
+      {tab === 'Plot' && (
+        <Stack>
+          <Card title="Plot" mono="PLOT">
+            <FormGrid>
+              <TextInput
+                label="Function"
+                value={functionExpr}
+                placeholder="f(x), e.g. x^2"
+                onChange={setFunctionExpr}
+              />
+              <TextInput
+                label="X min"
+                value={String(plotX0)}
+                inputMode="decimal"
+                onChange={(value) => {
+                  const parsed = Number(value)
+                  if (Number.isFinite(parsed)) setPlotX0(parsed)
+                }}
+              />
+              <TextInput
+                label="X max"
+                value={String(plotX1)}
+                inputMode="decimal"
+                onChange={(value) => {
+                  const parsed = Number(value)
+                  if (Number.isFinite(parsed)) setPlotX1(parsed)
+                }}
+              />
+            </FormGrid>
+            <Spread>
+              <Button kind="primary" onClick={handlePlot}>
+                Plot
+              </Button>
+              <Button kind="ghost" onClick={() => void copy(functionExpr)}>
+                {copied ? 'Copied' : 'Copy'}
+              </Button>
+            </Spread>
+          </Card>
+
+          <Card title="Chart" mono="RENDER" flush>
+            {plotPoints.length > 0 ? (
+              <Chart
+                data={chartData}
+                type="line"
+                title={`f(x) over [${Math.min(plotX0, plotX1)}, ${Math.max(plotX0, plotX1)}]`}
+                ariaLabel={`Plot of ${functionExpr}`}
+              />
+            ) : (
+              <div style={{ padding: 'calc(20px * var(--sf))' }}>
+                <MonoLabel faint>No plot yet — enter a function and press Plot.</MonoLabel>
+              </div>
+            )}
+          </Card>
+        </Stack>
+      )}
+    </AppShell>
   )
 }
