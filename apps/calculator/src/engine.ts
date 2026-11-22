@@ -11,6 +11,7 @@ type Tok =
   | { kind: 'comma' }
 
 const FUNCS = new Set(['sin', 'cos', 'tan', 'log', 'ln', 'sqrt', 'abs'])
+const VARS = new Set(['x'])
 
 export function tokenize(input: string): Tok[] {
   const toks: Tok[] = []
@@ -74,7 +75,11 @@ export function tokenize(input: string): Tok[] {
   return toks
 }
 
-function parsePostfix(toks: Tok[], mode: AngleMode): number {
+export function containsVariable(input: string): boolean {
+  return /\bx\b/i.test(input)
+}
+
+function parsePostfix(toks: Tok[], mode: AngleMode, xValue: number | null): number {
   const stack: number[] = []
   const call = (name: string, arg: number): number => {
     const rad = mode === 'Degrees' ? (arg * Math.PI) / 180 : arg
@@ -119,16 +124,21 @@ function parsePostfix(toks: Tok[], mode: AngleMode): number {
         }
       }
     } else if (t.kind === 'name') {
-      const a = stack.pop()
-      if (a === undefined) throw new Error('Bad expression')
-      stack.push(call(t.value, a))
+      if (VARS.has(t.value.toLowerCase())) {
+        if (xValue === null) throw new Error('Variable x has no value')
+        stack.push(xValue)
+      } else {
+        const a = stack.pop()
+        if (a === undefined) throw new Error('Bad expression')
+        stack.push(call(t.value, a))
+      }
     }
   }
   if (stack.length !== 1) throw new Error('Bad expression')
   return stack[0]
 }
 
-export function evaluate(input: string, mode: AngleMode = 'Degrees'): number {
+export function evaluate(input: string, mode: AngleMode = 'Degrees', xValue: number | null = null): number {
   const raw = tokenize(input)
   const out: Tok[] = []
   const prec: Record<string, number> = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3 }
@@ -137,8 +147,13 @@ export function evaluate(input: string, mode: AngleMode = 'Degrees'): number {
     if (t.kind === 'num') {
       out.push(t)
     } else if (t.kind === 'name') {
-      if (!FUNCS.has(t.value)) throw new Error('Unknown function: ' + t.value)
-      stack.push(t)
+      if (VARS.has(t.value.toLowerCase())) {
+        out.push(t)
+      } else if (FUNCS.has(t.value)) {
+        stack.push(t)
+      } else {
+        throw new Error('Unknown function: ' + t.value)
+      }
     } else if (t.kind === 'op') {
       while (stack.length > 0) {
         const top = stack[stack.length - 1]
@@ -165,7 +180,7 @@ export function evaluate(input: string, mode: AngleMode = 'Degrees'): number {
       }
       if (stack.length === 0) throw new Error('Mismatched parentheses')
       const top = stack[stack.length - 1]
-      if (top && top.kind === 'name') out.push(stack.pop() as Tok)
+      if (top && top.kind === 'name' && !VARS.has(top.value.toLowerCase())) out.push(stack.pop() as Tok)
     } else if (t.kind === 'comma') {
       throw new Error('Comma not supported')
     }
@@ -176,7 +191,7 @@ export function evaluate(input: string, mode: AngleMode = 'Degrees'): number {
     if (o.kind === 'lparen') throw new Error('Mismatched parentheses')
     out.push(o)
   }
-  const result = parsePostfix(out, mode)
+  const result = parsePostfix(out, mode, xValue)
   if (!Number.isFinite(result)) throw new Error('Result is not finite')
   return result
 }
@@ -200,15 +215,14 @@ export function sampleSeries(
   to = 360,
   step = 15,
 ): { points: SeriesPoint[]; atX: SeriesPoint | null } {
-  const xVar = /^x$/i.test(input.replace(/\s+/g, '')) || /\bx\b/i.test(input)
-  if (!xVar) return { points: [], atX: null }
+  if (!containsVariable(input)) return { points: [], atX: null }
   const points: SeriesPoint[] = []
   let atX: SeriesPoint | null = null
   for (let x = from; x <= to + 0.0001; x += step) {
     const xr = Math.round(x * 100) / 100
     let y: number
     try {
-      y = evaluate(input.replace(/\bx\b/gi, String(xr)), mode)
+      y = evaluate(input, mode, xr)
     } catch {
       y = 0
     }
