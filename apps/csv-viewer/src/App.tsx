@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AppShell, Button, Card, EmptyState, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, Keys, Rail, Tabs, TextInput } from '@lacuna/ui'
 import { parseCsv, toCsv } from '@lacuna/csv-parse'
 import { openFile, saveText } from '@lacuna/file-save-open'
 import { useCsvView } from './host/view'
@@ -13,6 +13,7 @@ export function App() {
   const { value, set } = useCsvView()
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<Cell | null>(null)
+  const [tab, setTab] = useState('Grid')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const result = useMemo(() => (value.text ? parseCsv(value.text, { header: true }) : null), [value.text])
@@ -28,10 +29,6 @@ export function App() {
     return result.rows.filter((row) => row.some((cell) => cell.toLowerCase().includes(q)))
   }, [result, filter])
 
-  const columns = useMemo(
-    () => headers.map((label, index) => ({ key: `c${index}`, label: label || `Column ${index + 1}` })),
-    [headers],
-  )
   const shown = filtered.length
 
   useEffect(() => {
@@ -46,6 +43,7 @@ export function App() {
       return
     }
     set({ name: file.name, text: String(read.data), filter: '' })
+    setTab('Grid')
   }
 
   function onPick(e: React.ChangeEvent<HTMLInputElement>) {
@@ -60,10 +58,6 @@ export function App() {
     if (file) void applyFile(file)
   }
 
-  function onFilterKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') setError(null)
-  }
-
   function clearFilter() {
     setError(null)
     set((view) => ({ ...view, filter: '' }))
@@ -72,6 +66,7 @@ export function App() {
   function reset() {
     set({ name: '', text: '', filter: '' })
     setError(null)
+    setTab('Grid')
   }
 
   function exportCsv() {
@@ -99,13 +94,43 @@ export function App() {
     }
   }
 
+  const railChips = hasData
+    ? [`${shown} of ${shown} rows`, `${headers.length} cols`, value.name || 'CSV']
+    : ['text/csv']
+
+  const status = hasData
+    ? filter.trim()
+      ? `filtered ${shown}/${total}`
+      : `${total} rows`
+    : undefined
+
   return (
     <AppShell
       name="CSV Viewer"
       hue="blue"
       icon="sheets"
       category="Productivity"
-      meta={hasData ? `${shown} of ${shown} rows` : undefined}
+      status={status}
+      side={
+        <Rail title="View" note={hasData ? value.name : undefined} chips={railChips}>
+          {hasData ? (
+            <>
+              <KpiRow>
+                <Kpi value={String(shown)} label="rows shown" accent={filter.trim() !== ''} />
+                <Kpi value={String(headers.length)} label="columns" />
+              </KpiRow>
+              <Keys
+                items={[
+                  ['↑↓', 'Move row'],
+                  ['←→', 'Move col'],
+                ]}
+              />
+            </>
+          ) : (
+            <Keys items={[['F', 'Filter']]} />
+          )}
+        </Rail>
+      }
       actions={
         hasData ? (
           <div style={{ display: 'flex', gap: 8 }}>
@@ -118,9 +143,10 @@ export function App() {
       <input ref={fileRef} type="file" accept=".csv,text/csv" hidden onChange={onPick} />
 
       {hasData ? (
-        <Card>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
-            <div style={{ flex: '1 1 calc(240px * var(--sf))', minWidth: 'calc(200px * var(--sf))' }} onKeyDown={onFilterKeyDown}>
+        <Card mono="Data" title={value.name || 'CSV'}>
+          <Tabs items={['Grid', 'Raw']} active={tab} onSelect={setTab} />
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', margin: 'calc(12px * var(--sf)) 0', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 calc(240px * var(--sf))', minWidth: 'calc(200px * var(--sf))' }}>
               <TextInput
                 label="Filter"
                 type="search"
@@ -133,44 +159,59 @@ export function App() {
             </div>
             <Button kind="ghost" onClick={clearFilter} disabled={filter === ''}>Clear Filter</Button>
           </div>
-          <div tabIndex={0} onKeyDown={onGridKey} aria-label="CSV grid">
-            <table className="lc-table" aria-label="CSV data">
-              <thead>
-                <tr>
-                  {columns.map((c) => (
-                    <th key={c.key}>{c.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((row, ri) => (
-                  <tr key={ri}>
-                    {headers.map((_, ci) => {
-                      const isSel = selected !== null && selected.row === ri && selected.col === ci
-                      return (
-                        <td
-                          key={ci}
-                          data-label={columns[ci].label}
-                          aria-selected={isSel ? true : undefined}
-                          style={isSel ? { background: 'var(--accent-soft)' } : undefined}
-                          onClick={() => selectCell(ri, ci)}
-                        >
-                          {row[ci] ?? ''}
-                        </td>
-                      )
-                    })}
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
+
+          {tab === 'Grid' ? (
+            <div tabIndex={0} onKeyDown={onGridKey} aria-label="CSV grid">
+              <table className="lc-table" aria-label="CSV data">
+                <thead>
                   <tr>
-                    <td colSpan={columns.length} className="lc-faint" style={{ color: 'var(--ink-60)' }}>
-                      {filter.trim() !== '' ? 'No rows match the filter' : 'No data'}
-                    </td>
+                    {headers.map((label, i) => (
+                      <th key={i}>{label || `Column ${i + 1}`}</th>
+                    ))}
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.map((row, ri) => (
+                    <tr key={ri}>
+                      {headers.map((_, ci) => {
+                        const isSel = selected !== null && selected.row === ri && selected.col === ci
+                        return (
+                          <td
+                            key={ci}
+                            data-label={headers[ci] || `Column ${ci + 1}`}
+                            aria-selected={isSel ? true : undefined}
+                            style={isSel ? { background: 'var(--accent-soft)' } : undefined}
+                            onClick={() => selectCell(ri, ci)}
+                          >
+                            {row[ci] ?? ''}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan={headers.length} className="lc-faint" style={{ color: 'var(--ink-60)' }}>
+                        {filter.trim() !== '' ? 'No rows match the filter' : 'No data'}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <pre style={{
+              fontFamily: 'var(--mono)',
+              fontSize: 'calc(12px * var(--tf))',
+              background: 'var(--ui-bg)',
+              border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+              borderRadius: 'calc(2px * var(--sf))',
+              padding: 'calc(12px * var(--sf))',
+              overflow: 'auto',
+              maxHeight: 'calc(400px * var(--sf))',
+              margin: 0,
+            }}>{filtered.length === 0 ? (filter.trim() ? 'No rows match' : 'No data') : [headers, ...filtered].map((row) => row.join(',')).join('\n')}</pre>
+          )}
         </Card>
       ) : (
         <Card>
@@ -185,9 +226,9 @@ export function App() {
               onDrop={onDrop}
               onDragOver={(e) => e.preventDefault()}
               style={{
-              border: 'calc(1px * var(--sf)) dashed var(--ink-30)',
-              borderRadius: 'calc(8px * var(--sf))',
-              padding: 'calc(40px * var(--sf))',
+                border: 'calc(1px * var(--sf)) dashed var(--ink-30)',
+                borderRadius: 'calc(8px * var(--sf))',
+                padding: 'calc(40px * var(--sf))',
                 textAlign: 'center',
                 marginTop: 16,
               }}
