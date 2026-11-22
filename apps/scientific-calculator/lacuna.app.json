@@ -1,0 +1,96 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.scientific-calculator",
+  "name": "Scientific Calculator",
+  "version": "0.1.0",
+  "summary": "Evaluate expressions, convert units, and plot functions on one page.",
+  "description": "A scientific calculator with three views: Calc evaluates expressions and trig functions, Convert converts between units, and Plot renders a function. History persists on this page. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/scientific-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/money-input": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:calculation",
+    "convert:unit"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "scientific-calculator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store calculation history"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "scientific-calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

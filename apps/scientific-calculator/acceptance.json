@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "88375f2846e5412441db84176dce814b1aaa16220364c773ad23b2ff4b05821f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Scientific Calculator\" and the tab labels \"Calc\", \"Convert\", and \"Plot\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Calc\" tab, typing \"2+3*4\" in the expression field and pressing Enter shows \"14\" in the result field."
+    },
+    {
+      "id": "A3",
+      "text": "In the \"Calc\" tab, typing \"sin(90)\" in the expression field and pressing Enter shows \"1\" in the result field."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Convert\" tab, selecting \"Length\" in the category select, typing \"100\" in the \"From\" field, and selecting \"Meters\" in the \"From Unit\" select shows \"328.084\" in the \"To\" field when \"Feet\" is selected in the \"To Unit\" select."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Plot\" tab, typing \"x^2\" in the function field and clicking \"Plot\" shows a chart with a point at (2, 4)."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Calc\" tab, after evaluating \"2+3*4\", clicking the \"Copy\" button copies \"14\" to the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"Calc\" tab, after evaluating \"2+3*4\", the history list shows an item with the text \"2+3*4 = 14\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Calc\" tab, clicking the \"Clear\" button removes all items from the history list and shows \"No history yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history item \"2+3*4 = 14\" in the \"Calc\" tab history list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "789c2355276e96a775ea587ba163b9485b1569530fbe033e986884d8fff7cd86"
+    }
+  ]
+}
