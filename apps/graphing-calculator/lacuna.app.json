@@ -30,8 +30,16 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/money": "0.1.0",
+      "@lacuna/money-input": "0.1.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
     }
   },
   "capabilities": [

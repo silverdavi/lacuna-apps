@@ -744,12 +744,36 @@ importers:
 
   apps/graphing-calculator:
     dependencies:
+      '@lacuna/calculator-kit':
+        specifier: workspace:0.2.0
+        version: link:../../toolbox/modules/calculator-kit/0.2.0
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/money':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/money/0.1.0
+      '@lacuna/money-input':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/money-input/0.1.0
+      '@lacuna/number-input':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/number-input/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-clipboard/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-local-record/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1

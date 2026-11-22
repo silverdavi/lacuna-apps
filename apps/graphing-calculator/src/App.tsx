@@ -1,31 +1,45 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import {
   Actions,
   AppShell,
   Button,
   Card,
+  Checkbox,
   EmptyState,
   FormGrid,
+  Keys,
   List,
   PrimaryButton,
+  Rail,
   Row,
   Table,
   TextInput,
 } from '@lacuna/ui'
+import { NumberInput } from '@lacuna/number-input'
+import { Chart } from '@lacuna/chart'
+import { ExportMenu } from '@lacuna/export-menu'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { useLocalRecord } from '@lacuna/use-local-record'
 import { host } from './host'
 import { compile } from './math/evaluator'
 import { SERIES_COLORS, EXPORT_GRID, EXPORT_AXIS, EXPORT_LABEL, EXPORT_BG } from './colors'
 
 type Tab = 'Graph' | 'Table'
+type GraphStyle = 'line' | 'chart'
 
 type PlotFunction = {
   id: string
   expression: string
   fn: (x: number) => number
   color: string
+}
+
+type ViewPrefs = {
+  showGrid: boolean
+  graphStyle: GraphStyle
 }
 
 function initState() {
@@ -48,6 +62,27 @@ function initState() {
   }
 }
 
+function buildCsv(fns: PlotFunction[], xMin: number, xMax: number, sampleStep: number): string {
+  const header = ['x', ...fns.map((f) => f.expression)]
+  const step = xMax - xMin
+  const numRows = step / sampleStep
+  const lines: string[] = [header.join(',')]
+  for (let i = 0; i <= numRows; i++) {
+    const x = xMin + i * sampleStep
+    const xLabel = parseFloat(x.toFixed(10)).toString()
+    const cells = fns.map((f) => {
+      try {
+        const y = f.fn(x)
+        return Number.isFinite(y) ? parseFloat(y.toFixed(10)).toString() : ''
+      } catch {
+        return ''
+      }
+    })
+    lines.push([xLabel, ...cells].join(','))
+  }
+  return lines.join('\n')
+}
+
 export function App() {
   const [init] = useState(initState)
   const [expression, setExpression] = useState('')
@@ -56,6 +91,17 @@ export function App() {
   const [xmin, setXmin] = useState(init.xmin)
   const [xmax, setXmax] = useState(init.xmax)
   const [tab, setTab] = useState<Tab>('Graph')
+  const [sampleStep, setSampleStep] = useState(1)
+  const { value: prefs, set: setPrefs } = useLocalRecord<ViewPrefs>({
+    key: 'lacuna.graphing-calculator.view',
+    version: 0,
+    defaultValue: { showGrid: true, graphStyle: 'line' },
+  })
+  const showGrid = prefs.showGrid
+  const graphStyle = prefs.graphStyle
+  const setShowGrid = useCallback((v: boolean) => setPrefs((p) => ({ ...p, showGrid: v })), [setPrefs])
+  const setGraphStyle = useCallback((v: GraphStyle) => setPrefs((p) => ({ ...p, graphStyle: v })), [setPrefs])
+  const clipboard = useClipboard({ timeoutMs: 1500 })
 
   const persist = useCallback(
     (fns: PlotFunction[], min: string, max: string) => {
@@ -259,13 +305,104 @@ export function App() {
     img.src = url
   }, [functions, xmin, xmax])
 
+  const buildCsvString = useCallback((): string => {
+    const xMin = parseFloat(xmin) || -10
+    const xMax = parseFloat(xmax) || 10
+    return buildCsv(functions, xMin, xMax, sampleStep)
+  }, [functions, xmin, xmax, sampleStep])
+
+  const copyCsv = useCallback(async () => {
+    try {
+      await clipboard.copy(buildCsvString())
+    } catch {
+      // clipboard unavailable
+    }
+  }, [clipboard, buildCsvString])
+
+  const exportMenuOptions = useMemo(() => {
+    if (functions.length === 0) return []
+    const xMin = parseFloat(xmin) || -10
+    const xMax = parseFloat(xmax) || 10
+    return [
+      {
+        id: 'csv',
+        label: 'CSV',
+        mimeType: 'text/csv',
+        extension: 'csv',
+        getData: () => buildCsv(functions, xMin, xMax, sampleStep),
+      },
+      {
+        id: 'svg',
+        label: 'SVG',
+        mimeType: 'image/svg+xml',
+        extension: 'svg',
+        getData: () => {
+          const parts: string[] = []
+          const W = 800
+          const H = 500
+          const pad = 50
+          const yValues: number[] = [0]
+          for (const f of functions) {
+            for (let i = 0; i <= 200; i++) {
+              const x = xMin + (i / 200) * (xMax - xMin)
+              try {
+                const y = f.fn(x)
+                if (Number.isFinite(y) && Math.abs(y) < 1e6) yValues.push(y)
+              } catch {
+                // skip
+              }
+            }
+          }
+          const yMin = Math.min(...yValues)
+          const yMax = Math.max(...yValues)
+          const yRange = yMax - yMin || 1
+          const toSvgX = (x: number) => pad + ((x - xMin) / (xMax - xMin || 1)) * (W - 2 * pad)
+          const toSvgY = (y: number) => H - pad - ((y - yMin) / yRange) * (H - 2 * pad)
+          parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`)
+          parts.push(`<rect width="${W}" height="${H}" fill="${EXPORT_BG}"/>`)
+          if (xMin <= 0 && xMax >= 0) {
+            const x0 = toSvgX(0)
+            parts.push(`<line x1="${x0.toFixed(1)}" y1="${pad}" x2="${x0.toFixed(1)}" y2="${H - pad}" stroke="${EXPORT_AXIS}" stroke-width="1.5"/>`)
+          }
+          if (yMin <= 0 && yMax >= 0) {
+            const y0 = toSvgY(0)
+            parts.push(`<line x1="${pad}" y1="${y0.toFixed(1)}" x2="${W - pad}" y2="${y0.toFixed(1)}" stroke="${EXPORT_AXIS}" stroke-width="1.5"/>`)
+          }
+          for (const f of functions) {
+            const points: string[] = []
+            for (let i = 0; i <= 400; i++) {
+              const x = xMin + (i / 400) * (xMax - xMin)
+              try {
+                const y = f.fn(x)
+                if (Number.isFinite(y) && Math.abs(y) < 1e6) {
+                  if (points.length > 0) points.push('L')
+                  points.push(`${toSvgX(x).toFixed(2)},${toSvgY(y).toFixed(2)}`)
+                } else {
+                  points.length = 0
+                }
+              } catch {
+                points.length = 0
+              }
+            }
+            if (points.length > 1) {
+              const d = `M${points.join('')}`
+              parts.push(`<path d="${d}" fill="none" stroke="${f.color}" stroke-width="2"/>`)
+            }
+          }
+          parts.push('</svg>')
+          return parts.join('')
+        },
+      },
+    ]
+  }, [functions, xmin, xmax, sampleStep])
+
   const tableRows = useMemo(() => {
     if (functions.length === 0) return []
     const xMin = parseFloat(xmin)
     const xMax = parseFloat(xmax)
     if (Number.isNaN(xMin) || Number.isNaN(xMax) || xMin >= xMax) return []
     const step = xMax - xMin
-    const numRows = Math.min(20, Math.max(1, Math.round(step / 2)))
+    const numRows = Math.min(20, Math.max(1, Math.round(step / (sampleStep || 1))))
     const delta = step / numRows
     const rows: { cells: Record<string, ReactNode> }[] = []
     for (let i = 0; i <= numRows; i++) {
@@ -275,15 +412,15 @@ export function App() {
       for (const f of functions) {
         try {
           const y = f.fn(x)
-          cells[f.expression] = Number.isFinite(y) ? parseFloat(y.toFixed(10)).toString() : '—'
+          cells[f.expression] = Number.isFinite(y) ? parseFloat(y.toFixed(10)).toString() : '\u2014'
         } catch {
-          cells[f.expression] = '—'
+          cells[f.expression] = '\u2014'
         }
       }
       rows.push({ cells })
     }
     return rows
-  }, [functions, xmin, xmax])
+  }, [functions, xmin, xmax, sampleStep])
 
   const tableColumns = useMemo(() => {
     const cols: { key: string; label: string; num?: boolean }[] = [
@@ -380,13 +517,47 @@ export function App() {
     return ticks
   }, [graphYBounds])
 
+  const chartData = useMemo(() => {
+    if (functions.length === 0) return []
+    const n = Math.min(20, Math.max(1, Math.round(gxRange / (sampleStep || 1))))
+    const data: { label: string; value: number }[] = []
+    for (let i = 0; i <= n; i++) {
+      const x = gxMin + (i / n) * gxRange
+      let maxAbs = 0
+      for (const f of functions) {
+        try {
+          const y = f.fn(x)
+          if (Number.isFinite(y)) maxAbs = Math.max(maxAbs, Math.abs(y))
+        } catch {
+          // skip
+        }
+      }
+      data.push({ label: parseFloat(x.toFixed(1)).toString(), value: Math.round(maxAbs * 100) / 100 })
+    }
+    return data
+  }, [functions, gxMin, gxRange, sampleStep])
+
   return (
     <AppShell
       name="Graphing Calculator"
       icon="docs"
-      hue="gold"
+      hue="green"
       category="Productivity"
       meta={`${functions.length} ${functions.length === 1 ? 'function' : 'functions'}`}
+      status={`Window ${gxMin} to ${gxMax} · ${functions.length} plotted`}
+      side={
+        <Rail
+          title="View window"
+          chips={[
+            `x ${gxMin} to ${gxMax}`,
+            `y ${Math.round(graphYBounds.yMin)} to ${Math.round(graphYBounds.yMax)}`,
+            `${functions.length} ${functions.length === 1 ? 'curve' : 'curves'}`,
+          ]}
+        >
+          <Checkbox label="Show grid" checked={showGrid} onChange={setShowGrid} />
+          <Keys items={[['G', 'Toggle grid'], ['E', 'Export PNG']]} />
+        </Rail>
+      }
     >
       <Card mono="New" title="Plot a function">
         <FormGrid>
@@ -405,17 +576,24 @@ export function App() {
           <Button kind="secondary" onClick={exportPng} disabled={functions.length === 0}>
             Export PNG
           </Button>
+          {functions.length > 0 && (
+            <ExportMenu
+              options={exportMenuOptions}
+              fileName="graph"
+              ariaLabel="More export formats"
+            />
+          )}
         </Actions>
       </Card>
 
-      <div className="gc-tabs" role="tablist" aria-label="View">
+      <div className="lc-tabs" role="tablist" aria-label="View">
         {(['Graph', 'Table'] as Tab[]).map((item) => (
           <button
             key={item}
             type="button"
             role="tab"
             aria-selected={tab === item}
-            className={`gc-tab${tab === item ? ' active' : ''}`}
+            className={`lc-tab gc-tab${tab === item ? ' active' : ''}`}
             onClick={() => setTab(item)}
           >
             {item}
@@ -426,85 +604,108 @@ export function App() {
       {tab === 'Graph' && (
         <Card mono="View" title="Graph">
           {functions.length === 0 ? (
-            <div className="lc-body-sm lc-faint">Nothing to plot yet.</div>
+            <div className="lc-body-sm gc-faint">Nothing to plot yet.</div>
           ) : (
-            <div style={{ width: '100%', overflowX: 'auto' }}>
-              <svg
-                width="100%"
-                viewBox={`0 0 ${graphWidth} ${graphHeight}`}
-                style={{ display: 'block', maxWidth: '100%' }}
-                aria-label={`Graph of ${functions.map((f) => f.expression).join(', ')}`}
-              >
-                <rect width={graphWidth} height={graphHeight} fill="var(--paper)" rx="4" />
-                {xTicks.map((x, i) => (
-                  <g key={`xt${i}`}>
-                    <line
-                      x1={toGraphX(x)}
-                      y1={gpad}
-                      x2={toGraphX(x)}
-                      y2={graphHeight - gpad}
-                      stroke="var(--ui-line)"
-                      strokeWidth="1"
-                    />
-                    <text
-                      x={toGraphX(x)}
-                      y={graphHeight - gpad + 18}
-                      textAnchor="middle"
-                      fontSize="11"
-                      fill="var(--ink-60)"
-                    >
-                      {parseFloat(x.toFixed(1)).toString()}
-                    </text>
-                  </g>
+            <>
+              <div className="gc-graph-style-row">
+                {(['line', 'chart'] as GraphStyle[]).map((style) => (
+                  <button
+                    key={style}
+                    type="button"
+                    className={`lc-tab gc-tab${graphStyle === style ? ' active' : ''}`}
+                    onClick={() => setGraphStyle(style)}
+                  >
+                    {style === 'line' ? 'Line plot' : 'Magnitude chart'}
+                  </button>
                 ))}
-                {yTicks.map((y, i) => (
-                  <g key={`yt${i}`}>
-                    <line
-                      x1={gpad}
-                      y1={toGraphY(y)}
-                      x2={graphWidth - gpad}
-                      y2={toGraphY(y)}
-                      stroke="var(--ui-line)"
-                      strokeWidth="1"
-                    />
-                    <text
-                      x={gpad - 6}
-                      y={toGraphY(y) + 4}
-                      textAnchor="end"
-                      fontSize="11"
-                      fill="var(--ink-60)"
-                    >
-                      {parseFloat(y.toFixed(1)).toString()}
-                    </text>
-                  </g>
-                ))}
-                {gxMin <= 0 && gxMax >= 0 && (
-                  <line
-                    x1={toGraphX(0)}
-                    y1={gpad}
-                    x2={toGraphX(0)}
-                    y2={graphHeight - gpad}
-                    stroke="var(--ink-40)"
-                    strokeWidth="1.5"
-                  />
-                )}
-                {graphYBounds.yMin <= 0 && graphYBounds.yMax >= 0 && (
-                  <line
-                    x1={gpad}
-                    y1={toGraphY(0)}
-                    x2={graphWidth - gpad}
-                    y2={toGraphY(0)}
-                    stroke="var(--ink-40)"
-                    strokeWidth="1.5"
-                  />
-                )}
-                {graphPaths.map((d, i) =>
-                  d ? (
-                    <path key={i} d={d} fill="none" stroke={functions[i].color} strokeWidth="2.5" />
-                  ) : null,
-                )}
-              </svg>
-            </div>
+              </div>
+              {graphStyle === 'line' ? (
+                <div style={{ width: '100%', overflowX: 'auto' }}>
+                  <svg
+                    width="100%"
+                    viewBox={`0 0 ${graphWidth} ${graphHeight}`}
+                    style={{ display: 'block', maxWidth: '100%' }}
+                    aria-label={`Graph of ${functions.map((f) => f.expression).join(', ')}`}
+                  >
+                    <rect width={graphWidth} height={graphHeight} fill="var(--paper)" rx="4" />
+                    {showGrid && xTicks.map((x, i) => (
+                      <g key={`xt${i}`}>
+                        <line
+                          x1={toGraphX(x)}
+                          y1={gpad}
+                          x2={toGraphX(x)}
+                          y2={graphHeight - gpad}
+                          stroke="var(--ui-line)"
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={toGraphX(x)}
+                          y={graphHeight - gpad + 18}
+                          textAnchor="middle"
+                          fontSize="11"
+                          fill="var(--ink-60)"
+                        >
+                          {parseFloat(x.toFixed(1)).toString()}
+                        </text>
+                      </g>
+                    ))}
+                    {showGrid && yTicks.map((y, i) => (
+                      <g key={`yt${i}`}>
+                        <line
+                          x1={gpad}
+                          y1={toGraphY(y)}
+                          x2={graphWidth - gpad}
+                          y2={toGraphY(y)}
+                          stroke="var(--ui-line)"
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={gpad - 6}
+                          y={toGraphY(y) + 4}
+                          textAnchor="end"
+                          fontSize="11"
+                          fill="var(--ink-60)"
+                        >
+                          {parseFloat(y.toFixed(1)).toString()}
+                        </text>
+                      </g>
+                    ))}
+                    {gxMin <= 0 && gxMax >= 0 && (
+                      <line
+                        x1={toGraphX(0)}
+                        y1={gpad}
+                        x2={toGraphX(0)}
+                        y2={graphHeight - gpad}
+                        stroke="var(--ink-40)"
+                        strokeWidth="1.5"
+                      />
+                    )}
+                    {graphYBounds.yMin <= 0 && graphYBounds.yMax >= 0 && (
+                      <line
+                        x1={gpad}
+                        y1={toGraphY(0)}
+                        x2={graphWidth - gpad}
+                        y2={toGraphY(0)}
+                        stroke="var(--ink-40)"
+                        strokeWidth="1.5"
+                      />
+                    )}
+                    {graphPaths.map((d, i) =>
+                      d ? (
+                        <path key={i} d={d} fill="none" stroke={functions[i].color} strokeWidth="2.5" />
+                      ) : null,
+                    )}
+                  </svg>
+                </div>
+              ) : (
+                <Chart
+                  type="line"
+                  title="Peak magnitude across window"
+                  data={chartData}
+                  ariaLabel={`Magnitude chart of ${functions.map((f) => f.expression).join(', ')}`}
+                />
+              )}
+            </>
           )}
         </Card>
       )}
@@ -512,12 +713,28 @@ export function App() {
       {tab === 'Table' && (
         <Card mono="Values" title="Sampled values">
           {functions.length === 0 ? null : (
-            <Table
-              label="Sampled values"
-              columns={tableColumns}
-              rows={tableRows}
-              empty="No rows in the current window"
-            />
+            <>
+              <div className="gc-table-controls">
+                <NumberInput
+                  label="Sample step"
+                  value={sampleStep}
+                  onChange={(v) => setSampleStep(v ?? 1)}
+                  min={0.1}
+                  max={100}
+                  step={0.1}
+                  unit="x"
+                />
+                <Button kind="secondary" onClick={copyCsv} disabled={functions.length === 0}>
+                  {clipboard.copied ? 'Copied' : 'Copy CSV'}
+                </Button>
+              </div>
+              <Table
+                label="Sampled values"
+                columns={tableColumns}
+                rows={tableRows}
+                empty="No rows in the current window"
+              />
+            </>
           )}
         </Card>
       )}

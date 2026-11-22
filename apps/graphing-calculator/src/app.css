@@ -1,28 +1,20 @@
-/* App-level tab styling for graphing-calculator. The kit's inactive-tab
-   color sits below the WCAG AA contrast floor, so the app draws its own
-   tab strip with a legible inactive state. */
-
-.gc-tabs {
-  display: flex;
-  gap: calc(20px * var(--sf));
-  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
-}
-
+/* App-level overrides for graphing-calculator. */
+/* Custom tab style to meet WCAG AA contrast (kit default --ink-40 fails). */
 .gc-tab {
-  font-family: var(--sans);
-  font-size: calc(12.5px * var(--tf));
-  font-weight: 600;
   color: var(--ink-60);
-  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
-  cursor: pointer;
-  border: none;
-  background: none;
-  border-bottom: calc(2px * var(--sf)) solid transparent;
 }
-
-.gc-tab.active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
+/* Custom faint style to meet WCAG AA contrast. */
+.gc-faint {
+  color: var(--ink-60);
 }
-
-
+.gc-graph-style-row {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
+.gc-table-controls {
+  display: flex;
+  align-items: center;
+  gap: calc(16px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}

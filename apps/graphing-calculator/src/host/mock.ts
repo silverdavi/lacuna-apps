@@ -40,7 +40,7 @@ function isGraphState(value: unknown): value is GraphState {
 const DEFAULT_STATE: GraphState = {
   functions: [],
   xmin: '-10',
-  xmax: '10',
+  xmax: '9',
 }
 
 export const state = createMockValue<GraphState>({
