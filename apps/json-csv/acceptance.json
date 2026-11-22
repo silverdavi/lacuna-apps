@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "de7db5f6ee8d007c75afdd6c690fc6ed7bf9955fb0af401d36cde954484a9301",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"JSON CSV Converter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `{\"name\":\"Alice\",\"age\":30}` in the input pane and clicking the button \"Convert to CSV\" shows `name,age` and `Alice,30` in the output pane."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `name,age` and `Alice,30` in the input pane and clicking the button \"Convert to JSON\" shows `{\"name\":\"Alice\",\"age\":30}` in the output pane."
+    },
+    {
+      "id": "A4",
+      "text": "After converting `{\"name\":\"Alice\",\"age\":30}` to CSV, clicking the button \"Copy output\" places the text `name,age` and `Alice,30` on the clipboard."
+    },
+    {
+      "id": "A5",
+      "text": "After converting `{\"name\":\"Alice\",\"age\":30}` to CSV, clicking the button \"Download\" saves a file named `output.csv` containing `name,age` and `Alice,30`."
+    },
+    {
+      "id": "A6",
+      "text": "With the input `{\"name\":\"Alice\",\"age\":30}` converted to CSV, selecting \"Semicolon\" in the setting labelled \"Delimiter\" and clicking \"Convert to CSV\" shows `name;age` and `Alice;30` in the output pane."
+    },
+    {
+      "id": "A7",
+      "text": "After converting `{\"name\":\"Alice\",\"age\":30}` to CSV, the history list contains an entry labelled \"JSON to CSV\". Clicking the button \"Clear history\" removes all entries from the history list."
+    },
+    {
+      "id": "A8",
+      "text": "Typing `name,age` and `Alice,30` in the input pane and clicking the button \"Convert to JSON\" shows `{\"name\":\"Alice\",\"age\":30}` in the output pane; clicking the button \"Swap\" moves that JSON text to the input pane and the CSV text to the output pane."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history entry labelled \"JSON to CSV\" and the setting \"Delimiter\" set to \"Semicolon\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "fc9bc4b1790f6fe4bb272b39ae3ea2b35d42a457d12c430e1274e0008b982aa9"
+    }
+  ]
+}
