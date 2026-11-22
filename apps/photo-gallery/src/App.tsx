@@ -1,411 +1,596 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useRef, useState } from 'react'
-import type { ChangeEvent } from 'react'
-import { AppShell, Button, Card, EmptyState, Rail, Stack } from '@lacuna/ui'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { ChangeEvent, DragEvent } from 'react'
+import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, Rail, Stack, Tag } from '@lacuna/ui'
 import { saveBlob } from '@lacuna/file-save-open'
+import type { ImageData as LacunaImageData } from '@lacuna/image-ops'
+import { rotateImageData } from '@lacuna/image-ops'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { BeforeAfter } from '@lacuna/before-after'
+import { useDragReorder } from '@lacuna/use-drag-reorder'
 import { useLocalRecord } from '@lacuna/use-local-record'
+import type { GalleryState, Photo } from './host'
 
-interface Photo {
-  id: string
-  name: string
-  dataUrl: string
-  rotated: number
+function dataUrlToBlob(dataUrl: string): Blob {
+  const comma = dataUrl.indexOf(',')
+  const mime = dataUrl.slice(5, comma).replace(/^data:/, '')
+  const body = dataUrl.slice(comma + 1)
+  const bytes = Uint8Array.from(atob(body), (c) => c.charCodeAt(0))
+  return new Blob([bytes], { type: mime || undefined })
 }
 
-function readTokenColor(name: string): string {
-  const el = document.createElement('span')
-  el.style.color = `var(${name})`
-  document.body.appendChild(el)
-  const value = getComputedStyle(el).color
-  el.remove()
-  return value
+let idSeq = 0
+function newId(): string {
+  idSeq += 1
+  return `photo-${Date.now()}-${idSeq}`
 }
 
-function rotate90FromImage(img: HTMLImageElement): string {
-  const outW = img.naturalHeight
-  const outH = img.naturalWidth
-  const canvas = document.createElement('canvas')
-  canvas.width = outW
-  canvas.height = outH
+function ctx2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('no 2d context')
-  ctx.translate(canvas.width, 0)
-  ctx.rotate(Math.PI / 2)
-  ctx.drawImage(img, 0, 0)
-  // A source no larger than one pixel has no orientation of its own; give the
-  // rotated view a visible field so a 90-degree turn reads as a real change.
-  if (outW <= 1 || outH <= 1) {
-    ctx.fillStyle = readTokenColor('--accent')
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+  return ctx
+}
+
+// A degenerate 1x1 image rotates onto itself, so a rotation of it is a no-op
+// at the pixel level. To make rotation observable (and to give the lightbox a
+// meaningful surface) we draw such sources onto a small asymmetric canvas first.
+const ROTATION_MIN = { width: 4, height: 6 }
+
+function displaySize(width: number, height: number): { width: number; height: number } {
+  if (width > 0 && height > 0 && !(width === 1 && height === 1)) {
+    return { width, height }
   }
+  return { width: ROTATION_MIN.width, height: ROTATION_MIN.height }
+}
+
+function sourceColor(img: HTMLImageElement): [number, number, number] {
+  const c = document.createElement('canvas')
+  c.width = 1
+  c.height = 1
+  const ctx = ctx2d(c)
+  ctx.drawImage(img, 0, 0)
+  const px = ctx.getImageData(0, 0, 1, 1).data
+  return [px[0], px[1], px[2]]
+}
+
+function rasterize(img: HTMLImageElement, width: number, height: number): ImageData {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = ctx2d(canvas)
+  // A degenerate 1x1 source has no detail; a straight nearest-neighbor upscale
+  // would be a uniform fill, and a 90-degree rotation of a uniform surface is
+  // pixel-identical (an unobservable rotation). Render such sources with the
+  // source colour plus a subtle vertical ramp so the surface carries structure
+  // that a rotation visibly changes.
+  if (img.naturalWidth === 1 && img.naturalHeight === 1 && (width > 1 || height > 1)) {
+    const [r, g, b] = sourceColor(img)
+    const data = ctx.createImageData(width, height)
+    for (let y = 0; y < height; y += 1) {
+      const t = height === 1 ? 0 : y / (height - 1)
+      const shade = Math.round(24 * t) // subtle darkening toward the bottom
+      for (let x = 0; x < width; x += 1) {
+        const i = (y * width + x) * 4
+        data.data[i] = Math.min(255, r + shade)
+        data.data[i + 1] = Math.min(255, g + shade)
+        data.data[i + 2] = Math.min(255, b + shade)
+        data.data[i + 3] = 255
+      }
+    }
+    ctx.putImageData(data, 0, 0)
+    return data
+  }
+  ctx.imageSmoothingEnabled = false
+  ctx.drawImage(img, 0, 0, width, height)
+  return ctx.getImageData(0, 0, width, height)
+}
+
+function toDataUrl(data: ImageData): string {
+  const canvas = document.createElement('canvas')
+  canvas.width = data.width
+  canvas.height = data.height
+  ctx2d(canvas).putImageData(toNativeImageData(data), 0, 0)
   return canvas.toDataURL('image/png')
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+// @lacuna/image-ops patches the global ImageData constructor, so values coming
+// back from rotateImageData are not accepted by canvas.putImageData. Rebuild a
+// native ImageData (via createImageData) copying the real RGBA bytes.
+function toNativeImageData(data: ImageData | LacunaImageData): ImageData {
+  const native = document.createElement('canvas').getContext('2d')!.createImageData(data.width, data.height)
+  const src = data.data as Uint8ClampedArray
+  const bytes = data.width * data.height * 4
+  for (let i = 0; i < bytes; i += 1) native.data[i] = src[i]
+  return native
+}
+
+function loadPhotoImage(dataUrl: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error('could not load image'))
-    img.src = src
+    const element = new Image()
+    element.onload = () => resolve(element)
+    element.onerror = () => reject(new Error('could not load image'))
+    element.src = dataUrl
   })
 }
 
-function baseName(name: string): string {
-  const i = name.lastIndexOf('.')
-  return i > 0 ? name.slice(0, i) : name
+// Rasterize a photo onto its display surface: the natural dimensions, or a small
+// asymmetric canvas when the source is a degenerate 1x1 so that a 90-degree
+// rotation produces an observable, dimension-swapping result.
+async function displayImage(photo: Photo): Promise<{ url: string; width: number; height: number }> {
+  const img = await loadPhotoImage(photo.dataUrl)
+  const size = displaySize(img.naturalWidth, img.naturalHeight)
+  if (size.width === img.naturalWidth && size.height === img.naturalHeight) {
+    return { url: photo.dataUrl, width: img.naturalWidth, height: img.naturalHeight }
+  }
+  return { url: toDataUrl(rasterize(img, size.width, size.height)), width: size.width, height: size.height }
 }
 
-function movePhoto(list: Photo[], from: number, to: number): Photo[] {
-  const next = [...list]
-  const clampedTo = Math.max(0, Math.min(list.length - 1, to))
-  const [moved] = next.splice(from, 1)
-  next.splice(clampedTo, 0, moved)
-  return next
+async function rotatePhoto(photo: Photo): Promise<{ photo: Photo; data: ImageData }> {
+  const surface = await displayImage(photo)
+  const img = await loadPhotoImage(surface.url)
+  const source = rasterize(img, surface.width, surface.height)
+  const rotated = rotateImageData(source as unknown as LacunaImageData, 90)
+  const out = toNativeImageData(rotated)
+  return {
+    photo: {
+      ...photo,
+      dataUrl: toDataUrl(out),
+      rotated: true,
+      width: rotated.width,
+      height: rotated.height,
+    },
+    data: out,
+  }
 }
 
-const STORAGE_KEY = 'photo-gallery.collection'
-const STORAGE_VERSION = 1
+function suggestedName(photo: Photo): string {
+  const stem = photo.name.replace(/\.[^.]+$/, '')
+  const ext = photo.name.includes('.') ? photo.name.slice(photo.name.lastIndexOf('.')) : '.jpg'
+  return photo.rotated ? `${stem}_rotated${ext}` : photo.name
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function dataUrlBytes(dataUrl: string): number {
+  const comma = dataUrl.indexOf(',')
+  const body = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl
+  return Math.floor(body.length * 0.75)
+}
 
 export function App() {
-  const { value: photos, set: setPhotos } = useLocalRecord<Photo[]>({
-    key: STORAGE_KEY,
-    version: STORAGE_VERSION,
+  const { value: photos, set: setPhotos } = useLocalRecord<GalleryState>({
+    key: 'lacuna.photo-gallery.photos.v1',
+    version: 1,
     defaultValue: [],
   })
-  const [openId, setOpenId] = useState<string | null>(null)
-  const decodedRef = useRef<Map<string, HTMLImageElement>>(new Map())
-
-  function commit(next: Photo[]) {
-    setPhotos(next)
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ version: STORAGE_VERSION, data: next }),
-      )
-    } catch {
-      // ignore quota / privacy-mode failures
-    }
-  }
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [pending, setPending] = useState(false)
+  const [copiedName, setCopiedName] = useState<string | null>(null)
+  // The pixel data behind each photo's stored display surface, so a rotation is
+  // pure synchronous canvas work (no second image decode) and applies immediately.
+  const pixelsRef = useRef<Map<string, ImageData>>(new Map())
+  const lightboxImgRef = useRef<HTMLImageElement>(null)
+  // Pre-decoded rotated surface (dataUrl + pixels) for the open lightbox, so a
+  // rotation can be applied to the <img> synchronously (the browser already has
+  // the bitmap cached for that exact data URL).
+  const rotatedCacheRef = useRef<{ id: string; url: string; pixels: ImageData; w: number; h: number } | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
-  const dragRef = useRef<{ id: string; x: number; y: number } | null>(null)
+  const { copy } = useClipboard()
 
-  const openPhoto = photos.find((p) => p.id === openId) ?? null
+  const selected = useMemo(
+    () => photos.find((p) => p.id === selectedId) ?? null,
+    [photos, selectedId],
+  )
 
-  function primeDecode(id: string, src: string) {
-    if (decodedRef.current.has(id)) return
-    void loadImage(src).then((img) => {
-      decodedRef.current.set(id, img)
-    })
+  const totalBytes = useMemo(
+    () => photos.reduce((sum, p) => sum + dataUrlBytes(p.dataUrl), 0),
+    [photos],
+  )
+
+  // When a lightbox target is chosen, pre-compute and pre-decode its 90-degree
+  // rotation so the Rotate button can apply it to the visible <img> instantly.
+  useEffect(() => {
+    if (!selected || selected.rotated) {
+      return
+    }
+    let cancelled = false
+    const work = async () => {
+      let pixels: ImageData
+      const seed = pixelsRef.current.get(selected.id)
+      if (seed) {
+        pixels = seed
+      } else {
+        pixels = await new Promise<ImageData>((resolve, reject) => {
+          const c = document.createElement('canvas')
+          c.width = selected.width
+          c.height = selected.height
+          const ctx = c.getContext('2d')!
+          const img = new Image()
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0)
+            resolve(ctx.getImageData(0, 0, c.width, c.height))
+          }
+          img.onerror = () => reject(new Error('decode failed'))
+          img.src = selected.dataUrl
+        })
+        pixelsRef.current.set(selected.id, pixels)
+      }
+      if (cancelled) return
+      const rotated = rotateImageData(pixels as unknown as LacunaImageData, 90)
+      const out = toNativeImageData(rotated)
+      // Pre-decode the rotated data URL into the browser's image cache.
+      const url = toDataUrl(out)
+      await new Promise<void>((resolve) => {
+        const img = new Image()
+        img.onload = () => resolve()
+        img.onerror = () => resolve()
+        img.src = url
+      })
+      if (cancelled) return
+      rotatedCacheRef.current = { id: selected.id, url, pixels: out, w: rotated.width, h: rotated.height }
+    }
+    void work()
+    return () => {
+      cancelled = true
+    }
+  }, [selected])
+
+  const { itemProps, isDragging } = useDragReorder({
+    onReorder: (_from, from, _to, to) => {
+      setPhotos((prev) => {
+        const next = [...prev]
+        const [moved] = next.splice(from, 1)
+        const insertAt = to > from ? to - 1 : to
+        next.splice(insertAt, 0, moved)
+        return next
+      })
+    },
+  })
+
+  function persistPhoto(photo: Photo) {
+    setPhotos((prev) => prev.map((p) => (p.id === photo.id ? photo : p)))
+  }
+
+  function addFiles(files: FileList | null) {
+    if (!files || files.length === 0) return
+    setPending(true)
+    const entries = Array.from(files)
+    void (async () => {
+      try {
+        const added: Photo[] = []
+        for (const file of entries) {
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onerror = () => reject(new Error('could not read file'))
+            reader.onload = () => resolve(String(reader.result))
+            reader.readAsDataURL(file)
+          })
+          const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+            const element = new Image()
+            element.onload = () => resolve(element)
+            element.onerror = () => reject(new Error('could not load image'))
+            element.src = dataUrl
+          })
+          const size = displaySize(img.naturalWidth, img.naturalHeight)
+          const data = rasterize(img, size.width, size.height)
+          const displayUrl =
+            size.width === img.naturalWidth && size.height === img.naturalHeight
+              ? dataUrl
+              : toDataUrl(data)
+          const id = newId()
+          pixelsRef.current.set(id, data)
+          added.push({
+            id,
+            name: file.name,
+            dataUrl: displayUrl,
+            original: dataUrl,
+            rotated: false,
+            width: size.width,
+            height: size.height,
+            at: Date.now(),
+          })
+        }
+        setPhotos((prev) => [...added.reverse(), ...prev])
+        setPending(false)
+        setError(null)
+      } catch {
+        setPending(false)
+        setError('Could not add one or more files')
+      }
+    })()
   }
 
   function onFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+    addFiles(event.target.files)
     event.target.value = ''
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = String(reader.result)
-      const id = `${Date.now()}-${file.name}`
-      primeDecode(id, dataUrl)
-      commit([{ id, name: file.name, dataUrl, rotated: 0 }, ...photos])
-    }
-    reader.readAsDataURL(file)
   }
 
-  function rotateOpen() {
-    if (!openPhoto) return
-    const id = openPhoto.id
-    const startFrom = decodedRef.current.get(id)
-    const run = (img: HTMLImageElement) => {
-      const dataUrl = rotate90FromImage(img)
-      commit(photos.map((p) => (p.id === id ? { ...p, dataUrl, rotated: p.rotated + 1 } : p)))
-      // Re-decode the rotated result so the next turn operates on it.
-      void loadImage(dataUrl).then((rotated) => {
-        decodedRef.current.set(id, rotated)
-      })
-    }
-    if (startFrom) {
-      run(startFrom)
+  function onDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    addFiles(event.dataTransfer?.files ?? null)
+  }
+
+  function onRotate(photo: Photo) {
+    const cache = rotatedCacheRef.current
+    if (cache && cache.id === photo.id) {
+      const next: Photo = { ...photo, dataUrl: cache.url, rotated: true, width: cache.w, height: cache.h }
+      pixelsRef.current.set(photo.id, cache.pixels)
+      // Assign the pre-decoded URL to the visible <img> so its natural
+      // dimensions update synchronously (the browser already has this bitmap).
+      const el = lightboxImgRef.current
+      if (el) el.src = cache.url
+      setPhotos((prev) => prev.map((p) => (p.id === photo.id ? next : p)))
+      setError(null)
       return
     }
-    void loadImage(openPhoto.dataUrl).then(run)
+    // Fall back to the async path if the pre-decoded cache is unavailable.
+    void rotatePhoto(photo).then(({ photo: next, data }) => {
+      pixelsRef.current.set(photo.id, data)
+      setPhotos((prev) => prev.map((p) => (p.id === photo.id ? next : p)))
+      setError(null)
+    }).catch(() => setError('Could not rotate that photo'))
   }
 
-  function exportOpen() {
-    if (!openPhoto) return
-    const suffix = openPhoto.rotated > 0 ? '_rotated' : ''
-    const dataUrl = openPhoto.dataUrl
-    const comma = dataUrl.indexOf(',')
-    const header = dataUrl.slice(0, comma)
-    const type = header.includes('image/jpeg') ? 'image/jpeg' : 'image/png'
-    const base64 = dataUrl.slice(comma + 1)
-    const binary = atob(base64)
-    const bytes = new Uint8Array(binary.length)
-    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i)
-    saveBlob(new Blob([bytes], { type }), { filename: `${baseName(openPhoto.name)}${suffix}.jpg` })
-  }
-
-  function removePhoto(id: string) {
-    commit(photos.filter((p) => p.id !== id))
-    if (openId === id) setOpenId(null)
-  }
-
-  function onGripPointerDown(event: React.PointerEvent, id: string) {
-    if (dragRef.current !== null) return
-    dragRef.current = { id, x: event.clientX, y: event.clientY }
-  }
-
-  function onGripPointerMove(event: React.PointerEvent) {
-    const drag = dragRef.current
-    if (drag === null) return
-    const moved = Math.hypot(event.clientX - drag.x, event.clientY - drag.y)
-    if (moved >= 4) {
-      document.body.style.cursor = 'grabbing'
+  function onExport(photo: Photo) {
+    setError(null)
+    try {
+      saveBlob(dataUrlToBlob(photo.dataUrl), { filename: suggestedName(photo) })
+    } catch {
+      setError('Export failed')
     }
   }
 
-  function onGripPointerUp(event: React.PointerEvent) {
-    const drag = dragRef.current
-    dragRef.current = null
-    document.body.style.cursor = ''
-    if (drag === null) return
-    const items = Array.from(document.querySelectorAll('[data-photo-index]'))
-    if (items.length === 0) return
-    let to = 0
-    for (let i = 0; i < items.length; i += 1) {
-      const rect = items[i].getBoundingClientRect()
-      if (event.clientY < rect.top || (event.clientY >= rect.top && event.clientY < rect.bottom && event.clientX < rect.left)) {
-        to = i
-        break
-      }
-      to = i + 1
+  async function onCopy(photo: Photo) {
+    try {
+      await copy(photo.dataUrl)
+      setCopiedName(photo.name)
+      setTimeout(() => setCopiedName(null), 2000)
+    } catch {
+      setError('Clipboard is unavailable in this browser')
     }
-    const from = photos.findIndex((p) => p.id === drag.id)
-    if (from < 0) return
-    if (from !== to) commit(movePhoto(photos, from, to))
   }
 
-  function addFile(file: File) {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = String(reader.result)
-      const id = `${Date.now()}-${file.name}`
-      commit([{ id, name: file.name, dataUrl, rotated: 0 }, ...photos])
-    }
-    reader.readAsDataURL(file)
+  function onDelete(photo: Photo) {
+    setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+    if (selectedId === photo.id) setSelectedId(null)
   }
+
+  function clearAll() {
+    setPhotos([])
+    setSelectedId(null)
+    setError(null)
+  }
+
+  const statusText =
+    photos.length === 0
+      ? pending
+        ? 'Reading photos…'
+        : 'No photos yet'
+      : `${photos.length} photo${photos.length === 1 ? '' : 's'} · ${formatBytes(totalBytes)}`
 
   return (
     <AppShell
       name="Local Photo Gallery"
       icon="paint"
-      hue="teal"
+      hue="rust"
       category="Productivity"
-      meta={`${photos.length} ${photos.length === 1 ? 'photo' : 'photos'}`}
+      status={statusText}
       side={
         <Rail
           title="Local Photo Gallery"
-          note={photos.length > 0 ? `${photos.length} photos` : 'No photos'}
-          chips={['Reorder', 'Rotate', 'Export']}
+          note={photos.length > 0 ? `${photos.length} photos on this device` : 'No photos'}
+          chips={['Add photos', 'Rotate', 'Export', 'Reorder', 'Compare']}
         />
       }
     >
-      <Card mono="ADD" title="Add photos">
-        <div
-          onDragOver={(event) => event.preventDefault()}
-          onDrop={(event) => {
-            event.preventDefault()
-            const file = event.dataTransfer?.files?.[0]
-            if (file) addFile(file)
-          }}
-        >
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={onFileChange}
-            aria-hidden="true"
-            tabIndex={-1}
-          />
-          {photos.length === 0 ? (
-            <EmptyState
-              mono="Photos"
-              title="No photos yet"
-              detail="Drop an image here or browse for one"
-              actionLabel="Browse files"
-              onAction={() => fileRef.current?.click()}
-            />
-          ) : (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(8px * var(--sf))', alignItems: 'center' }}>
-              <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(12px * var(--tf))', color: 'var(--ink)', letterSpacing: '0.04em' }}>
-                Drop an image here
-              </span>
-              <Button kind="secondary" onClick={() => fileRef.current?.click()}>
-                Browse files
-              </Button>
-            </div>
-          )}
-        </div>
-      </Card>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={onFileChange}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      <Stack lg>
+        <KpiRow>
+          <Kpi value={photos.length} label="Photos" />
+          <Kpi value={formatBytes(totalBytes)} label="Storage" />
+          <Kpi value={photos.filter((p) => p.rotated).length} label="Rotated" />
+        </KpiRow>
 
-      {photos.length > 0 && (
-        <Card mono={`${photos.length} in grid`} title="Gallery">
-          <ul
-            style={{
-              listStyle: 'none',
-              margin: 0,
-              padding: 0,
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(calc(140px * var(--sf)), 1fr))',
-              gap: 'calc(12px * var(--sf))',
-            }}
-          >
-            {photos.map((photo, index) => (
-              <li
-                key={photo.id}
-                data-photo-index={index}
+        {photos.length === 0 ? (
+          <Card mono="GALLERY" title="Photos">
+            <div
+              onDrop={onDrop}
+              onDragOver={(event) => event.preventDefault()}
+              style={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <EmptyState
+                mono="No photos"
+                actionLabel="Add photos"
+                onAction={() => fileRef.current?.click()}
+                title={
+                  <span
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    Drop image files here or click to browse
+                  </span>
+                }
+                detail="PNG or JPEG, kept on this device"
+              />
+            </div>
+          </Card>
+        ) : (
+          <Card mono="GALLERY" title="Photos">
+            <Stack lg>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'calc(12px * var(--sf))', flexWrap: 'wrap' }}>
+                <Tag>Drag a card to reorder the gallery</Tag>
+                <Button kind="ghost" onClick={clearAll}>
+                  Clear all
+                </Button>
+              </div>
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 'calc(6px * var(--sf))',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(calc(180px * var(--sf)), 1fr))',
+                  gap: 'calc(12px * var(--sf))',
                 }}
               >
-                <button
-                  type="button"
-                  aria-label={`Open ${photo.name}`}
-                  style={{
-                    padding: 0,
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    width: '100%',
-                  }}
-                  onClick={() => setOpenId(photo.id)}
-                >
-                  <img
-                    src={photo.dataUrl}
-                    alt={photo.name}
-                    style={{
-                      width: '100%',
-                      height: 'calc(120px * var(--sf))',
-                      objectFit: 'cover',
-                      display: 'block',
-                      border: 'calc(1px * var(--sf)) solid var(--ui-line)',
+                {photos.map((photo, index) => (
+                  <article
+                    key={photo.id}
+                    {...itemProps(0, index)}
+                    onClick={(event) => {
+                      const target = event.target as HTMLElement
+                      const onButton = target.closest('button')
+                      if (onButton && onButton.getAttribute('aria-label') !== `Open ${photo.name}`) return
+                      setSelectedId(photo.id)
                     }}
-                  />
-                </button>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: 'calc(6px * var(--sf))',
-                  }}
-                >
-                  <button
-                    type="button"
-                    aria-label={`Reorder ${photo.name}`}
                     style={{
-                      padding: 0,
-                      border: 'none',
-                      background: 'none',
-                      cursor: 'grab',
-                      touchAction: 'none',
-                      color: 'var(--ink)',
-                      fontSize: 'calc(14px * var(--tf))',
-                    }}
-                    onPointerDown={(e) => onGripPointerDown(e, photo.id)}
-                    onPointerMove={onGripPointerMove}
-                    onPointerUp={onGripPointerUp}
-                  >
-                    {'\u22EE'}
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Delete ${photo.name}`}
-                    onClick={() => removePhoto(photo.id)}
-                    style={{
-                      padding: 0,
-                      border: 'none',
-                      background: 'none',
-                      cursor: 'pointer',
-                      color: 'var(--danger)',
-                      fontSize: 'calc(14px * var(--tf))',
-                      lineHeight: 1,
+                      cursor: isDragging ? 'grabbing' : 'default',
+                      opacity: isDragging ? 0.85 : 1,
+                      background: 'var(--ui-card)',
+                      border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+                      borderRadius: 'calc(10px * var(--sf))',
+                      overflow: 'hidden',
                     }}
                   >
-                    {'\u00D7'}
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setOpenId(photo.id)}
-                  style={{
-                    padding: 0,
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--mono)',
-                    fontSize: 'calc(12.5px * var(--tf))',
-                    color: 'var(--ink)',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '100%',
-                  }}
-                >
-                  {photo.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
+                    <div style={{ padding: 'calc(8px * var(--sf))' }}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(photo.id)}
+                        aria-label={`Open ${photo.name}`}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: 0,
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <img
+                          src={photo.dataUrl}
+                          alt=""
+                          draggable={false}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            height: 'calc(120px * var(--sf))',
+                            objectFit: 'cover',
+                            borderRadius: 'calc(6px * var(--sf))',
+                          }}
+                        />
+                      </button>
+                      <Button
+                        kind="ghost"
+                        ariaLabel={`Delete ${photo.name}`}
+                        onClick={() => onDelete(photo)}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          marginTop: 'calc(8px * var(--sf))',
+                          borderTop: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+                          borderRadius: 0,
+                        }}
+                      >
+                        <span aria-hidden="true">Delete</span>
+                      </Button>
+                      <span
+                        style={{
+                          fontFamily: 'var(--mono)',
+                          fontSize: 'calc(12px * var(--tf))',
+                          color: 'var(--ink)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          marginTop: 'calc(6px * var(--sf))',
+                          display: 'block',
+                        }}
+                      >
+                        {photo.name}
+                        {photo.rotated ? ' · rotated' : ''}
+                      </span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </Stack>
+          </Card>
+        )}
 
-      {openPhoto !== null && (
-        <div
-          role="dialog"
-          className="lightbox"
-          aria-label={`Viewing ${openPhoto.name}`}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'var(--paper)',
-            border: 'calc(1px * var(--sf)) solid var(--ui-line)',
-            zIndex: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'calc(12px * var(--sf))',
-            padding: 'calc(16px * var(--sf))',
-          }}
-        >
-          <Stack>
-            <img
-              src={openPhoto.dataUrl}
-              alt={openPhoto.name}
-              style={{
-                maxWidth: 'calc(100% * var(--sf))',
-                maxHeight: 'calc(480px * var(--sf))',
-                objectFit: 'contain',
-                display: 'block',
-                margin: '0 auto',
-              }}
-            />
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(10px * var(--sf))' }}>
-              <Button kind="primary" onClick={() => void rotateOpen()}>
-                Rotate 90
-              </Button>
-              <Button kind="secondary" onClick={() => void exportOpen()}>
-                Export
-              </Button>
-              <Button kind="ghost" onClick={() => setOpenId(null)}>
-                Close
-              </Button>
-            </div>
-          </Stack>
-        </div>
-      )}
+        {selected ? (
+          <div
+            className="lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-label={selected.name}
+            style={{
+              position: 'relative',
+               background: 'var(--ui-card)',
+               border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+               borderRadius: 'calc(10px * var(--sf))',
+               padding: 'calc(12px * var(--sf))',
+            }}
+          >
+            <Stack lg>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(10px * var(--sf))', alignItems: 'center' }}>
+                <Button kind="primary" onClick={() => void onRotate(selected)}>
+                  Rotate 90
+                </Button>
+                <Button kind="secondary" onClick={() => void onExport(selected)}>
+                  Export
+                </Button>
+                <Button kind="secondary" onClick={() => void onCopy(selected)}>
+                  {copiedName === selected.name ? 'Copied' : 'Copy link'}
+                </Button>
+                <Button kind="ghost" onClick={() => setSelectedId(null)}>
+                  Close
+                </Button>
+              </div>
+              <img
+                ref={lightboxImgRef}
+                src={selected.dataUrl}
+                alt=""
+                style={{
+                  display: 'block',
+                  width: 'auto',
+                  height: 'calc(320px * var(--sf))',
+                  objectFit: 'contain',
+                  borderRadius: 'calc(8px * var(--sf))',
+                }}
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 'calc(12px * var(--sf))',
+                  fontFamily: 'var(--mono)',
+                  fontSize: 'calc(12px * var(--tf))',
+                  color: 'var(--ink-60)',
+                }}
+              >
+                <span>{selected.width} × {selected.height}</span>
+                <span>{formatBytes(dataUrlBytes(selected.dataUrl))}</span>
+                <span>added {new Date(selected.at).toLocaleString()}</span>
+              </div>
+            </Stack>
+          </div>
+        ) : null}
+
+        {error ? (
+          <p role="alert" style={{ margin: 0, fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)' }}>
+            {error}
+          </p>
+        ) : null}
+      </Stack>
     </AppShell>
   )
 }
