@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c08205a290e7c810cfd7fc7baaa1dd387a5ca1fab31658804fbc54f028dda478",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Pantry Inventory\" and, with no items, the text \"No items in your pantry yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Item name\" with \"Olive Oil\", the field labelled \"Quantity\" with \"2\", choosing \"bottles\" in the select labelled \"Unit\", and clicking the button \"Add item\" adds a table row containing \"Olive Oil\", \"2 bottles\", and a status badge \"Fresh\"; the text \"No items in your pantry yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Olive Oil\" (2 bottles, no expiration date), clicking the row's \"Edit\" button opens the form with \"Item name\" pre-filled \"Olive Oil\", \"Quantity\" pre-filled \"2\", and \"Unit\" set to \"bottles\"; changing \"Quantity\" to \"5\" and clicking \"Save\" updates the table row to show \"5 bottles\"."
+    },
+    {
+      "id": "A4",
+      "text": "Adding an item \"Milk\" with Quantity \"1\", Unit \"carton\", and an expiration date set to yesterday via the DatePicker shows a status badge \"Expired\" in its table row."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Milk\" (expired) and \"Olive Oil\" (fresh) in the list, selecting \"Expired\" in the filter select labelled \"Status\" hides the \"Olive Oil\" row and shows only the \"Milk\" row; selecting \"All\" shows both rows again."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"olive\" in the search box labelled \"Search items\" filters the table to show only the row containing \"Olive Oil\"; clearing the search box shows all rows again."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that begins with \"Item name,Quantity,Unit,Expiration date,Status\" and contains a line with \"Olive Oil,2,bottles,,Fresh\"."
+    },
+    {
+      "id": "A8",
+      "text": "Every table row has a button labelled \"Delete <item name>\". With \"Milk\" and \"Olive Oil\" present, clicking \"Delete Milk\" removes that row and the table shows only \"Olive Oil\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the item \"Olive Oil\" with quantity \"2 bottles\" and status \"Fresh\" visible in the table after a full page reload."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1cd22aa682abe4f0d9e416fc2d404cf5ec64191a1b95a8244d1a7b517af4f0be"
+    }
+  ]
+}
