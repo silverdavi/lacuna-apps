@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "971c83560be6aaa2aa765c52bb3fbbd6899f9bb661284d91c99736b518d24ed2",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Uploading a JPEG receipt photo shows a thumbnail in the list with \"Receipt 1\" as the label."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Add Another Receipt\" lets the user upload a second PNG receipt photo."
+    },
+    {
+      "id": "A3",
+      "text": "After adding two receipts, clicking \"Generate PDF\" creates a downloadable PDF with both receipts and a cover sheet."
+    },
+    {
+      "id": "A4",
+      "text": "The cover sheet lists each receipt's date and amount, extracted from the image."
+    },
+    {
+      "id": "A5",
+      "text": "The PDF is saved with the filename \"Receipt Packet_2025-04-05.pdf\"."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting \"Send to Expenses App\" opens the user's default expenses app with the PDF attached."
+    },
+    {
+      "id": "A7",
+      "text": "Cropping a receipt photo using the on-screen tool adjusts the image to the correct size."
+    },
+    {
+      "id": "A8",
+      "text": "Rotating a receipt photo straightens the image to a horizontal orientation."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the list of uploaded receipts with their original labels and thumbnails."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7ba2285eade2d4cf9f953dc61e5073b40b01a316925e6d609e8a37806ab3bbe9"
+    }
+  ]
+}

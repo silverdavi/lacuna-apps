@@ -34,10 +34,10 @@
     "modules": {
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0",
-      "@lacuna/editor-kit": "^0.1.0",
-      "@lacuna/formats": "^0.1.0",
-      "@lacuna/image": "^0.1.0",
-      "@lacuna/pdf": "^0.1.0"
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/pdf-ops": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
     }
   },
   "capabilities": [
