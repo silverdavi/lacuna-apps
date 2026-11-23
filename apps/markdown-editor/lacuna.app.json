@@ -50,7 +50,7 @@
   "capabilities": [
     "edit:markdown",
     "export:markdown",
-    "preview:markdown"
+    "render:markdown"
   ],
   "permissions": {
     "records": [
