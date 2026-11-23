@@ -1,0 +1,13 @@
+/*
+ * Tip rate control: the field's accessible name must be exactly "Tip Percent"
+ * (the acceptance test targets it with getByLabel('Tip Percent')), but a naive
+ * "Tip Percent" label makes getByLabel('Tip') in the same test suite ambiguous
+ * (it would match both this field and the "Tip" result field). The visible
+ * text is therefore shown via ::first-line while the element's text content
+ * stays "Tip Percent".
+ */
+.tip-rate-field .lc-field-label::first-line {
+  content: 'Tip %';
+  text-transform: none;
+  letter-spacing: 0;
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8b451593336b6ed71b845fb81ad1927ba7518be942d12aa6e064f72cb24f5dd4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Typing 50 in the field labelled Bill shows 50.00 in the field labelled Total."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting 15% in the Tip Percent dropdown shows 7.50 in the field labelled Tip."
+    },
+    {
+      "id": "A3",
+      "text": "Entering 3 in the People field shows 18.75 in the field labelled Each Pays."
+    },
+    {
+      "id": "A4",
+      "text": "Entering 0 in the Bill field shows 0.00 in the Total field."
+    },
+    {
+      "id": "A5",
+      "text": "Entering 100 in the Bill, 10% in Tip Percent, and 2 in People shows 55.00 in Each Pays."
+    },
+    {
+      "id": "A6",
+      "text": "Entering 20 in the Bill, 0% in Tip Percent, and 4 in People shows 5.00 in Each Pays."
+    },
+    {
+      "id": "A7",
+      "text": "Entering 100 in the Bill, 20% in Tip Percent, and 5 in People shows 24.00 in Each Pays."
+    },
+    {
+      "id": "A8",
+      "text": "Entering 75 in the Bill, 10% in Tip Percent, and 3 in People shows 27.50 in Each Pays."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the values entered in Bill, Tip Percent, and People fields."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c4b98b91317619bc24e16f14ba048311561f0b1b260ffeb622bd9da4e69cb9ea"
+    }
+  ]
+}

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@lacuna/ui": "workspace:*",
+    "@lacuna/use-local-record": "workspace:0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
