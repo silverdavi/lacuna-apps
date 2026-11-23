@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.notes-app",
+  "name": "Quick Notes",
+  "version": "0.1.0",
+  "summary": "A small shelf of quick notes you can search, archive, and export.",
+  "description": "Quick Notes is a small shelf app. One list of notes with a title and content. Search, archive, delete, and export the notes to a JSON backup file. Notes persist on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/notes-app",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/json-backup": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:notes-app"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "notes-app",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Quick Notes records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "notes-app"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
