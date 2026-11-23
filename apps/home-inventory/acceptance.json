@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8999b6ff08f9b87717337943bd1c6c42a8676dc87ab2eb396d00601c02851edf",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Home Inventory\" and, when no items exist, shows the text \"No items yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Laptop\" in the field labelled \"Name\", \"Office\" in the field labelled \"Location\", and \"1200\" in the field labelled \"Value\", then clicking the button \"Add item\", adds a row to the table containing \"Laptop\", \"Office\", and \"$1,200.00\"; the text \"No items yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Laptop\" (Office, 1200), clicking the button \"Sort by Value\" changes the table header to show a descending sort indicator on the Value column, and the first data row in the table is \"Laptop\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Lap\" in the input field labelled \"Search items\" filters the table to show only the row containing \"Laptop\"; typing \"Table\" in the same field shows the text \"No items match\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Edit Laptop\" opens a form pre-filled with \"Laptop\" in the Name field, \"Office\" in the Location field, and \"1200\" in the Value field; changing the Value field to \"1500\" and clicking \"Save\" updates the table row to show \"$1,500.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Laptop\" in the table, clicking the button \"Delete Laptop\" removes the row from the table and the text \"No items yet\" reappears."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" downloads a file containing the header row \"Name,Location,Value\" and a data row \"Laptop,Office,1200\" for the single existing item."
+    },
+    {
+      "id": "A8",
+      "text": "After adding \"Laptop\" (Office, 1200) and \"Chair\" (Living Room, 300), the table displays two rows, and the summary line at the bottom shows \"Total value: $1,500.00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the item \"Laptop\" with location \"Office\" and value \"$1,200.00\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "94d9aa7ad3f2cbc396f0668f9d837d16daf77e072eca668487302d1f12569e53"
+    }
+  ]
+}
