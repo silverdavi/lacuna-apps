@@ -1,0 +1,20 @@
+{
+  "repo": "XifeiNi/period-tracker",
+  "url": "https://github.com/XifeiNi/period-tracker",
+  "sha": "d84df3a182629d5edea07326bb5652fe461f5d39",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2019 Cecilia Ni"
+  ],
+  "files": [
+    "src/Add.js",
+    "src/App.js",
+    "src/CoreAlgorithm.js",
+    "src/dataset/EmptyUserData.js",
+    "src/dataset/TestUserData.js",
+    "src/index.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "9fea483d53569c345328f9bd2ae409a20eb227ccd256ed0a9a77e2c98c3a67d5"
+}
