@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.changelog",
+  "name": "Changelog Generator",
+  "version": "0.1.0",
+  "summary": "Turn raw commit messages into a formatted Markdown changelog.",
+  "description": "Paste commit messages, group them into sections, and generate a Markdown changelog with task-list items. Copy the Markdown or export it as JSON. The commits and the generated changelog stay on this device.",
+  "category": "productivity",
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/changelog"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/markdown-to-html": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:commit",
+    "compile:changelog",
+    "export:changelog"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "commit",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the commit messages and the generated changelog"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "commit"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
