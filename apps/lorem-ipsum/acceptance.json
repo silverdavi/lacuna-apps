@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "013d9ae432f2ca98a659a35acf17b8d9f4218356bf61f3a76b92530dfda056ab",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Lorem Ipsum Generator\" and the tab labelled \"Generate\" is active by default."
+    },
+    {
+      "id": "A2",
+      "text": "In the Generate tab, selecting \"Paragraphs\" in the select labelled \"Unit\", typing \"2\" in the field labelled \"Count\", and clicking the button \"Generate\" produces output that begins with \"Lorem ipsum dolor sit amet\" and contains exactly two paragraph breaks (two lines of text separated by a blank line)."
+    },
+    {
+      "id": "A3",
+      "text": "In the Generate tab, selecting \"Words\" in the select labelled \"Unit\", typing \"5\" in the field labelled \"Count\", and clicking the button \"Generate\" produces output that is exactly five words separated by single spaces, with no trailing newline."
+    },
+    {
+      "id": "A4",
+      "text": "In the Generate tab, typing \"42\" in the field labelled \"Seed\", selecting \"Sentences\" in the select labelled \"Unit\", typing \"1\" in the field labelled \"Count\", and clicking the button \"Generate\" produces the exact sentence \"Lorem ipsum dolor sit amet, consectetur adipiscing elit.\""
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Copy\" in the Generate tab after generating text changes the button label to \"Copied\" for 1.5 seconds and the clipboard contains the generated text."
+    },
+    {
+      "id": "A6",
+      "text": "In the Generate tab, clicking the button \"Download\" after generating text triggers a file download named \"lorem-ipsum.txt\" containing the generated text."
+    },
+    {
+      "id": "A7",
+      "text": "In the Generate tab, after generating text, clicking the button \"Save to list\" adds a new item to the Saved tab; switching to the tab labelled \"Saved\" shows a list containing an item with the first 40 characters of the generated text."
+    },
+    {
+      "id": "A8",
+      "text": "In the Saved tab, each saved item has a button labelled \"Delete\". Clicking \"Delete\" on the first item removes it from the list; if no items remain, the text \"No saved snippets\" is shown."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved snippets: after saving a snippet and reloading the page, the Saved tab still shows the item with the same first 40 characters."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d86963acd155d724ff186ab13442c000f6d6edbb4e1d30a650ed0395a4c52b64"
+    }
+  ]
+}

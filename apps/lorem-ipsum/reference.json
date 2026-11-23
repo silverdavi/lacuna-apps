@@ -1,0 +1,18 @@
+{
+  "repo": "fatihtelis/react-lorem-ipsum",
+  "url": "https://github.com/fatihtelis/react-lorem-ipsum",
+  "sha": "292ae27f3eb55f7fa8e67c3e197dd14175cd7efe",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2019 Fatih Telis"
+  ],
+  "files": [
+    "src/lorem-ipsum/index.js",
+    "src/user/avatar.js",
+    "src/user/index.js",
+    "src/utils/index.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "d96509bb575721327a2d0e33bca97fa65fcf93973283861b2512bd886e6cbb38"
+}

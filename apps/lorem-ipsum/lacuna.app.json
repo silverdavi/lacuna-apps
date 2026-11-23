@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.lorem-ipsum",
+  "name": "Lorem Ipsum Generator",
+  "version": "0.1.0",
+  "summary": "Generate Lorem Ipsum text by sentences, words or paragraphs.",
+  "description": "Pick sentences, words or paragraphs and an optional seed, then generate classic Lorem Ipsum. Copy it to the clipboard, download it as a text file, or keep a short snippet in your saved list, which stays on this device across reloads.",
+  "category": "productivity",
+  "tags": ["lorem", "ipsum", "text", "placeholder", "generator"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/lorem-ipsum",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:lorem-ipsum",
+    "export:text"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "lorem-ipsum-snippet",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own saved Lorem Ipsum snippets"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "clipboard.write",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "lorem-ipsum-snippet"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
