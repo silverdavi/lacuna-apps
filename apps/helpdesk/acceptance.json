@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "84fcb9d709bdc94b5f1e829eefe898274df21f40eaf74df90ff3b89aeed6ecc8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Helpdesk\". With no tickets, the list area shows the text \"No tickets yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Server down\" in the field labelled \"Subject\", \"Alice\" in the field labelled \"Customer\", selecting \"High\" in the select labelled \"Priority\", and clicking the button \"Add ticket\" adds a row to the table containing \"Server down\", \"Alice\", and \"High\". The text \"No tickets yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second ticket with Subject \"Login issue\", Customer \"Bob\", Priority \"Low\", the table shows two rows. Clicking the header \"Priority\" sorts the table so the row containing \"Server down\" appears before the row containing \"Login issue\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Alice\" in the search box labelled \"Search\" filters the table to show only the row containing \"Alice\". Clearing the search box shows both rows again."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the filter chip labelled \"Open\" shows only tickets with status \"Open\". Clicking the chip labelled \"Closed\" shows only tickets with status \"Closed\". Clicking \"All\" shows all tickets."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Edit\" on the row containing \"Server down\" opens a form. Changing the field labelled \"Status\" to \"Closed\" and clicking \"Save\" updates the row to show \"Closed\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete\" on the row containing \"Login issue\" removes that row from the table. The table now shows only the row containing \"Server down\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" downloads a file named \"helpdesk.csv\" containing the header row \"Subject,Customer,Priority,Status\" and a data row \"Server down,Alice,High,Open\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the ticket with Subject \"Server down\", Customer \"Alice\", Priority \"High\", and Status \"Open\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a288df0e66289db478ed7dfdbac0d3a72c2b49b5129355f6f8bda477a14c4772"
+    }
+  ]
+}
