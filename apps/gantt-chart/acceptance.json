@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "07cb3d9190b7662db80a288ba36961ec7b72a9e8ec1128c2465261e708edcd10",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Gantt Chart\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add task\" opens a form. Filling \"Task name\" with \"Design\", \"Start date\" with \"2024-01-15\", \"Duration (days)\" with \"5\", and clicking \"Save\" adds a bar labeled \"Design\" starting on Jan 15."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Design\" (Jan 15, 5 days) and \"Build\" (Jan 20, 10 days), clicking the \"Dependencies\" tab shows a list containing \"Design\" and \"Build\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Dependencies\" tab, selecting \"Design\" in the \"Predecessor\" dropdown for the \"Build\" row and clicking \"Apply\" adds a dependency line from \"Design\" to \"Build\" in the timeline view."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the \"Export\" button copies the text \"Design: 2024-01-15 to 2024-01-19\\nBuild: 2024-01-20 to 2024-01-29\" to the clipboard."
+    },
+    {
+      "id": "A6",
+      "text": "Dragging the \"Design\" bar to start on Jan 10 updates its start date to 2024-01-10 and end date to 2024-01-14."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"Delete\" button on the \"Build\" task removes it from the timeline and the dependencies list."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the \"Design\" task with start date 2024-01-10 and duration 5 days."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "dd57470a8959120af2f25ab68ef22166af5dc021769441d2049b7bb646fbff72"
+    }
+  ]
+}

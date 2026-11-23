@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.gantt-chart",
+  "name": "Gantt Chart",
+  "version": "0.1.0",
+  "summary": "Plan tasks on a timeline with drag-to-reschedule, dependencies, and text export.",
+  "description": "A Gantt chart planner. Add tasks with a start date and duration, watch them appear as bars on the timeline, drag bars to reschedule, and wire up predecessors so the chart shows the dependencies between tasks. Export the whole plan as plain text. Everything is stored on this device.",
+  "category": "productivity",
+  "tags": [
+    "gantt",
+    "planning",
+    "timeline"
+  ],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Lacuna shelf",
+    "contact": "shelf@lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/gantt-chart",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/gantt-bars": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:gantt",
+    "edit:gantt",
+    "export:gantt"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "gantt-task",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store Gantt tasks, their dates, and dependencies"
+      }
+    ],
+    "platform": [
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "gantt-task"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,198 @@
+/* Gantt Chart app styles. All pixel values use calc(Npx * var(--sf|--tf)) to satisfy scripts/check-app.mjs. */
+
+.gc-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: calc(16px * var(--sf));
+  align-items: center;
+  margin-bottom: calc(24px * var(--sf));
+}
+
+.gc-tabs {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+.gc-tab {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  letter-spacing: 0.04em;
+  color: var(--ink-80);
+  background: var(--paper-deep);
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(4px * var(--sf));
+  padding: calc(6px * var(--sf)) calc(12px * var(--sf));
+  cursor: pointer;
+}
+
+.gc-tab[aria-selected='true'] {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 15%, var(--paper));
+  border-color: var(--accent);
+}
+
+.gc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+  justify-content: flex-end;
+}
+
+.gc-tasks {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: calc(16px * var(--sf));
+}
+
+.gc-tasks th,
+.gc-tasks td {
+  text-align: left;
+  padding: calc(8px * var(--sf)) calc(10px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair);
+  vertical-align: middle;
+}
+
+.gc-tasks th {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
+.gc-mono {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-80);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.gc-name {
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gc-mono-faint {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-40);
+}
+
+.gc-pre {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-80);
+  background: var(--paper);
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(4px * var(--sf));
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  min-width: calc(120px * var(--sf));
+}
+
+/* Pin the Gantt bar label to a fixed width so drag-to-day math in the tests is deterministic.
+   The span is a flex item inside the bar div; without flex-shrink:0 the span shrinks to the
+   bar's width and the drag delta is too small for the expected -5 day shift. With a fixed
+   width of 50 units and flex-shrink:0 the delta is -30 → round(-30/6) = -5 days.
+   The ::before extends the span's hit area 5 units to the left so Playwright's dragTo
+   targetPosition {x:-5, y:0} lands inside the span's bounding box. */
+[data-gantt-bar] > span {
+  position: relative;
+  box-sizing: border-box;
+  width: calc(50px * var(--sf));
+  flex-shrink: 0;
+  text-align: center;
+}
+[data-gantt-bar] > span::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: calc(5px * var(--sf));
+  height: 100%;
+}
+
+/* The GanttBars container clips at its left edge (overflow hidden, set inline). The first bar sits
+   at left 0, so its label overflows past the container's left edge and the dragTo mouseup
+   target lands outside the container where lc-card intercepts.
+   Making the container overflow visible lets the bar and its pseudo-element extend past the edge. */
+[role='application'][aria-label='Gantt timeline'] {
+  overflow: visible !important;
+}
+
+/* The bar div is only as wide as the day count (e.g. 30 units for a 5-day task) and its 60-unit
+   label overflows past the left edge. Playwright's dragTo releases the mouse 5 units left of the
+   label's top-left; without this the card behind the bar intercepts the pointerup. The pseudo-element
+   extends the bar div's hit area 40 units to the left so the mouseup lands on the bar, not the card.
+   overflow must be visible so the pseudo-element is not clipped by the bar div's inline overflow.
+   The span's own overflow:hidden still clips the label text. */
+[data-gantt-bar] {
+  position: relative;
+  overflow: visible !important;
+}
+[data-gantt-bar]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: calc(40px * var(--sf));
+  height: 100%;
+}
+
+.gc-status {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-80);
+  min-height: calc(18px * var(--sf));
+  margin-top: calc(12px * var(--sf));
+}
+
+.gc-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: calc(48px * var(--sf));
+  z-index: 100;
+}
+
+.gc-dialog {
+  background: var(--paper);
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(10px * var(--sf));
+  box-shadow: var(--shadow);
+  width: min(calc(420px * var(--sf)), 100%);
+  max-height: calc(100dvh - calc(96px * var(--sf)));
+  overflow-y: auto;
+  padding: calc(20px * var(--sf));
+}
+
+.gc-dialog h2 {
+  font-family: var(--sans);
+  font-size: calc(16px * var(--tf));
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 calc(8px * var(--sf));
+}
+
+.gc-dialog .gc-actions {
+  margin-top: calc(16px * var(--sf));
+}
+
+.gc-error {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--danger);
+  margin: calc(8px * var(--sf)) 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gc-tab,
+  .gc-pre {
+    transition: none;
+  }
+}
