@@ -1,0 +1,98 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.markdown-editor",
+  "name": "Markdown Editor",
+  "version": "0.1.0",
+  "summary": "Write and preview Markdown with live rendering, task lists, tables, and export.",
+  "description": "Split-view Markdown editor. Type Markdown on the left, see rendered HTML on the right. Task lists are interactive in the preview, tables render natively, and you can export the document as .md. Autosaves locally. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": [
+    "markdown",
+    "editor",
+    "writing"
+  ],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/markdown-editor",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/markdown-to-html": "0.1.0",
+      "@lacuna/code-area": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:markdown",
+    "export:markdown",
+    "preview:markdown"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "markdown",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Autosave the editor document"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "markdown"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
