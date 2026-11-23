@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "941f1d8a99646cef02e68cd3dcf975314cc2f91c3b15f3cf654877b4bf13cd6f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Spreadsheet App\" and the sheet tab bar shows a tab labelled \"Sheet1\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the cell in row 1, column A (labelled \"A1\") and typing \"10\" then pressing Enter shows \"10\" in cell A1."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the cell in row 1, column B (labelled \"B1\") and typing \"=A1*2\" then pressing Enter shows \"20\" in cell B1."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the cell in row 2, column A (labelled \"A2\") and typing \"5\" then pressing Enter shows \"5\" in cell A2; clicking the cell in row 2, column B (labelled \"B2\") and typing \"=A2*2\" then pressing Enter shows \"10\" in cell B2."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Add sheet\" creates a new tab labelled \"Sheet2\" and switches to it; the grid is empty and cell A1 is blank."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Sheet1\" returns to the first sheet; cell A1 shows \"10\" and cell B1 shows \"20\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Export CSV\" copies the current sheet's data to the clipboard; the clipboard contains the text \"A,B\\n10,20\\n5,10\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the cell in row 1, column B (labelled \"B1\") and typing \"=A1+100\" then pressing Enter shows \"110\" in cell B1, replacing the previous value."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the sheet named \"Sheet1\" with cell A1 showing \"10\" and cell B1 showing \"110\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9d6a5c371d7f734f874e13715d75815c4f0f26ea7ea180c5a795f36f2c4cc10a"
+    }
+  ]
+}
