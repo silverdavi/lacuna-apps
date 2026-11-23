@@ -1,0 +1,1 @@
+export { gradeRecord } from './mock'

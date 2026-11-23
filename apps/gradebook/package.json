@@ -1,0 +1,27 @@
+{
+  "name": "@lacuna/gradebook",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 4202",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 4202"
+  },
+  "dependencies": {
+    "@lacuna/export-menu": "workspace:0.1.0",
+    "@lacuna/host-mock": "workspace:0.1.0",
+    "@lacuna/number-input": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "5.1.4",
+    "typescript": "7.0.2",
+    "vite": "8.0.8"
+  }
+}

@@ -1,0 +1,50 @@
+.gc-name {
+  width: 140px;
+}
+.gc-grade {
+  width: 80px;
+  text-align: right;
+}
+.gc-avg {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--tf));
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  cursor: default;
+}
+.gb-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--sf));
+}
+.gb-gap {
+  height: calc(16px * var(--sf));
+}
+.gc-stats {
+  display: grid;
+  gap: calc(10px * var(--sf));
+}
+.gc-stat-line {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: calc(20px * var(--tf));
+}
+.gc-csv {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  padding: calc(10px * var(--sf)) calc(12px * var(--sf));
+  border: 1px solid var(--ui-line);
+  background: var(--paper);
+}
+.gc-copied {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink);
+}

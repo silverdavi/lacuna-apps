@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "40ad389a496bf86b920efd93f0c1cfe41d5965b47e4bd711673250f8b2a6aa16",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Gradebook Manager\" and shows an empty grid with column headers \"Student\", \"Math\", \"Science\", \"English\" and \"Average\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice\" in the first cell of the Student column, \"95\" in the Math column, \"88\" in the Science column, and \"92\" in the English column, then pressing Tab to move to the Average column, displays \"91.67\" in the Average cell for Alice."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"Bob\" in the Student column of the next row, \"70\" in Math, \"75\" in Science, and \"80\" in English, then pressing Tab, displays \"75.00\" in the Average cell for Bob."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Add Student\" adds a new empty row below Bob with empty cells for Student, Math, Science, English and Average."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting the row for Alice by clicking the row header, then clicking the button \"Delete Student\", removes the Alice row and the grid now shows only Bob's data with \"75.00\" in his Average cell."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab \"Statistics\" displays a panel showing \"Class Average: 83.34\", \"Highest: 95\", \"Lowest: 70\", and \"Median: 83.00\" based on all numeric scores in the grid."
+    },
+    {
+      "id": "A7",
+      "text": "In the Statistics tab, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"Student,Math,Science,English,Average\" and the row \"Bob,70,75,80,75.00\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"105\" in the Math cell for Bob, then pressing Tab, displays \"78.33\" in the Average cell for Bob, and the Statistics tab updates to show \"Highest: 105\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the gradebook data: after reloading the page, the grid still shows Bob's row with \"70\" in Math, \"75\" in Science, \"80\" in English, and \"78.33\" in Average."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "55ad252ff4fe2c54c01d30fa700c3bbb2fffaa684cf9c0f0de18040157c56771"
+    }
+  ]
+}
