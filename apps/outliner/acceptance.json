@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "025302de8850c9069897ab78ea82881de881eaa40d1f50fa13684e77607cf49c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Outline App\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add item\" adds a new item with the text \"New item\" to the tree."
+    },
+    {
+      "id": "A3",
+      "text": "With one item \"New item\", clicking the button \"Indent\" on that item changes its indent level to 1."
+    },
+    {
+      "id": "A4",
+      "text": "With one item at indent level 1, clicking the button \"Outdent\" changes its indent level to 0."
+    },
+    {
+      "id": "A5",
+      "text": "With two items \"A\" and \"B\" at indent level 0, dragging item \"A\" below item \"B\" using the drag handle reorders the list so \"B\" appears before \"A\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export Markdown\" copies the text \"- A\\n- B\" to the clipboard when the outline contains items \"A\" and \"B\" at indent level 0."
+    },
+    {
+      "id": "A7",
+      "text": "With an item \"A\" at indent level 0 and an item \"B\" at indent level 1, clicking the collapse toggle on \"A\" hides \"B\" from view."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Hello\" in the text input of the first item and pressing Enter updates the item text to \"Hello\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the outline structure: after adding an item \"Test\" and reloading, the tree still contains the item \"Test\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a295b6846f8ea65e608758e289895196f4d75e347476fccabd91cde37b88f38f"
+    }
+  ]
+}
