@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "488eb121ca6bf8b5d291687c95dc1beac14feb19f3c6bcb9a087a0dd85cc291d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Daily Planner\" and shows a tab labelled \"Tasks\" and a tab labelled \"Calendar\"."
+    },
+    {
+      "id": "A2",
+      "text": "On the \"Tasks\" tab, typing \"Buy milk\" in the input labelled \"New task\" and pressing Enter adds a checklist item with the text \"Buy milk\" and a progress indicator showing \"0/1\"."
+    },
+    {
+      "id": "A3",
+      "text": "On the \"Tasks\" tab, clicking the checkbox next to the item \"Buy milk\" changes the progress indicator to \"1/1\" and strikes through the text \"Buy milk\"."
+    },
+    {
+      "id": "A4",
+      "text": "On the \"Tasks\" tab, clicking the button labelled \"Delete Buy milk\" removes the item \"Buy milk\" from the list and the progress indicator disappears."
+    },
+    {
+      "id": "A5",
+      "text": "On the \"Calendar\" tab, clicking the button \"Add event\" opens a form. Filling the field labelled \"Title\" with \"Team Sync\", the field labelled \"Date\" with \"2023-10-25\", and the field labelled \"Time\" with \"14:00\", then clicking \"Save\", adds an event to the month view for October 25, 2023, displaying \"Team Sync\" at \"14:00\"."
+    },
+    {
+      "id": "A6",
+      "text": "On the \"Calendar\" tab, clicking the tab labelled \"Week\" switches the view to a week grid. The event \"Team Sync\" appears in the column for Wednesday, October 25, 2023."
+    },
+    {
+      "id": "A7",
+      "text": "On the \"Calendar\" tab, clicking the button \"Export ICS\" copies a text string to the clipboard that contains \"BEGIN:VEVENT\" and \"SUMMARY:Team Sync\"."
+    },
+    {
+      "id": "A8",
+      "text": "On the \"Calendar\" tab, clicking the event \"Team Sync\" opens a detail panel. Changing the field labelled \"Recurrence\" to \"Daily\" and clicking \"Save\" adds a new event \"Team Sync\" to the month view for October 26, 2023."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the task \"Buy milk\" in the checklist with the text \"Buy milk\" and the event \"Team Sync\" visible in the month view for October 25, 2023."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4b03a5c186654de4766df502b00393c67262bdee81b065a35d777d0d7a485f55"
+    }
+  ]
+}
