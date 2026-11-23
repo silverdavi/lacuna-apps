@@ -1,5 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Actions, AppShell, Body, Button, Card, Stack, TextInput } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  Rail,
+  SectionLabel,
+  Stack,
+  TextInput,
+} from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
 import { host } from './host'
 
 const SUPER: Record<string, string> = {
@@ -56,36 +70,106 @@ function renderMath(src: string): string {
 
 export function App() {
   const [source, setSource] = useState<string>(() => host.getSource())
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
   useEffect(() => {
     host.setSource(source)
   }, [source])
 
-  const preview = source.trim() === '' ? '' : renderMath(source)
+  const isEmpty = source.trim() === ''
+  const preview = isEmpty ? '' : renderMath(source)
+  const chars = source.length
+  const lines = source === '' ? 0 : source.split('\n').length
+
+  function onLoadSample() {
+    setSource('E = mc^2')
+  }
+
+  function onCopy() {
+    void copy(preview)
+  }
 
   return (
-    <AppShell name="TeX snippet" icon="notes" hue="gold" category="Productivity">
-      <Stack>
+    <AppShell
+      name="TeX snippet"
+      icon="notes"
+      hue="gold"
+      category="Productivity"
+      meta={`${chars} chars`}
+      status={isEmpty ? 'No fragment yet' : 'Fragment ready'}
+      side={
+        <Rail
+          title="Reading"
+          note="Plain-text reading of the fragment"
+          chips={['plain text', 'copyable']}
+        />
+      }
+    >
+      <Stack lg>
         <Card mono="Source" title="TeX snippet">
-          <TextInput
-            label="Source"
-            value={source}
-            onChange={setSource}
-            rows={6}
-            placeholder="E = mc^2"
-          />
+          <Body>Type a TeX fragment and read it as plain text.</Body>
+          <div style={{ margin: 'calc(10px * var(--sf)) 0 calc(8px * var(--sf))' }}>
+            <TextInput
+              label="Source"
+              value={source}
+              onChange={setSource}
+              rows={6}
+              placeholder="E = mc^2"
+            />
+          </div>
           <Actions>
-            <Button onClick={() => setSource('')} disabled={source === ''}>
+            <Button kind="primary" onClick={onLoadSample} disabled={!isEmpty}>
+              Load sample
+            </Button>
+            <Button onClick={() => setSource('')} disabled={isEmpty}>
               Clear
             </Button>
           </Actions>
         </Card>
-        <Card mono="Preview" title="Rendered" accent={preview !== ''}>
-          {preview === '' ? (
-            <Body sm>No math to render.</Body>
+
+        <Card
+          mono="Reading"
+          title="Rendered"
+          accent={!isEmpty}
+          actions={
+            !isEmpty ? (
+              <Actions>
+                <Button kind="ghost" onClick={onCopy}>
+                  {copied ? 'Copied' : 'Copy'}
+                </Button>
+              </Actions>
+            ) : undefined
+          }
+        >
+          {isEmpty ? (
+            <EmptyState
+              mono="No fragment yet"
+              title="Nothing to read"
+              detail="Type TeX in the source box, or start from the sample."
+              actionLabel="Load sample"
+              onAction={onLoadSample}
+            />
           ) : (
             <Body>{preview}</Body>
           )}
+        </Card>
+
+        <Card mono="Fragment" title="Details">
+          <KpiRow>
+            <div>
+              <Kpi value={String(chars)} label="Characters" accent={!isEmpty} />
+            </div>
+            <div>
+              <Kpi value={String(lines)} label="Lines" />
+            </div>
+          </KpiRow>
+          <div style={{ marginTop: 'calc(14px * var(--sf))' }}>
+            <SectionLabel>How it maps</SectionLabel>
+            <Body sm>
+              Superscripts and subscripts, fractions, and symbols such as
+              {' '}∈, →, and · become readable glyphs. The source stays editable and is kept for you.
+            </Body>
+          </div>
         </Card>
       </Stack>
     </AppShell>
