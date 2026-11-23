@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "f885f082d6ce482d64f81289e38c2e3c728f7b3f493da5b7e38b8fec4f96fd20",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries, the page shows the heading \"Net Worth Tracker\", the text \"No entries yet\", and the summary lines \"Total Assets: $0.00\", \"Total Liabilities: $0.00\", and \"Net Worth: $0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Name\" with \"House\", choosing \"Asset\" in the select labelled \"Type\", choosing \"Real Estate\" in the select labelled \"Category\", and typing \"350000\" in the field labelled \"Value\", then clicking the button \"Add entry\" adds a list item containing \"House\" and \"$350,000.00\"; the summary shows \"Total Assets: $350,000.00\" and \"Net Worth: $350,000.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After also adding an entry with Name \"Car Loan\", Type \"Liability\", Category \"Vehicle\", and Value \"15000\", a list item contains \"Car Loan\" and \"-$15,000.00\", and the summary shows \"Total Liabilities: $15,000.00\" and \"Net Worth: $335,000.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete House\" removes the House entry from the list, and the summary updates to show \"Total Assets: $0.00\", \"Total Liabilities: $15,000.00\", and \"Net Worth: -$15,000.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab labelled \"Breakdown\" switches the view to show a donut chart; the chart displays a segment labelled \"Real Estate\" with the value \"$350,000.00\" and a segment labelled \"Vehicle\" with the value \"$15,000.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that begins with \"Name,Type,Category,Value\" and contains the line \"House,Asset,Real Estate,350000\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"0\" in the field labelled \"Value\" and clicking \"Add entry\" shows the message \"Value must be greater than 0\" and does not add a new list item."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the entry \"House\" with the value \"$350,000.00\" visible in the list and the summary line \"Net Worth: $335,000.00\" (assuming Car Loan is also present)."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "09ca9ab778e61154e2d92e41404634f57ecf48cf80128e3d10aef1c7e62c7893"
+    }
+  ]
+}
