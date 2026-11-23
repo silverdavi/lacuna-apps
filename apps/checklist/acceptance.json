@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "03eef2e7c3793c31fcb520059ae6904d9e94d9cc4f3e47184e156fc3a128959e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Checklist App\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" in the field labelled \"Task\" and clicking the button \"Add task\" adds a list item containing \"Buy milk\" and the progress text \"0 of 1 done\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the checkbox on the list item \"Buy milk\" changes the progress text to \"1 of 1 done\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Walk dog\" in the field labelled \"Task\" and clicking \"Add task\" adds a second list item containing \"Walk dog\"; the progress text shows \"1 of 2 done\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Walk dog\" removes that list item and the progress text returns to \"1 of 1 done\"."
+    },
+    {
+      "id": "A6",
+      "text": "With two tasks \"Buy milk\" (unchecked) and \"Walk dog\" (checked), clicking the button \"Copy as Markdown\" copies the text \"- [ ] Buy milk\\n- [x] Walk dog\" to the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"History\" shows the text \"No history yet\"; after checking \"Buy milk\" and then clicking the tab \"History\", the text \"No history yet\" is gone and a list item containing \"Buy milk\" is visible."
+    },
+    {
+      "id": "A8",
+      "text": "With tasks \"Buy milk\" and \"Walk dog\", pressing the key \"ArrowDown\" while the reorder handle for \"Buy milk\" is focused moves \"Buy milk\" below \"Walk dog\", so the first list item contains \"Walk dog\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the task \"Buy milk\" and its checked state, with progress text \"1 of 1 done\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b5302cbe3fca52fafebf611d4df11ae6d5fd2f0be262f29f51f1a32a2cc4556c"
+    }
+  ]
+}
