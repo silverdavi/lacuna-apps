@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "694ee886dc54e42d7b1fcdf220a76c80042e7d2551786c75859b06fec0fcdac1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Class Timetable\" and the default view is the week grid showing the days \"Monday\" through \"Friday\" with no class blocks visible."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add class\" form, typing \"Math\" in the field labelled \"Class name\", selecting \"Monday\" in the select labelled \"Day\", typing \"09:00\" in the field labelled \"Start time\", typing \"10:00\" in the field labelled \"End time\", and clicking the button \"Add class\" adds a block in the Monday column containing the text \"Math\" and \"09:00\u201310:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Math\" on Monday 09:00\u201310:00, clicking the tab \"Table\" shows a table with a row containing \"Math\", \"Monday\", \"09:00\", and \"10:00\"; clicking the column header \"Class name\" sorts the table so \"Math\" appears in the first row."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Add class\" form, typing \"Physics\" in \"Class name\", selecting \"Monday\" in \"Day\", typing \"08:00\" in \"Start time\", and typing \"09:00\" in \"End time\", then clicking \"Add class\" adds a block in the Monday column containing \"Physics\" and \"08:00\u201309:00\"; the week grid now shows two blocks in the Monday column."
+    },
+    {
+      "id": "A5",
+      "text": "In the week grid, clicking the block containing \"Math\" opens a detail panel with a button \"Delete class\"; clicking \"Delete class\" removes the \"Math\" block from the Monday column, leaving only \"Physics\" visible in that column."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Add class\" form, typing \"Chemistry\" in \"Class name\", selecting \"Tuesday\" in \"Day\", typing \"11:00\" in \"Start time\", typing \"12:00\" in \"End time\", and clicking \"Add class\" adds a block in the Tuesday column containing \"Chemistry\" and \"11:00\u201312:00\"."
+    },
+    {
+      "id": "A7",
+      "text": "With \"Math\" (Monday 09:00\u201310:00) and \"Chemistry\" (Tuesday 11:00\u201312:00) added, clicking the button \"Export ICS\" copies an ICS string to the clipboard that contains the lines \"SUMMARY:Math\" and \"SUMMARY:Chemistry\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Add class\" form, typing \"Bio\" in \"Class name\", selecting \"Monday\" in \"Day\", typing \"10:00\" in \"Start time\", and typing \"09:00\" in \"End time\", then clicking \"Add class\" shows the message \"End time must be after start time\" and adds no block."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the class \"Physics\" on Monday 08:00\u201309:00 visible in the week grid after the page is reloaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a4e22680a6a58ec8fac8b5f6ff2d4c16010591de604420877303093c2a6c920b"
+    }
+  ]
+}

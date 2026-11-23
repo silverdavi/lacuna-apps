@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.class-timetable",
+  "name": "Class Timetable",
+  "version": "0.1.0",
+  "summary": "Plan a weekly class schedule with add, remove, sort, and iCalendar export.",
+  "description": "Build a weekly class timetable. Add classes with a name, a weekday, and a start and end time, see them on the Monday-through-Friday week grid, list and sort them in a table, open a class to inspect or delete it, and export the whole schedule as an iCalendar (.ics) file. Everything stays on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/class-timetable"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:class-timetable"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "class",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store weekly class schedule entries"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "class"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
