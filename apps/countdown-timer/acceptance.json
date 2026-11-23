@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "63f36a5dd1555759c7efe8a2d924897316d18a6c646778f973680a7998b8c729",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Countdown Timer\" and the text \"No timer set\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"1h 20m\" in the field labelled \"Duration\" and clicking the button \"Start\" changes the large display to \"1:20:00\" and shows the buttons \"Pause\" and \"Reset\"."
+    },
+    {
+      "id": "A3",
+      "text": "After starting a timer with Duration \"0m 10s\", clicking the button \"Pause\" stops the countdown and shows the button \"Resume\" instead of \"Pause\"."
+    },
+    {
+      "id": "A4",
+      "text": "After pausing a running timer, clicking the button \"Resume\" restarts the countdown and the button label changes back to \"Pause\"."
+    },
+    {
+      "id": "A5",
+      "text": "After starting a timer with Duration \"0m 5s\", waiting until the timer reaches zero shows the text \"Time's up\" and the large display shows \"0:00:00\"."
+    },
+    {
+      "id": "A6",
+      "text": "After starting a timer with Duration \"0m 30s\", clicking the button \"Lap\" adds a list item containing \"Lap 1\" and the elapsed time \"0:00:10\" (assuming 10 seconds have passed)."
+    },
+    {
+      "id": "A7",
+      "text": "With two laps recorded, clicking the button \"Delete Lap 1\" removes the first lap item and the list shows only \"Lap 2\"."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting \"5m\" in the select labelled \"Preset\" and clicking the button \"Start\" sets the large display to \"0:05:00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the timer state: after starting a timer with Duration \"1h 0m\" and pausing it at \"0:59:30\", reloading the page still shows the large display \"0:59:30\" and the button \"Resume\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "fe3490ba737d1ec3422c79aa663b33ed89b5280edb1fa38e595bbb3c25604b70"
+    }
+  ]
+}

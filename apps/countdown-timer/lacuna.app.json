@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.countdown-timer",
+  "name": "Countdown Timer",
+  "version": "0.1.0",
+  "summary": "Count down a chosen duration with pause, laps, and a reload-safe clock.",
+  "description": "Set a duration in hours, minutes, and seconds, or pick a preset. Start it, pause it, resume it, and record laps while it runs. The clock keeps its place when the page reloads.",
+  "category": "productivity",
+  "tags": [
+    "timer",
+    "focus",
+    "countdown"
+  ],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/countdown-timer"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-timer": "0.1.0",
+      "@lacuna/format-duration": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:timer"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "timer",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the running countdown and its laps"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "timer"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
