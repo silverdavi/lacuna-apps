@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "78056e087d53e53cbf84e5f877ecc56799e1b35ec50dbdfd06dd7e90c8a29592",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Pasting `|A|B|C|\\n|---|---|---|\\n|1|2|3|` shows three rows: \"A, B, C\" and \"1, 2, 3\"."
+    },
+    {
+      "id": "A2",
+      "text": "Pasting `|X|Y|\\n|---|---|\\n|a|b|` shows two rows: \"X, Y\" and \"a, b\"."
+    },
+    {
+      "id": "A3",
+      "text": "Pasting `|1|2|3|` shows one row: \"1, 2, 3\"."
+    },
+    {
+      "id": "A4",
+      "text": "Pasting an empty string shows no output."
+    },
+    {
+      "id": "A5",
+      "text": "Pasting `|A|B|\\n|---|---|\\n|C|D|` shows two rows: \"A, B\" and \"C, D\"."
+    },
+    {
+      "id": "A6",
+      "text": "Pasting `|X|Y|Z|\\n|---|---|---|\\n|1|2|3|` shows one row: \"X, Y, Z\" and another: \"1, 2, 3\"."
+    },
+    {
+      "id": "A7",
+      "text": "Pasting `|A|B|\\n|---|---|\\n|C|D|` with a trailing newline shows two rows: \"A, B\" and \"C, D\"."
+    },
+    {
+      "id": "A8",
+      "text": "Pasting `|A|B|\\n|---|---|\\n|C|D|` with extra spaces in cells shows \"A, B\" and \"C, D\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the input text and output table visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "311c83869e5a75e47374b97a86adfc79a47e1c7a6ac796a4c5a4f114e591912c"
+    }
+  ]
+}
