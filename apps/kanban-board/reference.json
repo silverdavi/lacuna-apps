@@ -1,0 +1,18 @@
+{
+  "repo": "BrockReece/vue-kanban",
+  "url": "https://github.com/BrockReece/vue-kanban",
+  "sha": "c6ac59f5e51ec8887e81174443a32b0160ab44ba",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2018 Brock Reece"
+  ],
+  "files": [
+    "config/index.js",
+    "src/App.vue",
+    "src/components/Kanban.vue",
+    "src/main.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "e9e111b8024c874e59a5a01139313e8a4d9c53450204877cc52fe2ed63f139e1"
+}

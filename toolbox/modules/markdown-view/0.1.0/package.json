@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/markdown-view",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Safe rendered Markdown viewer with interactive task-list toggles.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/markdown-to-html": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "MarkdownView",
+    "kind": "widget",
+    "commit": "5a2695c06b0cb3a1d47407a70c19e9bd82e2fcf0",
+    "source": "59514237159e42ae",
+    "lines": 100,
+    "exports": [
+      "MarkdownView"
+    ],
+    "types": [
+      "MarkdownViewProps"
+    ],
+    "signature": "MarkdownView({ source, onTaskToggle, disabled = false, label, className, style, children }: Markdo...)"
+  }
+}

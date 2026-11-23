@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.percentage-calculator",
+  "name": "Percentage Calculator",
+  "version": "0.1.0",
+  "summary": "Work out percentages four ways: a percent of a value, a part as a percent of a whole, and increases and decreases.",
+  "description": "Pick one of four percentage questions, enter the numbers, and press Calculate. The result shows in a summary with a copy button. Each calculation is added to a history list that persists on this device across reloads, where entries can be deleted. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["percentage", "calculator", "math"],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/percentage-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/money-input": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "export:percentage-calculator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "percentage-calculator",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the history of percentage calculations"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "percentage-calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

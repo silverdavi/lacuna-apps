@@ -1,0 +1,77 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.habit-heatmap",
+  "name": "Habit Heatmap",
+  "version": "0.1.0",
+  "summary": "Track habits on a daily heatmap with streaks.",
+  "description": "Add habits, log a completion for today or yesterday, and watch the heatmap fill in day by day. Streaks are computed from the logged days. All data stays in the mock space store on this device; nothing leaves it.",
+  "category": "productivity",
+  "tags": ["habits", "streaks", "heatmap"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/habit-heatmap"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:habit"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "habit",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own habit definitions and daily completion history in this space's mock store."
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "habit"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

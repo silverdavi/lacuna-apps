@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/number-input",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Locale-aware numeric input with optional stepper buttons, min/max clamping, and a unit suffix.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "NumberInput",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "f93ff2554ebb824c",
+    "lines": 183,
+    "exports": [
+      "NumberInput"
+    ],
+    "types": [
+      "NumberInputProps"
+    ],
+    "signature": "NumberInput({ value, onChange, min, max, step = 1, unit, locale = 'en-US', disabled = false, id, ...)"
+  }
+}

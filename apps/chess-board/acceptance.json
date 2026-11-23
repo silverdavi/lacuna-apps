@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "bddfc6b85c23d160b9aa122610b3f57b78c95fac3ccf1682ac17b45897dd039e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page displays the heading \"Chess Board Game\", the status text \"White to move\", and the board grid contains 64 cells with the bottom-left cell (a1) showing a white pawn icon and the top-right cell (h8) showing a black rook icon."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the cell at e2 (white pawn) highlights it with a \"selected\" class, then clicking the cell at e4 moves the pawn; the status text changes to \"Black to move\" and the e2 cell is empty while e4 contains a white pawn."
+    },
+    {
+      "id": "A3",
+      "text": "With it being Black's turn, clicking the cell at e7 (black pawn) and then clicking e5 moves the black pawn; the status text changes to \"White to move\" and the e7 cell is empty while e5 contains a black pawn."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button labelled \"New Game\" resets the board to the starting position, the status text changes to \"White to move\", and the cell at e4 is empty."
+    },
+    {
+      "id": "A5",
+      "text": "Pressing the \"ArrowRight\" key while a cell has focus moves the keyboard focus to the adjacent cell on the right; pressing \"Enter\" on a selected cell attempts to move the piece to the focused cell, updating the board if the move is legal."
+    },
+    {
+      "id": "A6",
+      "text": "When the computer opponent is active (default mode), after White moves e2 to e4, the Black pawn automatically moves from e7 to e5 within 2 seconds, and the status text returns to \"White to move\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Undo\" after White has moved e2 to e4 and Black has moved e7 to e5 reverts the board to the starting position, and the status text changes to \"White to move\"."
+    },
+    {
+      "id": "A8",
+      "text": "After White moves e2 to e4, reloading the page keeps the board state with the white pawn on e4, the empty e2 cell, and the status text \"Black to move\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "e2545c3418aaeb33fb13fad75698ff904a6fcdbe9e8bfa42a9642bcc1aabbfb5"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4b5878c4b977557c30a85fc3c148beaddbd091ae244e7cd79dc2521c74b35a8b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no accounts, the page shows the heading \"TOTP Authenticator\" and the text \"No accounts yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"JBSWY3DPEHPK3PXP\" in the field labelled \"Base32 Secret\" and clicking \"Add account\" adds a list item containing \"JBSWY3DPEHPK3PXP\" and a 6-digit code; the text \"No accounts yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Example\" in the field labelled \"otpauth URI\" and clicking \"Add account\" adds a list item containing \"Example:alice@example.com\" and a 6-digit code."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"INVALID_SECRET\" in the field labelled \"Base32 Secret\" and clicking \"Add account\" shows the toast message \"Invalid base32 secret\" and adds no list item."
+    },
+    {
+      "id": "A5",
+      "text": "With an account added, clicking the button labelled \"Copy code\" copies the current 6-digit code to the clipboard and shows the toast message \"Code copied\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Delete Example:alice@example.com\" removes that list item; if it was the only account, the text \"No accounts yet\" reappears."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"JBSWY3DPEHPK3PXP\" in the field labelled \"Base32 Secret\" and clicking \"Add account\" twice adds two list items, each with a distinct label suffix like \"(1)\" and \"(2)\" or identical secrets shown separately."
+    },
+    {
+      "id": "A8",
+      "text": "The field labelled \"Base32 Secret\" accepts only uppercase alphanumeric characters; typing \"abc\" is auto-converted to \"ABC\" or rejected with a validation message."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the account added with secret \"JBSWY3DPEHPK3PXP\"; the list item containing \"JBSWY3DPEHPK3PXP\" and a 6-digit code is still visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "19083a449956f7640719235376f0813e98b7d835dfcd438729da8e13ed5a8a18"
+    }
+  ]
+}

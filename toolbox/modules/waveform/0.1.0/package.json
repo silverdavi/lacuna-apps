@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/waveform",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Static audio waveform with a draggable playhead and optional trim handles.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Waveform",
+    "kind": "widget",
+    "commit": "c16104ed71038f0946f1626fadb6487313514027",
+    "source": "05bb5aec3f8a54eb",
+    "lines": 316,
+    "exports": [
+      "Waveform"
+    ],
+    "types": [
+      "WaveformProps"
+    ],
+    "signature": "Waveform(props: WaveformProps)"
+  }
+}

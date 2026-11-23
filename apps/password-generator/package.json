@@ -8,9 +8,18 @@
     "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
+    "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@lacuna/combobox": "workspace:0.1.0",
+    "@lacuna/code-area": "workspace:0.1.0",
+    "@lacuna/codecs": "workspace:0.1.0",
+    "@lacuna/text-transforms": "workspace:0.1.0",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/file-save-open": "workspace:0.1.0",
+    "@lacuna/use-local-record": "workspace:0.1.0",
+    "@lacuna/password-generate": "workspace:0.1.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

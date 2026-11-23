@@ -1,0 +1,22 @@
+.cf-tabs {
+  display: flex;
+  gap: calc(16px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
+}
+
+.cf-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-80);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.cf-tab.on {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}

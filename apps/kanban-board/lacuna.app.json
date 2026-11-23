@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.kanban-board",
+  "name": "Kanban Board",
+  "version": "0.1.0",
+  "summary": "A small kanban board with three columns, WIP counts, drag to move, and JSON export.",
+  "description": "A small kanban board. Three columns (To Do, In Progress, Done), a WIP count in each header, cards you can add, rename, drag between columns, and delete, plus an Export JSON action. The board stays in this device's mock store; nothing leaves it.",
+  "category": "productivity",
+  "tags": ["kanban", "tasks", "board"],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/kanban-board",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/kanban-columns": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:kanban-board"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "kanban-board",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Kanban Board cards in this space's mock store."
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "kanban-board"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

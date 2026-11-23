@@ -1,0 +1,72 @@
+.mg-heading {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: calc(22px * var(--tf));
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.mg-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(8px * var(--sf));
+}
+
+.mg-card {
+  appearance: none;
+  font-family: var(--sans);
+  font-size: calc(18px * var(--tf));
+  line-height: 1;
+  border: 0;
+  border-radius: calc(4px * var(--sf));
+  background: var(--paper-deep);
+  color: var(--ink);
+  cursor: pointer;
+  min-height: calc(48px * var(--sf));
+  min-width: calc(48px * var(--sf));
+  padding: calc(8px * var(--sf));
+}
+
+.mg-card:hover {
+  background: var(--mid);
+}
+
+.mg-card:focus-visible {
+  outline: calc(1px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.mg-card.mg-card-up {
+  background: var(--paper);
+  color: var(--ink);
+  cursor: default;
+}
+
+.mg-score {
+  display: flex;
+  gap: calc(20px * var(--sf));
+  padding-top: calc(12px * var(--sf));
+  border-top: calc(1px * var(--sf)) solid var(--hair-strong);
+}
+
+.mg-score-item {
+  font-family: var(--mono);
+  font-size: calc(13.5px * var(--tf));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.mg-hint {
+  font-family: var(--sans);
+  font-size: calc(13.5px * var(--tf));
+  color: var(--mid);
+  display: grid;
+  gap: calc(8px * var(--sf));
+}
+
+.mg-hint p {
+  margin: 0;
+}

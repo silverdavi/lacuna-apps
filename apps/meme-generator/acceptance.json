@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "74aa9072123a7295745bac65cb6f9a66ab23b0eb0d6214b448c2afcbc901173a",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no image loaded, the page shows the heading \"Meme Maker\", the text \"No image loaded\", and the button \"Upload image\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Upload image\" and selecting a file named \"cat.png\" (a 100x100 red square) replaces \"No image loaded\" with the text \"Image loaded: cat.png\" and displays the image in the canvas area."
+    },
+    {
+      "id": "A3",
+      "text": "After loading an image, typing \"TOP TEXT\" in the field labelled \"Top text\" and \"BOTTOM TEXT\" in the field labelled \"Bottom text\" renders both strings on the canvas in white, bold, uppercase font with a black outline."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Rotate 90\u00b0\" rotates the displayed image 90 degrees clockwise; the image dimensions swap from 100x100 to 100x100 (for a square) but the orientation changes, and the text overlays remain anchored to the top and bottom of the rotated canvas."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Flip horizontal\" mirrors the image horizontally; the text \"TOP TEXT\" remains left-aligned at the top, and the image content is reversed left-to-right."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting \"Grayscale\" in the select labelled \"Filter\" applies a grayscale filter to the image; the canvas shows the image with no color saturation, and the select value displays \"Grayscale\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export PNG\" triggers a download of a file named \"meme.png\" that contains the composited image with the text overlays \"TOP TEXT\" and \"BOTTOM TEXT\" visible."
+    },
+    {
+      "id": "A8",
+      "text": "After loading an image, typing \"TOP TEXT\" in the field labelled \"Top text\", and reloading the page, the canvas still displays the text \"TOP TEXT\" at the top and the image remains loaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4946275ea01e25a786da69fd77b0da450ce9dbad3d16c3e30ac9a119c59ec5ea"
+    }
+  ]
+}

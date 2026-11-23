@@ -1,0 +1,86 @@
+{
+ "manifestVersion": 1,
+ "id": "lacuna.image-color-extractor",
+ "name": "Image Color Extractor",
+ "version": "0.1.0",
+ "summary": "Drop an image to extract its colors.",
+ "description": "Drop an image or browse for one to pull its dominant colors. Extract up to a dozen swatches, inspect any of them in hex, rgb, hsl and oklch, check contrast against white and black, copy hex values, and keep a palette that survives reloads. All extraction happens in the browser; nothing leaves the page.",
+ "category": "productivity",
+ "tags": [],
+ "icon": "paint",
+ "relationship": {
+  "kind": "standalone"
+ },
+ "maintainer": {
+  "type": "first-party",
+  "name": "Lacuna"
+ },
+ "pricing": {
+  "model": "free",
+  "inAppPurchases": false,
+  "ads": false
+ },
+ "maturity": "demo-working",
+  "entry": {
+   "type": "builtin",
+   "route": "/app/image-color-extractor"
+  },
+  "requires": {
+   "hostApi": "^1.0.0",
+   "modules": {
+    "@lacuna/host-mock": "0.1.0",
+    "@lacuna/tokens": "^0.1.0",
+    "@lacuna/ui": "^0.1.0"
+   }
+  },
+ "capabilities": [
+  "import:image->color",
+  "view:image"
+ ],
+ "permissions": {
+  "records": [
+   {
+    "kind": "image-color-extractor-palette",
+    "access": [
+     "read",
+     "write",
+     "create",
+     "delete"
+    ],
+    "purpose": "Own the saved palette of extracted colors"
+   }
+  ],
+  "platform": [
+   "files.pick",
+   "clipboard.write"
+  ],
+  "network": {
+   "origins": []
+  },
+  "dataClasses": [],
+  "availability": {
+   "spaceTypes": [
+    "any"
+   ]
+  }
+ },
+ "sharing": {
+  "owns": [
+   "image-color-extractor-palette"
+  ],
+  "reads": [],
+  "handoffs": []
+ },
+ "quality": {
+  "tests": [
+   "tests/acceptance.spec.ts"
+  ],
+  "themeMatrix": true,
+  "keyboardOnly": true,
+  "accessibilityScan": "axe",
+  "worksWithoutNetwork": true
+ },
+ "source": {
+  "license": "MIT"
+ }
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "bdc414343345378bdd6bda212fba85516fbc91142bac692776844ab8446aa936",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Kanban Board\" and three columns with the visible labels \"To Do\", \"In Progress\", and \"Done\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add card\" in the column \"To Do\" opens a card editor; typing \"Write spec\" in the field labelled \"Title\" and clicking \"Save\" adds a card containing \"Write spec\" to the \"To Do\" column."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the card \"Write spec\" to \"To Do\", the WIP count displayed in the \"To Do\" column header shows \"1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the card \"Write spec\" in \"To Do\" opens the card editor; changing the field labelled \"Title\" to \"Write final spec\" and clicking \"Save\" updates the card text to \"Write final spec\"."
+    },
+    {
+      "id": "A5",
+      "text": "Dragging the card \"Write final spec\" from the \"To Do\" column to the \"In Progress\" column moves the card; the \"To Do\" column WIP count shows \"0\" and the \"In Progress\" column WIP count shows \"1\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete card\" on the card \"Write final spec\" in \"In Progress\" removes the card; the \"In Progress\" column WIP count shows \"0\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Add card\" in \"In Progress\", typing \"Review code\" in the field labelled \"Title\", and clicking \"Save\" adds a card \"Review code\" to \"In Progress\"; the WIP count in \"In Progress\" shows \"1\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export JSON\" copies a JSON string to the clipboard that includes the text \"Write final spec\" if that card exists, or an empty array if no cards exist."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the card \"Review code\" in the \"In Progress\" column with the WIP count \"1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "73ef31c221ade28cb072f60487c3fc2ac3f252aa48a0eaa9f352695cc0173fa8"
+    }
+  ]
+}

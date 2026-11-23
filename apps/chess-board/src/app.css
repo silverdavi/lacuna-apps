@@ -1,0 +1,96 @@
+.chess-app {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+.chess-heading {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: calc(22px * var(--tf));
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: calc(4px * var(--sf));
+}
+
+.chess-row {
+  display: contents;
+}
+
+.chess-sq {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  border: calc(1px * var(--sf)) solid var(--soft);
+  border-radius: calc(4px * var(--sf));
+  cursor: pointer;
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.chess-sq.light {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.chess-sq.dark {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.chess-sq.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper);
+}
+
+.chess-sq.target {
+  border-color: var(--accent);
+}
+
+.chess-sq:focus-visible {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: calc(1px * var(--sf));
+}
+
+.chess-glyph {
+  font-size: calc(22px * var(--tf));
+  line-height: 1;
+  pointer-events: none;
+}
+
+.chess-label {
+  position: absolute;
+  left: calc(3px * var(--sf));
+  bottom: calc(2px * var(--sf));
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: calc(7px * var(--tf));
+  line-height: 1;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.chess-sr {
+  position: absolute;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4a08702c16598ae666f99b3d278c15d50469c3fa8a930ba4055d08bf6c1cccd9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Document Vault\" and the text \"No documents yet\" when the vault is empty."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Export backup\" when the vault is empty downloads a file named \"document-vault-backup.json\" containing the text `{\"version\":1,\"documents\":[]}`."
+    },
+    {
+      "id": "A3",
+      "text": "Using the FileDropZone to add a file named \"invoice.pdf\" with content \"PDFDATA\" creates a list item showing \"invoice.pdf\" and \"1 KB\"; the text \"No documents yet\" is removed."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"inv\" in the search field labelled \"Search documents\" highlights the list item for \"invoice.pdf\" and displays the text \"1 match\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete invoice.pdf\" removes the list item for \"invoice.pdf\" and the page shows the text \"No documents yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "After adding a document named \"report.txt\", clicking the button \"Export backup\" downloads a file named \"document-vault-backup.json\" containing the text `{\"version\":1,\"documents\":[{\"name\":\"report.txt\",\"size\":0,\"content\":\"\"}]}`."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Import backup\" and selecting a file containing `{\"version\":1,\"documents\":[{\"name\":\"scan.jpg\",\"size\":100,\"content\":\"IMG\"}]}` adds a list item showing \"scan.jpg\" and \"100 B\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"View report.txt\" opens a dialog with the heading \"report.txt\" and the body text \"PDFDATA\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the document named \"invoice.pdf\" visible in the list with its size \"1 KB\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9826b9747337c141307d0557841aa2b7d7387ab13fcf826bce1112f8dbca55e5"
+    }
+  ]
+}

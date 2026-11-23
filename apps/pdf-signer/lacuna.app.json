@@ -1,0 +1,113 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.pdf-signer",
+  "name": "PDF Document Signer",
+  "version": "0.1.0",
+  "summary": "Upload a PDF, draw signatures, and place them on any page.",
+  "description": "Upload a PDF document, draw a signature on the pad, choose a page, and place the signature on the document. Documents, signatures, and annotations persist in local storage, and the signed document can be downloaded. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["pdf", "signature", "documents"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/pdf-signer"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-pointer-draw": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:document",
+    "edit:document"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "document",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the PDF documents the user signs"
+      },
+      {
+        "kind": "signature",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the signatures the user draws"
+      },
+      {
+        "kind": "annotation",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the signature placements on documents"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "document",
+      "signature",
+      "annotation"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,29 @@
+.sub-error {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--accent);
+}
+
+.sub-sort {
+  all: unset;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  letter-spacing: calc(0.9px * var(--sf));
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+  padding: calc(8px * var(--sf));
+}
+
+.sub-sort-num {
+  text-align: right;
+}
+
+.sub-sort:focus-visible {
+  outline: calc(1px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}

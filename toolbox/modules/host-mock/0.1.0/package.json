@@ -1,0 +1,29 @@
+{
+  "name": "@lacuna/host-mock",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "localStorage-backed mock record and value stores, safe against corrupt or missing storage.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "hostMock",
+    "kind": "logic",
+    "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+    "source": "53b96338a8fe030b",
+    "lines": 181,
+    "exports": [
+      "createMemoryStorage",
+      "createMockRecordStore",
+      "createMockValue"
+    ],
+    "types": [
+      "StorageLike",
+      "MockRecordStore",
+      "MockValue"
+    ],
+    "signature": "createMemoryStorage(); createMockRecordStore(options: { key: string; validate?: (value: unknown) => value is T; idPrefix?: string;...); createMockValue(options: { key: string; fallback: T; validate?: (value: unknown) => value is T; stora..."
+  }
+}
