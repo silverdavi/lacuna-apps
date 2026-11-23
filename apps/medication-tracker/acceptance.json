@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2f0f116c4148f5614ed8d9f2b8bc990879f9cb330c807dae09bb6bcc601191ed",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Medication Reminder\" and the text \"No medications yet\" when no medications have been added."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Lisinopril\" in the field labelled \"Medication name\", \"10 mg\" in the field labelled \"Dose\", and \"08:00\" in the field labelled \"Time\", then clicking the button \"Add medication\" adds a list item containing \"Lisinopril\", \"10 mg\", and \"08:00\", and the text \"No medications yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Lisinopril\" 10 mg at 08:00, clicking the button \"Log dose\" on the Lisinopril item adds a log entry showing \"Lisinopril 10 mg taken at 08:00\" in the \"Dose log\" section."
+    },
+    {
+      "id": "A4",
+      "text": "After logging a dose for Lisinopril, clicking the button \"Delete Lisinopril\" removes the medication from the list and the \"Dose log\" section shows \"No doses logged\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"History\" shows a table with columns \"Date\", \"Medication\", \"Dose\", and \"Time\", and after logging Lisinopril 10 mg at 08:00, the table contains a row with \"Lisinopril\", \"10 mg\", and \"08:00\"."
+    },
+    {
+      "id": "A6",
+      "text": "With Lisinopril 10 mg at 08:00 added, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"Medication,Dose,Time\" and the row \"Lisinopril,10 mg,08:00\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding \"Metformin\" 500 mg at 12:00, the list shows two items: \"Lisinopril\" and \"Metformin\", and the \"Dose log\" section is empty."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Lis\" in the field labelled \"Search\" filters the list to show only the item containing \"Lisinopril\" and hides \"Metformin\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the medication \"Lisinopril\" with dose \"10 mg\" and time \"08:00\" in the list, and the logged dose \"Lisinopril 10 mg taken at 08:00\" in the \"Dose log\" section."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "858fd53673ca7437d52d4574ab3f4321fdae6be507ac6360f366d8769160b22d"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+/* Medication Reminder app styles.
+   Colors come from @lacuna/ui tokens; sizing uses the kit scale vars.
+   No .lk-* / .lc-* selectors here (the kit owns those). */
+
+/* Dose log is rendered as div[role=list] so it does not add <li> siblings to
+   the medication list; each entry is a single text node so the exact phrase
+   stays contiguous for screen readers. */
+.mr-dose-log {
+  display: flex;
+  flex-direction: column;
+}
+.mr-dose-log > div {
+  font: inherit;
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+  padding: calc(10px * var(--sf)) 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+.mr-dose-log > div:last-child {
+  border-bottom: none;
+}
