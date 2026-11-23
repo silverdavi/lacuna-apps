@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.mileage-log",
+  "name": "Vehicle Mileage Log",
+  "version": "0.1.0",
+  "summary": "Log fuel fills and read totals, average MPG, and a CSV export.",
+  "description": "One list of fuel entries. Odometer, gallons, cost, and a note per fill. Totals and average MPG computed from the list; CSV copies to the clipboard.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/mileage-log",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:mileage-log"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "mileage-log",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own mileage-log entries"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "mileage-log"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

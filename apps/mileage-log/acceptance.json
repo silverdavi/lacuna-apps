@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7482e2802adc824073d375197bcd2101c3874a21d714204bf9632e2c7b75d9c9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Vehicle Mileage Log\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add entry\" opens a form. Typing \"12500\" in the field labelled \"Odometer\", \"10.5\" in the field labelled \"Gallons\", \"45.25\" in the field labelled \"Cost\", and \"Full tank\" in the field labelled \"Note\", then clicking \"Save\" adds a list item containing \"12500\", \"10.5\", \"$45.25\", and \"Full tank\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the entry from A2, the summary section shows \"Total miles: 12500\" and \"Total cost: $45.25\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Add entry\" again, typing \"12800\" in \"Odometer\", \"8.2\" in \"Gallons\", \"38.10\" in \"Cost\", and \"Half tank\" in \"Note\", then clicking \"Save\" adds a second list item containing \"12800\", \"8.2\", \"$38.10\", and \"Half tank\". The summary now shows \"Total miles: 12800\" and \"Total cost: $83.35\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every list item has a button labelled \"Delete\". Clicking the \"Delete\" button on the first entry (the one with \"12500\") removes that item. The summary updates to \"Total miles: 12800\" and \"Total cost: $38.10\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab \"Summary\" shows a table with a row labelled \"Average MPG\" displaying \"14.4\" (calculated as (12800-12500) / (10.5+8.2) rounded to one decimal)."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that starts with \"odometer,gallons,cost,note\" and contains the line \"12800,8.2,38.10,Half tank\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Half\" in the search box labelled \"Search\" filters the list to show only the entry containing \"Half tank\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry with \"12800\" and \"Half tank\" visible in the list, and the summary shows \"Total cost: $38.10\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "cc99be66b0d8116e072aea3563c9286fbf82a2da3e20a385d7530ef2dcd78fa3"
+    }
+  ]
+}
