@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "41869614176071df61d1669e1cfbbc8aabc664c23979fa9f6e8568e9a2ad55d4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Markdown Slide Deck\". The editor area contains the default text \"# Welcome\\n\\nThis is a demo slide.\" and the preview pane shows the rendered heading \"Welcome\" and the paragraph \"This is a demo slide.\""
+    },
+    {
+      "id": "A2",
+      "text": "In the editor, typing the text \"## Agenda\\n\\n- Item one\\n- Item two\" after the existing text and pressing Enter creates a new slide. The preview pane now shows two slides: the first with \"Welcome\" and the second with the heading \"Agenda\" and a list containing \"Item one\" and \"Item two\". The status bar shows \"2 slides\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the editor, adding the text \"\\n---\\n\\n- [ ] Task A\\n- [x] Task B\" creates a third slide. The preview pane shows a third slide with a task list where \"Task A\" has an unchecked checkbox and \"Task B\" has a checked checkbox. Clicking the checkbox next to \"Task A\" in the preview updates the editor text to \"- [x] Task A\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab labelled \"Preview\" switches the main view to show only the rendered slides. Clicking the tab labelled \"Editor\" switches back to the text editor. The tab labelled \"Preview\" is visible and clickable in both states."
+    },
+    {
+      "id": "A5",
+      "text": "In the editor, typing the text \"| Col 1 | Col 2 |\\n|---|---|\\n| A | B |\" on a new slide renders a table in the preview with headers \"Col 1\" and \"Col 2\" and a row containing \"A\" and \"B\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export\" opens a menu. Selecting \"Print\" triggers the browser's print dialog. Selecting \"JSON\" downloads a file named \"deck.json\" containing the raw markdown text of the deck."
+    },
+    {
+      "id": "A7",
+      "text": "With the deck containing \"# Welcome\" and \"# Agenda\", clicking the button \"Undo\" reverts the last edit. If the last edit was adding \"# Agenda\", the editor text no longer contains \"# Agenda\" and the status bar shows \"1 slide\"."
+    },
+    {
+      "id": "A8",
+      "text": "The status bar at the bottom of the editor shows the current slide number and total slides. When the cursor is in the first slide, it shows \"Slide 1 of 2\". When the cursor is in the second slide, it shows \"Slide 2 of 2\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the deck text. After adding a slide with the text \"# New Slide\" and reloading the page, the editor still contains \"# New Slide\" and the preview shows the heading \"New Slide\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ceb9289a119776ec8122ef07b5e3c8d73222ab6b38c55c9f4ea595146b31710b"
+    }
+  ]
+}
