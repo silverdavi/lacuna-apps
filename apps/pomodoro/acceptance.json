@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "e2291ea3302ab1a18c8f7f09dcb59b03267952cae086da64f4bf550f4f8cf092",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Clicking the \"Start\" button begins a 25-minute countdown."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Pause\" stops the countdown and shows \"Paused\" on the button."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking \"Reset\" stops the countdown and returns to 25:00."
+    },
+    {
+      "id": "A4",
+      "text": "After 25 minutes, the timer switches to a 5-minute break."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking \"Switch\" toggles between work and break modes."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"30\" in the work time field changes the interval to 30 minutes."
+    },
+    {
+      "id": "A7",
+      "text": "The timer updates every second while running."
+    },
+    {
+      "id": "A8",
+      "text": "Closing the tab and reopening the app retains the last interval setting."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current interval and state (e.g., \"25:00\" or \"5:00\")."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "71531677a5975c1733ae257c5c7eca3deacad341210e78c91f3ab621229e58f5"
+    }
+  ]
+}
