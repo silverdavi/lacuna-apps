@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "9626597f99c308c8fd7387e378f2c03fe60c96601fce33659dc63ed00e65f947",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Stock Inventory Manager\" and the empty state shows the text \"No items in inventory\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Widget A\" in the field labelled \"Item name\", \"10\" in the field labelled \"Quantity\", choosing \"Tools\" in the select labelled \"Category\", and clicking the button \"Add item\" adds a row to the table containing \"Widget A\", \"10\", and \"Tools\"; the empty state text is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Widget A\" (Quantity 10, Category Tools) and \"Gadget B\" (Quantity 5, Category Electronics), clicking the button \"Record movement\" on the \"Widget A\" row, typing \"3\" in the field labelled \"Quantity\" and choosing \"Out\" in the select labelled \"Direction\", then clicking \"Save movement\" updates the \"Widget A\" row quantity to \"7\" and adds a movement entry showing \"Widget A\", \"3\", \"Out\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Gadget\" in the input labelled \"Search\" filters the table to show only the row containing \"Gadget B\"; the \"Widget A\" row is not visible."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the chip labelled \"Tools\" in the filter bar shows only rows where the Category column reads \"Tools\"; the \"Gadget B\" row (Category Electronics) is hidden."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the column header \"Quantity\" in the table sorts rows in descending order by quantity; with Widget A at 7 and Gadget B at 5, \"Widget A\" appears before \"Gadget B\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose content includes the header row \"Item name,Quantity,Category\" and a data row \"Widget A,7,Tools\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete\" on the \"Gadget B\" row removes that row from the table; only \"Widget A\" remains visible."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the item \"Widget A\" with quantity \"7\" and category \"Tools\" in the table, and the movement entry for \"Widget A\" with quantity \"3\" and direction \"Out\" in the Movements tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2ecc396014c866c8266def8095c8ca0f9617ae71a96999bcf28282341f07f086"
+    }
+  ]
+}
