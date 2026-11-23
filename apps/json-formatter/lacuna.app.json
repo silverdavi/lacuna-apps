@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.json-formatter",
+  "name": "JSON Formatter",
+  "version": "0.1.0",
+  "summary": "Format and validate JSON.",
+  "description": "Paste JSON, format it to two-space indents, validate it, copy the result to the clipboard, and review past snippets in the history, which is kept on this device. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": [
+    "json",
+    "format",
+    "validate"
+  ],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/json-formatter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/code-area": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:json-formatter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "json-formatter",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own JSON Formatter records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "json-formatter"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
