@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "81a6ebe84a53f05aa7f44274b905b2e52da9389129589448cccdfbae2c71f95a",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Math Editor\" and the tab labelled \"Source\" is active by default, showing the code area with the placeholder text \"Type Markdown and TeX here\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `# Title\\n\\nHello $x^2$ world` into the code area and waiting 500 ms shows the tab labelled \"Preview\" containing an `<h1>` with the text \"Title\" and a paragraph containing the text \"Hello\" followed by a rendered math element with the accessible text \"x squared\" and then the text \"world\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `| A | B |\\n|---|---|\\n| 1 | 2 |` into the code area shows in the Preview tab a table with two columns and two rows, where the first body cell contains \"1\" and the second body cell contains \"2\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing `- [ ] Task one\\n- [x] Task two` into the code area shows in the Preview tab a list with two items: the first item has an unchecked checkbox and the text \"Task one\", the second item has a checked checkbox and the text \"Task two\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Copy Markdown\" copies the exact text currently in the code area to the clipboard; with the code area containing `# Hi\\n\\n$y$`, the clipboard content is `# Hi\\n\\n$y$`."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Export HTML\" downloads a file named `math-editor.html` whose content includes the string `<h1>Hi</h1>` when the code area contains `# Hi`."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab labelled \"History\" shows a list of saved snapshots; after typing `# First` and waiting for autosave (2 seconds), then typing `# Second` and waiting for autosave, the History tab shows two entries with the texts \"First\" and \"Second\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the History tab, clicking the button labelled \"Restore\" on the entry containing \"First\" changes the code area content to `# First` and the Preview tab shows an `<h1>` with the text \"First\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the document: after typing `# Saved Doc` into the code area and waiting 2 seconds for autosave, reloading the page shows the code area containing `# Saved Doc` and the Preview tab showing an `<h1>` with the text \"Saved Doc\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ecf97b0fb01a77fa119828b5b970925741649c0165fa1dfa5b33d0a6e75584fd"
+    }
+  ]
+}

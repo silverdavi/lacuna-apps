@@ -1,0 +1,131 @@
+/* Math Editor. Reads tokens only; prefixes me- so it never touches the kit. */
+
+/* Tabs */
+.me-tabs {
+  display: flex;
+  gap: calc(4px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
+}
+
+.me-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+  padding: 0 calc(4px * var(--sf)) calc(9px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.me-tab.on {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Code area hint */
+.me-hint {
+  margin-top: calc(6px * var(--sf));
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  font-style: italic;
+  color: var(--ink-40);
+}
+
+/* Actions row */
+.me-actions {
+  margin-top: calc(10px * var(--sf));
+}
+
+/* Preview */
+.md-preview {
+  font-family: var(--serif);
+  font-size: calc(15px * var(--tf));
+  line-height: calc(1.6 * var(--tf));
+  color: var(--ink);
+  max-height: calc(560px * var(--sf));
+  overflow: auto;
+}
+
+.md-preview h1,
+.md-preview h2,
+.md-preview h3 {
+  font-family: var(--sans);
+  font-weight: 600;
+  margin: calc(16px * var(--sf)) 0 calc(8px * var(--sf));
+}
+
+.md-preview h1 { font-size: calc(22px * var(--tf)); }
+.md-preview h2 { font-size: calc(18px * var(--tf)); }
+.md-preview h3 { font-size: calc(16px * var(--tf)); }
+
+.md-preview p,
+.md-preview ul,
+.md-preview ol,
+.md-preview table {
+  margin: calc(8px * var(--sf)) 0;
+}
+
+.md-preview code {
+  font-family: var(--mono);
+  font-size: calc(0.9em * var(--tf));
+  background: var(--paper-deep);
+  padding: calc(1px * var(--sf)) calc(4px * var(--sf));
+  border-radius: calc(2px * var(--sf));
+}
+
+.md-preview pre {
+  background: var(--paper-deep);
+  padding: calc(10px * var(--sf));
+  overflow: auto;
+}
+
+.md-preview pre code {
+  background: none;
+  padding: 0;
+}
+
+.md-preview blockquote {
+  border-left: calc(3px * var(--sf)) solid var(--hair-strong);
+  margin-left: 0;
+  padding-left: calc(12px * var(--sf));
+  color: var(--ink-80);
+}
+
+.md-preview table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.md-preview th,
+.md-preview td {
+  border: calc(1px * var(--sf)) solid var(--hair);
+  padding: calc(6px * var(--sf)) calc(8px * var(--sf));
+  text-align: left;
+}
+
+.md-preview th {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(13px * var(--tf));
+  background: var(--paper-deep);
+}
+
+.md-preview input[type='checkbox'] {
+  accent-color: var(--accent);
+  margin-right: calc(4px * var(--sf));
+}
+
+.md-preview a {
+  color: var(--accent);
+}
+
+.math-a11y {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
