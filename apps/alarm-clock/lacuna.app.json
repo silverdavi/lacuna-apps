@@ -1,0 +1,88 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.alarm-clock",
+  "name": "Alarm Clock",
+  "version": "0.1.0",
+  "summary": "Set alarms and run a countdown timer.",
+  "description": "Keep a list of alarms with a time and a label, and run a countdown timer with presets. Alarms stay on this device.",
+  "category": "personal",
+  "tags": [],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/alarm-clock"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/format-duration": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-timer": "0.1.0",
+      "@lacuna/big-clock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:alarm"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "alarm",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the alarms the user sets"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "alarm"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

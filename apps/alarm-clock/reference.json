@@ -1,0 +1,15 @@
+{
+  "repo": "Hazrat-Ali9/Alarm-Clock",
+  "url": "https://github.com/Hazrat-Ali9/Alarm-Clock",
+  "sha": "19d9540bd06e0bb4138a3ffcdf295394b2047012",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) Hazrat Ali"
+  ],
+  "files": [
+    "Alarm Clock.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "fbcd5fb0af1e5565673bab134c605cb689bf190eea71d7e787f5bfe8306ac9ca"
+}

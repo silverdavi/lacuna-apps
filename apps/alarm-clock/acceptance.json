@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a07718e597773e908c77090200d16c3618e45166add84bcf68282aa1148f4df4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Alarm Clock\" and, with no alarms saved, the text \"No alarms yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"New alarm\" form, typing \"07:30\" in the field labelled \"Time\", typing \"Morning\" in the field labelled \"Label\", and clicking the button \"Add alarm\" adds a list item containing \"07:30\" and \"Morning\"; the text \"No alarms yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the alarm from A2, clicking the button \"Delete Morning\" removes that list item and the text \"No alarms yet\" is visible again."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab \"Timer\" switches the main view to the timer; the button \"Start\" is visible and the large clock display shows \"00:00\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the Timer view, clicking the preset button \"5 min\" changes the large clock display to \"05:00\"; clicking \"Start\" changes the button label to \"Pause\" and the display begins counting down from \"05:00\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the Timer view, after starting a 5-minute timer, clicking \"Pause\" changes the button label to \"Resume\" and the large clock display stops changing for at least 2 seconds."
+    },
+    {
+      "id": "A7",
+      "text": "In the Timer view, clicking \"Reset\" while a timer is paused or running changes the large clock display to \"00:00\" and the button label to \"Start\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"New alarm\" form, clicking \"Add alarm\" with an empty \"Time\" field shows the message \"Enter a time\" and adds no list item."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the alarm added in A2: after reloading the page, the list item containing \"07:30\" and \"Morning\" is still present."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b6d37daecf81d710cf2352933535676f403a2fb0cbcab41b99001e0df12f968f"
+    }
+  ]
+}
