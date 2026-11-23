@@ -1,0 +1,113 @@
+// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+
+/* The kit's tab and calendar classes are off-limits to app CSS. The day-of-week
+   headers, day headers, and inactive tabs are re-styled through these app
+   classes so the text clears the WCAG AA contrast floor; the kit colors
+   (--ink-40, --ink-60 at these sizes) do not. */
+.fcal-dow {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  font-weight: 600;
+  letter-spacing: calc(0.5px * var(--sf));
+  text-transform: uppercase;
+  color: var(--mid);
+}
+
+.fcal-week-day {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  font-weight: 600;
+  letter-spacing: calc(0.4px * var(--sf));
+  text-transform: uppercase;
+  color: var(--mid);
+}
+
+.fcal-tabs {
+  display: flex;
+  gap: calc(20px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.fcal-tab {
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--mid);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+  font-family: var(--sans);
+}
+
+.fcal-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.fcal-chip {
+  display: flex;
+  align-items: baseline;
+  gap: calc(4px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(4px * var(--sf));
+  border-radius: calc(4px * var(--sf));
+  background: var(--ui-card);
+  border: 1px solid var(--ui-line);
+  font-size: calc(11px * var(--tf));
+}
+
+.fcal-chip-line {
+  color: var(--ink-80);
+}
+
+.fcal-chip-time {
+  color: var(--ink-60);
+  font-variant-numeric: tabular-nums;
+}
+
+.fcal-delete {
+  margin-left: auto;
+  font-size: calc(10px * var(--tf));
+  font-weight: 600;
+  letter-spacing: calc(0.5px * var(--sf));
+  text-transform: uppercase;
+  padding: 0 calc(8px * var(--sf));
+  border: 1px solid var(--ui-line2);
+  border-radius: calc(4px * var(--sf));
+  background: transparent;
+  color: var(--mid);
+  cursor: pointer;
+}
+
+.fcal-delete:hover {
+  color: var(--ink);
+  border-color: var(--hair-strong);
+}
+
+.fcal-tasks {
+  list-style: none;
+  margin: calc(8px * var(--sf)) 0 0;
+  padding: 0;
+  display: grid;
+  gap: calc(4px * var(--sf));
+}
+
+.fcal-task {
+  display: flex;
+  align-items: baseline;
+  gap: calc(8px * var(--sf));
+  padding: calc(6px * var(--sf));
+  border: 1px solid var(--ui-line);
+  border-radius: calc(6px * var(--sf));
+  background: var(--ui-card);
+  cursor: pointer;
+}
+
+.fcal-task {
+  accent-color: var(--accent);
+}
+
+.fcal-task.done {
+  text-decoration: line-through;
+  color: var(--ink-60);
+}
