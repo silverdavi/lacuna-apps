@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.grocery-list",
+  "name": "Grocery List",
+  "version": "0.1.0",
+  "summary": "Track what to buy, with quantities.",
+  "description": "Keep one list of things to buy. Add items with a quantity, check them off as you go, copy the list, and export it as CSV. Items stay on this device.",
+  "category": "productivity",
+  "tags": ["shopping", "lists"],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/grocery-list",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:grocery-list"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "grocery-list",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own grocery list items"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "grocery-list"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
