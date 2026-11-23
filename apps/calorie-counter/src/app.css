@@ -1,0 +1,2 @@
+/* Contrast override: inactive tab labels use --ink-40 which fails WCAG AA. */
+.lk-shell .lc-tab { color: var(--ink-60); }
