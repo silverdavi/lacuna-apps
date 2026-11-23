@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "30fae6e4cc076f56e4a2c78b2ca075b17395f6699ac34843e7ba872ffc537a59",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Personal Calendar\" and a month grid displaying the current month's days."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add event\" opens a form. Filling the field labelled \"Title\" with \"Team Sync\", the field labelled \"Date\" with \"2024-06-15\", and the field labelled \"Time\" with \"10:00\", then clicking \"Save\" adds an event to the grid on June 15 that displays \"Team Sync\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the event \"Team Sync\" on June 15 opens a detail view showing the title \"Team Sync\", the date \"2024-06-15\", and the time \"10:00\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the event detail view, clicking the button \"Delete\" removes the event \"Team Sync\" from the grid, and the grid no longer displays \"Team Sync\" on June 15."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Export ICS\" triggers a file download named \"calendar.ics\" containing the text \"BEGIN:VEVENT\" and \"SUMMARY:Team Sync\" if an event exists, or \"BEGIN:VCALENDAR\" if no events exist."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Import ICS\" and selecting a file containing a valid ICS event with summary \"Imported Event\" and date \"2024-06-20\" adds an event to the grid on June 20 that displays \"Imported Event\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Next month\" changes the grid to display the next month, and the button \"Previous month\" changes it back to the current month."
+    },
+    {
+      "id": "A8",
+      "text": "Adding an event with an empty Title and clicking \"Save\" shows the message \"Title is required\" and does not add the event to the grid."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the event \"Team Sync\" visible on June 15 in the month grid after the page is reloaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b977f1a1c42a70fddfec8f74e427d9ef2e5d5c57e458ab8e7539d3c9d85ec4b8"
+    }
+  ]
+}
