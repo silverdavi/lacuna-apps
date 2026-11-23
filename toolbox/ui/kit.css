@@ -40,7 +40,11 @@
   flex: 0 1 auto; width: calc(100% - calc(48px * var(--sf))); max-width: 1120px;
   margin: calc(24px * var(--sf)) auto; overflow: visible;
 }
-.lk-embedded .lk-win { margin-top: calc(18px * var(--sf)); }
+/* Inside the Lacuna desktop the host window already has the title bar, so the app is the board. */
+.lk-shell.lk-embedded .lk-win {
+  width: 100%; max-width: none; margin: 0; border: 0; box-shadow: none;
+}
+.lk-shell.lk-embedded .lk-win > .lc-app-bar { display: none; }
 .lk-shell .lc-app-bar .lk-name { margin: 0; line-height: 1.2; flex: 0 1 auto; max-width: none; }
 .lk-grow { flex: 1; }
 .lk-shell .lc-app-body { min-height: 0; }
@@ -146,7 +150,7 @@
   --cell-size: min(calc(var(--cell, 28px) * var(--sf)), calc((100vw - 56px) / var(--cols)));
   display: grid; grid-template-columns: repeat(var(--cols), var(--cell-size)); grid-auto-rows: var(--cell-size);
   gap: 1px; padding: 1px; width: max-content; max-width: 100%; margin: 0 auto;
-  background: var(--ui-line2); border: 1px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
+  background: var(--ui-line2); border: 1px solid var(--ui-line2); box-shadow: none;
 }
 .lk-shell .lk-board > * {
   box-sizing: border-box; width: 100%; height: 100%; min-width: 0; min-height: 0 !important; margin: 0; padding: 0 !important;
@@ -230,6 +234,7 @@ button.lk-row-text { cursor: pointer; }
    Rust stays the one action colour. */
 .lk-shell .lk-win { border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); margin-bottom: calc(28px * var(--sf)); }
 :root[data-appearance='dark'] .lk-shell .lk-win { box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.6); }
+:root[data-appearance='dark'] .lk-shell.lk-embedded .lk-win { box-shadow: none; }
 .lk-shell .lk-win > .lc-app-bar {
   height: 42px; border-top-width: 6px; border-bottom: 1px solid var(--ink);
   background: color-mix(in srgb, var(--win-accent) 22%, var(--ui-card));
@@ -250,6 +255,7 @@ button.lk-row-text { cursor: pointer; }
 @media (max-width: 720px) {
   .lk-win { width: calc(100% - calc(16px * var(--sf))); margin: calc(8px * var(--sf)) auto; }
   .lk-shell .lk-win { box-shadow: 3px 3px 0 var(--ink); margin-bottom: calc(14px * var(--sf)); }
+  .lk-shell.lk-embedded .lk-win { box-shadow: none; margin: 0; width: 100%; }
   .lk-main { padding: calc(12px * var(--sf)); }
   .lk-shell .lc-spacechip { display: none; }
   .lk-shell .lc-btn, .lk-shell .lc-input, .lk-main button:not([class]) { min-height: 44px; }
