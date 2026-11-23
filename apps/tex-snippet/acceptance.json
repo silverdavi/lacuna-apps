@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1f18d1279d3dbcff1cf0c20b87eed25d0eacd5df2f424eff6e07494b73944743",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Typing \"x^2 + y^2 = r^2\" in the input field shows \"x\u00b2 + y\u00b2 = r\u00b2\" in the rendered preview."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Clear\" removes all text from both input and preview."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"a \\cdot b\" in the input field shows \"a \u00b7 b\" in the rendered preview."
+    },
+    {
+      "id": "A4",
+      "text": "Entering \"f(x) = \\frac{d}{dx}x^2\" in the input field shows \"f(x) = d/dx x\u00b2\" in the rendered preview."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"E = mc^2\" in the input field shows \"E = mc\u00b2\" in the rendered preview."
+    },
+    {
+      "id": "A6",
+      "text": "Entering \"x \\in \\mathbb{R}\" in the input field shows \"x \u2208 \u211d\" in the rendered preview."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"a_n + a_{n+1}\" in the input field shows \"a\u2099 + a\u2099\u208a\u2081\" in the rendered preview."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"x \\to 0\" in the input field shows \"x \u2192 0\" in the rendered preview."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps \"x^2 + y^2 = r^2\" in the input field and \"x\u00b2 + y\u00b2 = r\u00b2\" in the preview."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2b9541b461523b01cb9446cbffdfa2451c87005f64bc2c057df34de8538ebe0f"
+    }
+  ]
+}
