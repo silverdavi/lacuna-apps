@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "79636b2326a47fdd11faf59b7d6df24ce3f2f62ec22846fb5e13fda96e0ad033",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Appointment Booking\" and a month grid for the current month with the text \"No appointments yet\" visible in the empty state area."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New appointment\" opens a dialog with fields labelled \"Client name\", \"Date\", \"Start time\", \"End time\", and \"Notes\". Typing \"Jane Doe\" in \"Client name\", selecting \"2025-06-15\" in \"Date\", \"09:00\" in \"Start time\", \"10:00\" in \"End time\", and \"Initial consultation\" in \"Notes\", then clicking \"Save\" adds an appointment; the month grid shows a block labelled \"Jane Doe\" on June 15 and the text \"No appointments yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After the appointment from A2 exists, clicking the \"Week\" tab shows a week view for the week containing June 15, 2025, with a time slot at 09:00 on Monday June 15 displaying \"Jane Doe\" and \"Initial consultation\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the week view, clicking the \"Jane Doe\" block opens the appointment detail dialog showing \"Client name: Jane Doe\", \"Date: 2025-06-15\", \"Start time: 09:00\", \"End time: 10:00\", and \"Notes: Initial consultation\". Changing \"End time\" to \"11:00\" and clicking \"Save\" updates the block in the week view to show \"09:00 \u2013 11:00\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the appointment detail dialog for \"Jane Doe\", clicking \"Delete\" removes the appointment; the week view no longer shows the \"Jane Doe\" block, and the month grid shows \"No appointments yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the \"Settings\" tab shows a form with fields labelled \"Day of week\", \"Start time\", and \"End time\". Selecting \"Monday\" in \"Day of week\", \"08:00\" in \"Start time\", and \"17:00\" in \"End time\", and clicking \"Save availability\" shows a confirmation text \"Availability saved for Monday\"."
+    },
+    {
+      "id": "A7",
+      "text": "After saving Monday availability from A6, clicking the \"Export ICS\" button triggers a file download named \"appointments.ics\" whose content includes the line \"BEGIN:VEVENT\" and the text \"Jane Doe\" if an appointment exists, or only \"BEGIN:VCALENDAR\" and \"END:VCALENDAR\" if no appointments exist."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Jane\" in the search field labelled \"Search appointments\" filters the month grid to show only the \"Jane Doe\" block; typing \"zzz\" shows \"No appointments match\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the appointment \"Jane Doe\" on 2025-06-15 and the Monday availability setting; after reload, the month grid shows \"Jane Doe\" on June 15 and the Settings tab shows \"Monday\" with \"08:00\" and \"17:00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8d0bb8fa734c17e036289c6f18d6cdb2738c6bcb244410004a35e65391e5b202"
+    }
+  ]
+}
