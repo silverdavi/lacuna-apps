@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "715ea42f89fb93d71473760ae35aa3019bab141d176da5f2239cedc8fff26c0b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Baby Activity Log\" and, with no entries, the list area shows the text \"No activities yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting \"Feeding\" in the field labelled \"Type\", typing \"120\" in the field labelled \"Duration (min)\", typing \"Bottle\" in the field labelled \"Notes\", and clicking the button \"Add activity\" adds a list item containing \"Feeding\", \"2h 0m\", and \"Bottle\"; the text \"No activities yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "Selecting \"Sleep\" in the field labelled \"Type\", typing \"45\" in the field labelled \"Duration (min)\", and clicking the button \"Add activity\" adds a list item containing \"Sleep\" and \"45m\"."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting \"Diaper\" in the field labelled \"Type\", clicking the button \"Add activity\" without entering a duration adds a list item containing \"Diaper\" and \"\u2014\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Feeding\" in the filter bar shows only the list item containing \"Feeding\" and \"2h 0m\"; the items containing \"Sleep\" and \"Diaper\" are hidden."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"All\" in the filter bar shows all three list items: one containing \"Feeding\", one containing \"Sleep\", and one containing \"Diaper\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Feeding\" on the list item containing \"Feeding\" removes that item; the list now shows only the items containing \"Sleep\" and \"Diaper\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose first line is \"type,timestamp,duration,notes\" and whose second line contains \"Feeding\" and \"Bottle\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the list item containing \"Sleep\" and \"45m\" after the page is reloaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "98c0a2e8a723fee8fa7f0ed359f1c02c1ee005035178a7be46a72535dccd9c70"
+    }
+  ]
+}
