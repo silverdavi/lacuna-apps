@@ -187,8 +187,7 @@ export function App() {
             detail="Save your first snippet above."
             actionLabel="Save a snippet"
             onAction={() => {
-              const el = document.querySelector<HTMLTextAreaElement>('textarea')
-              el?.focus()
+              document.querySelector<HTMLTextAreaElement>('.ca-ta')?.focus()
             }}
           />
         </Card>
@@ -204,11 +203,10 @@ export function App() {
             value={code}
             onChange={setCode}
             language={languageForCodeArea(language)}
-            ariaLabel="Snippet code"
           />
         </div>
         <div className="sm-tags">
-          <TagInput tags={tags} onChange={setTags} placeholder="Add tags and press Enter" aria-label="Tags" />
+          <TagInput tags={tags} onChange={setTags} />
         </div>
         {formError && <div className="sm-error" role="alert">{formError}</div>}
         <FormGrid>
