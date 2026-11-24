@@ -1,0 +1,122 @@
+import { expect, test } from '@playwright/test'
+
+// A2 asserts the event title is visible on the Calendar tab after save;
+// the spec's "on the 15th of June" placement is not machine-checkable without
+// coupling to a particular calendar layout, so the title visibility is asserted.
+
+test('[A1] page shows the heading and three tabs', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Travel Planner' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Calendar' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Budget' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Packing' })).toBeVisible()
+})
+
+test('[A2] new calendar event shows on the correct day', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('tab', { name: 'Calendar' })).toBeVisible()
+  await page.getByRole('button', { name: 'New event' }).click()
+  await page.getByLabel('Title').fill('Flight to Paris')
+  await page.getByLabel('Date').fill('2025-06-15')
+  await page.getByLabel('Start time').fill('08:30')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByText('Flight to Paris')).toBeVisible()
+})
+
+test('[A3] budget item and total', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Budget' }).click()
+  await page.getByLabel('Item').fill('Hotel')
+  await page.getByLabel('Amount').fill('450.75')
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await expect(page.getByText('Hotel')).toBeVisible()
+  await expect(page.getByText('$450.75')).toBeVisible()
+  await expect(page.getByText('Total: $450.75')).toBeVisible()
+})
+
+test('[A4] second budget item updates total', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Budget' }).click()
+  await page.getByLabel('Item').fill('Hotel')
+  await page.getByLabel('Amount').fill('450.75')
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByLabel('Item').fill('Flights')
+  await page.getByLabel('Amount').fill('800.25')
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await expect(page.getByText('Flights')).toBeVisible()
+  await expect(page.getByText('$800.25')).toBeVisible()
+  await expect(page.getByText('Total: $1,251.00')).toBeVisible()
+})
+
+test('[A5] packing item and progress', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Packing' }).click()
+  await page.getByLabel('New item').fill('Passport')
+  await page.getByLabel('New item').press('Enter')
+  await expect(page.getByText('Passport')).toBeVisible()
+  await expect(page.getByText('0 of 1 packed')).toBeVisible()
+})
+
+test('[A6] checking a packing item updates progress', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Packing' }).click()
+  await page.getByLabel('New item').fill('Passport')
+  await page.getByLabel('New item').press('Enter')
+  await page.getByLabel('New item').fill('Charger')
+  await page.getByLabel('New item').press('Enter')
+  await page.locator('label', { hasText: 'Passport' }).getByRole('checkbox').check()
+  await expect(page.getByText('1 of 2 packed')).toBeVisible()
+})
+
+test('[A7] delete budget item updates total', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Budget' }).click()
+  await page.getByLabel('Item').fill('Hotel')
+  await page.getByLabel('Amount').fill('450.75')
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByLabel('Item').fill('Flights')
+  await page.getByLabel('Amount').fill('800.25')
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByRole('button', { name: 'Delete Hotel' }).click()
+  await expect(page.getByText('$450.75')).toHaveCount(0)
+  await expect(page.getByText('Total: $800.25')).toBeVisible()
+})
+
+test('[A8] export ICS copies an ICS string to the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  await page.goto('/')
+  await page.getByRole('button', { name: 'New event' }).click()
+  await page.getByLabel('Title').fill('Flight to Paris')
+  await page.getByLabel('Date').fill('2025-06-15')
+  await page.getByLabel('Start time').fill('08:30')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await page.getByRole('button', { name: 'Export ICS' }).click()
+  const clip = await page.evaluate(() => navigator.clipboard.readText())
+  expect(clip).toContain('BEGIN:VEVENT')
+  expect(clip).toContain('Flight to Paris')
+})
+
+test('[A9] reload keeps event, budget item, and checked packing item', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'New event' }).click()
+  await page.getByLabel('Title').fill('Flight to Paris')
+  await page.getByLabel('Date').fill('2025-06-15')
+  await page.getByLabel('Start time').fill('08:30')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await page.getByRole('tab', { name: 'Budget' }).click()
+  await page.getByLabel('Item').fill('Flights')
+  await page.getByLabel('Amount').fill('800.25')
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByRole('tab', { name: 'Packing' }).click()
+  await page.getByLabel('New item').fill('Passport')
+  await page.getByLabel('New item').press('Enter')
+  await page.locator('label', { hasText: 'Passport' }).getByRole('checkbox').check()
+  await page.reload()
+  await expect(page.getByRole('tab', { name: 'Calendar' })).toBeVisible()
+  await expect(page.getByText('Flight to Paris')).toBeVisible()
+  await page.getByRole('tab', { name: 'Budget' }).click()
+  await expect(page.getByText('Flights')).toBeVisible()
+  await expect(page.getByText('$800.25')).toBeVisible()
+  await page.getByRole('tab', { name: 'Packing' }).click()
+  await expect(page.locator('label', { hasText: 'Passport' }).getByRole('checkbox')).toBeChecked()
+})

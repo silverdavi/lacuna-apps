@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "86f24006cf8a819b646decab1f7727d8b8f020208c0f9a130befdb47925717cf",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Travel Planner\" and three tabs labelled \"Calendar\", \"Budget\" and \"Packing\"."
+    },
+    {
+      "id": "A2",
+      "text": "On the Calendar tab, clicking the button \"New event\" opens a form; filling the field labelled \"Title\" with \"Flight to Paris\", the field labelled \"Date\" with \"2025-06-15\", the field labelled \"Start time\" with \"08:30\", and clicking \"Save\" adds a calendar event that displays \"Flight to Paris\" on the 15th of June."
+    },
+    {
+      "id": "A3",
+      "text": "On the Budget tab, filling the field labelled \"Item\" with \"Hotel\" and the field labelled \"Amount\" with \"450.75\" and clicking \"Add item\" adds a row showing \"Hotel\" and \"$450.75\"; the summary line shows \"Total: $450.75\"."
+    },
+    {
+      "id": "A4",
+      "text": "On the Budget tab, after adding \"Hotel\" 450.75, adding a second item with \"Item\" \"Flights\" and \"Amount\" \"800.25\" shows a row \"Flights\" \"$800.25\" and the summary line \"Total: $1,251.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "On the Packing tab, typing \"Passport\" in the field labelled \"New item\" and pressing Enter adds a checkable item \"Passport\"; the progress indicator shows \"0 of 1 packed\"."
+    },
+    {
+      "id": "A6",
+      "text": "On the Packing tab, after adding \"Passport\" and \"Charger\", clicking the checkbox next to \"Passport\" changes the progress indicator to \"1 of 2 packed\"."
+    },
+    {
+      "id": "A7",
+      "text": "On the Budget tab, clicking the button \"Delete Hotel\" removes the Hotel row and the summary line shows \"Total: $800.25\"."
+    },
+    {
+      "id": "A8",
+      "text": "On the Calendar tab, clicking the button \"Export ICS\" copies an ICS string to the clipboard that contains \"BEGIN:VEVENT\" and \"Flight to Paris\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the event \"Flight to Paris\" on the Calendar tab, the budget item \"Flights\" with \"$800.25\" on the Budget tab, and the packing item \"Passport\" checked on the Packing tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0b92a4160cb33d24f1271f94be71dcc29d32d9bd84f5ad440d9cab96b0a62b38"
+    }
+  ]
+}

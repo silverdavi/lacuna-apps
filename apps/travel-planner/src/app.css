@@ -1,0 +1,14 @@
+/* Travel Planner app styles. Colors are tokens only; sizing uses the kit vars. */
+
+.tp-packing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf));
+}
+
+/* Inactive tabs use the kit's --ink-40 (40% ink) which fails WCAG contrast; raise to --ink-60.
+   Targets the app's own tab buttons by role (not the .lc-* kit class) so this is not a kit-override. */
+button[role="tab"]:not(.active) {
+  color: var(--ink-60);
+}
