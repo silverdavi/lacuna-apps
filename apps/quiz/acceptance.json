@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ce2d47b079711b42683b475f20e776d2d209f92f0287e7efdb2f237b99f76745",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Quiz Maker\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Questions\" tab, typing \"What is 2+2?\" in the field labelled \"Question\", typing \"4\" in the field labelled \"Correct answer\", typing \"3\" in the field labelled \"Wrong answer 1\", typing \"5\" in the field labelled \"Wrong answer 2\", and clicking the button \"Add question\" adds a list item containing \"What is 2+2?\" and the text \"4\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the question from A2, clicking the tab \"Study\" shows the button \"Start session\" and the text \"1 question ready\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Start session\" shows the question text \"What is 2+2?\", three answer buttons labelled \"4\", \"3\", and \"5\", and the button \"Next\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the answer button \"4\" shows the feedback text \"Correct\" and the button \"Next\" becomes enabled."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking \"Next\" after the correct answer shows the score line \"Score: 1/1\" and the button \"Review\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking \"Review\" shows a list containing the item \"What is 2+2?\" with the status \"Correct\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Questions\" tab, clicking the button \"Delete What is 2+2?\" removes the question from the list and the \"Study\" tab shows the text \"No questions yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the question \"What is 2+2?\" in the \"Questions\" tab list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c58a13749c676ab6f31aa73ad4bfbe83441631526be48f2aedca0b3242cd979b"
+    }
+  ]
+}
