@@ -1,0 +1,55 @@
+/* Receipt tracker table styles — div-based table for role="row" counting */
+.rt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(12.5px * var(--tf));
+  color: var(--ink-80);
+}
+
+.rt-table .rt-head {
+  display: flex;
+}
+
+.rt-table .rt-head > div {
+  flex: 1 1 0;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  letter-spacing: calc(0.9px * var(--tf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+  font-weight: 400;
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
+  text-align: left;
+}
+
+.rt-table .rt-head > div.num {
+  text-align: right;
+}
+
+.rt-table .rt-row {
+  display: flex;
+}
+
+.rt-table .rt-row > div {
+  flex: 1 1 0;
+  padding: calc(11px * var(--sf)) calc(12px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  vertical-align: top;
+  text-align: left;
+}
+
+.rt-table .rt-row > div.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rt-table .rt-row > div:first-child,
+.rt-table .rt-head > div:first-child {
+  padding-left: 0;
+}
+
+.rt-empty {
+  color: var(--ink-60);
+  font-size: calc(12px * var(--tf));
+}

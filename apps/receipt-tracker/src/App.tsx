@@ -13,7 +13,6 @@ import {
   Rail,
   Select,
   Stack,
-  Table,
   TextInput,
 } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
@@ -76,7 +75,7 @@ export function App() {
     saveText(text, { filename: 'receipts.csv', mimeType: 'text/csv' })
   }
 
-  const columns = [
+  const columns: { key: string; label: string; num?: boolean }[] = [
     { key: 'merchant', label: 'Merchant' },
     { key: 'category', label: 'Category' },
     { key: 'amount', label: 'Amount', num: true },
@@ -153,17 +152,24 @@ export function App() {
               actionLabel="Add a receipt"
               onAction={add}
             />
+          ) : rows.length === 0 ? (
+            <div className="rt-empty">No receipts match</div>
           ) : (
             <>
-              <Table
-                label="Receipts"
-                columns={columns}
-                rows={rows.map((item) => ({
-                  cells: {
-                    merchant: item.data.merchant,
-                    category: item.data.category,
-                    amount: rows.length > 1 ? formatMoney(item.data.amount) : item.data.amount.toFixed(2),
-                    actions: (
+              <div className="rt-table" role="table" aria-label="Receipts">
+                <div className="rt-head" role="rowgroup">
+                  {columns.map((c) => (
+                    <div key={c.key} role="columnheader" className={c.num ? 'num' : undefined}>
+                      {c.label}
+                    </div>
+                  ))}
+                </div>
+                {rows.map((item) => (
+                  <div key={item.id} className="rt-row" role="row">
+                    <div role="cell">{item.data.merchant}</div>
+                    <div role="cell">{item.data.category}</div>
+                    <div role="cell" className="num">{formatMoney(item.data.amount)}</div>
+                    <div role="cell">
                       <Button
                         kind="ghost"
                         ariaLabel={`Delete ${item.data.merchant}`}
@@ -171,11 +177,10 @@ export function App() {
                       >
                         Delete
                       </Button>
-                    ),
-                  },
-                }))}
-                empty="No receipts match"
-              />
+                    </div>
+                  </div>
+                ))}
+              </div>
               <p role="status">Total: {formatMoney(total)}</p>
             </>
           )}
