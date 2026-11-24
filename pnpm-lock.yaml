@@ -4891,6 +4891,31 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/calendar-kit/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+      '@lacuna/ics-calendar':
+        specifier: workspace:0.1.0
+        version: link:../../ics-calendar/0.1.0
+      '@lacuna/record-form':
+        specifier: workspace:0.1.0
+        version: link:../../record-form/0.1.0
+      '@lacuna/recurrence':
+        specifier: workspace:0.1.0
+        version: link:../../recurrence/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/canvas-kit/0.1.0:
     dependencies:
       '@lacuna/export-menu':

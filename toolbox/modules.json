@@ -955,6 +955,62 @@
       }
     },
     {
+      "id": "@lacuna/calendar-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Calendar application panel with month and week views, event creation through a record form, recurrence rules, and iCalendar import/export.",
+      "today": [
+        "toolbox/modules/calendar-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math",
+        "@lacuna/ics-calendar",
+        "@lacuna/record-form",
+        "@lacuna/recurrence",
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "CalendarKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/calendar-kit/0.1.0",
+      "bridge": {
+        "component": "CalendarKit",
+        "kind": "kit",
+        "exports": [
+          "CalendarMonth",
+          "CalendarWeek",
+          "CalendarKit"
+        ],
+        "types": [
+          "CalendarMonthProps",
+          "CalendarWeekProps",
+          "CalendarKitProps",
+          "KitEvent",
+          "RecurrenceFrequency"
+        ],
+        "signature": "CalendarMonth({ value, events, onSelect, onMonthChange, today }: CalendarMonthProps); CalendarWeek({ value, events, onSelect, onWeekChange, today }: CalendarWeekProps); CalendarKit({ events: propEvents, onEventsChange, showRecurrence = true",
+        "releases": {
+          "0.1.0": {
+            "commit": "aba02383198cd743676e43618faef4e639647b87",
+            "source": "d7c5a9de496f1226",
+            "lines": 368,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0",
+              "@lacuna/ics-calendar": "0.1.0",
+              "@lacuna/record-form": "0.1.0",
+              "@lacuna/recurrence": "0.1.0",
+              "@lacuna/ui": "*"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/canvas-kit",
       "layer": 2,
       "status": "exists",
