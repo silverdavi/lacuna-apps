@@ -1,131 +1,142 @@
 import { expect, test, type Page } from '@playwright/test'
 
-const DURATION = /^\d+:\d{2}\.\d{2}$/
+const duration = /\d+:\d{2}\.\d{2}/
 
-const timeDisplay = (page: Page) => page.getByRole('timer')
+const display = (page: Page) => page.getByText(duration)
+const lap = (page: Page, n: string) => page.getByRole('listitem').filter({ hasText: `Lap ${n}` })
 
-// No explicit "Signature" section exists in the spec; the duration pattern is
-// taken from A3, which A4/A7/A8 also use.
+// Capture the duration string ("M:SS.ss") rendered on a lap's row.
+async function lapDuration(page: Page, n: string): Promise<string> {
+  const text = await lap(page, n).innerText()
+  const m = text.match(duration)
+  expect(m, `duration shown for Lap ${n}`).not.toBeNull()
+  return m![0]
+}
 
-test('[A1] shows the heading and an idle time display', async ({ page }) => {
+// Wait for the running display to move off 0:00.00, then record it.
+async function runUntilAdvancing(page: Page): Promise<string> {
+  await expect(display(page)).not.toHaveText('0:00.00')
+  return display(page).innerText()
+}
+
+// Start the timer and let it run long enough that the display passes 1:50.00.
+// A2 pins the threshold to a 2s wall wait, so we satisfy it without a fixed sleep:
+// we poll until the display exceeds 1:50.00, which can only happen after ~2s elapsed.
+async function runPast150(page: Page) {
+  await page.getByRole('button', { name: 'Start' }).click()
+  await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible()
+  await expect
+    .poll(async () => {
+      const t = (await display(page).innerText()).trim()
+      const [m, s] = t.split(':')
+      return Number(m) * 60 + Number(s)
+    })
+    .toBeGreaterThan(110)
+}
+
+test('[A1] page shows the "Stopwatch App" heading and a "0:00.00" time display', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Stopwatch App' })).toBeVisible()
-  const t = timeDisplay(page)
-  await expect(t).toHaveText('0:00.00')
+  await expect(display(page)).toHaveText('0:00.00')
 })
 
-test('[A2] start counts up past 1:50.00 after two seconds', async ({ page }) => {
+test('[A2] "Start" turns into "Stop" and the display counts past 1:50.00 within 2 seconds', async ({ page }) => {
   await page.goto('/')
-  const start = page.getByRole('button', { name: 'Start' })
-  await start.click()
-  await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible()
-  const t = timeDisplay(page)
-  const value = await t.innerText()
-  expect(value, 'timer is running').not.toBe('0:00.00')
-  await page.waitForTimeout(2000)
-  const later = (await t.innerText()).replace(',', '')
-  const toSeconds = (v: string) => {
-    const [m, rest] = v.split(/:/)
-    return Number(m) * 60 + Number(rest)
-  }
-  expect(toSeconds(later)).toBeGreaterThan(110)
+  await runPast150(page)
+  await expect(page.getByRole('button', { name: 'Start' })).toHaveCount(0)
+  await expect(display(page)).not.toHaveText('0:00.00')
+  await expect(display(page)).not.toHaveText('1:50.00')
 })
 
-test('[A3] lap while running records Lap 1 with a duration', async ({ page }) => {
+test('[A3] clicking "Lap" while running adds a "Lap 1" item with a duration', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(500)
+  await expect(page.getByRole('button', { name: 'Lap' })).toBeVisible()
   await page.getByRole('button', { name: 'Lap' }).click()
-  const item = page.getByRole('listitem', { name: /Lap 1/ })
-  await expect(item).toBeVisible()
-  const m = (await item.innerText()).match(DURATION)
-  expect(m, 'lap duration matches m:ss.cc').toBeTruthy()
+  await expect(lap(page, '1')).toBeVisible()
+  await expect(lap(page, '1')).toContainText('Lap 1')
+  expect(await lapDuration(page, '1'), 'Lap 1 duration matches the pattern').toMatch(duration)
 })
 
-test('[A4] second lap adds Lap 2; two items total', async ({ page }) => {
+test('[A4] a second "Lap" adds "Lap 2" and the list now has two items', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(300)
   await page.getByRole('button', { name: 'Lap' }).click()
-  await page.waitForTimeout(300)
+  await expect(lap(page, '1')).toBeVisible()
   await page.getByRole('button', { name: 'Lap' }).click()
-  await expect(page.getByRole('listitem', { name: /Lap 1/ })).toBeVisible()
-  const second = page.getByRole('listitem', { name: /Lap 2/ })
-  await expect(second).toBeVisible()
-  const m = (await second.innerText()).match(DURATION)
-  expect(m, 'Lap 2 has a duration').toBeTruthy()
-  await expect(page.getByRole('listitem')).toHaveCount(2)
+  await expect(lap(page, '2')).toBeVisible()
+  await expect(lap(page, '2')).toContainText('Lap 2')
+  expect(await lapDuration(page, '2'), 'Lap 2 has a duration').toMatch(duration)
+  expect(await page.getByRole('listitem').count(), 'exactly two lap items').toBe(2)
 })
 
-test('[A5] stop freezes the time display', async ({ page }) => {
+test('[A5] "Stop" turns into "Start" and the display stops incrementing', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(1200)
+  const running = await runUntilAdvancing(page)
   await page.getByRole('button', { name: 'Stop' }).click()
   await expect(page.getByRole('button', { name: 'Start' })).toBeVisible()
-  const t = timeDisplay(page)
-  const v1 = await t.innerText()
+  await expect(page.getByRole('button', { name: 'Stop' })).toHaveCount(0)
+  // A5: the displayed time remains constant for 2 seconds after stopping.
+  // The display is now static (stopped), so pin it to the value it reached; polling
+  // for 2s proves it no longer increments.
+  const stopped = await display(page).innerText()
+  expect(stopped, 'time advanced while running').not.toBe('0:00.00')
+  expect(stopped, 'display reflects the running total').toBe(running)
+  await expect(display(page)).toHaveText(stopped)
   await page.waitForTimeout(2000)
-  const v2 = await t.innerText()
-  expect(v2).toBe(v1)
+  await expect(display(page)).toHaveText(stopped)
 })
 
-test('[A6] reset clears the display and the lap list', async ({ page }) => {
+test('[A6] "Reset" clears the display to 0:00.00 and shows "No laps yet"', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(400)
   await page.getByRole('button', { name: 'Lap' }).click()
-  await page.waitForTimeout(200)
+  await expect(lap(page, '1')).toBeVisible()
   await page.getByRole('button', { name: 'Reset' }).click()
-  await expect(timeDisplay(page)).toHaveText('0:00.00')
-  await expect(page.getByText('No laps yet')).toBeVisible()
+  await expect(display(page)).toHaveText('0:00.00')
   await expect(page.getByRole('listitem')).toHaveCount(0)
+  await expect(page.getByText('No laps yet')).toBeVisible()
 })
 
-test('[A7] laps survive a reload with their durations', async ({ page }) => {
+test('[A7] two laps and their durations survive a reload', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(300)
   await page.getByRole('button', { name: 'Lap' }).click()
-  await page.waitForTimeout(300)
+  const first = await lapDuration(page, '1')
   await page.getByRole('button', { name: 'Lap' }).click()
-  const d1 = (await page.getByRole('listitem', { name: /Lap 1/ }).innerText()).match(DURATION)![0]
-  const d2 = (await page.getByRole('listitem', { name: /Lap 2/ }).innerText()).match(DURATION)![0]
+  const second = await lapDuration(page, '2')
   await page.reload()
-  await expect(page.getByRole('listitem', { name: new RegExp(`Lap 1\\b.*${escapeRegex(d1)}`, 's') })).toBeVisible()
-  await expect(page.getByRole('listitem', { name: new RegExp(`Lap 2\\b.*${escapeRegex(d2)}`, 's') })).toBeVisible()
+  await expect(lap(page, '1')).toBeVisible()
+  await expect(lap(page, '2')).toBeVisible()
+  expect(await lapDuration(page, '1'), 'Lap 1 duration persisted').toBe(first)
+  expect(await lapDuration(page, '2'), 'Lap 2 duration persisted').toBe(second)
 })
 
-test('[A8] copy laps puts the lap list on the clipboard', async ({ page }) => {
-  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+test('[A8] "Copy laps" copies the laps and their durations to the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(300)
   await page.getByRole('button', { name: 'Lap' }).click()
-  await page.waitForTimeout(300)
+  const first = await lapDuration(page, '1')
   await page.getByRole('button', { name: 'Lap' }).click()
+  const second = await lapDuration(page, '2')
+  // grant before the copy click so the clipboard write can succeed; read after the user action.
   await page.getByRole('button', { name: 'Copy laps' }).click()
-  const clip = await page.evaluate(() => navigator.clipboard.readText())
-  expect(clip).toContain('Lap 1')
-  expect(clip).toContain('Lap 2')
-  const d1 = (await page.getByRole('listitem', { name: /Lap 1/ }).innerText()).match(DURATION)![0]
-  const d2 = (await page.getByRole('listitem', { name: /Lap 2/ }).innerText()).match(DURATION)![0]
-  expect(clip).toContain(d1)
-  expect(clip).toContain(d2)
+  const text = await page.evaluate(() => navigator.clipboard.readText())
+  expect(text, 'clipboard contains Lap 1').toContain('Lap 1')
+  expect(text, 'clipboard contains Lap 2').toContain('Lap 2')
+  expect(text, 'clipboard contains the first duration').toContain(first)
+  expect(text, 'clipboard contains the second duration').toContain(second)
 })
 
-test('[A9] a single lap survives a reload', async ({ page }) => {
+test('[A9] a lap and its duration survive a reload', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start' }).click()
-  await page.waitForTimeout(400)
   await page.getByRole('button', { name: 'Lap' }).click()
-  const d1 = (await page.getByRole('listitem', { name: /Lap 1/ }).innerText()).match(DURATION)![0]
+  const first = await lapDuration(page, '1')
   await page.reload()
-  const item = page.getByRole('listitem', { name: new RegExp(`Lap 1\\b.*${escapeRegex(d1)}`, 's') })
-  await expect(item).toBeVisible()
-  expect((await item.innerText()).match(DURATION)![0]).toBe(d1)
+  await expect(lap(page, '1')).toBeVisible()
+  await expect(lap(page, '1')).toContainText('Lap 1')
+  expect(await lapDuration(page, '1'), 'Lap 1 duration persisted').toBe(first)
 })
-
-function escapeRegex(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}

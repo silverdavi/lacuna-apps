@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. */
+.sw-body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(12px * var(--sf));
+}
+.sw-controls {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  margin-top: calc(12px * var(--sf));
+}

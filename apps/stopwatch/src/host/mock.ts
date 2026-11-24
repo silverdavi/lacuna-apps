@@ -1,18 +1,29 @@
 import { createMockValue } from '@lacuna/host-mock'
 
-export interface StopRecord {
-  running: boolean
-  laps: number[]
+export interface Lap {
+  label: string
+  durationMs: number
 }
 
-const fallback: StopRecord = { running: false, laps: [] }
+export interface StopRecord {
+  elapsedMs: number
+  laps: Lap[]
+  running: boolean
+}
+
+const fallback: StopRecord = { elapsedMs: 0, laps: [], running: false }
 
 function isStopRecord(value: unknown): value is StopRecord {
   if (typeof value !== 'object' || value === null) return false
   const rec = value as Record<string, unknown>
+  if (typeof rec.elapsedMs !== 'number' || !Number.isFinite(rec.elapsedMs) || rec.elapsedMs < 0) return false
   if (typeof rec.running !== 'boolean') return false
   if (!Array.isArray(rec.laps)) return false
-  return (rec.laps as unknown[]).every((n) => typeof n === 'number' && Number.isFinite(n) && n >= 0)
+  return (rec.laps as unknown[]).every((l) => {
+    if (typeof l !== 'object' || l === null) return false
+    const lap = l as Record<string, unknown>
+    return typeof lap.label === 'string' && typeof lap.durationMs === 'number' && Number.isFinite(lap.durationMs) && lap.durationMs >= 0
+  })
 }
 
 const record = createMockValue<StopRecord>({
@@ -22,8 +33,7 @@ const record = createMockValue<StopRecord>({
 })
 
 export function loadRecord(): StopRecord {
-  const v = record.get()
-  return { running: v.running, laps: Array.isArray(v.laps) ? v.laps : [] }
+  return record.get()
 }
 
 export function saveRecord(rec: StopRecord): void {
