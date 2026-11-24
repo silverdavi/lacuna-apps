@@ -11,6 +11,7 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  Rail,
   Table,
   TextInput,
 } from '@lacuna/ui'
@@ -137,7 +138,21 @@ export function App() {
   }))
 
   return (
-    <AppShell name="Score Keeper" icon="grid" hue="cobalt" category="Productivity" meta={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}>
+    <AppShell
+      name="Score Keeper"
+      icon="grid"
+      hue="cobalt"
+      category="Productivity"
+      meta={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}
+      status={entries.length > 0 ? 'Scoreboard live' : 'Ready'}
+      side={
+        <Rail
+          title="Scoreboard"
+          note="Names and scores"
+          chips={['Track scores', 'Search & sort', 'Export CSV', 'Edit entries']}
+        />
+      }
+    >
       <Card mono="New" title={editingId ? 'Edit entry' : 'Add entry'}>
         <FormGrid>
           <TextInput label="Name" value={name} onChange={(v) => { setName(v); if (error) setError(null) }} error={error && error.startsWith('Name') ? error : null} />
