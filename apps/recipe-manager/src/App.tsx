@@ -1,23 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { exportBackup } from '@lacuna/json-backup'
-import { saveBlob } from '@lacuna/file-save-open'
-import { RecordForm, type FieldDef, type RecordValues } from '@lacuna/record-form'
+import { useMemo, useState } from 'react'
+import { exportBackup, importBackup, type BackupRecord } from '@lacuna/json-backup'
+import { openFile, saveText } from '@lacuna/file-save-open'
+import { RecordForm, type FieldDef } from '@lacuna/record-form'
+import { TagInput } from '@lacuna/tag-input'
 import { useCollection } from '@lacuna/use-collection'
-import {
-  AppShell,
-  Body,
-  Button,
-  Card,
-  EmptyState,
-  PrimaryButton,
-  Rail,
-  Stack,
-} from '@lacuna/ui'
-import type { RecipeData } from './host'
+import { AppShell, Card, EmptyState, MonoLabel, PrimaryButton, Rail, Stack } from '@lacuna/ui'
+import { ExportCsvButton } from './components/ExportCsvButton'
+import { RecipeSearch } from './components/RecipeSearch'
+import { RecipeTable } from './components/RecipeTable'
+import type { Recipe, RecipeData } from './host'
 
 type Editing = { mode: 'add' } | { mode: 'edit'; id: string } | null
-
-type Row = RecipeData & { id: string }
 
 const FIELDS: FieldDef[] = [
   { name: 'name', label: 'Name', type: 'text', required: true },
@@ -25,143 +18,27 @@ const FIELDS: FieldDef[] = [
   { name: 'notes', label: 'Notes', type: 'text' },
 ]
 
-function csvEscape(value: string): string {
-  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
-}
+const TAG_SUGGESTIONS = [
+  'breakfast',
+  'dinner',
+  'lunch',
+  'quick',
+  'vegetarian',
+  'meal-prep',
+  'comfort-food',
+  'soup',
+]
 
-function toCsv(rows: Row[]): string {
-  const lines = ['Name,Servings']
-  for (const r of rows) lines.push(`${csvEscape(r.name)},${csvEscape(r.servings)}`)
-  return lines.join('\n')
-}
-
-function SearchInput({
-  records,
-  query,
-  onQueryChange,
-}: {
-  records: Row[]
-  query: string
-  onQueryChange: (q: string) => void
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const textNode = el.childNodes[0]
-    if (textNode && textNode.nodeType === 3 && textNode.textContent !== query) {
-      textNode.textContent = query
-    }
-  }, [query])
-
-  function readText(el: HTMLElement): string {
-    let text = ''
-    for (const node of Array.from(el.childNodes)) {
-      if (node.nodeType === 3) text += node.textContent ?? ''
-    }
-    return text
-  }
-
-  const matches = query
-    ? records.filter((r) => r.name.toLowerCase().includes(query.toLowerCase()))
-    : []
-
+function validRecipeData(v: unknown): v is RecipeData {
+  const r = v as Partial<RecipeData> | null
+  if (!r) return false
   return (
-    <div
-      ref={ref}
-      role="searchbox"
-      aria-label="Search"
-      contentEditable
-      suppressContentEditableWarning
-      onInput={(e) => {
-        const text = readText(e.currentTarget)
-        onQueryChange(text)
-      }}
-      style={{
-        width: '100%',
-        boxSizing: 'border-box',
-        fontFamily: 'var(--sans)',
-        fontSize: 'calc(14px * var(--tf))',
-        color: 'var(--ink)',
-        background: 'var(--paper)',
-        border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-        borderRadius: 'calc(4px * var(--sf))',
-        padding: 'calc(4px * var(--sf))',
-        minHeight: 'calc(28px * var(--tf))',
-        position: 'relative',
-      }}
-    >
-      {query}
-      {query !== '' && (
-        <ul
-          role="listbox"
-          aria-label="Results"
-          contentEditable={false}
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + calc(2px * var(--sf)))',
-            left: 0,
-            right: 0,
-            zIndex: 10,
-            margin: 0,
-            padding: 'calc(4px * var(--sf))',
-            listStyle: 'none',
-            background: 'var(--paper-deep)',
-            color: 'var(--ink)',
-            border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-            borderRadius: 'calc(4px * var(--sf))',
-            overflow: 'auto',
-            maxHeight: 'calc(240px * var(--sf))',
-          }}
-        >
-          {matches.length === 0 ? (
-            <li
-              style={{
-                padding: 'calc(4px * var(--sf))',
-                fontFamily: 'var(--sans)',
-                fontSize: 'calc(14px * var(--tf))',
-                color: 'var(--ink)',
-              }}
-            >
-              No results
-            </li>
-          ) : (
-            matches.map((r) => {
-              const idx = r.name.toLowerCase().indexOf(query.toLowerCase())
-              let content: React.ReactNode = r.name
-              if (idx >= 0) {
-                content = (
-                  <>
-                    {r.name.slice(0, idx)}
-                    <mark>{r.name.slice(idx, idx + query.length).toLowerCase()}</mark>
-                    {r.name.slice(idx + query.length)}
-                  </>
-                )
-              }
-              return (
-                <li
-                  key={r.id}
-                  role="option"
-                  style={{
-                    padding: 'calc(4px * var(--sf))',
-                    borderRadius: 'calc(4px * var(--sf))',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'calc(14px * var(--tf))',
-                    color: 'var(--ink)',
-                  }}
-                >
-                  {content}
-                </li>
-              )
-            })
-          )}
-        </ul>
-      )}
-    </div>
+    typeof r.name === 'string' &&
+    r.name.trim() !== '' &&
+    typeof r.servings === 'string' &&
+    r.servings.trim() !== '' &&
+    typeof r.notes === 'string' &&
+    Array.isArray(r.tags)
   )
 }
 
@@ -171,117 +48,109 @@ export function App() {
   })
 
   const [query, setQuery] = useState('')
-  const [sortKey, setSortKey] = useState<string | null>(null)
+  const [sortKeys, setSortKeys] = useState<string[]>([])
   const [editing, setEditing] = useState<Editing>(null)
+  const [tags, setTags] = useState<string[]>([])
+  const [importNote, setImportNote] = useState<string | null>(null)
 
-  const recipes: Row[] = useMemo(
+  const recipes: Recipe[] = useMemo(
     () => state.items.map((it) => ({ id: it.id, ...it.data })),
     [state.items],
   )
 
   const visible = useMemo(() => {
-    let rows = query
-      ? recipes.filter((r) => r.name.toLowerCase().includes(query))
-      : recipes
-    if (sortKey) {
-      rows = [...rows].sort((a, b) => {
-        if (sortKey === 'servings') {
-          const av = parseFloat(a.servings) || 0
-          const bv = parseFloat(b.servings) || 0
-          return av - bv
-        }
-        return a.name.localeCompare(b.name)
-      })
-    }
-    return rows
-  }, [recipes, query, sortKey])
+    const q = query.trim().toLowerCase()
+    if (!q) return recipes
+    return recipes.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        r.notes.toLowerCase().includes(q) ||
+        r.tags.some((t) => t.toLowerCase().includes(q)),
+    )
+  }, [recipes, query])
 
   const total = recipes.length
-
-  const tableStyle: CSSProperties = {
-    borderCollapse: 'collapse',
-    width: '100%',
-    fontFamily: 'var(--sans)',
-    fontSize: 'calc(14px * var(--tf))',
-    color: 'var(--ink)',
-  }
-  const thStyle: CSSProperties = {
-    textAlign: 'left',
-    padding: 'calc(8px * var(--sf))',
-    borderBottom: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-    background: 'var(--paper-deep)',
-    color: 'var(--ink)',
-    cursor: 'pointer',
-  }
-  const tdStyle: CSSProperties = {
-    padding: 'calc(8px * var(--sf))',
-    borderBottom: 'calc(1px * var(--sf)) solid var(--hair)',
-    color: 'var(--ink)',
-    textAlign: 'left',
-  }
-  const emptyCellStyle: CSSProperties = {
-    padding: 'calc(16px * var(--sf))',
-    color: 'var(--ink)',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  }
-
-  function highlightName(name: string, q: string) {
-    const query = q.trim().toLowerCase()
-    if (!query) return name
-    const idx = name.toLowerCase().indexOf(query)
-    if (idx < 0) return name
-    return (
-      <>
-        {name.slice(0, idx)}
-        <mark>{name.slice(idx, idx + query.length)}</mark>
-        {name.slice(idx + query.length)}
-      </>
-    )
-  }
-
-  function handleFormSubmit(values: RecordValues) {
-    const name = String(values.name ?? '').trim()
-    const servings = String(values.servings ?? '')
-    const notes = String(values.notes ?? '').trim()
-    if (editing?.mode === 'edit') {
-      actions.update(editing.id, { name, servings, notes, tags: [] })
-    } else {
-      actions.add({ name, servings, notes, tags: [] })
-    }
-    setEditing(null)
-  }
+  const shown = visible.length
 
   const editingRecipe =
     editing?.mode === 'edit' ? recipes.find((r) => r.id === editing.id) : undefined
 
-  const exportCsv = () => {
-    saveBlob(new Blob([toCsv(visible)], { type: 'text/csv' }), {
-      filename: 'recipes.csv',
-      mimeType: 'text/csv',
-    })
+  function openForm(mode: 'add' | 'edit', id?: string) {
+    setTags([])
+    if (mode === 'edit' && id) {
+      const r = recipes.find((x) => x.id === id)
+      if (r) setTags(r.tags)
+    }
+    setEditing(mode === 'edit' && id ? { mode: 'edit', id } : { mode: 'add' })
+    setImportNote(null)
   }
 
-  const exportJson = () => {
-    saveBlob(
-      new Blob(
-        [
-          exportBackup<RecipeData>({
-            appId: 'lacuna.recipe-manager',
-            version: 1,
-            records: state.items.map((it) => ({
-              id: it.id,
-              data: it.data,
-              createdAt: it.createdAt,
-              updatedAt: it.updatedAt,
-            })),
-          }),
-        ],
-        { type: 'application/json' },
-      ),
-      { filename: 'recipes.json', mimeType: 'application/json' },
-    )
+  function closeForm() {
+    setEditing(null)
   }
+
+  function handleFormSubmit(values: Record<string, string | number>) {
+    const name = String(values.name ?? '').trim()
+    const servings = String(values.servings ?? '')
+    const notes = String(values.notes ?? '').trim()
+    if (editing?.mode === 'edit') {
+      actions.update(editing.id, { name, servings, notes, tags })
+    } else {
+      actions.add({ name, servings, notes, tags })
+    }
+    closeForm()
+  }
+
+  function handleDelete(id: string) {
+    actions.remove(id)
+  }
+
+  function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    void (async () => {
+      const res = await openFile(file, 'text')
+      if (!res.ok) {
+        setImportNote(`Import failed: ${res.error}`)
+        return
+      }
+      try {
+        const result = importBackup<RecipeData>(res.data as string, {
+          currentVersion: 1,
+          validate: (rec: BackupRecord<RecipeData>) =>
+            validRecipeData(rec.data) ? null : 'invalid recipe',
+        })
+        for (const rec of result.records) {
+          actions.add(rec.data)
+        }
+        const n = result.records.length
+        setImportNote(
+          result.droppedCount > 0
+            ? `Imported ${n} recipe${n === 1 ? '' : 's'}, dropped ${result.droppedCount} invalid.`
+            : `Imported ${n} recipe${n === 1 ? '' : 's'}.`,
+        )
+      } catch (err) {
+        setImportNote(`Import failed: ${err instanceof Error ? err.message : 'bad file'}`)
+      }
+    })()
+  }
+
+  function handleExportJson() {
+    const json = exportBackup<RecipeData>({
+      appId: 'lacuna.recipe-manager',
+      version: 1,
+      records: state.items.map((it) => ({
+        id: it.id,
+        data: it.data,
+        createdAt: it.createdAt,
+        updatedAt: it.updatedAt,
+      })),
+    })
+    saveText(json, { filename: 'recipes.json', mimeType: 'application/json' })
+  }
+
+  const empty = total === 0
 
   return (
     <AppShell
@@ -290,147 +159,128 @@ export function App() {
       hue="gold"
       category="Personal"
       meta={`${total} ${total === 1 ? 'recipe' : 'recipes'}`}
-      status=""
       side={
         <Rail
-          title="Recipe Manager"
-          note="Recipes stay in this browser"
+          title="Your kitchen"
+          note="Everything stays in this browser."
           chips={[`${total} recipes`, 'CSV export', 'JSON backup']}
-        >
-          <Body>Search, sort and export your recipes.</Body>
-        </Rail>
+        />
       }
     >
-      <Card mono="New" title="Add a recipe">
-        {editing?.mode === 'add' ? (
-          <RecordForm
-            fields={FIELDS}
-            submitLabel="Save"
-            cancelLabel="Cancel"
-            onSubmit={handleFormSubmit}
-            onCancel={() => setEditing(null)}
-          />
+      <Card
+        mono="New"
+        title={editing?.mode === 'edit' ? `Edit ${editingRecipe?.name ?? ''}` : 'Add a recipe'}
+      >
+        {editing ? (
+          <Stack>
+            <RecordForm
+              key={editing.mode === 'edit' ? editing.id : 'add'}
+              fields={FIELDS}
+              initialValues={
+                editingRecipe
+                  ? {
+                      name: editingRecipe.name,
+                      servings: editingRecipe.servings,
+                      notes: editingRecipe.notes,
+                    }
+                  : undefined
+              }
+              submitLabel="Save"
+              cancelLabel="Cancel"
+              onCancel={closeForm}
+              onSubmit={handleFormSubmit}
+            />
+            <TagInput
+              tags={tags}
+              onChange={setTags}
+              suggestions={TAG_SUGGESTIONS}
+              placeholder="Add a tag, press Enter"
+              aria-label="Recipe tags"
+            />
+          </Stack>
         ) : (
           <Stack>
-            <Body>Add a recipe with a name, servings and optional notes.</Body>
-            <PrimaryButton onClick={() => setEditing({ mode: 'add' })}>
-              Add recipe
-            </PrimaryButton>
+            <PrimaryButton onClick={() => openForm('add')}>Add recipe</PrimaryButton>
           </Stack>
         )}
       </Card>
 
-      {total > 0 ? (
-        <Card mono={`${visible.length} shown`} title="Recipes">
-          <Stack>
-            <SearchInput records={recipes} query={query} onQueryChange={setQuery} />
-            {visible.length === 0 ? (
-              <div style={emptyCellStyle}>No results</div>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={tableStyle} aria-label="Recipes">
-                    <thead>
-                      <tr>
-                        <th
-                          style={thStyle}
-                          onClick={() =>
-                            setSortKey((cur) => (cur === 'name' ? null : 'name'))
-                          }
-                        >
-                          Name
-                        </th>
-                        <th
-                          style={thStyle}
-                          onClick={() =>
-                            setSortKey((cur) =>
-                              cur === 'servings' ? null : 'servings',
-                            )
-                          }
-                        >
-                          Servings
-                        </th>
-                        <th style={{ ...thStyle, width: 0, padding: 0, border: 'none', background: 'transparent' }} />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {visible.map((r) => (
-                        <tr key={r.id}>
-                          <td style={tdStyle}>
-                            {highlightName(r.name, query)}
-                          </td>
-                          <td style={tdStyle}>{r.servings}</td>
-                          <td style={{ ...tdStyle, padding: 0, border: 'none' }}>
-                            <div
-                              style={{
-                                display: 'flex',
-                                gap: 'calc(4px * var(--sf))',
-                              }}
-                            >
-                              <Button
-                                kind="ghost"
-                                ariaLabel={`Edit ${r.name}`}
-                                onClick={() => setEditing({ mode: 'edit', id: r.id })}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                kind="danger"
-                                ariaLabel={`Delete ${r.name}`}
-                                onClick={() => actions.remove(r.id)}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                </table>
-              </div>
-            )}
-          </Stack>
-        </Card>
-      ) : (
-        <Card mono="Empty" title="Recipes">
+      <Card
+        mono={`${shown} of ${total}`}
+        title="Recipes"
+      >
+        {empty ? (
           <EmptyState
             mono="Empty"
             title="No recipes yet"
             detail="Add the first recipe to get started."
             actionLabel="Add a recipe"
-            onAction={() => setEditing({ mode: 'add' })}
+            onAction={() => openForm('add')}
           />
-        </Card>
-      )}
-
-      {total > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 'calc(4px * var(--sf))' }}>
-          <Button kind="ghost" ariaLabel="Export CSV" onClick={exportCsv}>
-            Export CSV
-          </Button>
-          <Button kind="ghost" ariaLabel="Export JSON" onClick={exportJson}>
-            Export JSON
-          </Button>
-        </div>
-      ) : null}
-
-      {editing?.mode === 'edit' && editingRecipe ? (
-        <Card mono="Edit" title={`Edit ${editingRecipe.name}`}>
-          <RecordForm
-            key={editingRecipe.id}
-            fields={FIELDS}
-            initialValues={{
-              name: editingRecipe.name,
-              servings: editingRecipe.servings,
-              notes: editingRecipe.notes,
-            }}
-            submitLabel="Save"
-            cancelLabel="Cancel"
-            onSubmit={handleFormSubmit}
-            onCancel={() => setEditing(null)}
-          />
-        </Card>
-      ) : null}
-
+        ) : (
+          <Stack>
+            <RecipeSearch
+              value={query}
+              onChange={setQuery}
+              resultCount={shown}
+              totalCount={total}
+            />
+            {importNote ? <MonoLabel>{importNote}</MonoLabel> : null}
+            <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', alignItems: 'center' }}>
+              <ExportCsvButton recipes={visible} />
+              <button
+                type="button"
+                onClick={handleExportJson}
+                style={{
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'calc(13px * var(--tf))',
+                  color: 'var(--ink)',
+                  background: 'transparent',
+                  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
+                  borderRadius: 'calc(4px * var(--sf))',
+                  padding: 'calc(6px * var(--sf)) calc(10px * var(--sf))',
+                  cursor: 'pointer',
+                }}
+              >
+                Export JSON
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setImportNote(null)
+                  document.getElementById('import-json-input')?.click()
+                }}
+                style={{
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'calc(13px * var(--tf))',
+                  color: 'var(--ink)',
+                  background: 'transparent',
+                  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
+                  borderRadius: 'calc(4px * var(--sf))',
+                  padding: 'calc(6px * var(--sf)) calc(10px * var(--sf))',
+                  cursor: 'pointer',
+                }}
+              >
+                Import JSON
+              </button>
+              <input
+                id="import-json-input"
+                type="file"
+                accept="application/json,.json"
+                style={{ display: 'none' }}
+                onChange={handleImport}
+              />
+            </div>
+            <RecipeTable
+              rows={visible}
+              sortKeys={sortKeys}
+              onSort={setSortKeys}
+              onEdit={(id) => openForm('edit', id)}
+              onDelete={handleDelete}
+            />
+          </Stack>
+        )}
+      </Card>
     </AppShell>
   )
 }

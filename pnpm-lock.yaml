@@ -2546,18 +2546,9 @@ importers:
 
   apps/recipe-manager:
     dependencies:
-      '@lacuna/confirm-dialog':
-        specifier: workspace:0.2.0
-        version: link:../../toolbox/modules/confirm-dialog/0.2.0
-      '@lacuna/export-menu':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/export-menu/0.1.0
       '@lacuna/file-save-open':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/file-save-open/0.1.0
-      '@lacuna/filter-bar':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/filter-bar/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
@@ -2567,9 +2558,9 @@ importers:
       '@lacuna/record-form':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/record-form/0.1.0
-      '@lacuna/record-table':
+      '@lacuna/tag-input':
         specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/record-table/0.1.0
+        version: link:../../toolbox/modules/tag-input/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
