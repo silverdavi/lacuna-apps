@@ -6,12 +6,15 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   List,
-  PrimaryButton,
+  Rail,
   Row,
   Select,
   Stack,
   Table,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import {
@@ -92,40 +95,7 @@ function correctAnswer(q: Question, operation: Operation): number {
   }
 }
 
-function AppTabs({ active, disabled, onSelect }: { active: Tab; disabled: Tab[]; onSelect: (t: Tab) => void }) {
-  return (
-    <div role="tablist" aria-label="Math Practice sections" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-      {TABS.map((t) => {
-        const off = disabled.includes(t)
-        return (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={active === t}
-            aria-disabled={off}
-            onClick={() => {
-              if (!off) onSelect(t)
-            }}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '6px',
-              border: '1px solid var(--line, transparent)',
-              background: active === t ? 'var(--accent, transparent)' : 'transparent',
-              color: active === t ? 'var(--on-accent, inherit)' : 'inherit',
-              cursor: off ? 'not-allowed' : 'pointer',
-              opacity: off ? 0.5 : 1,
-              fontFamily: 'inherit',
-              fontSize: '0.9rem',
-            }}
-          >
-            {t}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
+
 
 export function App() {
   const [tab, setTab] = useState<Tab>('Generate')
@@ -137,6 +107,7 @@ export function App() {
   const [answers, setAnswers] = useState<Record<number, Answer>>({})
   const [history, setHistory] = useState<HistoryEntry[]>(() => historyStore.list())
   const [lastChecked, setLastChecked] = useState<number | null>(null)
+  const [copied, setCopied] = useState(false)
 
   // The Study panel walks question 1..N in order, showing exactly one
   // question's answer box at a time. Each "Check" records the status for the
@@ -229,6 +200,29 @@ export function App() {
     }
   }
 
+  function copyQuestions() {
+    const text = questions.map((q, i) => `${i + 1}. ${q.text}`).join('\n')
+    void navigator.clipboard?.writeText(text).then(
+      () => {
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 1600)
+      },
+      () => undefined,
+    )
+  }
+
+  function exportHistory() {
+    if (history.length === 0) return
+    const lines = ['date,questions,score', ...history.map((e) => `${e.date},${e.count},${e.score}`)]
+    void navigator.clipboard?.writeText(lines.join('\n')).then(
+      () => {
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 1600)
+      },
+      () => undefined,
+    )
+  }
+
   const resultRows = questions.map((q, i) => {
     const a = answers[i]
     const answered = Boolean(a?.checked)
@@ -243,6 +237,9 @@ export function App() {
     }
   })
 
+  const answered = Object.values(answers).filter((a) => a.checked).length
+  const correctCount = Object.values(answers).filter((a) => a.correct).length
+
   return (
     <AppShell
       name="Math Practice"
@@ -250,8 +247,73 @@ export function App() {
       hue="rust"
       category="Productivity"
       meta={`${history.length} ${history.length === 1 ? 'session' : 'sessions'}`}
+      status={
+        sessionComplete && questions.length > 0
+          ? `Session complete · score ${correctCount}/${questions.length}`
+          : questions.length > 0
+            ? `Question ${Math.min(currentIndex + 1, questions.length)} of ${questions.length}`
+            : 'No active set'
+      }
+      side={
+        <Rail
+          title="Session"
+          note={questions.length > 0 ? `${answered}/${questions.length} answered` : 'Not started'}
+          chips={[...TABS]}
+        >
+          <KpiRow>
+            <Kpi value={questions.length} label="Questions" />
+            <Kpi value={`${correctCount}`} label="Correct" accent />
+            <Kpi value={history.length} label="Sessions" />
+          </KpiRow>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <Tag>{difficulty}</Tag>
+            <Tag>{operation}</Tag>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Button kind="ghost" ariaLabel="Copy questions" disabled={questions.length === 0} onClick={copyQuestions}>
+              {copied ? 'Copied' : 'Copy'}
+            </Button>
+            <Button kind="ghost" ariaLabel="Export history" disabled={history.length === 0} onClick={exportHistory}>
+              Export
+            </Button>
+          </div>
+        </Rail>
+      }
     >
-      <AppTabs active={tab} disabled={disabledTabs} onSelect={setTab} />
+      <div
+        role="tablist"
+        aria-label="Math Practice sections"
+        style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '12px' }}
+      >
+        {TABS.map((t) => {
+          const off = disabledTabs.includes(t)
+          return (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={tab === t}
+              aria-disabled={off}
+              onClick={() => {
+                if (!off) setTab(t)
+              }}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '6px',
+                border: '1px solid var(--line, transparent)',
+                background: tab === t ? 'var(--accent, transparent)' : 'transparent',
+                color: tab === t ? 'var(--on-accent, inherit)' : 'inherit',
+                cursor: off ? 'not-allowed' : 'pointer',
+                opacity: off ? 0.5 : 1,
+                fontFamily: 'inherit',
+                fontSize: '0.9rem',
+              }}
+            >
+              {t}
+            </button>
+          )
+        })}
+      </div>
 
       <Stack>
         {(tab === 'Generate' || tab === 'Settings') && (
@@ -272,7 +334,7 @@ export function App() {
               />
             </FormGrid>
             <Actions>
-              <PrimaryButton onClick={generate}>Generate</PrimaryButton>
+              <Button kind="primary" onClick={generate}>Generate</Button>
             </Actions>
           </Card>
         )}
@@ -343,7 +405,7 @@ export function App() {
                     </div>
                   )}
                   <Actions>
-                    <PrimaryButton onClick={check}>Check</PrimaryButton>
+                    <Button kind="primary" onClick={check}>Check</Button>
                   </Actions>
                 </Card>
               </Stack>
