@@ -66,6 +66,7 @@ export function App() {
 
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [lastDeleted, setLastDeleted] = useState<{ id: string; book: Book } | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>('title')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
@@ -102,6 +103,7 @@ export function App() {
       status: draftStatus,
       rating: parsedRating,
     })
+    setLastDeleted(null)
     setDraftTitle('')
     setDraftAuthor('')
     setDraftStatus('To Read')
@@ -142,8 +144,17 @@ export function App() {
   function deleteBook(index: number) {
     const book = books[index]
     if (!book) return
-    actions.remove(bookId(index))
+    const id = bookId(index)
+    actions.remove(id)
+    setLastDeleted({ id, book })
     if (editingIndex === index) cancelEdit()
+  }
+
+  function undoDelete() {
+    if (lastDeleted == null) return
+    const { book } = lastDeleted
+    actions.add(book)
+    setLastDeleted(null)
   }
 
   function toggleSort(key: SortKey) {
@@ -229,9 +240,9 @@ export function App() {
   return (
     <AppShell
       name="Reading Tracker"
-      icon="docs"
+      icon="notes"
       hue="gold"
-      category="Productivity"
+      category="Personal"
       meta={`${books.length} book${books.length === 1 ? '' : 's'}`}
       side={
         <Rail title="Library">
@@ -263,6 +274,11 @@ export function App() {
               <Button kind="secondary" onClick={exportCsv} disabled={books.length === 0}>
                 Export CSV
               </Button>
+              {lastDeleted != null && (
+                <Button kind="secondary" onClick={undoDelete}>
+                  Undo delete {lastDeleted.book.title}
+                </Button>
+              )}
             </FormGrid>
             <Table columns={columns} rows={rows} label="Books" empty="No books yet" />
           </Card>

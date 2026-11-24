@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "summary": "Track the books you read, plan to read, and are reading, with ratings and CSV export.",
   "description": "Keep a list of books with their title, author, status, and rating. Search and filter the shelf, sort by title, edit and remove entries, and export the list as CSV. Everything stays on this device.",
-  "category": "productivity",
-  "icon": "docs",
+  "category": "personal",
+  "icon": "notes",
   "relationship": {
     "kind": "standalone"
   },
@@ -80,7 +80,8 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts"
+      "tests/acceptance.spec.ts",
+      "tests/undo-delete.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
