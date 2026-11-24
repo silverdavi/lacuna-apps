@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useMemo, useState } from 'react'
-import { Actions, AppShell, Card, EmptyState, FormGrid, MonoLabel, PrimaryButton, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Card, EmptyState, FormGrid, MonoLabel, PrimaryButton, Rail, Stack, TextInput } from '@lacuna/ui'
 import { add, format, toMinorUnits } from '@lacuna/money'
 import { addItem, deleteItem, listItems, updateItem, type Item } from './host'
 import './style.css'
@@ -128,6 +128,14 @@ export function App() {
       hue="gold"
       category="Productivity"
       meta={`${items.length} ${items.length === 1 ? 'item' : 'items'}`}
+      status={`${items.length} ${items.length === 1 ? 'item' : 'items'} · total ${money(totalMinor)}`}
+      side={
+        <Rail
+          title="Home Inventory"
+          note={`${items.length} tracked`}
+          chips={['CSV', 'Search', 'Sort']}
+        />
+      }
     >
       <Card mono={editing ? 'Edit' : 'New'} title={editing ? `Edit ${editing.name}` : 'Add an item'}>
         <FormGrid>
