@@ -10,6 +10,7 @@
   "dependencies": {
     "@lacuna/ui": "workspace:*",
     "@lacuna/codecs": "workspace:0.1.0",
+    "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/use-clipboard": "workspace:0.1.0",
     "@lacuna/use-local-record": "workspace:0.1.0",
     "react": "^19.0.0",
