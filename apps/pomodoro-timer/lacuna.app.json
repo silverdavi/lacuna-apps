@@ -34,7 +34,8 @@
       "@lacuna/ui": "^0.1.0",
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/streak-calc": "0.1.0",
-      "@lacuna/use-clipboard": "0.1.0"
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-timer": "0.1.0"
     }
   },
   "capabilities": [
