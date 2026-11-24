@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useLayoutEffect, useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Kpi, KpiRow, PrimaryButton, Select, Table, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, PrimaryButton, Rail, Select, Table, TextInput } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { add, format, mul, sub, toMinorUnits } from '@lacuna/money'
@@ -55,11 +55,11 @@ export function App() {
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
   useLayoutEffect(() => {
-    const removeChromeSvgs = () => {
-      document.querySelectorAll('header svg, main > div:first-child svg').forEach((svg) => svg.remove())
+    const stripChromeSvgs = () => {
+      document.querySelectorAll('header svg, .lc-cv-plate svg').forEach((svg) => svg.remove())
     }
-    removeChromeSvgs()
-    const observer = new MutationObserver(removeChromeSvgs)
+    stripChromeSvgs()
+    const observer = new MutationObserver(stripChromeSvgs)
     observer.observe(document.body, { childList: true, subtree: true })
     return () => observer.disconnect()
   }, [])
@@ -175,10 +175,31 @@ export function App() {
       hue="green"
       category="Finance"
       meta={`${holdingItems.length} ${holdingItems.length === 1 ? 'holding' : 'holdings'}`}
+      status={`${holdingItems.length} ${holdingItems.length === 1 ? 'position' : 'positions'} · ${snapshotItems.length} ${snapshotItems.length === 1 ? 'price point' : 'price points'} · updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+      side={
+        <Rail title="Summary">
+          <div className="lc-kpirow">
+            <div>
+              <div className="lc-kpi-value">{fmt(totalCost)}</div>
+              <div className="lc-kpi-label">Cost basis</div>
+            </div>
+            <div>
+              <div className="lc-kpi-value">{fmt(totalValue)}</div>
+              <div className="lc-kpi-label">Mark value</div>
+            </div>
+            <div>
+              <div className="lc-kpi-value">{gainLabel(totalGain)}</div>
+              <div className="lc-kpi-label">Unrealized</div>
+            </div>
+          </div>
+          {copied ? <div role="status" className="lk-field-hint">Copied to clipboard</div> : null}
+          <Button kind="secondary" onClick={exportCsv} disabled={holdingItems.length === 0}>Export CSV</Button>
+        </Rail>
+      }
     >
       <div className="lc-tabs" role="tablist">
-        <button type="button" role="tab" className={`pt-tab${tab === 'Holdings' ? ' active' : ''}`} aria-selected={tab === 'Holdings'} onClick={() => setTab('Holdings')}>Holdings</button>
-        <button type="button" role="tab" className={`pt-tab${tab === 'History' ? ' active' : ''}`} aria-selected={tab === 'History'} onClick={() => setTab('History')}>History</button>
+        <button type="button" role="tab" className={`lc-tab${tab === 'Holdings' ? ' active' : ''}`} aria-selected={tab === 'Holdings'} style={tab === 'Holdings' ? undefined : { color: 'var(--ink-60)' }} onClick={() => setTab('Holdings')}>Holdings</button>
+        <button type="button" role="tab" className={`lc-tab${tab === 'History' ? ' active' : ''}`} aria-selected={tab === 'History'} style={tab === 'History' ? undefined : { color: 'var(--ink-60)' }} onClick={() => setTab('History')}>History</button>
       </div>
 
       {tab === 'Holdings' ? (
@@ -194,19 +215,13 @@ export function App() {
             </Actions>
           </Card>
 
-          <Card mono={`${holdingItems.length} saved`} title="Holdings" actions={<Button kind="secondary" onClick={exportCsv} disabled={holdingItems.length === 0}>Export CSV</Button>}>
-            <KpiRow>
-              <Kpi value={fmt(totalCost)} label="Total Cost" />
-              <Kpi value={fmt(totalValue)} label="Total Value" />
-              <Kpi value={gainLabel(totalGain)} label="Gain/Loss" />
-            </KpiRow>
+          <Card mono={`${holdingItems.length} saved`} title="Holdings">
             <div className="pt-summary">
-              Total Cost: {fmt(totalCost)}
-              {' · '}
-              Total Value: {fmt(totalValue)}
-              {holdingItems.length === 0 ? ` · Gain/Loss: ${gainLabel(totalGain)}` : ''}
+              <span>Total Cost: {fmt(totalCost)}</span>
+              <span> · </span>
+              <span>Total Value: {fmt(totalValue)}</span>
+              {holdingItems.length === 0 ? <span> · Gain/Loss: {gainLabel(totalGain)}</span> : null}
             </div>
-            {copied ? <div role="status" className="lk-field-hint">Copied to clipboard</div> : null}
             {holdingItems.length === 0 ? (
               <EmptyState mono="Empty" title="No holdings yet" detail="Add your first holding above." actionLabel="Add a holding" onAction={addHolding} />
             ) : (

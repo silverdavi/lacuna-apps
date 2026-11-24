@@ -13,19 +13,3 @@
   margin-top: calc(4px * var(--sf));
 }
 
-.pt-tab {
-  font-size: calc(12.5px * var(--tf));
-  font-weight: 600;
-  color: var(--ink-80);
-  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
-  cursor: pointer;
-  border: none;
-  background: none;
-  border-bottom: calc(2px * var(--sf)) solid transparent;
-  font-family: var(--sans);
-}
-
-.pt-tab.active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
-}
