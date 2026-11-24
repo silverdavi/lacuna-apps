@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   AppShell,
   Button,
@@ -7,24 +7,19 @@ import {
   FormGrid,
   Kpi,
   KpiRow,
-  SectionLabel,
+  Rail,
   Table,
   TextInput,
-  type IconName,
 } from '@lacuna/ui'
 import { Chart, type ChartDataPoint } from '@lacuna/chart'
 import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
 import { exportBackup } from '@lacuna/json-backup'
-import { useCollection, type CollectionItem } from '@lacuna/use-collection'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { ProgressRing } from '@lacuna/progress-ring'
 import { toISODate } from '@lacuna/date-math'
 import { computeStreaks } from '@lacuna/streak-calc'
-import { host, spaceId } from './host/mock'
+import { host } from './host/mock'
 import {
-  KEY,
-  emptyState,
-  makeId,
   money,
   percentOf,
   savedOf,
@@ -49,7 +44,6 @@ function parseAmount(raw: string): number | null {
 }
 
 export function App() {
-  const [, forceRender] = useReducer((x: number) => x + 1, 0)
   const [version, setVersion] = useState(0)
   const [tab, setTab] = useState<Tab>('Goals')
   const [goalFormOpen, setGoalFormOpen] = useState(false)
@@ -68,13 +62,12 @@ export function App() {
 
   const goals = useMemo<Goal[]>(() => host.read().goals, [version])
 
-  const refresh = () => {
-    setVersion((v) => v + 1)
-    forceRender()
-  }
+  const refresh = () => setVersion((v) => v + 1)
 
   const totalSaved = goals.reduce((sum, g) => sum + savedOf(g), 0)
   const totalTarget = goals.reduce((sum, g) => sum + g.target, 0)
+  const overallPct = totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0
+
   const depositDates = useMemo(
     () => goals.flatMap((g) => g.deposits.map((d) => d.date)),
     [goals],
@@ -83,7 +76,7 @@ export function App() {
 
   const historyRows = useMemo(() => {
     const all = goals
-      .flatMap((g) => g.deposits.map((d) => ({ ...d, goal: g.name, goalId: g.id })))
+      .flatMap((g) => g.deposits.map((d) => ({ ...d, goal: g.name })))
       .sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt)
     let running = 0
     return all.map((d) => {
@@ -93,7 +86,6 @@ export function App() {
         goal: d.goal,
         amount: money(d.amount),
         running: money(running),
-        raw: d,
       }
     })
   }, [goals])
@@ -167,7 +159,7 @@ export function App() {
   }
 
   const shellActions = (
-    <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+    <>
       <ExportMenu
         options={exportOptions}
         fileName="savings-goal"
@@ -177,7 +169,7 @@ export function App() {
       <Button kind={copied ? 'primary' : 'secondary'} onClick={() => void copy(csv)} disabled={goals.length === 0}>
         {copied ? 'Copied' : 'Export CSV'}
       </Button>
-    </div>
+    </>
   )
 
   return (
@@ -185,33 +177,33 @@ export function App() {
       name="Savings Goal Tracker"
       icon="wallet"
       category="Finance"
-      hue="teal"
+      hue="green"
       meta={`${goals.length} goal${goals.length === 1 ? '' : 's'}`}
+      status={`${totalTarget > 0 ? `${overallPct}% saved` : 'No goals'} · ${streak.current > 0 ? `${streak.current}-day streak` : 'No streak'}`}
       actions={shellActions}
       side={
-        <div style={{ display: 'grid', gap: 'calc(12px * var(--sf))' }}>
-          <Card title="Overall" mono="Summary">
-            <KpiRow>
-              <Kpi value={money(totalSaved)} label="Saved" accent />
-              <Kpi value={totalTarget > 0 ? `${Math.round((totalSaved / totalTarget) * 100)}pct` : '0pct'} label="Of targets" />
-            </KpiRow>
-          </Card>
-          <Card title="Consistency" mono="Streak">
-            <Kpi value={streak.current > 0 ? `${streak.current} day${streak.current === 1 ? '' : 's'}` : 'None'} label="Deposit streak" />
-            {depositDates.length > 0 && (
-                <Chart
-                  type="donut"
-                  data={chartData}
-                  title="Saved by goal"
-                  ariaLabel="Saved by goal"
-                  height={160}
-                />
-            )}
-          </Card>
-        </div>
+        <Rail
+          title="Overview"
+          note={`${depositDates.length} deposit${depositDates.length === 1 ? '' : 's'} logged`}
+          chips={[`${goals.length} goal${goals.length === 1 ? '' : 's'}`, `${streak.current}d streak`, `${depositDates.length} deposit${depositDates.length === 1 ? '' : 's'}`]}
+        >
+          <KpiRow>
+            <Kpi value={money(totalSaved)} label="Saved" accent />
+            <Kpi value={money(totalTarget)} label="Target" />
+          </KpiRow>
+          {depositDates.length > 0 && (
+            <Chart
+              type="donut"
+              data={chartData}
+              title="Saved by goal"
+              ariaLabel="Saved by goal"
+              height={160}
+            />
+          )}
+        </Rail>
       }
     >
-      <div role="tablist" aria-label="Savings Goal Tracker views" className="lc-tabs">
+      <div role="tablist" aria-label="Views" className="lc-tabs">
         {TABS.map((t) => (
           <button
             key={t}
@@ -273,12 +265,7 @@ export function App() {
               )}
               <ul className="lk-list" aria-label="Goals">
                 {goals.map((goal) => (
-                  <li
-                    key={goal.id}
-                    className="lk-row"
-                    role="listitem"
-                    aria-label={goal.name}
-                  >
+                  <li key={goal.id} className="lk-row" role="listitem" aria-label={goal.name}>
                     <span className="lk-row-text">
                       <span className="lk-row-title">{goal.name}</span>
                       <span className="lk-row-meta">due {goal.deadline}</span>
@@ -377,5 +364,5 @@ export function App() {
   )
 }
 
-export type { Goal, SavingsState, CollectionItem }
-export { KEY, spaceId, emptyState, makeId, percentOf, savedOf, todayISO }
+export type { Goal, SavingsState }
+export { percentOf, savedOf, todayISO }
