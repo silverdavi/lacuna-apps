@@ -17,12 +17,18 @@ importers:
 
   apps/alarm-clock:
     dependencies:
-      '@lacuna/big-clock':
+      '@lacuna/export-menu':
         specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/big-clock/0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
       '@lacuna/format-duration':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/format-duration/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox

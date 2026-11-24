@@ -1,0 +1,95 @@
+.ac-tabs {
+  display: flex;
+  gap: calc(4px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair);
+}
+
+.ac-tab {
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  font-weight: 600;
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--ink-muted);
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.ac-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+
+.ac-form-row {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.ac-alarms {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.ac-row-actions {
+  display: flex;
+  gap: calc(6px * var(--sf));
+}
+
+.ac-export-row {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  justify-content: flex-end;
+}
+
+.ac-timer-display {
+  display: flex;
+  justify-content: center;
+  padding: calc(16px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(4px * var(--sf));
+  background: var(--paper-deep);
+}
+
+.ac-timer-display time {
+  font-family: var(--mono);
+  font-size: calc(40px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.ac-timer-controls {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  justify-content: center;
+}
+
+.ac-presets {
+  display: flex;
+  gap: calc(6px * var(--sf));
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ac-preset {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  padding: calc(4px * var(--sf)) calc(10px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--hair);
+  border-radius: calc(4px * var(--sf));
+  background: var(--paper-deep);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ac-preset:hover {
+  border-color: var(--accent);
+}
+
+
