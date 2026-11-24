@@ -2558,9 +2558,6 @@ importers:
       '@lacuna/json-backup':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/json-backup/0.1.0
-      '@lacuna/tracker-kit':
-        specifier: workspace:0.2.0
-        version: link:../../toolbox/modules/tracker-kit/0.2.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox

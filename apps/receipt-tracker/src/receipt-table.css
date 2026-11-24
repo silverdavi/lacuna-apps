@@ -1,55 +1,52 @@
-/* Receipt tracker table styles — div-based table for role="row" counting */
-.rt-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: calc(12.5px * var(--tf));
-  color: var(--ink-80);
-}
+/* Receipt tracker layout helpers — tokens only, no color literals. */
 
-.rt-table .rt-head {
+.rt-filter-row {
   display: flex;
+  flex-wrap: wrap;
+  gap: calc(12px * var(--sf));
+  margin-bottom: calc(16px * var(--sf));
 }
 
-.rt-table .rt-head > div {
-  flex: 1 1 0;
-  font-family: var(--mono);
-  font-size: calc(9px * var(--tf));
-  letter-spacing: calc(0.9px * var(--tf));
-  text-transform: uppercase;
-  color: var(--ink-60);
-  font-weight: 400;
-  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
-  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
-  text-align: left;
+.rt-filter-row > * {
+  flex: 1 1 calc(220px * var(--sf));
 }
 
-.rt-table .rt-head > div.num {
-  text-align: right;
-}
-
-.rt-table .rt-row {
-  display: flex;
-}
-
-.rt-table .rt-row > div {
-  flex: 1 1 0;
-  padding: calc(11px * var(--sf)) calc(12px * var(--sf));
-  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
-  vertical-align: top;
-  text-align: left;
-}
-
-.rt-table .rt-row > div.num {
-  text-align: right;
+.rt-total {
+  margin-top: calc(14px * var(--sf));
+  margin-bottom: 0;
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
-.rt-table .rt-row > div:first-child,
-.rt-table .rt-head > div:first-child {
-  padding-left: 0;
+.rt-catlist {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.rt-empty {
+.rt-cat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: calc(12.5px * var(--tf));
+  color: var(--ink);
+  padding: calc(6px * var(--sf)) 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.rt-cat .num {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.rt-muted {
   color: var(--ink-60);
   font-size: calc(12px * var(--tf));
+}
+
+.rt-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
 }
