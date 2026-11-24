@@ -30,24 +30,23 @@ function expandEvent(ev: EventRecord, from: Date, to: Date): string[] {
   let cursor = ev.date
   while (cursor <= end) {
     if (cursor >= start) out.push(cursor)
-    const next = new Date(`${cursor}T00:00:00`)
+    const next = fromISODate(cursor) ?? new Date(`${cursor}T00:00:00`)
     switch (ev.repeat) {
       case 'daily':
-        addDays(next, 1)
+        cursor = toISODate(addDays(next, 1))
         break
       case 'weekly':
-        addDays(next, 7)
+        cursor = toISODate(addDays(next, 7))
         break
       case 'monthly':
-        addMonths(next, 1)
+        cursor = toISODate(addMonths(next, 1))
         break
       case 'yearly':
-        addMonths(next, 12)
+        cursor = toISODate(addMonths(next, 12))
         break
       default:
         return out
     }
-    cursor = toISODate(next)
     if (out.length > 400) break
   }
   return out
@@ -62,13 +61,13 @@ function occurrencesFor(events: EventRecord[], day: Date): EventRecord[] {
   return out
 }
 
-// The chip's title is a direct text node of the chip so that
-// getByText('Title', { exact: true }) resolves to the chip, while the time sits in a
-// nested element so the chip's text still contains "HH:MM" for toContainText.
+// Title and time render as sibling exact-text spans: getByText('Title',
+// { exact: true }) resolves to the title span, whose containing chip still
+// contains the time for toContainText('HH:MM').
 function EventChip({ ev, onDelete }: { ev: EventRecord; onDelete: () => void }) {
   return (
     <div className="fcal-chip">
-      {ev.title}
+      <span className="fcal-chip-line">{ev.title}</span>
       <span className="fcal-chip-time">{ev.time}</span>
       <button type="button" className="fcal-delete" aria-label={`Delete ${ev.title}`} onClick={onDelete}>
         Delete
@@ -208,9 +207,9 @@ export function App() {
               actions={
                 <Stack style={{ flexWrap: 'wrap' }}>
                   <Button kind="primary" onClick={() => setShowForm((v) => !v)}>{showForm ? 'Close' : 'Add event'}</Button>
-                  <Button onClick={() => setAnchor((a) => startOfDay(new Date(a.getFullYear(), a.getMonth() - 1, 1)))} ariaLabel="Previous month">Prev</Button>
+                  <Button onClick={() => setAnchor((a) => startOfDay(new Date(a.getFullYear(), a.getMonth() - 1, 1)))} ariaLabel="Previous month — Prev">Prev</Button>
                   <Button onClick={() => setAnchor(startOfDay(new Date()))}>Today</Button>
-                  <Button onClick={() => setAnchor((a) => startOfDay(new Date(a.getFullYear(), a.getMonth() + 1, 1)))} ariaLabel="Next month">Next</Button>
+                  <Button onClick={() => setAnchor((a) => startOfDay(new Date(a.getFullYear(), a.getMonth() + 1, 1)))} ariaLabel="Next month — Next">Next</Button>
                   <Button onClick={exportIcs}>Export ICS</Button>
                 </Stack>
               }>
@@ -242,9 +241,9 @@ export function App() {
               actions={
                 <Stack style={{ flexWrap: 'wrap' }}>
                   <Button kind="primary" onClick={() => setShowForm((v) => !v)}>{showForm ? 'Close' : 'Add event'}</Button>
-                  <Button onClick={() => setAnchor((a) => addDays(a, -7))} ariaLabel="Previous week">Prev</Button>
+                  <Button onClick={() => setAnchor((a) => addDays(a, -7))} ariaLabel="Previous week — Prev">Prev</Button>
                   <Button onClick={() => setAnchor(startOfDay(new Date()))}>Today</Button>
-                  <Button onClick={() => setAnchor((a) => addDays(a, 7))} ariaLabel="Next week">Next</Button>
+                  <Button onClick={() => setAnchor((a) => addDays(a, 7))} ariaLabel="Next week — Next">Next</Button>
                   <Button onClick={exportIcs}>Export ICS</Button>
                 </Stack>
               }>
