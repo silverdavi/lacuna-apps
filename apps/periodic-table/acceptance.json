@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "614c684db7c69683f9a18fe1e35defee3274b604fdc31b8dde440ed3d7c7ae46",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Periodic Table\", a search field labelled \"Search elements\", a data grid with a column header \"Symbol\", and a checkbox labelled \"Show only metals\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Hyd\" in the field labelled \"Search elements\" shows a results list containing the item \"Hydrogen (H)\"; clicking that item updates the data grid to show a row where the \"Symbol\" cell is \"H\" and the \"Name\" cell is \"Hydrogen\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the grid showing Hydrogen, pressing the Down arrow key moves focus to the next row, which shows \"Symbol\" \"He\" and \"Name\" \"Helium\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Carbon\" in the field labelled \"Search elements\" and clicking the result \"Carbon (C)\" shows a grid row with \"Symbol\" \"C\", \"Name\" \"Carbon\", and \"Category\" \"Nonmetal\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the grid showing Carbon, clicking the checkbox labelled \"Show only metals\" removes the Carbon row and shows the text \"No elements match the current filter\"."
+    },
+    {
+      "id": "A6",
+      "text": "Unchecking \"Show only metals\" and typing \"Iron\" in the field labelled \"Search elements\", then clicking the result \"Iron (Fe)\", shows a grid row with \"Symbol\" \"Fe\", \"Name\" \"Iron\", and \"Category\" \"Metal\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the grid showing Iron, clicking the button \"Copy details\" places the exact text \"Iron (Fe) | Metal | 55.845\" on the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Zinc\" in the field labelled \"Search elements\" and clicking the result \"Zinc (Zn)\" shows a grid row with \"Symbol\" \"Zn\", \"Name\" \"Zinc\", and \"Category\" \"Metal\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the filter state: after checking \"Show only metals\", searching for \"Iron\", and reloading the page, the checkbox \"Show only metals\" is checked and the grid shows a row with \"Symbol\" \"Fe\" and \"Name\" \"Iron\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d876882a6a8ca6315919033ad0a8edf513f5dd50d0b95c3911960cd6a7c0f40f"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.periodic-table",
+  "name": "Periodic Table",
+  "version": "0.1.0",
+  "summary": "Browse and search a fixed set of chemical elements by name or symbol.",
+  "description": "A fixed set of chemical elements. Search by name or symbol, view properties in a data grid, and filter by category. The selected element and the filter setting survive a page reload.",
+  "category": "productivity",
+  "icon": "search",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/periodic-table"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:element",
+    "create:element"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "element",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the selected element, the filter setting, and recent searches"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "element"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts",
+      "tests/browse-and-persist.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
