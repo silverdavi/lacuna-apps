@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8a7b1ad25d46ce3c3e2248436443cc6cd9c2c92f6fed15746bbe62b282870565",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries the page shows the heading \"Expense Tracker\", the text \"No transactions yet\", and the summary line \"Total spent: $0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Description\" with \"Groceries\", the MoneyInput labelled \"Amount\" with \"45.50\", choosing \"Food\" in the select labelled \"Category\", and clicking the button \"Add transaction\" adds a row in the ledger table containing \"Groceries\", \"Food\", and \"-$45.50\"; the summary shows \"Total spent: $45.50\" and \"No transactions yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second transaction with Description \"Coffee\", Amount \"4.25\", Category \"Food\", the ledger table shows two rows and the summary shows \"Total spent: $49.75\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add transaction\" with an empty Description, or with an Amount that is empty or 0, adds no row and shows the message \"Enter a description and an amount greater than 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every row in the ledger table has a button named \"Delete <description>\". With the transactions Groceries 45.50 and Coffee 4.25, clicking \"Delete Coffee\" removes that row and the summary shows \"Total spent: $45.50\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Budgets\" shows a table with a row for \"Food\" displaying \"Budget: $0.00\" and \"Spent: $45.50\"; clicking the tab labelled \"Ledger\" returns to the transaction list."
+    },
+    {
+      "id": "A7",
+      "text": "In the Budgets tab, filling the field labelled \"Budget\" in the Food row with \"100\" and clicking \"Save budget\" changes that row to \"Budget: $100.00\" and \"Spent: $45.50\", and the status text shows \"Under budget\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that begins with \"date,description,category,amount\" and contains a line \"2024-01-15,Groceries,Food,-4550\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the transaction with Description \"Groceries\" and Amount \"-$45.50\" in the ledger table, and the summary line \"Total spent: $45.50\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "479f4f1475424ac013b15dacf358d1fd5633823100cb320abdfe5883dbfa3d94"
+    }
+  ]
+}
