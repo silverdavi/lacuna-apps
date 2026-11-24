@@ -1,0 +1,102 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.savings-goal",
+  "name": "Savings Goal Tracker",
+  "version": "0.1.0",
+  "summary": "Set a target amount and deadline, log deposits, and watch the savings build up.",
+  "description": "Savings Goal Tracker keeps a list of goals. Each goal has a name, a target amount, a deadline, and the deposits made toward it. The list shows how far each goal is along, the progress tab shows a ring per goal, the history tab is a dated log of every deposit with running totals, and Export CSV copies a summary to the clipboard. Everything persists in the browser.",
+  "category": "personal",
+  "tags": [],
+  "icon": "wallet",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/savings-goal"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/date-picker": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/progress-ring": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/tracker-kit": "0.2.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:savings-goal",
+    "create:deposit",
+    "edit:savings-goal",
+    "view:progress",
+    "view:history",
+    "export:csv"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "savings-goal",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store goals and the deposits made toward them"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "savings-goal"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
