@@ -141,8 +141,7 @@ export function App() {
     recordSet(value)
     try {
       window.localStorage.setItem('lacuna.receipt-packet.v1', JSON.stringify({ version: 1, data: value }))
-    } catch {
-      // ignore quota / privacy-mode failures
+    } catch (e) {
     }
   }
 
@@ -195,9 +194,9 @@ export function App() {
   }, [crop, rect])
 
   function updateReceipt(id: string, patch: Partial<Receipt>) {
-    setPacket({
-      receipts: receipts.map((r) => (r.id === id ? { ...r, ...patch } : r)),
-    })
+    setPacket((prev) => ({
+      receipts: prev.receipts.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+    }))
   }
 
   function removeReceipt(id: string) {
@@ -207,10 +206,6 @@ export function App() {
   async function addFiles(files: FileList | null) {
     if (!files || files.length === 0) return
     setError(null)
-    // Commit each receipt to state (and storage) the moment its data URL is read,
-    // before the async image decode completes. This keeps the receipt persisted
-    // even if the tab is reloaded while a later receipt's dimensions are still
-    // decoding; dimensions are patched in once decoding finishes.
     for (const file of Array.from(files)) {
       try {
         const reader = new FileReader()
@@ -228,9 +223,11 @@ export function App() {
           date: new Date(file.lastModified || Date.now()).toISOString().slice(0, 10),
           amount: '0.00',
         }
-        setPacket((prev) => ({
-          receipts: [...prev.receipts, { ...receipt, label: `Receipt ${prev.receipts.length + 1}` }],
-        }))
+        setPacket((prev) => {
+          return {
+            receipts: [...prev.receipts, { ...receipt, label: `Receipt ${prev.receipts.length + 1}` }],
+          }
+        })
         loadImageSource(dataUrl)
           .then((s) => {
             updateReceipt(receipt.id, { width: s.width, height: s.height })
@@ -238,7 +235,7 @@ export function App() {
           .catch(() => {
             // Decoding failed; the receipt still persists without a size readout.
           })
-      } catch {
+      } catch (err) {
         setError(`Could not read ${file.name}`)
       }
     }
@@ -404,7 +401,7 @@ export function App() {
       const url = `http://127.0.0.1/expenses/${encodeURIComponent(PDF_NAME)}`
       const frame = document.createElement('iframe')
       frame.setAttribute('aria-hidden', 'true')
-      frame.style.cssText = 'position:absolute;width:1px;height:1px;left:-9999px;top:0'
+      frame.style.display = 'none'
       frame.src = url
       document.body.appendChild(frame)
     } catch {
@@ -458,11 +455,10 @@ export function App() {
             {receipts.length === 0 ? (
               <EmptyState
                 actionLabel="Add Receipt"
-                detail="Upload the first receipt photo. It stays on this device."
+                onAction={() => fileRef.current?.click()}
                 title="No receipts yet"
-              >
-                <PrimaryButton onClick={() => fileRef.current?.click()}>Add Receipt</PrimaryButton>
-              </EmptyState>
+                detail="Upload the first receipt photo. It stays on this device."
+              />
             ) : (
               <>
                 <ul className="lp-list">

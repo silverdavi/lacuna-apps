@@ -1,3 +1,4 @@
+.lp-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(8px * var(--sf)); }
 .lp-receipt { display: flex; align-items: flex-start; gap: calc(12px * var(--sf)); padding: calc(10px * var(--sf)); border: calc(1px * var(--sf)) solid var(--ui-line2); border-radius: calc(2px * var(--sf)); background: var(--ui-card); }
 .lp-receipt img { width: calc(72px * var(--sf)); height: calc(54px * var(--sf)); object-fit: cover; border-radius: calc(2px * var(--sf)); border: calc(1px * var(--sf)) solid var(--ui-line2); flex: none; }
 .lp-receipt-meta { flex: 1 1 auto; display: flex; flex-direction: column; gap: calc(6px * var(--sf)); min-width: 0; }
