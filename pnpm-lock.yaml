@@ -2669,6 +2669,9 @@ importers:
       '@lacuna/json-backup':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/json-backup/0.1.0
+      '@lacuna/progress-ring':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/progress-ring/0.1.0
       '@lacuna/streak-calc':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/streak-calc/0.1.0

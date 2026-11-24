@@ -17,6 +17,7 @@ import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
 import { exportBackup } from '@lacuna/json-backup'
 import { useCollection, type CollectionItem } from '@lacuna/use-collection'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { ProgressRing } from '@lacuna/progress-ring'
 import { toISODate } from '@lacuna/date-math'
 import { computeStreaks } from '@lacuna/streak-calc'
 import { host, spaceId } from './host/mock'
@@ -45,49 +46,6 @@ function parseAmount(raw: string): number | null {
   const value = Number.parseFloat(raw.replace(/[^0-9.]/g, ''))
   if (!Number.isFinite(value) || value <= 0) return null
   return Math.round(value * 100) / 100
-}
-
-/** A circular progress ring. The percentage is shown inside the ring. */
-function Ring({ percent, saved, target }: { percent: number; saved: number; target: number }) {
-  const radius = 42
-  const circumference = 2 * Math.PI * radius
-  const filled = Math.min(100, Math.max(0, percent))
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <svg
-        width={108}
-        height={108}
-        viewBox="0 0 108 108"
-        style={{ display: 'block', margin: '0 auto' }}
-      >
-        <circle cx={54} cy={54} r={radius} fill="none" stroke="var(--ui-line2)" strokeWidth={8} />
-        <circle
-          cx={54}
-          cy={54}
-          r={radius}
-          fill="none"
-          stroke="var(--accent)"
-          strokeWidth={8}
-          strokeLinecap="round"
-          strokeDasharray={`${(filled / 100) * circumference} ${circumference}`}
-          transform="rotate(-90 54 54)"
-        />
-        <text
-          x={54}
-          y={54}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fill="var(--ink)"
-          style={{ fontSize: 'calc(18px * var(--tf))', fontFamily: 'var(--mono)' }}
-        >
-          {percent}%
-        </text>
-      </svg>
-      <div style={{ fontSize: 'calc(12px * var(--tf))', color: 'var(--ink-60)' }}>
-        {money(saved)} of {money(target)}
-      </div>
-    </div>
-  )
 }
 
 export function App() {
@@ -383,7 +341,14 @@ export function App() {
             <div className="ring-layout">
               {goals.map((goal) => (
                 <Card key={goal.id} title={goal.name} mono="Progress">
-                  <Ring percent={percentOf(goal)} saved={savedOf(goal)} target={goal.target} />
+                  <div style={{ display: 'grid', gap: 'calc(8px * var(--sf))', justifyItems: 'center' }}>
+                    <ProgressRing value={percentOf(goal)} max={100} label={`${goal.name} progress`} size={14} strokeWidth={2}>
+                      {percentOf(goal)}%
+                    </ProgressRing>
+                    <div style={{ fontSize: 'calc(12px * var(--tf))', color: 'var(--ink-60)' }}>
+                      {money(savedOf(goal))} of {money(goal.target)}
+                    </div>
+                  </div>
                 </Card>
               ))}
             </div>
