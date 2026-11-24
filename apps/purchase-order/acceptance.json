@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a944df5f4f6e8617615fac1f949002a4d3c912bb269467d986e8c75d994e23ba",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Purchase Order\" and, with no orders, the list area shows the text \"No purchase orders yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New order\" opens a form. Filling the field labelled \"Vendor\" with \"Acme Corp\", the field labelled \"Order date\" with \"2024-01-15\", and clicking the button \"Save\" adds a row to the table with \"Acme Corp\" and \"2024-01-15\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the new order form, clicking the button \"Add line item\" adds a row. Filling the field labelled \"Description\" with \"Widget\", the field labelled \"Quantity\" with \"10\", the field labelled \"Unit price\" with \"25.00\", the field labelled \"Discount %\" with \"5\", and the field labelled \"Tax %\" with \"8\", then clicking \"Save\" shows a table row with \"Acme Corp\", \"Widget\", \"10\", \"$25.00\", and a total of \"$261.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "After saving the order from A3, the table shows a row with \"Acme Corp\" and a total of \"$261.00\". Clicking the button \"Delete Acme Corp\" removes that row and the list shows \"No purchase orders yet\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the order from A3 saved, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"vendor,order_date,description,quantity,unit_price,discount_pct,tax_pct,total\" and a data row \"Acme Corp,2024-01-15,Widget,10,25.00,5,8,261.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the new order form, adding a line item with Description \"Gadget\", Quantity \"2\", Unit price \"100.00\", Discount % \"0\", Tax % \"10\", then clicking \"Save\" shows a total of \"$220.00\" for that line item."
+    },
+    {
+      "id": "A7",
+      "text": "The table has a column header \"Total\". Clicking the header \"Total\" sorts the rows in descending order by total. With two orders (Acme Corp total $261.00 and Beta Inc total $500.00), the first row shows \"Beta Inc\" and the second shows \"Acme Corp\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Acme\" in the search box labelled \"Search\" filters the table to show only the row with \"Acme Corp\". Clearing the search shows all rows again."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the order with vendor \"Acme Corp\" and total \"$261.00\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "558813daf7a477a10f8de45627dc96b377ae6c08e55adaaefa2bab5280707d2b"
+    }
+  ]
+}

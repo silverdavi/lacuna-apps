@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.purchase-order",
+  "name": "Purchase Order",
+  "version": "0.1.0",
+  "summary": "Create, track, and export purchase orders with line-item totals.",
+  "description": "A purchase-order app. Create orders with vendor, date, and line items, compute subtotals, discounts, and tax with integer-currency math, export to CSV, and keep everything on this device.",
+  "category": "business",
+  "tags": [],
+  "icon": "procurement",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/purchase-order",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/line-items": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:purchase-order"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "purchase-order",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own purchase-order records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "purchase-order"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
