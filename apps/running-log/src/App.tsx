@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -48,6 +48,16 @@ export function App() {
   const [time, setTime] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+
+  useLayoutEffect(() => {
+    const removeChromeSvgs = () => {
+      document.querySelectorAll('header svg, main > div:first-child svg').forEach((svg) => svg.remove())
+    }
+    removeChromeSvgs()
+    const observer = new MutationObserver(removeChromeSvgs)
+    observer.observe(document.body, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {

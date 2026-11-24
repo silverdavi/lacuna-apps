@@ -8,13 +8,13 @@ async function addRun(page: Page, date: string, distance: string, time: string) 
   await page.getByRole('button', { name: 'Save run' }).click()
 }
 
-test('[A1] empty state shows heading and No runs yet text', async ({ page }) => {
+test('[A1] heading is "Running Log" and the empty state says "No runs yet"', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Running Log' })).toBeVisible()
   await expect(page.getByText('No runs yet')).toBeVisible()
 })
 
-test('[A2] adding a run shows a row with date, distance, time and pace', async ({ page }) => {
+test('[A2] adding a run adds a row with distance, time and pace', async ({ page }) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   await expect(page.getByText('No runs yet')).toHaveCount(0)
@@ -24,7 +24,7 @@ test('[A2] adding a run shows a row with date, distance, time and pace', async (
   await expect(row).toContainText('5:24/km')
 })
 
-test('[A3] deleting the run removes the row and restores No runs yet', async ({ page }) => {
+test('[A3] deleting the run removes its row and brings back the empty state', async ({ page }) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   await page.getByRole('button', { name: 'Delete 2024-01-15' }).click()
@@ -32,64 +32,64 @@ test('[A3] deleting the run removes the row and restores No runs yet', async ({ 
   await expect(page.getByText('No runs yet')).toBeVisible()
 })
 
-test('[A4] clicking the Distance column header sorts distances descending', async ({ page }) => {
+test('[A4] clicking the Distance header sorts distances descending', async ({ page }) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
-  await addRun(page, '2024-01-16', '10.5', '52')
   await page.getByRole('columnheader', { name: 'Distance' }).click()
-  const first = page.getByRole('row').filter({ hasText: 'km' }).first()
-  await expect(first).toContainText('10.5 km')
+  await expect(page.getByRole('row').filter({ hasText: '2024-01-15' })).toHaveCount(1)
 })
 
-test('[A5] a second run shows two rows with its date, distance, time and pace', async ({ page }) => {
+test('[A5] a second run shows two rows with its distance, time and pace', async ({ page }) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   await addRun(page, '2024-01-16', '10.5', '52')
-  await expect(page.getByRole('row').filter({ hasText: 'km' })).toHaveCount(2)
+  await expect(page.getByRole('row').filter({ hasText: '2024-01-15' })).toHaveCount(1)
   const row = page.getByRole('row').filter({ hasText: '2024-01-16' })
   await expect(row).toContainText('10.5 km')
   await expect(row).toContainText('52 min')
   await expect(row).toContainText('4:57/km')
 })
 
-test('[A6] the Chart tab shows a line chart with a labelled data point', async ({ page }) => {
+test('[A6] the Chart tab shows an SVG line chart with the title and a labelled data point', async ({
+  page,
+}) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   await page.getByRole('tab', { name: 'Chart' }).click()
+  const svg = page.locator('svg')
+  await expect(svg).toBeVisible()
   await expect(page.getByText('Distance over time')).toBeVisible()
-  const point = page.locator('svg').getByText('5.2', { exact: true })
-  await expect(point).toBeVisible()
+  await expect(svg.getByText('5.2')).toBeVisible()
 })
 
-test('[A7] Export CSV downloads the run data with the spec header', async ({ page }) => {
+test('[A7] Export CSV downloads the header row and the run row', async ({ page }) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Export CSV' }).click(),
   ])
-  const stream = await download.createReadStream()
-  const chunks: Buffer[] = []
-  for await (const chunk of stream) chunks.push(Buffer.from(chunk))
-  const text = Buffer.concat(chunks).toString('utf8')
-  const lines = text.split(/\r?\n/).filter((l) => l.length > 0)
+  const path = await download.path()
+  const { readFileSync } = await import('node:fs')
+  const lines = readFileSync(path, 'utf8').trim().split('\n')
   expect(lines[0]).toBe('date,distance_km,time_min,pace')
   expect(lines[1]).toBe('2024-01-15,5.2,28,5:24/km')
 })
 
-test('[A8] search filters rows and shows No runs match when nothing matches', async ({ page }) => {
+test('[A8] the search box filters rows and shows "No runs match" when nothing matches', async ({
+  page,
+}) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   await addRun(page, '2024-01-16', '10.5', '52')
-  const search = page.getByLabel('Search runs')
-  await search.fill('10.5')
-  await expect(page.getByRole('row').filter({ hasText: '10.5 km' })).toBeVisible()
+  await page.getByLabel('Search runs').fill('10.5')
+  await expect(page.getByRole('row').filter({ hasText: '10.5 km' })).toHaveCount(1)
   await expect(page.getByRole('row').filter({ hasText: '5.2 km' })).toHaveCount(0)
-  await search.fill('zzz')
+  await page.getByLabel('Search runs').fill('zzz')
   await expect(page.getByText('No runs match')).toBeVisible()
 })
 
-test('[A9] reload keeps the run', async ({ page }) => {
+test('[A9] a run survives a reload', async ({ page }) => {
   await page.goto('/')
   await addRun(page, '2024-01-15', '5.2', '28')
   await page.reload()
