@@ -8,6 +8,8 @@
     "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
+    "@lacuna/csv-parse": "workspace:0.1.0",
+    "@lacuna/file-save-open": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/password-generate": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
