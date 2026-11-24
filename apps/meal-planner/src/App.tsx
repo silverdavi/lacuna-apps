@@ -12,11 +12,14 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   List,
   PrimaryButton,
+  Rail,
   Row,
-  Select,
   Stack,
+  Table,
   TextInput,
 } from '@lacuna/ui'
 import { DAYS, syncMeals, type Day } from './host'
@@ -47,7 +50,11 @@ function shopping(meals: MealData[]): { name: string; quantity: number }[] {
 }
 
 function copyText(items: { name: string; quantity: number }[]): string {
-  return items.map((i) => `${i.name}: ${i.quantity}`).join('\n')
+  return items
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((i) => `${i.name}: ${i.quantity}`)
+    .join('\n')
 }
 
 function startOfWeek(): Date {
@@ -90,14 +97,19 @@ function icsEvents(meals: MealData[]): IcsEvent[] {
   return out
 }
 
+function isDay(v: string): v is Day {
+  return (DAYS as readonly string[]).includes(v)
+}
+
 export function App() {
   const { state, actions } = useCollection<MealData>({ storageKey: 'meal-planner' })
   const [tab, setTab] = useState<Tab>('Week View')
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
-  const [day, setDay] = useState<Day>('Monday')
+  const [day, setDay] = useState('Monday')
   const [ingredients, setIngredients] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [dayError, setDayError] = useState<string | null>(null)
 
   const meals = state.activeItems.map((i) => i.data)
 
@@ -111,14 +123,24 @@ export function App() {
 
   const saveMeal = () => {
     const n = name.trim()
+    let ok = true
     if (n === '') {
-      setError('Enter a meal name')
-      return
+      setNameError('Enter a meal name')
+      ok = false
+    } else {
+      setNameError(null)
     }
-    actions.add({ name: n, day, ingredients: ingredients.trim() })
+    if (!isDay(day.trim())) {
+      setDayError('Pick a day: Monday through Sunday')
+      ok = false
+    } else {
+      setDayError(null)
+    }
+    if (!ok) return
+    actions.add({ name: n, day: day.trim() as Day, ingredients: ingredients.trim() })
     setName('')
+    setDay('Monday')
     setIngredients('')
-    setError(null)
     setOpen(false)
   }
 
@@ -144,16 +166,24 @@ export function App() {
           </Button>
         </Stack>
       }
+      side={
+        <Rail>
+          <KpiRow>
+            <Kpi value={meals.length} label="meals planned" />
+            <Kpi value={items.length} label="items to buy" accent />
+          </KpiRow>
+        </Rail>
+      }
     >
       <Stack>
-        <div className="mp-tabs" role="tablist" aria-label="Views">
+        <div role="tablist" aria-label="Views" className="mp-tabs">
           {(['Week View', 'Shopping List'] as const).map((t) => (
             <button
               key={t}
               type="button"
               role="tab"
               aria-selected={tab === t}
-              className="mp-tab"
+              className={`mp-tab${tab === t ? ' active' : ''}`}
               onClick={() => setTab(t)}
             >
               {t}
@@ -176,8 +206,8 @@ export function App() {
               {open ? (
                 <Stack>
                   <FormGrid>
-                    <TextInput label="Meal Name" value={name} onChange={setName} error={error} />
-                    <Select label="Day" value={day} onChange={(v) => setDay(v as Day)} options={[...DAYS]} />
+                    <TextInput label="Meal Name" value={name} onChange={setName} error={nameError} />
+                    <TextInput label="Day" value={day} onChange={setDay} error={dayError} hint="Monday, Tuesday, ..." />
                     <TextInput label="Ingredients" value={ingredients} onChange={setIngredients} />
                   </FormGrid>
                   <Actions>
@@ -197,24 +227,29 @@ export function App() {
                   onAction={() => setOpen(true)}
                 />
               ) : (
-                <List label="Planned meals">
-                  {state.activeItems.map((item) => (
-                    <Row
-                      key={item.id}
-                      title={item.data.name}
-                      meta={item.data.day}
-                      action={
+                <Table
+                  label="Planned meals"
+                  columns={[
+                    { key: 'day', label: 'Day' },
+                    { key: 'meal', label: 'Meal' },
+                    { key: 'delete', label: '' },
+                  ]}
+                  rows={state.activeItems.map((item) => ({
+                    cells: {
+                      day: item.data.day,
+                      meal: item.data.name,
+                      delete: (
                         <Button
                           kind="ghost"
                           ariaLabel={`Delete ${item.data.name}`}
                           onClick={() => actions.remove(item.id)}
                         >
-                          Delete
+                          Delete {item.data.name}
                         </Button>
-                      }
-                    />
-                  ))}
-                </List>
+                      ),
+                    },
+                  }))}
+                />
               )}
             </Card>
           </Stack>
@@ -231,7 +266,7 @@ export function App() {
             ) : (
               <List label="Ingredients to buy">
                 {items.map((i) => (
-                  <Row key={i.name} title={i.name} value={String(i.quantity)} />
+                  <Row key={i.name} title={i.name} value={i.quantity} />
                 ))}
               </List>
             )}
