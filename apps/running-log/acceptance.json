@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "bdd7c6fbcf5a8f620859c474e028bb0803aa218355a4c1a191aee71ae6b7a42c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Running Log\" and the empty state shows the text \"No runs yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add run\" opens a form. Filling the field labelled \"Date\" with \"2024-01-15\", the field labelled \"Distance (km)\" with \"5.2\", and the field labelled \"Time (min)\" with \"28\", then clicking \"Save run\" adds a row to the table containing \"2024-01-15\", \"5.2 km\", \"28 min\", and \"5:24/km\"; the text \"No runs yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the run from A2, clicking the button \"Delete 2024-01-15\" removes that row and the text \"No runs yet\" reappears."
+    },
+    {
+      "id": "A4",
+      "text": "With the run from A2 present, clicking the column header \"Distance\" sorts the table so the distance column is in descending order; the first data row shows \"5.2 km\"."
+    },
+    {
+      "id": "A5",
+      "text": "After adding a second run with Date \"2024-01-16\", Distance \"10.5\", and Time \"52\", the table shows two rows; the row for \"2024-01-16\" displays \"10.5 km\", \"52 min\", and \"4:57/km\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab \"Chart\" shows an SVG line chart with the text \"Distance over time\" and a data point labelled \"5.2\" for the run dated \"2024-01-15\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose first line is \"date,distance_km,time_min,pace\" and whose second line is \"2024-01-15,5.2,28,5:24/km\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"10.5\" in the search box labelled \"Search runs\" filters the table to show only the row containing \"10.5 km\"; typing \"zzz\" shows the text \"No runs match\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the run added in A2: after reloading, the table still contains a row with \"2024-01-15\", \"5.2 km\", \"28 min\", and \"5:24/km\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "3f65cd79bc7472210fa342571902b7f96c35f4bc36b81801d6095860d4bab17f"
+    }
+  ]
+}
