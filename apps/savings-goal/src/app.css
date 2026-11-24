@@ -1,0 +1,5 @@
+/* Inactive tabs at the kit default (--ink-40) fail WCAG contrast; raise them to legible ink. */
+.lk-main .lc-tab:not(.active) { color: var(--ink-80); }
+
+/* Progress tab: two columns on wide screens (chart beside the goal ring), single column below. */
+.ring-layout { display: grid; gap: calc(16px * var(--sf)); grid-template-columns: repeat(auto-fill, minmax(calc(180px * var(--sf)), 1fr)); align-items: start; }
