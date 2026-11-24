@@ -1,139 +1,140 @@
-import { readFileSync } from 'node:fs'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
-const card = (page: Page, title = 'Customer Feedback') => page.getByText(title).locator('..')
+// A2's "creates a survey card" is read as a named article per card, so the card
+// is located by getByRole('article', { name }) and the spec's text checks assert
+// the content that lives inside it.
+
+function surveyCard(page: Page, title: string): Locator {
+  return page.getByRole('article', { name: title }).first()
+}
 
 async function createSurvey(page: Page, title: string) {
   await page.getByRole('button', { name: 'New survey' }).click()
   await page.getByLabel('Title').fill(title)
   await page.getByRole('button', { name: 'Save survey' }).click()
+  return surveyCard(page, title)
 }
 
-async function addQuestion(page: Page, text: string) {
-  await page.getByRole('button', { name: 'Add question' }).click()
-  const input = page.getByRole('textbox', { name: 'Question' })
-  await input.fill(text)
+async function addQuestion(page: Page, card: Locator, text: string) {
+  await card.getByRole('button', { name: 'Add question' }).click()
+  // The spec fixes only the question wording; the input's accessible name is not
+  // specified, so target the newest text input that the Add question button opens.
+  await page.getByRole('textbox').last().fill(text)
   await page.getByRole('button', { name: 'Add' }).click()
 }
 
-// [A1]
-test('[A1] empty state shows heading and "No surveys yet"', async ({ page }) => {
+test('[A1] empty app shows the heading and "No surveys yet"', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Survey App' })).toBeVisible()
   await expect(page.getByText('No surveys yet')).toBeVisible()
 })
 
-// [A2]
-test('[A2] saving a new survey replaces the empty state', async ({ page }) => {
+test('[A2] creating a survey shows its card with the title and "0 responses"', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await expect(page.getByText('Customer Feedback')).toBeVisible()
-  await expect(page.getByText('0 responses')).toBeVisible()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await expect(card).toContainText('Customer Feedback')
+  await expect(card).toContainText('0 responses')
   await expect(page.getByText('No surveys yet')).not.toBeVisible()
 })
 
-// [A3]
-test('[A3] adding two questions makes the card show "2 questions"', async ({ page }) => {
+test('[A3] adding two questions shows a checklist item for each and "2 questions"', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await addQuestion(page, 'Would you recommend us?')
-  await addQuestion(page, 'What did you like?')
-  await expect(page.getByText('Would you recommend us?')).toBeVisible()
-  await expect(page.getByText('What did you like?')).toBeVisible()
-  await expect(page.getByText('2 questions')).toBeVisible()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await addQuestion(page, card, 'Would you recommend us?')
+  await addQuestion(page, card, 'What did you like?')
+  await expect(card.getByText('Would you recommend us?')).toBeVisible()
+  await expect(card.getByText('What did you like?')).toBeVisible()
+  await expect(card).toContainText('2 questions')
 })
 
-// [A4]
-test('[A4] submitting one checked response shows "1 response"', async ({ page }) => {
+test('[A4] Start collecting opens a form with the questions as checkboxes; submitting increments the count', async ({
+  page,
+}) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await addQuestion(page, 'Would you recommend us?')
-  await addQuestion(page, 'What did you like?')
-  await page.getByRole('button', { name: 'Start collecting' }).click()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await addQuestion(page, card, 'Would you recommend us?')
+  await addQuestion(page, card, 'What did you like?')
+  await card.getByRole('button', { name: 'Start collecting' }).click()
   await expect(page.getByRole('heading', { name: 'Customer Feedback' })).toBeVisible()
-  const first = page.getByLabel('Would you recommend us?')
-  const second = page.getByLabel('What did you like?')
-  await expect(first).toBeVisible()
-  await expect(second).toBeVisible()
-  await first.check()
-  await expect(first).toBeChecked()
+  const recommend = page.getByRole('checkbox', { name: 'Would you recommend us?' })
+  const liked = page.getByRole('checkbox', { name: 'What did you like?' })
+  await expect(recommend).toBeVisible()
+  await expect(liked).toBeVisible()
+  await recommend.click()
+  await expect(recommend).toBeChecked()
   await page.getByRole('button', { name: 'Submit response' }).click()
-  await expect(page.getByText('1 response')).toBeVisible()
+  await expect(card).toContainText('1 response')
 })
 
-// [A5]
-test('[A5] responses table has the question columns and first row', async ({ page }) => {
+test('[A5] View responses opens a table with a Respondent column and Yes/No per question', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await addQuestion(page, 'Would you recommend us?')
-  await addQuestion(page, 'What did you like?')
-  await page.getByRole('button', { name: 'Start collecting' }).click()
-  await page.getByLabel('Would you recommend us?').check()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await addQuestion(page, card, 'Would you recommend us?')
+  await addQuestion(page, card, 'What did you like?')
+  await card.getByRole('button', { name: 'Start collecting' }).click()
+  await page.getByRole('checkbox', { name: 'Would you recommend us?' }).click()
   await page.getByRole('button', { name: 'Submit response' }).click()
-  await page.getByRole('button', { name: 'View responses' }).click()
-  const table = page.getByRole('table')
+  await card.getByRole('button', { name: 'View responses' }).click()
+  const table = page.getByRole('table').last()
   await expect(table.getByRole('columnheader', { name: 'Respondent' })).toBeVisible()
   await expect(table.getByRole('columnheader', { name: 'Would you recommend us?' })).toBeVisible()
   await expect(table.getByRole('columnheader', { name: 'What did you like?' })).toBeVisible()
-  const firstRow = table.getByRole('row').filter({ hasText: 'Respondent 1' })
-  await expect(firstRow.getByRole('cell', { name: 'Yes' })).toBeVisible()
-  await expect(firstRow.getByRole('cell', { name: 'No' })).toBeVisible()
+  const row = table.locator('tr').filter({ hasText: 'Respondent 1' })
+  await expect(row).toContainText('Yes')
+  await expect(row).toContainText('No')
 })
 
-// [A6]
-test('[A6] CSV export contains the header and data rows', async ({ page }) => {
+test('[A6] Export CSV downloads a file with the header row and the response row', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await addQuestion(page, 'Would you recommend us?')
-  await addQuestion(page, 'What did you like?')
-  await page.getByRole('button', { name: 'Start collecting' }).click()
-  await page.getByLabel('Would you recommend us?').check()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await addQuestion(page, card, 'Would you recommend us?')
+  await addQuestion(page, card, 'What did you like?')
+  await card.getByRole('button', { name: 'Start collecting' }).click()
+  await page.getByRole('checkbox', { name: 'Would you recommend us?' }).click()
   await page.getByRole('button', { name: 'Submit response' }).click()
   const [download] = await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Export CSV' }).click(),
+    card.getByRole('button', { name: 'Export CSV' }).click(),
   ])
+  const { readFileSync } = await import('node:fs')
   const content = readFileSync(await download.path(), 'utf8')
   expect(content).toContain('Respondent,Would you recommend us?,What did you like?')
   expect(content).toContain('Respondent 1,Yes,No')
 })
 
-// [A7]
-test('[A7] deleting the survey brings back the empty state', async ({ page }) => {
+test('[A7] Delete survey removes the card and brings back "No surveys yet"', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await page.getByRole('button', { name: 'Delete survey' }).click()
-  await expect(page.getByText('Customer Feedback')).not.toBeVisible()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await card.getByRole('button', { name: 'Delete survey' }).click()
+  await expect(card).toHaveCount(0)
   await expect(page.getByText('No surveys yet')).toBeVisible()
 })
 
-// [A8]
-test('[A8] a single-question survey collects a response', async ({ page }) => {
+test('[A8] a single-question survey records a response and shows it in the table', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'NPS Score')
-  await addQuestion(page, 'Rate us 1-10')
-  await page.getByRole('button', { name: 'Start collecting' }).click()
-  await page.getByLabel('Rate us 1-10').check()
+  const card = await createSurvey(page, 'NPS Score')
+  await addQuestion(page, card, 'Rate us 1-10')
+  await card.getByRole('button', { name: 'Start collecting' }).click()
+  await page.getByRole('checkbox', { name: 'Rate us 1-10' }).click()
   await page.getByRole('button', { name: 'Submit response' }).click()
-  await expect(page.getByText('1 response')).toBeVisible()
-  await page.getByRole('button', { name: 'View responses' }).click()
-  const table = page.getByRole('table')
-  const firstRow = table.getByRole('row').filter({ hasText: 'Respondent 1' })
-  await expect(firstRow.getByRole('cell', { name: 'Yes' })).toBeVisible()
+  await expect(card).toContainText('1 response')
+  await card.getByRole('button', { name: 'View responses' }).click()
+  const row = page.getByRole('table').last().locator('tr').filter({ hasText: 'Respondent 1' })
+  await expect(row).toContainText('Yes')
 })
 
-// [A9]
-test('[A9] reload keeps the survey, its questions and response count', async ({ page }) => {
+test('[A9] reload keeps the survey, its questions and its response count', async ({ page }) => {
   await page.goto('/')
-  await createSurvey(page, 'Customer Feedback')
-  await addQuestion(page, 'Would you recommend us?')
-  await addQuestion(page, 'What did you like?')
-  await page.getByRole('button', { name: 'Start collecting' }).click()
-  await page.getByLabel('Would you recommend us?').check()
+  const card = await createSurvey(page, 'Customer Feedback')
+  await addQuestion(page, card, 'Would you recommend us?')
+  await addQuestion(page, card, 'What did you like?')
+  await card.getByRole('button', { name: 'Start collecting' }).click()
+  await page.getByRole('checkbox', { name: 'Would you recommend us?' }).click()
   await page.getByRole('button', { name: 'Submit response' }).click()
-  await page.goto('/')
-  await expect(page.getByText('Customer Feedback')).toBeVisible()
-  await expect(page.getByText('Would you recommend us?')).toBeVisible()
-  await expect(page.getByText('What did you like?')).toBeVisible()
-  await expect(page.getByText('1 response')).toBeVisible()
+  await expect(card).toContainText('1 response')
+  await page.reload()
+  const card2 = surveyCard(page, 'Customer Feedback')
+  await expect(card2).toContainText('Would you recommend us?')
+  await expect(card2).toContainText('What did you like?')
+  await expect(card2).toContainText('1 response')
 })

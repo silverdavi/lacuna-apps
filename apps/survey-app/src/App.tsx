@@ -38,6 +38,7 @@ export function App() {
   const [title, setTitle] = useState('')
   const [titleError, setTitleError] = useState<string | null>(null)
   const [questionDrafts, setQuestionDrafts] = useState<Record<string, string>>({})
+  const [questionOpen, setQuestionOpen] = useState<Record<string, boolean>>({})
   const [answers, setAnswers] = useState<Record<string, boolean>>({})
   const [view, setView] = useState<View>({ kind: 'list' })
 
@@ -66,6 +67,7 @@ export function App() {
     if (!text) return
     addQuestion(survey.id, text)
     setQuestionDrafts({ ...questionDrafts, [survey.id]: '' })
+    setQuestionOpen({ ...questionOpen, [survey.id]: false })
   }
 
   function submitResponse(survey: Survey) {
@@ -225,11 +227,14 @@ export function App() {
             {surveys.map((survey) => {
               const responses = responsesFor(survey.id)
               return (
-                <Card
-                  key={survey.id}
-                  title={survey.title}
-                  actions={<MonoLabel sm>{`${survey.questions.length} ${survey.questions.length === 1 ? 'question' : 'questions'} · ${responses.length} ${responses.length === 1 ? 'response' : 'responses'}`}</MonoLabel>}
-                >
+                <article key={survey.id} className="lc-card" aria-label={survey.title}>
+                  <div className="lc-card-head">
+                    <div>
+                      <MonoLabel sm>{survey.questions.length === 1 ? '1 question' : `${survey.questions.length} questions`}</MonoLabel>
+                      <Title size="md">{survey.title}</Title>
+                    </div>
+                    <MonoLabel sm>{responses.length === 1 ? '1 response' : `${responses.length} responses`}</MonoLabel>
+                  </div>
                   <Stack>
                     {survey.questions.length > 0 ? (
                       <Stack>
@@ -240,10 +245,16 @@ export function App() {
                         ))}
                       </Stack>
                     ) : null}
-                    <FormGrid>
-                      <TextInput label="Question" value={questionDrafts[survey.id] ?? ''} onChange={(value) => setQuestionDrafts({ ...questionDrafts, [survey.id]: value })} placeholder="e.g. Would you recommend us?" />
-                      <Button onClick={() => addQuestionFor(survey)}>Add question</Button>
-                    </FormGrid>
+                    {questionOpen[survey.id] ? (
+                      <FormGrid>
+                        <TextInput label="Question" value={questionDrafts[survey.id] ?? ''} onChange={(value) => setQuestionDrafts({ ...questionDrafts, [survey.id]: value })} placeholder="e.g. Would you recommend us?" />
+                        <Button onClick={() => addQuestionFor(survey)}>Add</Button>
+                      </FormGrid>
+                    ) : (
+                      <Actions>
+                        <Button onClick={() => setQuestionOpen({ ...questionOpen, [survey.id]: true })}>Add question</Button>
+                      </Actions>
+                    )}
                     <FormGrid>
                       <Button
                         onClick={() => {
@@ -258,7 +269,7 @@ export function App() {
                       <Button kind="danger" onClick={() => deleteSurvey(survey.id)}>Delete survey</Button>
                     </FormGrid>
                   </Stack>
-                </Card>
+                </article>
               )
             })}
             <Actions>
