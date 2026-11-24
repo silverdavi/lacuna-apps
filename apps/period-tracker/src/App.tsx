@@ -31,7 +31,7 @@ function dayDiff(a: Date, b: Date): number {
   return Math.round(ms / 86400000)
 }
 
-function cycleDays(periods: PeriodRecord[]): number | null {
+function averageGapDays(periods: PeriodRecord[]): number | null {
   if (periods.length < 2) return null
   const starts = periods
     .map((period) => parseISO(period.start))
@@ -44,6 +44,10 @@ function cycleDays(periods: PeriodRecord[]): number | null {
   }
   if (gaps.length === 0) return null
   return Math.round(gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length)
+}
+
+function predictDay(latest: Date, step: number): Date {
+  return addDays(latest, step)
 }
 
 export function App() {
@@ -67,15 +71,15 @@ export function App() {
     [periods],
   )
 
-  const cycle = useMemo(() => cycleDays(periods), [periods])
+  const cycle = useMemo(() => averageGapDays(periods), [periods])
 
   const nextPeriod = useMemo(() => {
-    if (!cycle || sorted.length === 0) return null
-    const latest = sorted[sorted.length - 1]
-    const latestDate = parseISO(latest.start)
-    if (!latestDate) return null
-    return toISODate(addDays(latestDate, cycle))
-  }, [cycle, sorted])
+    const latest = parseISO(sorted[sorted.length - 1]?.start)
+    if (!latest) return null
+    if (cycle) return toISODate(predictDay(latest, cycle))
+    if (settings.hasCustomLength) return toISODate(predictDay(latest, settings.defaultLength))
+    return null
+  }, [cycle, settings, sorted])
 
   const startKeys = useMemo(() => {
     const keys = new Set<string>()
@@ -85,20 +89,15 @@ export function App() {
 
   const predictedKeys = useMemo(() => {
     const keys = new Set<string>()
-    if (cycle) {
-      for (const period of periods) {
-        const date = parseISO(period.start)
-        if (date) keys.add(toISODate(addDays(date, cycle)))
-      }
-    }
+    if (nextPeriod) keys.add(nextPeriod)
     return keys
-  }, [cycle, periods])
+  }, [nextPeriod])
 
   const viewDate = useMemo(() => {
     const date = selected ? parseISO(selected) : null
     if (date) return date
-    const first = sorted[0] ? parseISO(sorted[0].start) : null
-    return first ?? new Date()
+    const latest = sorted.length > 0 ? parseISO(sorted[sorted.length - 1].start) : null
+    return latest ?? new Date()
   }, [selected, sorted])
 
   const monthLabel = viewDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })
@@ -107,10 +106,17 @@ export function App() {
     const first = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1)
     const offset = first.getDay()
     const start = addDays(first, -offset)
+    let end = addDays(first, new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate() - 1)
+    if (nextPeriod) {
+      const predicted = parseISO(nextPeriod)
+      if (predicted && dayDiff(predicted, end) > 0) end = predicted
+    }
+    const totalDays = dayDiff(end, start) + 1
+    const weeks = Math.ceil(totalDays / 7)
     const days: Date[] = []
-    for (let i = 0; i < 42; i += 1) days.push(addDays(start, i))
+    for (let i = 0; i < weeks * 7; i += 1) days.push(addDays(start, i))
     return days
-  }, [viewDate])
+  }, [viewDate, nextPeriod])
 
   const addPeriod = () => {
     const lengthValue = Number.parseInt(length, 10)
@@ -127,10 +133,14 @@ export function App() {
     if (selected === record.start) setSelected('')
   }
 
+  const selectDay = (iso: string) => {
+    setSelected(iso)
+  }
+
   const saveSettings = () => {
     const value = Number.parseInt(draftLength, 10)
     if (!Number.isFinite(value) || value < 1) return
-    host.saveSettings({ defaultLength: value })
+    host.saveSettings({ defaultLength: value, hasCustomLength: true })
     setSettings(host.getSettings())
   }
 
@@ -157,10 +167,6 @@ export function App() {
     await clipboard.copy(toIcs(events))
   }
 
-  const selectDay = (iso: string) => {
-    setSelected(iso)
-  }
-
   const chipGap = 'calc(8px * var(--sf))'
   const cellGap = 'calc(4px * var(--sf))'
 
@@ -178,85 +184,89 @@ export function App() {
           chips={[
             `${periods.length} periods`,
             cycle ? `Cycle ${cycle}d` : 'Cycle —',
-            nextPeriod ? `Next ${nextPeriod}` : 'Next —',
+            nextPeriod ? 'Prediction on' : 'No prediction',
           ]}
         />
       }
     >
-      <Card mono="Log" title="Add period">
-        <Stack>
-          <FormGrid>
-            <TextInput
-              label="Start date"
-              type="date"
-              value={start}
-              onChange={setStart}
-            />
-            <TextInput
-              label="Length (days)"
-              type="number"
-              inputMode="numeric"
-              value={length}
-              onChange={setLength}
-              placeholder="5"
-            />
-          </FormGrid>
-          <div style={{ display: 'flex', gap: chipGap, alignItems: 'center' }}>
-            <Button kind="primary" onClick={addPeriod}>
-              Add period
-            </Button>
-            <Button kind="secondary" onClick={() => void exportIcs()}>
-              Export ICS
-            </Button>
-            {clipboard.copied ? <Body sm>Calendar exported</Body> : null}
-          </div>
-        </Stack>
-      </Card>
+      {tab !== 'Calendar' ? (
+        <>
+          <Card mono="Log" title="Add period">
+            <Stack>
+              <FormGrid>
+                <TextInput
+                  label="Start date"
+                  type="date"
+                  value={start}
+                  onChange={setStart}
+                />
+                <TextInput
+                  label="Length (days)"
+                  type="number"
+                  inputMode="numeric"
+                  value={length}
+                  onChange={setLength}
+                  placeholder="5"
+                />
+              </FormGrid>
+              <div style={{ display: 'flex', gap: chipGap, alignItems: 'center' }}>
+                <Button kind="primary" onClick={addPeriod}>
+                  Add period
+                </Button>
+                <Button kind="secondary" onClick={() => void exportIcs()}>
+                  Export ICS
+                </Button>
+                {clipboard.copied ? <Body sm>Calendar exported</Body> : null}
+              </div>
+            </Stack>
+          </Card>
 
-      <Card mono="Summary" title="Cycle">
-        {periods.length === 0 ? (
-          <EmptyState
-            mono="Empty"
-            title="No periods recorded yet"
-            detail="Add a start date and length to compute the cycle."
-            actionLabel="Record a period"
-            onAction={addPeriod}
-          />
-        ) : (
-          <Stack>
-            <KpiRow>
-              <Kpi value={cycle ? `${cycle} days` : '—'} label={`Average cycle: ${cycle ? `${cycle} days` : '—'}`} accent />
-              <Kpi value={nextPeriod ?? '—'} label={`Next period: ${nextPeriod ?? '—'}`} />
-            </KpiRow>
-            <div role="list" style={{ display: 'flex', flexDirection: 'column' }}>
-              {sorted.map((period) => (
-                <div
-                  key={period.id}
-                  role="listitem"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: chipGap,
-                    padding: 'calc(8px * var(--sf)) 0',
-                    borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: chipGap }}>
-                    <MonoLabel>{period.start}</MonoLabel>
-                    <span>{period.length} days</span>
-                  </span>
-                  <Button kind="ghost" onClick={() => deletePeriod(period)}>
-                    Delete {period.start}
-                  </Button>
+          <Card mono="Summary" title="Cycle">
+            <Stack>
+              <KpiRow>
+                <Kpi value={cycle ? `${cycle} days` : '—'} label={`Average cycle: ${cycle ? `${cycle} days` : '—'}`} accent />
+                <Kpi value={nextPeriod ?? '—'} label={`Next period: ${nextPeriod ?? '—'}`} />
+              </KpiRow>
+              {periods.length === 0 ? (
+                <EmptyState
+                  mono="Empty"
+                  title="No periods recorded yet"
+                  detail="Add a start date and length to compute the cycle."
+                  actionLabel="Record a period"
+                  onAction={addPeriod}
+                />
+              ) : (
+                <div role="list" style={{ display: 'flex', flexDirection: 'column' }}>
+                  {sorted.map((period) => (
+                    <div
+                      key={period.id}
+                      role="listitem"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: chipGap,
+                        padding: 'calc(8px * var(--sf)) 0',
+                        borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: chipGap }}>
+                        <MonoLabel>{period.start}</MonoLabel>
+                        <span>{period.length} days</span>
+                      </span>
+                      <Button kind="ghost" onClick={() => deletePeriod(period)}>
+                        Delete {period.start}
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Stack>
-        )}
-      </Card>
+              )}
+            </Stack>
+          </Card>
+        </>
+      ) : null}
 
-      <div style={{ borderBottom: '1px solid var(--ui-line2)' }}>
+      <div style={{ borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)' }}>
         <div role="tablist" aria-label="Views" style={{ display: 'flex', gap: 'calc(20px * var(--sf))' }}>
           {(['Overview', 'Calendar', 'Settings'] as const).map((item) => (
             <button
@@ -264,7 +274,6 @@ export function App() {
               type="button"
               role="tab"
               aria-selected={tab === item}
-              className="lc-tab"
               style={{
                 fontSize: 'calc(12.5px * var(--tf))',
                 fontWeight: 600,
@@ -290,24 +299,28 @@ export function App() {
             <Button
               kind="ghost"
               ariaLabel="Previous month"
-              onClick={() => selectDay(toISODate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1)))}
+              onClick={() =>
+                selectDay(toISODate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1)))
+              }
             >
               ←
             </Button>
             <Button
               kind="ghost"
               ariaLabel="Next month"
-              onClick={() => selectDay(toISODate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1)))}
+              onClick={() =>
+                selectDay(toISODate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1)))
+              }
             >
               →
             </Button>
             <MonoLabel>{selected ? selected : monthLabel}</MonoLabel>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: cellGap }}>
+          <div role="grid" aria-label={monthLabel} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: cellGap }}>
             {WEEKDAYS.map((day) => (
-              <MonoLabel key={day} sm>
-                {day}
-              </MonoLabel>
+              <div key={day} role="columnheader">
+                <MonoLabel sm>{day}</MonoLabel>
+              </div>
             ))}
             {grid.map((day) => {
               const iso = toISODate(day)
@@ -316,50 +329,56 @@ export function App() {
               const isPredicted = predictedKeys.has(iso)
               const isSelected = selected === iso
               return (
-                <button
-                  key={iso}
-                  type="button"
-                  aria-label={iso}
-                  onClick={() => selectDay(iso)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 'calc(2px * var(--sf))',
-                    padding: 'calc(6px * var(--sf)) 0',
-                    border: isSelected ? 'calc(1px * var(--sf)) solid var(--accent)' : 'calc(1px * var(--sf)) solid transparent',
-                    borderRadius: 'calc(4px * var(--sf))',
-                    background: 'none',
-                    color: inMonth ? 'var(--ink)' : 'var(--ink-60)',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'calc(12px * var(--tf))',
-                  }}
-                >
-                  <span>{day.getDate()}</span>
-                  {isStart ? (
-                    <span
-                      style={{
-                        fontSize: 'calc(9px * var(--tf))',
-                        fontFamily: 'var(--mono)',
-                        color: 'var(--accent)',
-                      }}
-                    >
-                      Period start
-                    </span>
+                <div key={iso} role="gridcell">
+                  <button
+                    type="button"
+                    onClick={() => selectDay(iso)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 'calc(2px * var(--sf))',
+                      padding: 'calc(6px * var(--sf)) 0',
+                      border: isSelected ? 'calc(1px * var(--sf)) solid var(--accent)' : 'calc(1px * var(--sf)) solid transparent',
+                      borderRadius: 'calc(4px * var(--sf))',
+                      background: 'none',
+                      color: inMonth ? 'var(--ink)' : 'var(--ink-60)',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--sans)',
+                      fontSize: 'calc(12px * var(--tf))',
+                    }}
+                  >
+                    <span>{day.getDate()}</span>
+                    {isStart ? (
+                      <span
+                        style={{
+                          fontSize: 'calc(9px * var(--tf))',
+                          fontFamily: 'var(--mono)',
+                          color: 'var(--accent)',
+                        }}
+                      >
+                        Period start
+                      </span>
+                    ) : null}
+                    {isPredicted ? (
+                      <span
+                        style={{
+                          fontSize: 'calc(9px * var(--tf))',
+                          fontFamily: 'var(--mono)',
+                          color: 'var(--ink-60)',
+                        }}
+                      >
+                        Predicted period
+                      </span>
+                    ) : null}
+                  </button>
+                  {isStart || isPredicted ? (
+                    <div style={{ textAlign: 'center' }}>
+                      <MonoLabel sm>{iso}</MonoLabel>
+                    </div>
                   ) : null}
-                  {isPredicted ? (
-                    <span
-                      style={{
-                        fontSize: 'calc(9px * var(--tf))',
-                        fontFamily: 'var(--mono)',
-                        color: 'var(--ink-60)',
-                      }}
-                    >
-                      Predicted period
-                    </span>
-                  ) : null}
-                </button>
+                </div>
               )
             })}
           </div>

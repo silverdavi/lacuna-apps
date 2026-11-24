@@ -9,6 +9,7 @@ export interface PeriodRecord {
 
 export interface PeriodSettings {
   defaultLength: number
+  hasCustomLength?: boolean
 }
 
 const PERIODS_KEY = 'lacuna.period-tracker.periods'

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "node ../scripts/check-app.mjs"
+    "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
     "@lacuna/date-math": "workspace:0.1.0",
