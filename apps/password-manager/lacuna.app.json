@@ -6,7 +6,7 @@
   "summary": "Generate, store, and manage strong passwords locally.",
   "description": "Store site logins locally, generate strong passwords and passphrases, and copy them to the clipboard. Nothing leaves the browser.",
   "category": "productivity",
-  "icon": "database",
+  "icon": "vault",
   "relationship": {
     "kind": "standalone"
   },

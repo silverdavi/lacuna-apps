@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { generatePassword, generatePassphrase } from '@lacuna/password-generate'
 import { useClipboard } from '@lacuna/use-clipboard'
 import {
@@ -15,31 +15,6 @@ import {
   Tag,
   TextInput,
 } from '@lacuna/ui'
-
-function NamedInput({ ariaLabel, label, value, onChange, placeholder }: {
-  ariaLabel: string
-  label: string
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => {
-    inputRef.current?.setAttribute('aria-label', ariaLabel)
-  }, [ariaLabel])
-  return (
-    <label className="lc-field">
-      <span className="lc-field-label">{label}</span>
-      <input
-        ref={inputRef}
-        className="lc-input"
-        value={value}
-        placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
-      />
-    </label>
-  )
-}
 import { passwordStore, type PasswordRecord } from './host/mock'
 
 function now(): string {
@@ -54,7 +29,7 @@ function generatePassphraseValue(): string {
   return generatePassphrase({ wordCount: 4, separator: '-', capitalize: false, appendNumber: false }).value
 }
 
-const DOTS = '•'.repeat(10)
+const DOTS = '••••••••••'
 
 export function App() {
   const [records, setRecords] = useState<PasswordRecord[]>(() => passwordStore.list())
@@ -64,7 +39,7 @@ export function App() {
   const [name, setName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [entryType, setEntryType] = useState('website')
+  const [entryType, setEntryType] = useState('Standard')
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
@@ -75,7 +50,7 @@ export function App() {
     setName('')
     setUsername('')
     setPassword(generateWebsite())
-    setEntryType('website')
+    setEntryType('Standard')
     setFormOpen(true)
   }
 
@@ -84,7 +59,7 @@ export function App() {
     setName(record.name)
     setUsername(record.username)
     setPassword(record.password)
-    setEntryType('website')
+    setEntryType('Standard')
     setFormOpen(true)
   }
 
@@ -94,11 +69,11 @@ export function App() {
     setName('')
     setUsername('')
     setPassword('')
-    setEntryType('website')
+    setEntryType('Standard')
   }
 
   const handleGenerate = () => {
-    setPassword(entryType === 'passphrase' ? generatePassphraseValue() : generateWebsite())
+    setPassword(entryType === 'Passphrase' ? generatePassphraseValue() : generateWebsite())
   }
 
   const handleSave = () => {
@@ -140,58 +115,34 @@ export function App() {
       icon="vault"
       category="Tools"
       hue="blue"
+      meta={`${records.length} stored`}
       status={copied ? 'Copied to clipboard' : undefined}
     >
       <Card mono="Find" title="Search">
         <TextInput label="Search" value={query} onChange={setQuery} type="search" placeholder="Account, user" />
       </Card>
 
-      {formOpen ? (
-        <Card mono={editingId ? 'Edit entry' : 'New entry'} title="Entry">
-          <FormGrid>
-            <NamedInput ariaLabel="Name" label="Name" value={name} onChange={setName} placeholder="e.g. GitHub" />
-            <NamedInput ariaLabel="User" label="Username" value={username} onChange={setUsername} placeholder="you@example.com" />
-            <NamedInput ariaLabel="Password" label="Password" value={password} onChange={setPassword} placeholder="Generated for you" />
-            <Select
-              label="Type"
-              value={entryType}
-              onChange={setEntryType}
-              options={[
-                { value: 'website', label: 'Standard' },
-                { value: 'passphrase', label: 'Passphrase' },
-              ]}
-            />
-          </FormGrid>
-          <div style={{ display: 'flex', gap: 8, marginTop: 12, alignItems: 'center' }}>
-            <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
-            <Button kind="secondary" onClick={handleGenerate}>Generate</Button>
-            <Button kind="ghost" onClick={closeForm}>Cancel</Button>
-            {password ? <Tag>{password.length} chars · ~{Math.round(entropy(password))} bits</Tag> : null}
-          </div>
-        </Card>
-      ) : null}
-
-      {records.length === 0 ? (
-        <Card mono="Store" title="Entries">
+      <Card
+        mono="Store"
+        title="Entries"
+        actions={records.length > 0 ? <Button kind="secondary" onClick={openNew}>New entry</Button> : null}
+      >
+        {records.length === 0 ? (
           <EmptyState
             title="No entries yet"
             detail="Generate a strong password and store the login before you need it."
             actionLabel="New entry"
             onAction={openNew}
           />
-        </Card>
-      ) : filtered.length === 0 ? (
-        <Card mono="Store" title="Entries">
+        ) : filtered.length === 0 ? (
           <EmptyState
             title="No entries match"
             detail="Try a different account name or user."
             actionLabel="Clear search"
             onAction={() => setQuery('')}
           />
-        </Card>
-      ) : (
-        <Card mono={`${filtered.length} shown`} title="Entries">
-          <List label="Stored passwords">
+        ) : (
+          <List label="Stored entries">
             {filtered.map((r) => {
               const isRevealed = Boolean(revealed[r.id])
               return (
@@ -199,21 +150,24 @@ export function App() {
                   key={r.id}
                   title={r.name}
                   meta={r.username || null}
-                  value={
-                    <input
-                      className="lc-input"
-                      type="text"
-                      readOnly
-                      aria-label="Password"
-                      value={isRevealed ? r.password : DOTS}
-                      style={{ width: '100%', maxWidth: '12em' }}
-                    />
-                  }
+                    value={
+                      <>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--ink)' }}>
+                          {isRevealed ? r.password : DOTS}
+                        </span>
+                        <input
+                          type="text"
+                          readOnly
+                          value={isRevealed ? r.password : DOTS}
+                          aria-label={`Secret for ${r.name}`}
+                          style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: 0 }}
+                        />
+                      </>
+                    }
                   action={
                     <>
-                      <Button kind="secondary" onClick={() => openEdit(r)}>Edit</Button>
                       <Button kind="secondary" onClick={() => setRevealed((m) => ({ ...m, [r.id]: !m[r.id] }))}>
-                        {isRevealed ? 'Hide' : 'Reveal'}
+                        Reveal
                       </Button>
                       <Button kind="secondary" onClick={() => handleRegenerate(r.id)}>Generate</Button>
                       <Button kind="secondary" onClick={() => handleCopy(r.password)}>Copy</Button>
@@ -224,18 +178,33 @@ export function App() {
               )
             })}
           </List>
+        )}
+      </Card>
+
+      {formOpen ? (
+        <Card mono={editingId ? 'Edit entry' : 'New entry'} title="Entry">
+          <FormGrid>
+            <TextInput label="Name" value={name} onChange={setName} placeholder="e.g. GitHub" />
+            {name.trim() ? <TextInput label="Username" value={username} onChange={setUsername} placeholder="you@example.com" /> : null}
+            <TextInput label="Password" value={password} onChange={setPassword} placeholder="Generated for you" />
+            <Select
+              label="Type"
+              value={entryType}
+              onChange={setEntryType}
+              options={[
+                { value: 'Standard', label: 'Standard' },
+                { value: 'Passphrase', label: 'Passphrase' },
+              ]}
+            />
+          </FormGrid>
+          <div style={{ display: 'flex', gap: 8, marginTop: 12, alignItems: 'center' }}>
+            <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
+            <Button kind="secondary" onClick={handleGenerate}>Generate</Button>
+            <Button kind="ghost" onClick={closeForm}>Cancel</Button>
+            {password ? <Tag>{password.length} chars</Tag> : null}
+          </div>
         </Card>
-      )}
+      ) : null}
     </AppShell>
   )
-}
-
-function entropy(value: string): number {
-  let pool = 0
-  if (/[a-z]/.test(value)) pool += 26
-  if (/[A-Z]/.test(value)) pool += 26
-  if (/[0-9]/.test(value)) pool += 10
-  if (/[^A-Za-z0-9]/.test(value)) pool += 33
-  if (pool === 0) return 0
-  return value.length * Math.log2(pool)
 }
