@@ -2,7 +2,7 @@
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
-import { AppShell, Button, Card, EmptyState, PrimaryButton } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, PrimaryButton, Rail } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { gradeRecord } from './host'
 import './gradebook.css'
@@ -21,11 +21,11 @@ function mean(values: number[]): number | null {
 }
 
 function fmt(n: number | null): string {
-  return n == null ? '\u2014' : n.toFixed(2)
+  return n == null ? 'n/a' : n.toFixed(2)
 }
 
 function fmtStat(n: number | null): string {
-  return n == null ? '\u2014' : String(Math.round(n))
+  return n == null ? 'n/a' : String(Math.round(n))
 }
 
 function median(values: number[]): number | null {
@@ -82,7 +82,7 @@ function TabBar({ active, onSelect }: { active: string; onSelect: (value: string
 
   return (
     <div
-      className="lc-tabs"
+      className="gb-tabs"
       role="tablist"
       aria-label="Gradebook views"
       onKeyDown={onKeyDown}
@@ -97,7 +97,7 @@ function TabBar({ active, onSelect }: { active: string; onSelect: (value: string
           aria-selected={item === active}
           aria-controls={`panel-${item}`}
           tabIndex={item === active ? 0 : -1}
-          className={item === active ? 'lc-tab active' : 'lc-tab'}
+          className={item === active ? 'gb-tab active' : 'gb-tab'}
           onClick={() => {
             setFocused(i)
             onSelect(item)
@@ -108,10 +108,6 @@ function TabBar({ active, onSelect }: { active: string; onSelect: (value: string
       ))}
     </div>
   )
-}
-
-function StatLine({ label, value }: { label: string; value: string }) {
-  return <div className="gc-stat-line">{label}: {value}</div>
 }
 
 export function App() {
@@ -208,15 +204,21 @@ export function App() {
     void clipboard.copy(csv)
   }
 
+  const railChips = [
+    `${namedStudents.length} student${namedStudents.length === 1 ? '' : 's'}`,
+    ...ASSIGNMENTS,
+    'Average',
+  ]
+
   return (
     <AppShell
-      name="Gradebook"
+      name="Gradebook Manager"
       icon="docs"
       hue="green"
       category="Productivity"
       meta={`${namedStudents.length} students`}
+      side={<Rail title="Gradebook" note="Local record" chips={railChips} />}
     >
-      <h2>Gradebook Manager</h2>
       <TabBar active={tab} onSelect={setTab} />
       <div className="gb-gap" />
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
@@ -267,9 +269,9 @@ export function App() {
                     ))}
                     <td className="num">
                       <span
-                        className="gc-avg"
+                        className={`gc-avg${studentAverage(i) != null ? ' has' : ''}`}
                         tabIndex={0}
-                        aria-label={`Average, ${s || 'new student'}`}
+                        aria-label={`Average, ${s || `Row ${i + 1}`}`}
                       >
                         {fmt(studentAverage(i))}
                       </span>
@@ -298,12 +300,12 @@ export function App() {
               />
             ) : (
               <>
-                <div className="gc-stats">
-                  <StatLine label="Class Average" value={fmt(classAverage)} />
-                  <StatLine label="Highest" value={fmtStat(highest)} />
-                  <StatLine label="Lowest" value={fmtStat(lowest)} />
-                  <StatLine label="Median" value={fmt(med)} />
-                </div>
+                <KpiRow>
+                  <Kpi value={fmt(classAverage)} label="Class Average" />
+                  <Kpi value={fmtStat(highest)} label="Highest" />
+                  <Kpi value={fmtStat(lowest)} label="Lowest" />
+                  <Kpi value={fmt(med)} label="Median" />
+                </KpiRow>
                 <div className="gb-gap" />
                 <div className="gb-actions">
                   <PrimaryButton onClick={exportCsv}>Export CSV</PrimaryButton>
