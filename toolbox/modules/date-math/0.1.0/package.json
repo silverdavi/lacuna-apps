@@ -1,0 +1,40 @@
+{
+  "name": "@lacuna/date-math",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure local-date arithmetic and formatting: add/subtract days/weeks/months, differences, day/week/month bounds, ISO week, age, and relative time strings.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "dateMath",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "f94c8bc071990cdc",
+    "lines": 128,
+    "exports": [
+      "addDays",
+      "addWeeks",
+      "addMonths",
+      "diff",
+      "startOfDay",
+      "endOfDay",
+      "startOfWeek",
+      "endOfWeek",
+      "startOfMonth",
+      "endOfMonth",
+      "isoWeek",
+      "age",
+      "relativeTime",
+      "toISODate",
+      "fromISODate"
+    ],
+    "types": [
+      "DateParts",
+      "DiffResult"
+    ],
+    "signature": "addDays(date: Date, days: number); addWeeks(date: Date, weeks: number); addMonths(date: Date, months: number); diff(a: Date, b: Date)"
+  }
+}

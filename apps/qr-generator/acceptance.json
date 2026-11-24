@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "e793100eb02aabd31adcb628be7673739f558de0329c81388c777eb415d16a7a",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no input, the page shows the heading \"QR Maker\", the text \"Enter text or a URL to generate a QR code\", and the button \"Generate\" is disabled."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Hello\" in the field labelled \"Content\" enables the button \"Generate\"; clicking it shows an SVG element with the aria-label \"QR code for Hello\" and the text \"Error correction: L\" below it."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"https://example.com\" in the field labelled \"Content\", choosing \"H\" in the select labelled \"Error correction\", and clicking \"Generate\" shows an SVG element with the aria-label \"QR code for https://example.com\" and the text \"Error correction: H\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Copy\" after generating a QR code for \"Hello\" shows the tooltip \"Copied\" for 2 seconds and the button label returns to \"Copy\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Download\" after generating a QR code for \"Hello\" triggers a file download named \"qr-hello.svg\" containing valid SVG markup."
+    },
+    {
+      "id": "A6",
+      "text": "Typing an empty string in the field labelled \"Content\" and clicking \"Generate\" shows the message \"Content cannot be empty\" and no SVG element is rendered."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"Test\" in the field labelled \"Content\", clicking \"Generate\", then changing the select labelled \"Error correction\" to \"Q\" and clicking \"Generate\" again shows an SVG element with the aria-label \"QR code for Test\" and the text \"Error correction: Q\"."
+    },
+    {
+      "id": "A8",
+      "text": "After generating a QR code for \"Persist\", reloading the page still shows the SVG element with the aria-label \"QR code for Persist\" and the field labelled \"Content\" contains \"Persist\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "786bbc3d7471f704c689a513ef747d2565a9880826657d15b24454a92218f6a0"
+    }
+  ]
+}

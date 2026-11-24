@@ -1,0 +1,30 @@
+{
+  "name": "@lacuna/streak-calc",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Compute current and longest consecutive-day check-in streaks with allowed skip days.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "streakCalc",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "ac33969cf945beee",
+    "lines": 94,
+    "exports": [
+      "computeStreaks",
+      "isStreakAlive"
+    ],
+    "types": [
+      "StreakOptions",
+      "StreakResult"
+    ],
+    "signature": "computeStreaks(checkIns: string[], options?: StreakOptions); isStreakAlive(checkIns: string[], options?: StreakOptions)"
+  }
+}

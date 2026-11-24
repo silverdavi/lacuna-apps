@@ -1,0 +1,17 @@
+.ice-drop { display: flex; flex-direction: column; align-items: center; gap: calc(8px * var(--sf)); padding: calc(24px * var(--sf)) calc(16px * var(--sf)); border: calc(1px * var(--sf)) dashed var(--ui-line2); border-radius: calc(2px * var(--sf)); background: var(--ui-card); text-align: center; cursor: pointer; }
+.ice-drop-hot { border-color: var(--accent); background: var(--accent-soft); }
+.ice-draghint { font-family: var(--sans); font-size: calc(15px * var(--tf)); font-weight: 600; color: var(--ink); cursor: grab; user-select: none; }
+.ice-draghint:active { cursor: grabbing; }
+.ice-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(96px * var(--sf)), 1fr)); gap: calc(8px * var(--sf)); }
+.ice-swatch { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: calc(2px * var(--sf)); width: 100%; height: calc(64px * var(--sf)); padding: calc(6px * var(--sf)); border: calc(1px * var(--sf)) solid var(--ui-line2); border-radius: calc(2px * var(--sf)); cursor: pointer; text-align: left; font-family: inherit; }
+.ice-swatch-on, .ice-swatch:focus-visible { outline: calc(2px * var(--sf)) solid var(--accent); outline-offset: calc(1px * var(--sf)); }
+.ice-swatch-name { font-family: var(--sans); font-size: calc(12px * var(--tf)); color: var(--on-accent); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ice-swatch-hex { font-family: var(--mono); font-size: calc(11px * var(--tf)); color: var(--on-accent); opacity: 0.85; }
+.ice-detail-row { display: flex; align-items: center; gap: calc(12px * var(--sf)); margin-bottom: calc(12px * var(--sf)); }
+.ice-detail-chip { width: calc(48px * var(--sf)); height: calc(48px * var(--sf)); border-radius: calc(2px * var(--sf)); border: calc(1px * var(--sf)) solid var(--ui-line2); flex: none; }
+.ice-rows { display: flex; flex-direction: column; gap: calc(4px * var(--sf)); }
+.ice-row { display: flex; align-items: baseline; gap: calc(12px * var(--sf)); }
+.ice-row > :first-child { flex: none; width: calc(56px * var(--sf)); }
+.ice-mono { font-family: var(--mono); font-size: calc(13px * var(--tf)); color: var(--ink); word-break: break-all; }
+.ice-pal-title { display: inline-flex; align-items: center; gap: calc(8px * var(--sf)); }
+.ice-pal-chip { display: inline-block; width: calc(20px * var(--sf)); height: calc(20px * var(--sf)); border-radius: calc(2px * var(--sf)); border: calc(1px * var(--sf)) solid var(--ui-line2); flex: none; }

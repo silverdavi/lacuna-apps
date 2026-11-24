@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "be64ae389828dedfc0273f216aebda51bbeba56880cb427215b34915e1fc762a",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"PDF Splitter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Dropping a file named \"report.pdf\" into the drop zone labeled \"Drop PDF here\" displays a preview card with the text \"report.pdf\" and \"3 pages\"."
+    },
+    {
+      "id": "A3",
+      "text": "Selecting the \"Split\" tab, entering \"1-2\" in the field labeled \"Page range\", and clicking the button \"Process\" displays a success message \"Split complete\" and enables the button \"Download PDF\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Download PDF\" after a successful split triggers a file download named \"report_split.pdf\"."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting the \"Merge\" tab, dropping a second file \"notes.pdf\", and clicking the button \"Process\" displays a success message \"Merge complete\" and enables the button \"Download PDF\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Download PDF\" after a successful merge triggers a file download named \"merged.pdf\"."
+    },
+    {
+      "id": "A7",
+      "text": "After processing a file, the \"History\" tab displays a list item containing the text \"report.pdf\" and \"Split\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear history\" removes all items from the \"History\" tab list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history entry \"report.pdf\" and \"Split\" visible in the \"History\" tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "59472af418b9ab7d73744d7edb38dc81a0ceacef8a07b2ab6c96e02f7f477cb2"
+    }
+  ]
+}

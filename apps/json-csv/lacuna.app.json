@@ -1,0 +1,94 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.json-csv",
+  "name": "JSON CSV Converter",
+  "version": "0.1.0",
+  "summary": "Convert structured data between JSON and CSV formats offline.",
+  "description": "Paste JSON or CSV, pick a direction and a delimiter, and convert locally in the browser. Output can be copied to the clipboard or downloaded as a file. Recent conversions are kept in a history list that survives reloads. Nothing leaves the device.",
+  "category": "productivity",
+  "tags": ["json", "csv", "convert", "data", "export", "import"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/json-csv"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/code-area": "0.1.0",
+      "@lacuna/codecs": "0.1.0",
+      "@lacuna/combobox": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/text-transforms": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:json-csv"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "json-csv",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store conversion history and the last delimiter setting so they survive a reload"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "json-csv"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

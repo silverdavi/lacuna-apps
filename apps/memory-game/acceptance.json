@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "5211beefc7a9cc6829f8eecf1a252387ae01bf8faee64f2a4c351adeb7789c0e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On load, the page shows the heading \"Card Memory Match\", 16 buttons named \"Card 1\" to \"Card 16\" each with the text \"?\", the text \"Score: 0\", and the text \"Best: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Card 1\" makes its text \"A\"; \"Card 2\" still reads \"?\" and \"Score: 0\" is shown."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking \"Card 1\" then \"Card 2\" shows \"A\" and \"B\", and within 3 seconds both read \"?\" again; \"Score: 0\" is shown."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Card 1\" then \"Card 16\" leaves both reading \"A\" and shows \"Score: 1\" and \"Best: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking \"Card 1\" twice leaves it reading \"A\" and \"Score: 0\" is shown; then clicking \"Card 16\" shows \"Score: 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "After matching \"Card 1\" and \"Card 16\", clicking \"Restart\" makes all 16 cards read \"?\" and shows \"Score: 0\" and \"Best: 1\"."
+    },
+    {
+      "id": "A7",
+      "text": "After matching \"Card 1\" and \"Card 16\", clicking the heading and pressing \"r\" makes all 16 cards read \"?\" and shows \"Score: 0\" and \"Best: 1\"."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the game: after matching \"Card 1\" and \"Card 16\" and reloading, both read \"A\", \"Card 2\" reads \"?\", and the page shows \"Score: 1\" and \"Best: 1\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after matching \"Card 1\" and \"Card 16\", clicking \"Restart\" and reloading, the page shows \"Score: 0\" and \"Best: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "5e2fd89bc0ec548bead4043944e638a7344d8f85ad306212733ea15793227c45"
+    }
+  ]
+}

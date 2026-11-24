@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.world-clock",
+  "name": "World Clock",
+  "version": "0.1.0",
+  "summary": "Track live clocks across any number of time zones.",
+  "description": "Add the cities you care about and see their current time at a glance, each ticking live in its own zone. Switch to the Offsets view for a sortable table of each zone's UTC offset, copy every current time to the clipboard in one click, and pick up exactly where you left off: your zones stay on this device.",
+  "category": "productivity",
+  "tags": ["clock", "time", "timezone", "utc", "travel"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/world-clock",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:zone",
+    "edit:zone",
+    "export:times"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "zone",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own World Clock zone records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "world-clock"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

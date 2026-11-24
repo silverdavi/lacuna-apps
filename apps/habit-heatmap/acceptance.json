@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6054aeb10185b2d94b48181e607cd1b24bf2b7a0f577e0387393258c4b8e9048",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Habit Heatmap\"."
+    },
+    {
+      "id": "A2",
+      "text": "With no habits defined, the page shows the text \"No habits yet\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"Read\" in the field labelled \"Habit name\" and clicking the button \"Add habit\" adds a list item containing \"Read\" and changes the text \"No habits yet\" to disappear."
+    },
+    {
+      "id": "A4",
+      "text": "After adding the habit \"Read\", clicking the button \"Log today\" logs today's date as done for \"Read\"; the streak display for \"Read\" shows \"Streak: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "After logging \"Read\" for today, clicking the button \"Log yesterday\" logs yesterday's date as done for \"Read\"; the streak display for \"Read\" shows \"Streak: 2\"."
+    },
+    {
+      "id": "A6",
+      "text": "After logging \"Read\" for today and yesterday, clicking the button \"Log today\" again does not change the streak; the streak display for \"Read\" still shows \"Streak: 2\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Read\" removes the habit \"Read\" from the list and the page shows the text \"No habits yet\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding the habit \"Read\" and logging it for today, clicking the tab \"Heatmap\" shows a heatmap grid where the cell for today's date has the data attribute `data-value=\"1\"`."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the habit \"Read\" and its logged entries; after reloading, the list item containing \"Read\" is present and the streak display shows \"Streak: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "29b1da921d19d313c246911728c483fb8707a8ca89611984521eb8b627243c20"
+    }
+  ]
+}

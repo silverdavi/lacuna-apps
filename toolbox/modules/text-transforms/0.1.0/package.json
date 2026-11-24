@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/text-transforms",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure text utilities: case conversion, slugify, line trim/dedupe/sort, Lorem Ipsum",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "textTransforms",
+    "kind": "logic",
+    "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+    "source": "cee13edc953ad6dd",
+    "lines": 92,
+    "exports": [
+      "toUpper",
+      "toLower",
+      "toTitleCase",
+      "toSnakeCase",
+      "toKebabCase",
+      "toCamelCase",
+      "toPascalCase",
+      "slugify",
+      "trimLines",
+      "dedupeLines",
+      "sortLines",
+      "loremIpsum"
+    ],
+    "types": [],
+    "signature": "toUpper(text: string); toLower(text: string); toTitleCase(text: string); toSnakeCase(text: string)"
+  }
+}

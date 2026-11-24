@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "51eea4c16f9754b94971f910fe4e91f43361a8be0e86dc1c74e1841426aafbd9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Bullet Journal\" and a month grid where the button for the 15th of the current month is labelled \"15\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"15\" in the month grid selects that day, and the text \"Tasks for 15\" appears in the checklist section header."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"Buy milk\" in the input labelled \"New task\" and pressing Enter adds a checklist item with the text \"Buy milk\" and an unchecked checkbox; the progress indicator shows \"0/1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the checkbox for the item \"Buy milk\" marks it as complete, changes its text to \"Buy milk\" with a strikethrough style, and updates the progress indicator to \"1/1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"Read book\" in the input labelled \"New task\" and pressing Enter adds a second item; the progress indicator shows \"1/2\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Move up\" next to the item \"Read book\" moves it above \"Buy milk\"; the first item in the list is now \"Read book\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete\" next to the item \"Read book\" removes it from the list; the progress indicator reverts to \"1/1\" and only \"Buy milk\" remains."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"16\" in the month grid changes the checklist header to \"Tasks for 16\" and shows the text \"No tasks yet\" because no items exist for that date."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the task \"Buy milk\" for the 15th; after reloading, selecting the 15th shows the item \"Buy milk\" with a checked checkbox and progress \"1/1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c8658ccc99dd152710621791277c2072132fd05a5d394c95e2379d226d2a889e"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+/* App-level overrides for graphing-calculator. */
+/* Custom tab style to meet WCAG AA contrast (kit default --ink-40 fails). */
+.gc-tab {
+  color: var(--ink-60);
+}
+/* Custom faint style to meet WCAG AA contrast. */
+.gc-faint {
+  color: var(--ink-60);
+}
+.gc-graph-style-row {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
+.gc-table-controls {
+  display: flex;
+  align-items: center;
+  gap: calc(16px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}

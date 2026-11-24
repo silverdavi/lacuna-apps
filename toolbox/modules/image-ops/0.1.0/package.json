@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/image-ops",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions for canvas image manipulation: resize, crop, rotate, flip, CSS-like filters, and format encoding.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "imageOps",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "604b284be089503f",
+    "lines": 335,
+    "exports": [
+      "ImageData",
+      "resizeImageData",
+      "cropImageData",
+      "rotateImageData",
+      "flipImageData",
+      "applyFilter",
+      "encodeCanvas"
+    ],
+    "types": [
+      "CropRect",
+      "FilterParams",
+      "EncodeOptions"
+    ],
+    "signature": "resizeImageData(src: ImageData, width: number, height: number); cropImageData(src: ImageData, rect: CropRect); rotateImageData(src: ImageData, degrees: 90 | 180 | 270); flipImageData(src: ImageData, axis: 'horizontal' | 'vertical')"
+  }
+}

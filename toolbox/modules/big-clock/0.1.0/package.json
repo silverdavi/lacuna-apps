@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/big-clock",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A large, high-contrast monospace time display (h:mm:ss, optional ms) for timers, clocks, and countdowns.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/format-duration": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "BigClock",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "06a936ae87a87f35",
+    "lines": 74,
+    "exports": [
+      "BigClock"
+    ],
+    "types": [
+      "BigClockProps"
+    ],
+    "signature": "BigClock(props: BigClockProps)"
+  }
+}

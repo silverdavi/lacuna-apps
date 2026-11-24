@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "68d02b22e874530ddf1a90371556b92cdcc4e504c3ba9f68d0133c4e50ff0da0",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"HTML Markdown Converter\" and two panes labelled \"Input\" and \"Output\" separated by a draggable divider."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `<h1>Hello</h1>` into the CodeArea in the pane labelled \"Input\" shows `# Hello` in the CodeArea in the pane labelled \"Output\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `<ul><li>One</li><li>Two</li></ul>` into the pane labelled \"Input\" shows `- One\\n- Two` in the pane labelled \"Output\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing `<p>Visit <a href=\"https://example.com\">site</a></p>` into the pane labelled \"Input\" shows `Visit [site](https://example.com)` in the pane labelled \"Output\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Copy output\" after entering `<h2>Test</h2>` in the pane labelled \"Input\" puts `## Test` on the clipboard and shows the toast \"Copied to clipboard\"."
+    },
+    {
+      "id": "A6",
+      "text": "Toggling the switch labelled \"Sanitize\" to off, then typing `<script>alert(1)</script><p>Safe</p>` into the pane labelled \"Input\", shows `<script>alert(1)</script>\\nSafe` in the pane labelled \"Output\"; toggling it back on shows `Safe` in the pane labelled \"Output\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab labelled \"Markdown to HTML\" switches the conversion direction; typing `# Title` into the pane labelled \"Input\" shows `<h1>Title</h1>` in the pane labelled \"Output\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing `<table><tr><td>A</td><td>B</td></tr></table>` into the pane labelled \"Input\" shows `| A | B |` in the pane labelled \"Output\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the text `<h1>Hello</h1>` in the pane labelled \"Input\" and `# Hello` in the pane labelled \"Output\", with the \"Sanitize\" switch still on."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2f65425e8536fd55faeb6584d76de99fba360fa1c8ab705eb26b29282ef6c831"
+    }
+  ]
+}

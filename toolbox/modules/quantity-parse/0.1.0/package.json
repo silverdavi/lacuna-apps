@@ -1,0 +1,29 @@
+{
+  "name": "@lacuna/quantity-parse",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Parse, normalize, and scale quantities expressed as whole numbers, decimals, fractions, or mixed numbers with optional units.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "quantityParse",
+    "kind": "logic",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "3c765fecc3540191",
+    "lines": 123,
+    "exports": [
+      "parseQuantity",
+      "scaleQuantity",
+      "addQuantities",
+      "toFractionString",
+      "isValidQuantity"
+    ],
+    "types": [
+      "ParsedQuantity"
+    ],
+    "signature": "parseQuantity(input: string); scaleQuantity(qty: ParsedQuantity, factor: number); addQuantities(a: ParsedQuantity, b: ParsedQuantity); toFractionString(value: number, maxDenominator = 16)"
+  }
+}

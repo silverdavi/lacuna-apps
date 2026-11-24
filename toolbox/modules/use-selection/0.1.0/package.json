@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/use-selection",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Manages single, multi, and range selection state over an indexed list with toggle, clear, and range-select operations.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useSelection",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "a37bb2866cf4e279",
+    "lines": 86,
+    "exports": [
+      "useSelection"
+    ],
+    "types": [
+      "UseSelectionOptions",
+      "UseSelectionReturn"
+    ],
+    "signature": "useSelection(options: UseSelectionOptions)"
+  }
+}

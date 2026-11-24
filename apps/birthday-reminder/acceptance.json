@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "164d412bdc24bc69cb3dd8ee5b601808bf4257b6355f7f786df7f6ac75729e37",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Birthday Reminder\" and, with no records, shows the text \"No birthdays yet\" in the list area."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add birthday\" form, typing \"Alice\" in the field labelled \"Name\", \"1990-05-15\" in the field labelled \"Birth date\", and \"Loves cake\" in the field labelled \"Notes\", then clicking \"Save\" adds a list item containing \"Alice\" and \"May 15\". The text \"No birthdays yet\" disappears."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the tab labelled \"Calendar\" shows a month grid. The cell for May 15 contains the text \"Alice\". Clicking the cell for May 15 selects it and displays the detail panel with \"Alice\" and \"Loves cake\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Add birthday\" form, typing \"Bob\" in \"Name\" and \"1985-12-25\" in \"Birth date\", then clicking \"Save\" adds a list item containing \"Bob\" and \"Dec 25\". The list now contains two items."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Delete Alice\" removes the Alice entry from the list. The list now contains only \"Bob\". The Calendar tab no longer shows \"Alice\" in the May 15 cell."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Settings\" section, changing the select labelled \"Reminder lead time\" from \"0 days\" to \"1 day\" and saving, then setting the system date to May 14, 2024, triggers a notification with the text \"Alice's birthday is tomorrow\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Export CSV\" downloads a file containing the header \"Name,Birth Date,Notes\" and the row \"Alice,1990-05-15,Loves cake\" (assuming Alice was re-added after deletion in A5, or this check runs on a fresh state with Alice present)."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Ali\" in the search box labelled \"Search\" filters the list to show only the item containing \"Alice\". Clearing the search box restores the full list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the record \"Alice\" with birth date \"1990-05-15\" and notes \"Loves cake\" visible in the list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "6a98a0b185418aa2d5f9280f11880750fb315bf8d1ba65628fc335920947fe87"
+    }
+  ]
+}

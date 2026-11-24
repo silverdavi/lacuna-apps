@@ -1,0 +1,64 @@
+.job-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: calc(16px * var(--sf));
+  margin-bottom: calc(16px * var(--sf));
+}
+
+.job-search {
+  flex: 1 1 auto;
+  min-width: calc(220px * var(--sf));
+}
+
+.job-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+  align-items: center;
+  padding-bottom: calc(8px * var(--sf));
+}
+
+.job-chip {
+  all: unset;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  letter-spacing: calc(0.9px * var(--sf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+}
+
+.job-chip.on {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.job-chip:focus-visible {
+  outline: calc(1px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}
+
+.job-sort {
+  all: unset;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  letter-spacing: calc(0.9px * var(--sf));
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+  padding: calc(8px * var(--sf));
+}
+
+.job-sort:focus-visible {
+  outline: calc(1px * var(--sf)) solid var(--accent);
+  outline-offset: calc(2px * var(--sf));
+}

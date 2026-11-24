@@ -1,0 +1,15 @@
+{
+  "repo": "sivaprakashDesingu/react-voice-recorder",
+  "url": "https://github.com/sivaprakashDesingu/react-voice-recorder",
+  "sha": "8ef9e81cfa81fbaf37925b93ce02de003901a547",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2020 Sivaprakash Desingu"
+  ],
+  "files": [
+    "src/components/Recorder.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "d6969d7955a67dad7e2537dcc1b80593b77e637d66bd87db5ec4dc1856ae6fa9"
+}

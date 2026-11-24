@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "f60848095e9e920de90a25ad4d2d3ef92aebcfb7a38fe98046fe937532ad2325",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Family Tree Visualizer\" and, with no people added, shows the text \"No people yet\" in the list area."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add Person\" form, typing \"Alice\" in the field labelled \"Name\", \"1980-05-15\" in the field labelled \"Birth date\", and clicking the button \"Add person\" adds a list item containing \"Alice\" and \"b. 1980-05-15\"; the text \"No people yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "After adding Alice, clicking the button \"Add child\" next to Alice's list item opens a form; typing \"Bob\" in \"Name\" and \"2010-03-22\" in \"Birth date\" and clicking \"Add person\" adds a list item containing \"Bob\" and \"b. 2010-03-22\", and the TreeOutline shows \"Bob\" indented under \"Alice\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete Alice\" removes Alice and her child Bob from the list; the list area again shows \"No people yet\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab labelled \"Graph\" switches the main view to the NodeGraph; with Alice and Bob added, the graph displays two nodes labelled \"Alice\" and \"Bob\" connected by an edge."
+    },
+    {
+      "id": "A6",
+      "text": "In the Graph view, clicking the button \"Auto-layout\" rearranges the nodes so that \"Alice\" appears above \"Bob\" in the vertical position."
+    },
+    {
+      "id": "A7",
+      "text": "In the Graph view, clicking the button \"Export JSON\" copies a JSON string to the clipboard that contains `\"name\":\"Alice\"` and `\"name\":\"Bob\"`."
+    },
+    {
+      "id": "A8",
+      "text": "After adding Alice (1980-05-15) and Bob (2010-03-22), the list item for Bob displays the age text \"14 years\" calculated from the current date using dateMath."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the people added: after adding \"Alice\" with birth date \"1980-05-15\" and reloading the page, the list still shows a list item containing \"Alice\" and \"b. 1980-05-15\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c61287fbf7a1911265c60e44c57ea94ce926e642685c1f7a67007022c12c9d56"
+    }
+  ]
+}

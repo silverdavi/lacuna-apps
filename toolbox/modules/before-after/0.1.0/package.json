@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/before-after",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Side-by-side or slider comparison widget that lets users drag a divider to reveal one of two images or text blocks.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "BeforeAfter",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "a1cf0020b48ebd27",
+    "lines": 278,
+    "exports": [
+      "BeforeAfter"
+    ],
+    "types": [
+      "BeforeAfterProps"
+    ],
+    "signature": ""
+  }
+}

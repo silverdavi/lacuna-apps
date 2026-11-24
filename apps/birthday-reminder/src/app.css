@@ -1,0 +1,57 @@
+/* App-specific layout. The kit owns the visual language; this file only adds
+   structure that the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+.br-tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: calc(10px * var(--sf));
+  letter-spacing: calc(0.8px * var(--sf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+  padding: calc(6px * var(--sf)) calc(10px * var(--sf));
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.br-tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.br-calendar-wrap {
+  overflow: auto;
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(8px * var(--sf));
+}
+
+.br-calendar {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(11px * var(--tf));
+}
+
+.br-calendar th {
+  text-align: left;
+  padding: calc(6px * var(--sf)) calc(6px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  color: var(--ink-60);
+}
+
+.br-day {
+  padding: calc(4px * var(--sf)) calc(6px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  vertical-align: top;
+  min-width: calc(96px * var(--sf));
+  line-height: calc(14px * var(--tf));
+}
+
+.br-day-num {
+  display: block;
+  font-weight: 600;
+}
+
+.br-day-names {
+  display: block;
+  color: var(--accent);
+  font-weight: 600;
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4bb8bec76d23f762342fd297616191a7f5123fdcca4b8830022b211dcd164a4d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Percentage Calculator\"."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting \"What is X% of Y?\" in the mode selector, typing \"20\" in the field labelled \"Percent\" and \"50\" in the field labelled \"Value\", then clicking \"Calculate\" shows \"10\" in the result summary."
+    },
+    {
+      "id": "A3",
+      "text": "Selecting \"What percent is X of Y?\" in the mode selector, typing \"10\" in the field labelled \"Part\" and \"50\" in the field labelled \"Whole\", then clicking \"Calculate\" shows \"20%\" in the result summary."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting \"Increase by X%\" in the mode selector, typing \"15\" in the field labelled \"Percent\" and \"100\" in the field labelled \"Original\", then clicking \"Calculate\" shows \"115\" in the result summary."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting \"Decrease by X%\" in the mode selector, typing \"10\" in the field labelled \"Percent\" and \"200\" in the field labelled \"Original\", then clicking \"Calculate\" shows \"180\" in the result summary."
+    },
+    {
+      "id": "A6",
+      "text": "After performing a calculation, clicking the \"Copy result\" button copies the exact result text to the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"History\" tab shows a list of previous calculations; the most recent entry contains the mode name and the result value."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the \"Delete\" button next to a history entry removes that entry from the list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history list; after reloading, the previously calculated entry is still visible in the History tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "65db5d6c1555d1daeaa3100c67bdad014389bed046be6f2c37e0001e21cf750b"
+    }
+  ]
+}

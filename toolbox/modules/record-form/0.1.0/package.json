@@ -1,0 +1,40 @@
+{
+  "name": "@lacuna/record-form",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Schema-driven form rendering text, number, date, and select fields from a declarative definition, with validation, dirty tracking, and submit handling.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/combobox": "workspace:0.1.0",
+    "@lacuna/date-picker": "workspace:0.1.0",
+    "@lacuna/schema-validate": "workspace:0.1.0",
+    "@lacuna/use-form": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "RecordForm",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "abc94db0f962fd61",
+    "lines": 331,
+    "exports": [
+      "RecordForm"
+    ],
+    "types": [
+      "FieldType",
+      "FieldDef",
+      "RecordValues",
+      "RecordFormProps"
+    ],
+    "signature": "RecordForm(props: RecordFormProps)"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c2a5e7c166f8004868b741c4d681a4916be38c92035e224bc4237f481a77d44d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Floor Plan Editor\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button labeled \"Add layer\" adds a new item to the layer list with the text \"Layer 1\"."
+    },
+    {
+      "id": "A3",
+      "text": "With \"Layer 1\" selected, clicking the button labeled \"Delete layer\" removes \"Layer 1\" from the layer list and shows the text \"No layers\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab labeled \"Layers\" shows the layer list; clicking the tab labeled \"Canvas\" shows the drawing surface and hides the layer list."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labeled \"Export PNG\" triggers a download of a file named \"floor-plan.png\"."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting the option \"Grid\" in the select labeled \"Background\" changes the canvas background to a grid pattern."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"Living Room\" in the field labeled \"Room name\" and clicking the button labeled \"Add room\" adds a list item containing \"Living Room\" to the room list."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labeled \"Delete Living Room\" removes the \"Living Room\" item from the room list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the layer named \"Layer 1\" and the room named \"Living Room\" visible in their respective lists."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f09f8ac31239a4674e2828fe67b8ca02691319d5fad2874b497ceeaa4c05d6fb"
+    }
+  ]
+}

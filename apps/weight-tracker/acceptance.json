@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a5317c68d690c7910701d29d473c0f59516359d65a4d9241fe781f9de5d4ced5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no entries, the page shows the heading \"Weight Tracker\", the text \"No entries yet\", and the button \"Add entry\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Add entry\" opens a form with fields labelled \"Date\" and \"Weight (kg)\". Typing \"2024-01-15\" in the field labelled \"Date\" and \"72.5\" in the field labelled \"Weight (kg)\", then clicking \"Save\", adds a list item containing \"2024-01-15\" and \"72.5 kg\". The text \"No entries yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding an entry with Date \"2024-01-15\" and Weight \"72.5\", adding another entry with Date \"2024-01-22\" and Weight \"71.8\" shows a list item containing \"2024-01-22\" and \"71.8 kg\", and the summary line \"Change: -0.7 kg\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Save\" with an empty Weight field or a Weight of \"0\" adds no list item and shows the message \"Enter a weight greater than 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every list item has a button named \"Delete <date>\". With entries for 2024-01-15 and 2024-01-22, clicking \"Delete 2024-01-15\" removes that item, leaving only the item with \"2024-01-22\" and \"71.8 kg\", and the summary line \"Change: -0.7 kg\" is gone."
+    },
+    {
+      "id": "A6",
+      "text": "With entries for 2024-01-15 (72.5 kg) and 2024-01-22 (71.8 kg), the SVG line chart contains a path element and two circle elements representing the data points."
+    },
+    {
+      "id": "A7",
+      "text": "With entries for 2024-01-15 (72.5 kg) and 2024-01-22 (71.8 kg), the summary shows \"Latest: 71.8 kg\" and \"Change: -0.7 kg\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"abc\" in the field labelled \"Weight (kg)\" and clicking \"Save\" adds no list item and shows the message \"Enter a valid weight\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry with \"2024-01-15\" and \"72.5 kg\" visible in the list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "734fc31b142ca281c4ec82a7a5a52942e5151f01fc0cb918d604c29827cc95c5"
+    }
+  ]
+}

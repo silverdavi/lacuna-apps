@@ -1,0 +1,5 @@
+/* App-level overrides for guitar-tuner. */
+/* Inactive tabs use --ink-40 which fails color-contrast; bump to --ink-60. */
+.tuner-tab:not(.active) {
+  color: var(--ink-60);
+}

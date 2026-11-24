@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/random",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Seedable pseudo-random generator with shuffling, weighted selection, dice notation parsing, and a crypto-strength path.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "random",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "42aba2f01db07327",
+    "lines": 87,
+    "exports": [
+      "mulberry32",
+      "randomInt",
+      "randomFloat",
+      "shuffle",
+      "weightedPick",
+      "parseDiceNotation",
+      "cryptoRng"
+    ],
+    "types": [
+      "Rng"
+    ],
+    "signature": "mulberry32(seed: number); randomInt(rng: Rng, min: number, max: number); randomFloat(rng: Rng, min: number, max: number); shuffle(rng: Rng, items: readonly T[])"
+  }
+}

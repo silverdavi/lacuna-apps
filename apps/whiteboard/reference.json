@@ -1,0 +1,19 @@
+{
+  "repo": "bansalsurya/whiteboard-app",
+  "url": "https://github.com/bansalsurya/whiteboard-app",
+  "sha": "c16c775f7c0ef744db1852c075268ff079fcfa44",
+  "spdx": "MIT",
+  "licence_path": "LICENSE.txt",
+  "copyright": [
+    "Copyright (c) 2022 Surya"
+  ],
+  "files": [
+    "src/App.js",
+    "src/components/drawingtool.js",
+    "src/components/penciltool.js",
+    "src/components/swatch.js",
+    "src/index.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "18e9cb5f72b150f4513d15f13fc2ca6213423bd56a137d20b55888a996267865"
+}
