@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d827b2e0873f2ad5a03d9788073a6e146acd74e4548d6221ccc700ce687e22f4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Password Manager\" and, when no entries exist, shows the text \"No entries yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New entry\" opens a form. Typing \"GitHub\" in the field labelled \"Name\", \"octocat\" in the field labelled \"Username\", and \"secret123\" in the field labelled \"Password\", then clicking \"Save\" adds a list item containing \"GitHub\" and \"octocat\". The text \"No entries yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "In the entry list, clicking the button \"Reveal\" next to the \"GitHub\" entry changes the password field display from \"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\" to \"secret123\". Clicking \"Reveal\" again changes it back to \"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Generate\" next to the \"GitHub\" entry replaces the password with a new 12-character string. The new password contains at least one uppercase letter, one lowercase letter, one digit, and one special character."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Copy\" next to the \"GitHub\" entry copies the current password to the clipboard and displays a toast message \"Copied to clipboard\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"git\" in the search box labelled \"Search\" filters the list to show only the \"GitHub\" entry. Typing \"nonexistent\" in the search box shows the text \"No entries match\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete\" next to the \"GitHub\" entry removes the item from the list. The list becomes empty and the text \"No entries yet\" is visible again."
+    },
+    {
+      "id": "A8",
+      "text": "After adding an entry named \"GitHub\" with password \"secret123\", reloading the page still shows the list item containing \"GitHub\" and \"octocat\". Clicking \"Reveal\" shows \"secret123\"."
+    },
+    {
+      "id": "A9",
+      "text": "In the \"New entry\" form, selecting \"Passphrase\" in the select labelled \"Type\" and clicking \"Generate\" produces a password consisting of 4 words separated by hyphens, such as \"correct-horse-battery-staple\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b70fcaca00f572e41a1f41e94923ce90385c1247466bc882bcd9bbff17292890"
+    }
+  ]
+}
