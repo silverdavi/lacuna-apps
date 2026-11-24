@@ -6,9 +6,18 @@
   vertical-align: middle;
 }
 
+.pl-row-name {
+  color: var(--ink);
+}
+
 .pl-item-actions {
   display: inline-flex;
   gap: 0.5em;
+}
+
+.pl-item-edit {
+  width: 9em;
+  margin-left: 0.5em;
 }
 
 .pl-tabs {
