@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "34c7b9ca0bc6e5d27293fe34acf54531b5671baae01b170109bf83677148d6a1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no tasks, the page shows the heading \"Simple Todo List\", the text \"No tasks yet\", and the progress bar \"Completion\" with `aria-valuenow=\"0\"`."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" in \"Task title\" and clicking \"Add task\" adds one listitem containing \"Buy milk\" whose checkbox \"Buy milk\" is not checked; progress stays \"0\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Buy milk\" then \"Call mom\", the first listitem contains \"Buy milk\" and the second \"Call mom\"."
+    },
+    {
+      "id": "A4",
+      "text": "After adding \"Buy milk\" and \"Call mom\", checking the checkbox \"Buy milk\" gives the text \"Buy milk\" `text-decoration-line: line-through` and progress \"50\"."
+    },
+    {
+      "id": "A5",
+      "text": "After adding \"Buy milk\" and \"Call mom\", dragging the handle \"Drag Call mom\" onto the listitem containing \"Buy milk\" makes the first listitem contain \"Call mom\" and the second \"Buy milk\"."
+    },
+    {
+      "id": "A6",
+      "text": "After adding \"Buy milk\", adding \"Buy milk\" again leaves one listitem and shows the text \"Task already exists\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding only \"Buy milk\", clicking \"Delete Buy milk\" removes it, shows \"No tasks yet\", and progress is \"0\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Buy milk\" in \"Task title\" and filling \"Due date\" with \"2024-01-15\", then clicking \"Add task\", adds a listitem containing \"Buy milk\" and the text \"Due: Jan 15, 2024\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps tasks and their state: after adding \"Buy milk\" and \"Call mom\", checking \"Buy milk\" and reloading, checkbox \"Buy milk\" is checked, checkbox \"Call mom\" is not, and progress is \"50\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d89e6bd7f0d227f769774427f9bd0705b175fc01a5e50bfa5858fd78eb54a0c9"
+    }
+  ]
+}
