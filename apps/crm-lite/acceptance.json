@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "b5cdd4dc17d65e2098322423c38dff407fa6334329727497c4503aa02751436b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load with no data, the page shows the heading \"Simple CRM\", the text \"No customers yet\", and the tab labelled \"Customers\" is active."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add customer\" opens a form. Filling the field labelled \"Name\" with \"Ada Lovelace\", the field labelled \"Email\" with \"ada@example.com\", and the field labelled \"Company\" with \"Analytical Engines\", then clicking \"Save\" adds a list item containing \"Ada Lovelace\" and \"ada@example.com\", and the text \"No customers yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "With the customer \"Ada Lovelace\" present, clicking the button \"Log interaction\" on that row opens a form. Filling the field labelled \"Type\" with \"Call\", the field labelled \"Notes\" with \"Discussed pricing\", and clicking \"Save\" adds an interaction entry under the customer that contains \"Call\" and \"Discussed pricing\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Ada\" in the search field labelled \"Search customers\" filters the list so that only the row containing \"Ada Lovelace\" is visible; typing \"Zzz\" shows the text \"No customers match\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the select labelled \"Filter by status\" and choosing \"Lead\" hides the row for \"Ada Lovelace\" (whose status is \"Customer\") and shows the text \"No customers match\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Edit\" on the row for \"Ada Lovelace\" opens the form pre-filled. Changing the field labelled \"Company\" to \"Babbage Labs\" and clicking \"Save\" updates the row to show \"Babbage Labs\" and no longer shows \"Analytical Engines\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete\" on the row for \"Ada Lovelace\" removes that row from the list; with no other customers, the text \"No customers yet\" reappears."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"Interactions\" shows a table with the header \"Date\", \"Customer\", \"Type\", and \"Notes\". With the interaction logged in A3, the table contains a row with \"Ada Lovelace\", \"Call\", and \"Discussed pricing\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the customer \"Ada Lovelace\" with company \"Babbage Labs\" and the interaction \"Discussed pricing\" visible in the Interactions tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "fbcf6b0ab49ab0d2548fbe80934cb8a3edd600da45710b745a49219ca68efba3"
+    }
+  ]
+}

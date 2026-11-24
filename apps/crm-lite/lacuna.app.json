@@ -1,0 +1,86 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.crm-lite",
+  "name": "Simple CRM",
+  "version": "0.1.0",
+  "summary": "Track customers and their interactions.",
+  "description": "Keep a small list of customers with their contact details and status. Log interactions against each customer. Search and filter the list, edit or delete entries. Nothing leaves the browser.",
+  "category": "business",
+  "tags": ["crm", "customers"],
+  "icon": "crm",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/crm-lite",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:crm-lite"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "crm-lite",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store customers and their interactions"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "crm-lite"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
