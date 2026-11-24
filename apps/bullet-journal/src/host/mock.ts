@@ -1,6 +1,7 @@
 import { createMockRecordStore } from '@lacuna/host-mock'
 
 export interface DayTask {
+  id: string
   label: string
   done: boolean
 }
@@ -14,8 +15,8 @@ export interface DayRecord {
 const KEY = 'lacuna.bullet-journal.mock.v1'
 
 function isDayTask(v: unknown): v is DayTask {
-  const t = v as { label?: unknown; done?: unknown }
-  return typeof t.label === 'string' && typeof t.done === 'boolean'
+  const t = v as { id?: unknown; label?: unknown; done?: unknown }
+  return typeof t.id === 'string' && typeof t.label === 'string' && typeof t.done === 'boolean'
 }
 
 function isDayRecord(v: unknown): v is DayRecord {
