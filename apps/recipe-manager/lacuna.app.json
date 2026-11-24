@@ -39,11 +39,10 @@
       "@lacuna/record-table": "0.1.0",
       "@lacuna/record-form": "0.1.0",
       "@lacuna/filter-bar": "0.1.0",
-      "@lacuna/search-box": "0.1.0",
       "@lacuna/confirm-dialog": "0.2.0",
-      "@lacuna/tag-input": "0.1.0",
       "@lacuna/export-menu": "0.1.0",
       "@lacuna/json-backup": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
       "@lacuna/host-mock": "0.1.0"
     }
   },
