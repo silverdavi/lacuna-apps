@@ -48,7 +48,6 @@ type Phase = 'idle' | 'session' | 'done'
 export function App() {
   const [tab, setTab] = useState<'Questions' | 'Study'>('Questions')
 
-  // Question bank
   const [questions, setQuestions] = useState<Question[]>(() => questionStore.list())
   const [text, setText] = useState('')
   const [qType, setQType] = useState<QuestionType>('multiple-choice')
@@ -59,10 +58,8 @@ export function App() {
   const [correct, setCorrect] = useState('A')
   const [formError, setFormError] = useState<string | null>(null)
 
-  // Settings
   const [shuffleOptions, setShuffleOptions] = useState<boolean>(() => settingsStore.get().shuffleOptions)
 
-  // Session state
   const [phase, setPhase] = useState<Phase>('idle')
   const [sessionOrder, setSessionOrder] = useState<Question[]>([])
   const [shuffled] = useState<string[]>([...LETTERS])
@@ -72,7 +69,6 @@ export function App() {
   const [answers, setAnswers] = useState<AnswerRecord[]>([])
   const [reviewing, setReviewing] = useState(false)
 
-  // Session history
   const [sessions, setSessions] = useState<Session[]>(() => sessionStore.list())
 
   useEffect(() => {
@@ -201,6 +197,8 @@ export function App() {
   const lastGood = sessions[sessions.length - 1] ?? null
   const sessionScore = answers.filter((a) => a.ok).length
 
+  const chipCount = questions.length === 1 ? '1 question in the bank' : `${questions.length} questions in the bank`
+
   return (
     <AppShell
       name="Quiz App"
@@ -210,9 +208,13 @@ export function App() {
       meta={`${questions.length} question${questions.length === 1 ? '' : 's'}`}
       side={
         <Rail
-          title="Study"
-          note="Sessions run in shuffled order."
-          chips={questions.length === 0 ? ['Bank is empty'] : [`${questions.length} in the bank`, `${sessions.length} sessions run`]}
+          title="Session"
+          note="Order and options are shuffled each run."
+          chips={
+            questions.length === 0
+              ? ['Bank is empty']
+              : [chipCount, `${sessions.length} session${sessions.length === 1 ? '' : 's'} run`]
+          }
         />
       }
     >
@@ -319,25 +321,24 @@ export function App() {
       {tab === 'Study' && phase === 'session' && current ? (
         <Card mono={`${index + 1} of ${sessionOrder.length}`} title={current.text}>
           {current.type === 'multiple-choice' ? (
-            <div style={{ display: 'grid', gap: 'calc(8px * var(--sf))' }}>
-              {shuffled.map((letter) => {
-                const value = current.options[optIndex(letter)] ?? ''
-                const label = `${letter}: ${value}`
-                const isChosen = chosen === letter
-                const isCorrect = chosen !== null && letter === current.correct
-                return (
-                  <Button
-                    key={letter}
-                    kind={isCorrect ? 'primary' : 'secondary'}
-                    disabled={chosen !== null}
-                    onClick={() => pick(letter)}
-                    style={{ display: 'block', textAlign: 'left' }}
-                  >
-                    {label}
-                  </Button>
-                )
-              })}
-            </div>
+            chosen === null ? (
+              <div style={{ display: 'grid', gap: 'calc(8px * var(--sf))' }}>
+                {shuffled.map((letter) => {
+                  const value = current.options[optIndex(letter)] ?? ''
+                  const label = `${letter}: ${value}`
+                  return (
+                    <Button
+                      key={letter}
+                      kind="secondary"
+                      onClick={() => pick(letter)}
+                      style={{ display: 'block', textAlign: 'left' }}
+                    >
+                      {label}
+                    </Button>
+                  )
+                })}
+              </div>
+            ) : null
           ) : (
             <FormGrid>
               <TextInput
@@ -361,9 +362,14 @@ export function App() {
             )}
           </Actions>
           {chosen !== null && currentAnswer ? (
-            <p style={{ margin: 'calc(8px * var(--sf)) 0 0' }}>
-              {currentAnswer.ok ? 'Correct' : 'Incorrect'}
-            </p>
+            <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+              <p style={{ margin: 0 }}>{currentAnswer.ok ? 'Correct' : 'Incorrect'}</p>
+              {!currentAnswer.ok && current.type === 'multiple-choice' ? (
+                <p style={{ margin: 'calc(4px * var(--sf)) 0 0' }}>
+                  Correct answer: {current.correct}: {current.options[optIndex(current.correct)]}
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </Card>
       ) : null}
@@ -399,34 +405,29 @@ export function App() {
             />
           ) : (
             <List label="Mistakes">
-              {mistakes.map((m) => (
-                <Row
-                  key={m.questionId}
-                  title={m.question?.text ?? ''}
-                  meta={
-                    `Your answer: ${m.given}${
-                      m.question?.type === 'multiple-choice' ? `: ${m.question.options[optIndex(m.given)]}` : ''
-                    }`
-                  }
-                  value={
-                    `Answer ${m.correct}${
-                      m.question?.type === 'multiple-choice' ? `: ${m.question.options[optIndex(m.correct)]}` : ''
-                    }`
-                  }
-                />
-              ))}
+              {mistakes.map((m) => {
+                const given = `Your answer: ${m.given}${
+                  m.question?.type === 'multiple-choice' ? `: ${m.question.options[optIndex(m.given)]}` : ''
+                }`
+                const correct = `Answer ${m.correct}${
+                  m.question?.type === 'multiple-choice' ? `: ${m.question.options[optIndex(m.correct)]}` : ''
+                }`
+                return (
+                  <li
+                    key={m.questionId}
+                    className="lk-row hot"
+                    aria-label={`${m.question?.text ?? ''} ${given} ${correct}`}
+                  >
+                    <span className="lk-row-text">
+                      <span className="lk-row-title">{m.question?.text ?? ''}</span>
+                      <span className="lk-row-meta">{given}</span>
+                    </span>
+                    <span className="lk-row-value">{correct}</span>
+                  </li>
+                )
+              })}
             </List>
           )}
-        </Card>
-      ) : null}
-
-      {tab === 'Study' && phase !== 'idle' && reviewing ? (
-        <Card mono="Back" title="Session controls">
-          <Actions>
-            <Button kind="secondary" onClick={() => setReviewing(false)}>
-              Back to summary
-            </Button>
-          </Actions>
         </Card>
       ) : null}
 
