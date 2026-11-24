@@ -1,0 +1,20 @@
+{
+  "repo": "completejavascript/pomodoro-clock",
+  "url": "https://github.com/completejavascript/pomodoro-clock",
+  "sha": "bacaa0ef5657c6084c64924e645cd6575340fe40",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2018 Lam Pham"
+  ],
+  "files": [
+    "src/components/App.js",
+    "src/components/Controller.js",
+    "src/components/Folkme.js",
+    "src/components/Settings.js",
+    "src/components/Times.js",
+    "src/index.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "753af27c8c63ac4cb711a2ee29dfeb8e25353c104afe3b7a7cf67c1ba6c18f77"
+}

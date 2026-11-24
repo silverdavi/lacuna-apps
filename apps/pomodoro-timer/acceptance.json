@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "9a282af06d4b49047aa058592d7745bc9de28737d55a81b13e503157b3ec78cd",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Pomodoro Timer\", the text \"Focus\", and the time display \"25:00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Start\" changes the phase label to \"Focus\", the time display to \"24:59\" within one second, and the button label to \"Pause\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking \"Pause\" freezes the time display at its current value, changes the button label to \"Resume\", and clicking \"Resume\" resumes the countdown from that frozen value."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Skip\" during a running Focus phase changes the phase label to \"Break\" and resets the time display to \"05:00\"."
+    },
+    {
+      "id": "A5",
+      "text": "After a Focus phase completes naturally (time reaches \"00:00\"), the phase label changes to \"Break\", the time display resets to \"05:00\", and a toast message \"Focus session completed\" appears."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab \"History\" shows a list of completed sessions; after completing one Focus session, the list contains an item with the text \"Focus\" and a duration of \"25:00\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy summary\" on the History tab copies the text \"Sessions: 1, Total focus: 25:00\" to the clipboard and shows a toast \"Copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "The streak display shows \"Streak: 0\" initially; after completing one Focus session, it shows \"Streak: 1\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the completed session: after completing one Focus session and reloading, the History tab shows an item with \"Focus\" and \"25:00\", and the streak display shows \"Streak: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "55aa9bd18bf69d5acc8b23ece370fbc1bb10d22b1a1c32d6917592bd8fd15e6b"
+    }
+  ]
+}
