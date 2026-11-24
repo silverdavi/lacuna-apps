@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ec9f79d1f975847ac5544505b833cc4f3672773af87eaa8f634738e27a5fa762",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no surveys created, the page shows the heading \"Survey App\" and the text \"No surveys yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New survey\" opens a form. Typing \"Customer Feedback\" in the field labelled \"Title\" and clicking the button \"Save survey\" creates a survey card that contains \"Customer Feedback\" and the status \"0 responses\". The text \"No surveys yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "On the \"Customer Feedback\" survey card, clicking the button \"Add question\" and typing \"Would you recommend us?\" in the input that appears, then clicking \"Add\", adds a checklist item containing \"Would you recommend us?\". Clicking \"Add question\" again, typing \"What did you like?\" and clicking \"Add\" adds a second item. The survey card now shows \"2 questions\"."
+    },
+    {
+      "id": "A4",
+      "text": "On the \"Customer Feedback\" survey card, clicking the button \"Start collecting\" switches the view to a response form. The form shows the heading \"Customer Feedback\" and two checkboxes labelled \"Would you recommend us?\" and \"What did you like?\". Clicking the checkbox \"Would you recommend us?\" marks it checked. Clicking the button \"Submit response\" adds a response and returns to the survey list. The survey card now shows \"1 response\"."
+    },
+    {
+      "id": "A5",
+      "text": "On the \"Customer Feedback\" survey card, clicking the button \"View responses\" opens a table. The table has columns \"Respondent\", \"Would you recommend us?\", and \"What did you like?\". The first row shows \"Respondent 1\", \"Yes\", and \"No\"."
+    },
+    {
+      "id": "A6",
+      "text": "On the \"Customer Feedback\" survey card, clicking the button \"Export CSV\" downloads a file. The file content contains the header row \"Respondent,Would you recommend us?,What did you like?\" and the data row \"Respondent 1,Yes,No\"."
+    },
+    {
+      "id": "A7",
+      "text": "On the \"Customer Feedback\" survey card, clicking the button \"Delete survey\" removes the survey card from the list. The text \"No surveys yet\" reappears."
+    },
+    {
+      "id": "A8",
+      "text": "After creating a survey titled \"NPS Score\" and adding one question \"Rate us 1-10\", then submitting one response with the checkbox checked, the survey card shows \"1 response\". Clicking \"View responses\" shows a table row with \"Respondent 1\" and \"Yes\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the survey \"Customer Feedback\" with its two questions \"Would you recommend us?\" and \"What did you like?\" and the response count \"1 response\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8314522f4ef23fb981493a1fcfb9f6ade28d21e9355afa514fb994dda4efedaa"
+    }
+  ]
+}
