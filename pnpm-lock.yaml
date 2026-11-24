@@ -4407,6 +4407,46 @@ importers:
         specifier: ^6.2.0
         version: 6.4.5
 
+  apps/warranty-tracker:
+    dependencies:
+      '@lacuna/csv-parse':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/csv-parse/0.1.0
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/date-math/0.1.0
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/file-save-open/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/weight-tracker:
     dependencies:
       '@lacuna/chart':
