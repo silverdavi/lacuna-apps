@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AppShell, Button, Card, PrimaryButton, Row, Stack, Actions, type ListProps } from '@lacuna/ui'
+import { AppShell, Button, Card, PrimaryButton, Row, Stack, Actions } from '@lacuna/ui'
 import { CodeArea } from '@lacuna/code-area'
 import { markdownToHtml } from '@lacuna/markdown-to-html'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -151,7 +151,36 @@ function mathToHtml(source: string): string {
     if (ph === undefined) continue
     out = out.replace(`@@MATH@@${k}@@`, ph)
   }
+  // Give tables explicit column structure so assistive tech and
+  // role queries resolve "column" and "row" reliably.
+  out = enhanceTables(out)
+  // Give task-list checkboxes an accessible name from their text.
+  out = labelCheckboxes(out)
   return out
+}
+
+function enhanceTables(html: string): string {
+  return html.replace(/<table>([\s\S]*?)<\/table>/g, (whole, inner: string) => {
+    const headerMatch = /<thead>\s*<tr>([\s\S]*?)<\/tr>\s*<\/thead>/.exec(inner ?? '')
+    const headers = (headerMatch?.[1] ?? '').match(/<th>[\s\S]*?<\/th>/g) ?? []
+    const cols = '<colgroup>' + '<col>'.repeat(headers.length) + '</colgroup>'
+    const theadFixed = (inner ?? '').replace(
+      /<th>/g,
+      '<th scope="col">',
+    )
+    return `<table>${cols}${theadFixed}</table>`
+  })
+}
+
+function labelCheckboxes(html: string): string {
+  // Wrap each task-list item's checkbox + text in a <label> so the
+  // input exposes the item text as its accessible name.
+  // markdownToHtml emits: <li><input type="checkbox"[ checked=""] disabled=""> text</li>
+  return html.replace(
+    /<li><input type="checkbox"([^>]*)>([\s\S]*?)<\/li>/g,
+    (_m, attrs: string, text: string) =>
+      `<li><label><input type="checkbox"${attrs}> ${text}</label></li>`,
+  )
 }
 
 function extractHeading(text: string): string {
@@ -207,9 +236,9 @@ export function App() {
       'color:var(--ink);background:var(--paper);line-height:1.6}' +
       'h1,h2,h3{font-family:var(--sans);font-weight:600}' +
       'code,pre{font-family:var(--mono)}' +
-      'table{border-collapse:collapse}th,td{border:1px solid var(--hair);padding:6px 8px}' +
+      'table{border-collapse:collapse}th,td{border:calc(1px * var(--sf)) solid var(--hair);padding:calc(6px * var(--sf)) calc(8px * var(--sf))}' +
       'th{font-family:var(--sans)}' +
-      '.math-a11y{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}'
+      '.math-a11y{position:absolute;width:calc(1px * var(--sf));height:calc(1px * var(--sf));overflow:hidden;clip:rect(0 0 0 0)}'
     const html = [
       '<!doctype html>',
       '<html lang="en">',
@@ -230,27 +259,6 @@ export function App() {
     lastSnapshotRef.current = text
     setTab('Source')
     setDoc(text)
-  }
-
-  const historyList: ListProps = {
-    label: 'History',
-    children:
-      snapshots.length === 0 ? (
-        <div className="me-hint">No snapshots yet. Type in the Source tab and autosave will record them here.</div>
-      ) : (
-        snapshots.map((s) => (
-          <Row
-            key={s.id}
-            title={extractHeading(s.text) || s.text.split('\n')[0] || s.text}
-            meta={new Date(s.ts).toLocaleString()}
-            action={
-              <Button kind="secondary" ariaLabel="Restore" onClick={() => onRestore(s.text)}>
-                Restore
-              </Button>
-            }
-          />
-        ))
-      ),
   }
 
   return (
@@ -274,8 +282,8 @@ export function App() {
             ))}
           </div>
 
-          <div role="tabpanel" aria-label="Source" id="tabpanel-source" aria-labelledby="tab-source">
-            <CodeArea value={doc} onChange={setDoc} language="md" ariaLabel="Math Editor source" />
+          <div role="tabpanel" aria-label="Source" id="tabpanel-source" aria-labelledby="tab-source" style={{ display: tab === 'Source' ? undefined : 'none' }}>
+            <CodeArea value={doc} onChange={setDoc} language="plain" ariaLabel="Math Editor source" />
             {doc === '' ? <div className="me-hint">Type Markdown and TeX here</div> : null}
             <div className="me-actions">
               <Actions>
@@ -287,31 +295,31 @@ export function App() {
                 </Button>
               </Actions>
             </div>
-            <div role="tabpanel" aria-label="Preview" id="tabpanel-preview" aria-labelledby="tab-preview" className="md-preview" style={{ display: tab === 'Preview' ? undefined : 'none' }} dangerouslySetInnerHTML={{ __html: previewHtml }} />
           </div>
-          {tab === 'History' ? (
-            <div role="tabpanel" aria-label="History" id="tabpanel-history" aria-labelledby="tab-history">
-              {snapshots.length === 0 ? (
-                <div className="me-hint">No snapshots yet. Type in the Source tab and autosave will record them here.</div>
-              ) : (
-                <ul className="lk-list" aria-label="History">
-                  {snapshots.map((s) => (
-                    <li key={s.id} className="lk-row">
-                      <Row
-                        title={extractHeading(s.text) || s.text.split('\n')[0] || s.text}
-                        meta={new Date(s.ts).toLocaleString()}
-                        action={
-                          <Button kind="secondary" ariaLabel="Restore" onClick={() => onRestore(s.text)}>
-                            Restore
-                          </Button>
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ) : null}
+          <div role="tabpanel" aria-label="Preview" id="tabpanel-preview" aria-labelledby="tab-preview" style={{ display: tab === 'Preview' ? undefined : 'none' }}>
+            <div className="md-preview" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          </div>
+          <div role="tabpanel" aria-label="History" id="tabpanel-history" aria-labelledby="tab-history" style={{ display: tab === 'History' ? undefined : 'none' }}>
+            {snapshots.length === 0 ? (
+              <div className="me-hint">No snapshots yet. Type in the Source tab and autosave will record them here.</div>
+            ) : (
+              <ul className="lk-list" aria-label="History">
+                {snapshots.map((s) => (
+                  <li key={s.id} className="lk-row">
+                    <Row
+                      title={extractHeading(s.text) || s.text.split('\n')[0] || s.text}
+                      meta={new Date(s.ts).toLocaleString()}
+                      action={
+                        <Button kind="secondary" ariaLabel="Restore" onClick={() => onRestore(s.text)}>
+                          Restore
+                        </Button>
+                      }
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </Card>
       </Stack>
     </AppShell>
