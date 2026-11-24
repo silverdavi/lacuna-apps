@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "50def9d1032eb6f7f9e473028830846f41756f9cacce9d1c174dbe07d9cdfee8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Personal Finance Ledger\" and the tab labelled \"Ledger\" is active by default."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add transaction\" form, typing \"Salary\" in the field labelled \"Description\", \"2500\" in the field labelled \"Amount\", choosing \"Income\" in the select labelled \"Type\", \"Bank\" in the select labelled \"Account\", and \"Salary\" in the select labelled \"Category\", then clicking the button \"Add\" adds a row to the table with the text \"Salary\", \"+$2,500.00\", \"Bank\", and \"Salary\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the Salary transaction from A2, the summary line labelled \"Net worth\" shows \"$2,500.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Adding an expense with Description \"Rent\", Amount \"1200.50\", Type \"Expense\", Account \"Bank\", Category \"Housing\" makes the summary line \"Net worth\" show \"$1,299.50\" and the row for Rent shows \"-$1,200.50\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Rent\" removes the Rent row from the table and the summary line \"Net worth\" returns to \"$2,500.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Budgets\" shows a table with a row for \"Housing\" where the column \"Budget\" shows \"$1,500.00\" and the column \"Actual\" shows \"$1,200.50\" (assuming the Rent expense from A4 is present)."
+    },
+    {
+      "id": "A7",
+      "text": "In the Budgets tab, changing the field labelled \"Budget\" for the \"Housing\" row to \"1000\" and pressing Enter updates the \"Budget\" column for Housing to \"$1,000.00\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"Charts\" shows a donut chart with a legend entry \"Housing\" and a tooltip that, when hovering the Housing slice, displays \"Housing: $1,200.50\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the transaction with Description \"Salary\" and Amount \"+$2,500.00\" in the Ledger table and the summary line \"Net worth\" showing \"$2,500.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "5dad4daa7308a9d93fd03fbe61499a1be2c66d2d14221d3e8038af33de278b4d"
+    }
+  ]
+}
