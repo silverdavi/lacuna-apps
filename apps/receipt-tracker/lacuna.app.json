@@ -1,0 +1,99 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.receipt-tracker",
+  "name": "Receipt Tracker",
+  "version": "0.1.0",
+  "summary": "Log receipts, filter them, and total what you spent.",
+  "description": "Add a receipt with a merchant, an amount, and a category. Search and filter the list, delete receipts, see the running total, export the receipts as CSV, and back up and restore the collection as JSON. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": [
+    "money",
+    "receipts",
+    "expenses"
+  ],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/receipt-tracker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/tracker-kit": "0.2.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:receipt",
+    "edit:receipt",
+    "export:csv"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "receipt",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Receipt Tracker records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "receipt"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

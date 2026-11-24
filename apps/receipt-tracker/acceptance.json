@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "61df2ef87a81acbb7a576968eabddd474bf1789515938d744f3ac9738da5e681",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Receipt Tracker\" and, with no receipts, shows the text \"No receipts yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Merchant\" with \"Grocery Store\", the field labelled \"Amount\" with \"50.00\", choosing \"Food\" in the select labelled \"Category\", and clicking the button \"Add receipt\" adds a row to the table containing \"Grocery Store\", \"$50.00\", and \"Food\". The text \"No receipts yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second receipt with Merchant \"Office Supplies\", Amount \"25.50\", and Category \"Office\", the table contains two rows. The summary line \"Total: $75.50\" is visible."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Grocery\" in the search box labelled \"Search\" filters the table to show only the row containing \"Grocery Store\". The row for \"Office Supplies\" is not visible."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting \"Office\" in the filter select labelled \"Category\" shows only the row containing \"Office Supplies\". The row for \"Grocery Store\" is not visible."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete Grocery Store\" removes that row from the table. The summary line updates to \"Total: $25.50\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" downloads a file named \"receipts.csv\" containing the header \"Merchant,Category,Amount\" and a line \"Grocery Store,Food,50.00\" (assuming the Grocery Store receipt was not deleted in A6, or re-added)."
+    },
+    {
+      "id": "A8",
+      "text": "Filling the field labelled \"Merchant\" with \"Empty\" and clicking \"Add receipt\" without entering an Amount shows the error message \"Amount is required\" and adds no row to the table."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the receipt with Merchant \"Office Supplies\" and Amount \"$25.50\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "dcc84ee5025bcc5ca218cfb166642b6c97557507e32949e8f290147a0324ae00"
+    }
+  ]
+}
