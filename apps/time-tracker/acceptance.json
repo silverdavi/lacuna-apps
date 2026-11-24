@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6cd93206d0e1c868b52afde7dc17bceee3330b997d346769b32b63fbbed87692",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Time Tracker\" and a button labelled \"Start Timer\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Start Timer\" changes the button label to \"Stop Timer\" and displays a timer counting up from \"00:00:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After the timer has run for 60 seconds, clicking \"Stop Timer\" adds a new row to the table with the task name \"Default Task\" and duration \"00:01:00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Deep Work\" in the field labelled \"Task Name\" and clicking \"Start Timer\" then \"Stop Timer\" after 30 seconds adds a row with task name \"Deep Work\" and duration \"00:00:30\"."
+    },
+    {
+      "id": "A5",
+      "text": "The table displays a column labelled \"Total\" which shows the sum of all durations. With one session of \"00:01:00\", the cell shows \"00:01:00\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Delete\" on the row with task name \"Deep Work\" removes that row and updates the \"Total\" to \"00:00:00\" if no other rows exist."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Export CSV\" downloads a file containing the header \"Task,Duration\" and a row \"Deep Work,00:00:30\"."
+    },
+    {
+      "id": "A8",
+      "text": "The tab labelled \"History\" is visible. Clicking it shows the table of sessions. The tab labelled \"Timer\" is active by default."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the session with task name \"Deep Work\" and duration \"00:00:30\" in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9ee07a9eecb7288409ae4896304f85df1dc40559d0833f4420420cf44012733f"
+    }
+  ]
+}

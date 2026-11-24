@@ -1,0 +1,5 @@
+/* App-level accessibility overrides. */
+/* Inactive tabs must meet WCAG contrast; the kit default (--ink-40) is too light. */
+.tt-tab:not(.active) {
+  color: var(--ink-60);
+}
