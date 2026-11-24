@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "686577b488d3957eb9bf454136732524c3f2b6280d52c423ef0f8b324d644a00",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Recipe Manager\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add recipe\" opens a form. Filling the field labelled \"Name\" with \"Pancakes\", the field labelled \"Servings\" with \"4\", and clicking \"Save\" adds a row to the table containing \"Pancakes\" and \"4\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the search box, typing \"pan\" shows a result with \"Pancakes\" highlighted, and the table shows only the Pancakes row."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the column header \"Name\" in the table sorts the rows alphabetically by name."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Edit Pancakes\" opens the form with \"Pancakes\" pre-filled. Changing the field labelled \"Servings\" to \"6\" and clicking \"Save\" updates the table row to show \"6\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete Pancakes\" removes the row from the table."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" downloads a file containing the header \"Name,Servings\" and the row \"Pancakes,4\"."
+    },
+    {
+      "id": "A8",
+      "text": "With no recipes, the table shows the text \"No recipes yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the recipe \"Pancakes\" with servings \"4\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "bdb0b943714a0489a02a2e7a789023e8d841f0778b1b1c810b65300ab0c6d814"
+    }
+  ]
+}
