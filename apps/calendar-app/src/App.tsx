@@ -5,7 +5,10 @@ import {
   AppShell,
   Button,
   Card,
+  EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   PrimaryButton,
   TextInput,
 } from '@lacuna/ui'
@@ -16,6 +19,12 @@ import { addEvent, listEvents, removeEvent, type CalendarEvent } from './host'
 import './app.css'
 
 const DAY_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+function monthHeading(anchor: string): string {
+  const d = fromISODate(anchor)
+  if (!d) return ''
+  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+}
 
 function monthCells(anchor: string): { iso: string; inMonth: boolean }[] {
   const d = fromISODate(anchor)
@@ -31,12 +40,6 @@ function monthCells(anchor: string): { iso: string; inMonth: boolean }[] {
     })
   }
   return cells
-}
-
-function monthHeading(anchor: string): string {
-  const d = fromISODate(anchor)
-  if (!d) return ''
-  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 }
 
 function timeOf(startDate: string): string {
@@ -97,6 +100,17 @@ export function App() {
     }
     return map
   }, [events])
+
+  const cells = useMemo(() => monthCells(anchor), [anchor])
+  const total = events.length
+  const currentEvents = useMemo(
+    () =>
+      cells
+        .filter((c) => c.inMonth)
+        .flatMap((c) => byDay.get(c.iso) ?? [])
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
+    [cells, byDay],
+  )
 
   function shift(offset: number) {
     const d = fromISODate(anchor)
@@ -169,9 +183,6 @@ export function App() {
     setNotice(added > 0 ? `Imported ${added} event${added === 1 ? '' : 's'}` : 'No new events found')
   }
 
-  const cells = useMemo(() => monthCells(anchor), [anchor])
-  const total = events.length
-
   return (
     <>
       <input
@@ -200,10 +211,10 @@ export function App() {
             <div className="cal-card-stack">
               <div className="cal-toolbar">
                 <div className="cal-nav">
-                  <Button kind="ghost" ariaLabel="Previous month" onClick={() => shift(-1)}>
+                  <Button kind="ghost" onClick={() => shift(-1)}>
                     Previous month
                   </Button>
-                  <Button kind="ghost" ariaLabel="Next month" onClick={() => shift(1)}>
+                  <Button kind="ghost" onClick={() => shift(1)}>
                     Next month
                   </Button>
                 </div>
@@ -226,45 +237,56 @@ export function App() {
                 {cells.map((c) => {
                   const dayEvents = byDay.get(c.iso) ?? []
                   const dayNum = Number(c.iso.slice(8, 10))
-                  const daySpan = c.inMonth ? (
-                    <span className="cal-cell-date">
-                      <span className="cal-cell-day">
-                        {dayNum}
+                    return (
+                      <div
+                        key={c.iso}
+                        className={`cal-cell${c.inMonth ? '' : ' off'}${c.iso === TODAY ? ' today' : ''}`}
+                      >
+                        <div className="cal-cell-date">{c.inMonth ? dayNum : null}</div>
                         {dayEvents.map((ev) => (
                           <button
                             key={ev.id}
                             type="button"
                             className="cal-block"
+                            title={ev.title}
                             onClick={() => setSelected(ev)}
                           >
                             {ev.title}
                           </button>
                         ))}
-                      </span>
-                    </span>
-                  ) : null
-                  return (
-                    <div
-                      key={c.iso}
-                      className={`cal-cell${c.inMonth ? '' : ' off'}${c.iso === TODAY ? ' today' : ''}`}
-                    >
-                      {daySpan}
-                      {!c.inMonth &&
-                        dayEvents.map((ev) => (
-                          <button
-                            key={ev.id}
-                            type="button"
-                            className="cal-block off"
-                            onClick={() => setSelected(ev)}
-                          >
-                            {ev.title}
-                          </button>
-                        ))}
-                    </div>
-                  )
+                      </div>
+                    )
                 })}
               </div>
             </div>
+          </Card>
+
+          <Card mono="This month" title="This month's events">
+            {currentEvents.length === 0 ? (
+              <div className="cal-month-empty">
+                <div className="lc-mono lc-mono-sm lc-faint">Empty</div>
+                <div className="lc-empty-title">No events this month</div>
+                <div className="lc-body-sm">Add an event or import a calendar file to fill the grid.</div>
+              </div>
+            ) : (
+              <>
+              <div className="cal-list">
+                {currentEvents.map((ev) => (
+                  <div key={ev.id} className="cal-list-row">
+                    <button type="button" className="cal-list-title" onClick={() => setSelected(ev)}>
+                      {ev.title}
+                    </button>
+                    <span className="cal-list-date">{ev.date}</span>
+                    <span className="cal-list-time">{ev.time === '' ? 'All day' : ev.time}</span>
+                    <span className="cal-list-key">{ev.title}</span>
+                  </div>
+                ))}
+              </div>
+                <KpiRow>
+                  <Kpi value={String(currentEvents.length)} label="Events this month" accent />
+                </KpiRow>
+              </>
+            )}
           </Card>
         </div>
 
@@ -317,11 +339,10 @@ export function App() {
                     </div>
                   ))}
                 </div>
+                {selected.time !== '' ? <span className="cal-detail-key">{selected.time}</span> : null}
               </div>
               <Actions>
-                <Button kind="danger" onClick={deleteSelected}>
-                  Delete
-                </Button>
+                <PrimaryButton onClick={deleteSelected}>Delete</PrimaryButton>
                 <Button kind="ghost" onClick={() => setSelected(null)}>
                   Close
                 </Button>
@@ -333,3 +354,5 @@ export function App() {
     </>
   )
 }
+
+export { monthHeading }
