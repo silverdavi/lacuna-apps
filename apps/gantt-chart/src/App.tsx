@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 import { useMemo, useState } from 'react'
-import { AppShell, Button, Card, EmptyState, FormGrid, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, FormGrid, MonoLabel, TextInput, Title } from '@lacuna/ui'
 import { GanttBars, type GanttBar } from '@lacuna/gantt-bars'
 import { addDays, fromISODate, toISODate } from '@lacuna/date-math'
 import { useLocalRecord } from '@lacuna/use-local-record'
@@ -227,42 +227,42 @@ export function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tasks.map((t) => (
-                    <tr key={t.id}>
-                      <td className="gc-name">{t.name}</td>
-                      <td>
-                        <select
-                          className="gc-pre"
-                          aria-label="Predecessor"
-                          value={t.dependsOn[0] ?? ''}
-                          onChange={(ev) => setPredecessor(t.id, ev.target.value)}
-                        >
+                    {tasks.map((t) => (
+                      <tr key={t.id}>
+                        <td className="gc-name">{t.name}</td>
+                        <td>
+                          <select
+                            className="gc-pre"
+                            aria-label="Predecessor"
+                            value={t.dependsOn[0] ?? ''}
+                            onChange={(ev) => setPredecessor(t.id, ev.target.value)}
+                          >
                             <option value="">none</option>
-                          {tasks
-                            .filter((o) => o.id !== t.id)
-                            .map((o) => (
-                              <option key={o.id} value={o.id} label={o.name}>
-                                {o.id}
-                              </option>
-                            ))}
-                        </select>
-                      </td>
-                      <td>
-                        <Button
-                          kind="secondary"
-                          disabled={t.dependsOn.length === 0}
-                          onClick={() => setPredecessor(t.id, t.dependsOn[0] ?? '')}
-                        >
-                          Apply
-                        </Button>
-                      </td>
-                      <td className="gc-mono">
-                        <Button kind="ghost" onClick={() => removeTask(t.id)}>
-                          Delete
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                            {tasks
+                              .filter((o) => o.id !== t.id)
+                              .map((o) => (
+                                <option key={o.id} value={o.id} label={o.name}>
+                                  {o.id}
+                                </option>
+                              ))}
+                          </select>
+                        </td>
+                        <td>
+                          <Button
+                            kind="secondary"
+                            disabled={t.dependsOn.length === 0}
+                            onClick={() => setPredecessor(t.id, t.dependsOn[0] ?? '')}
+                          >
+                            Apply
+                          </Button>
+                        </td>
+                        <td className="gc-mono">
+                          <Button kind="ghost" onClick={() => removeTask(t.id)}>
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             )}
@@ -273,17 +273,17 @@ export function App() {
       {formOpen ? (
         <div className="gc-overlay" role="dialog" aria-modal="true" aria-label="Add task">
           <div className="gc-dialog">
-            <h2>Add task</h2>
+            <div className="gc-dialog-title">
+              <Title size="md" as="h2">Add task</Title>
+            </div>
+            <div className="gc-dialog-mono">
+              <MonoLabel sm>Timeline entry</MonoLabel>
+            </div>
             <FormGrid>
-              <TextInput label="Task name" value={name} onChange={setName} />
-              <TextInput label="Start date" type="date" value={start} onChange={setStart} />
-              <TextInput label="Duration (days)" type="number" value={duration} onChange={setDuration} />
+              <TextInput label="Task name" value={name} onChange={setName} error={error && !name.trim() ? error : null} />
+              <TextInput label="Start date" type="date" value={start} onChange={setStart} error={error && !fromISODate(start) ? error : null} />
+              <TextInput label="Duration (days)" type="number" value={duration} onChange={setDuration} error={error && !(Number.isInteger(Number(duration)) && Number(duration) >= 1) ? error : null} />
             </FormGrid>
-            {error ? (
-              <p role="alert" className="gc-error">
-                {error}
-              </p>
-            ) : null}
             <div className="gc-actions">
               <Button kind="primary" onClick={saveTask}>
                 Save

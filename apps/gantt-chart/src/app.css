@@ -171,23 +171,16 @@
   padding: calc(20px * var(--sf));
 }
 
-.gc-dialog h2 {
-  font-family: var(--sans);
-  font-size: calc(16px * var(--tf));
-  font-weight: 800;
-  color: var(--ink);
-  margin: 0 0 calc(8px * var(--sf));
+.gc-dialog-title {
+  margin-bottom: calc(2px * var(--sf));
+}
+
+.gc-dialog-mono {
+  margin-bottom: calc(10px * var(--sf));
 }
 
 .gc-dialog .gc-actions {
-  margin-top: calc(16px * var(--sf));
-}
-
-.gc-error {
-  font-family: var(--mono);
-  font-size: calc(12px * var(--tf));
-  color: var(--danger);
-  margin: calc(8px * var(--sf)) 0 0;
+  margin-top: calc(14px * var(--sf));
 }
 
 @media (prefers-reduced-motion: reduce) {
