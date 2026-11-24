@@ -4,6 +4,7 @@ import {
   AppShell,
   Button,
   Card,
+  EmptyState,
   FormGrid,
   Kpi,
   KpiRow,
@@ -170,8 +171,9 @@ export function App() {
       name="Expense Tracker"
       icon="finance"
       hue="teal"
-      category="Finance"
+      category="productivity"
       meta={`${transactions.length} ${transactions.length === 1 ? 'transaction' : 'transactions'}`}
+      status="Ledger and budgets are stored locally in your browser."
       side={
         <Rail title="Expense Tracker" note="This month · local" chips={['Ledger', 'Budgets', 'CSV export']}>
           <KpiRow>
@@ -224,7 +226,17 @@ export function App() {
           {transactions.length === 0 ? (
             <table aria-label="Ledger">
               <tbody>
-                <tr><td style={{ color: 'var(--ink-80)' }}>No transactions yet</td></tr>
+                <tr>
+                  <td colSpan={5} style={{ padding: 0 }}>
+                    <EmptyState
+                      mono="Empty"
+                      title="No transactions yet"
+                      detail="Add your first expense with the form above."
+                      actionLabel="Add a transaction"
+                      onAction={onAdd}
+                    />
+                  </td>
+                </tr>
               </tbody>
             </table>
           ) : (
