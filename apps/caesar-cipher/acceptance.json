@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d9ab390ca38ca3a34346a2796e0ac87f9b6764dcad226edd7187c807ac2d0527",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Cipher Tool\" and the text \"Enter text to transform\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"hello world\" in the field labelled \"Input text\", selecting \"Base64\" in the select labelled \"Cipher\", and clicking the button \"Transform\" shows \"aGVsbG8gd29ybGQ=\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"aGVsbG8gd29ybGQ=\" in the field labelled \"Input text\", selecting \"Base64\" in the select labelled \"Cipher\", and clicking the button \"Transform\" shows \"hello world\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"42\" in the field labelled \"Input text\", selecting \"Hex\" in the select labelled \"Cipher\", and clicking the button \"Transform\" shows \"2a\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"2a\" in the field labelled \"Input text\", selecting \"Hex\" in the select labelled \"Cipher\", and clicking the button \"Transform\" shows \"42\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"HELLO\" in the field labelled \"Input text\", selecting \"Caesar\" in the select labelled \"Cipher\", entering \"3\" in the field labelled \"Shift\", and clicking the button \"Transform\" shows \"KHOOR\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy result\" after transforming \"hello world\" to Base64 shows the message \"Copied to clipboard\" and the clipboard contains \"aGVsbG8gd29ybGQ=\"."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting \"URL\" in the select labelled \"Cipher\", typing \"hello world\" in the field labelled \"Input text\", and clicking the button \"Transform\" shows \"hello%20world\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last input \"hello world\" and the cipher selection \"Base64\" in the field labelled \"Input text\" and the select labelled \"Cipher\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "55c27fb4cfbe7a4b93da2f282629c052c59039f17668f8918a9666765db92311"
+    }
+  ]
+}

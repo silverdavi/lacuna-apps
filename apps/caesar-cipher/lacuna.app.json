@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.caesar-cipher",
+  "name": "Cipher Tool",
+  "version": "0.1.0",
+  "summary": "Encode and decode text with Base64, Hex, Caesar and URL ciphers.",
+  "description": "A small shelf app. One input, one cipher, one result. Base64, Hex, Caesar and URL encode/decode. Token colors and type. Shared buttons and cards.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "security",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/caesar-cipher",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/codecs": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:caesar-cipher"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "caesar-cipher",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Cipher Tool records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "caesar-cipher"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
