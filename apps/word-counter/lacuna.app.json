@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.word-counter",
+  "name": "Word Counter",
+  "version": "0.1.0",
+  "summary": "Count words, characters, sentences, and reading time in a draft.",
+  "description": "Write a draft in a plain editor and watch word, character, sentence, paragraph, and reading-time counts update as you type. Toggle punctuation counting, copy the draft to the clipboard, export a text report, or clear the draft. Your draft is kept in this space so it is still there when you come back.",
+  "category": "productivity",
+  "tags": ["writing", "counting", "drafting"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/word-counter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/code-area": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:word-counter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "word-counter",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Word Counter drafts"
+      }
+    ],
+    "platform": [
+      "files.save",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "word-counter"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

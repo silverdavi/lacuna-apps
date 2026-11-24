@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "e056a062749561435c3848f230c4a0b44b1d8e5554e532e550854060b7f95a28",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Word Counter\" and the initial stats panel shows \"Words: 0\", \"Characters: 0\", \"Sentences: 0\", \"Paragraphs: 0\", and \"Reading time: 0 min\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Hello world. This is a test.\" into the CodeArea updates the stats to \"Words: 6\", \"Characters: 27\", \"Sentences: 2\", \"Paragraphs: 1\", and \"Reading time: 0 min\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clearing the editor and typing \"One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty.\" updates the stats to \"Words: 20\", \"Characters: 100\", \"Sentences: 1\", \"Paragraphs: 1\", and \"Reading time: 1 min\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the text \"First paragraph. Second paragraph.\" in the editor, clicking the tab labelled \"Report\" shows a table with rows \"Words: 4\", \"Characters: 31\", \"Sentences: 2\", \"Paragraphs: 2\", and \"Reading time: 0 min\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the text \"Hello world.\" in the editor, clicking the button \"Copy text\" places \"Hello world.\" on the clipboard and shows a toast \"Copied\"."
+    },
+    {
+      "id": "A6",
+      "text": "With the text \"Hello world.\" in the editor, clicking the button \"Download report\" triggers a file download named \"word-counter-report.txt\" containing the line \"Words: 2\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the text \"Hello world.\" in the editor, toggling the switch labelled \"Count punctuation\" to off changes the \"Characters\" stat from \"12\" to \"10\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the text \"Hello world.\" in the editor, clicking the button \"Clear\" empties the editor and resets all stats to zero."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the text \"Hello world.\" in the editor and the stat \"Words: 2\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0145c124e367b93b090f918a67c1e17517a1f7842016a91b0cb25147c7be0f91"
+    }
+  ]
+}
