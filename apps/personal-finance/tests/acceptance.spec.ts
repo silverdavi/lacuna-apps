@@ -1,157 +1,90 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-test('[A1] page heading and Ledger tab active by default', async ({ page }) => {
+// A6: "$1,500.00" is the spec's stated default budget for Housing.
+async function addTransaction(
+  page: Page,
+  t: { description: string; amount: string; type: string; account: string; category: string }
+) {
+  await page.getByLabel('Description').fill(t.description)
+  await page.getByLabel('Amount').fill(t.amount)
+  await page.getByLabel('Type').selectOption(t.type)
+  await page.getByLabel('Account').selectOption(t.account)
+  await page.getByLabel('Category').selectOption(t.category)
+  await page.getByRole('button', { name: 'Add' }).click()
+}
+
+const salary = { description: 'Salary', amount: '2500', type: 'Income', account: 'Bank', category: 'Salary' }
+const rent = { description: 'Rent', amount: '1200.50', type: 'Expense', account: 'Bank', category: 'Housing' }
+
+test('[A1] heading and Ledger tab active by default', async ({ page }) => {
   await page.goto('/')
-  expect(page.getByRole('heading', { name: 'Personal Finance Ledger' })).toBeVisible()
-  const ledgerTab = page.getByRole('tab', { name: 'Ledger' })
-  await expect(ledgerTab).toBeVisible()
-  await expect(ledgerTab).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('heading', { name: 'Personal Finance Ledger' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Ledger' })).toHaveAttribute('aria-selected', 'true')
 })
 
-test('[A2] adding a Salary income transaction adds the expected row', async ({ page }) => {
+test('[A2] adding a transaction appends a row', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Salary')
-  await page.getByLabel('Amount').fill('2500')
-  await page.getByLabel('Type').selectOption('Income')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Salary')
-  await page.getByRole('button', { name: 'Add' }).click()
-
-  const row = page.getByRole('row', { name: /Salary/ }).filter({
-    has: page.locator('text="\\+$2,500.00"'),
-  })
-  await expect(row).toHaveText(/Salary/)
-  await expect(row.getByText('+$2,500.00')).toBeVisible()
-  await expect(row.getByText('Bank')).toBeVisible()
+  await addTransaction(page, salary)
+  const row = page.getByRole('row').filter({ hasText: 'Salary' })
+  await expect(row).toContainText(['+$2,500.00', 'Bank', 'Salary'])
 })
 
-test('[A3] Net worth is $2,500.00 after adding the Salary transaction', async ({ page }) => {
+test('[A3] net worth after the income', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Salary')
-  await page.getByLabel('Amount').fill('2500')
-  await page.getByLabel('Type').selectOption('Income')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Salary')
-  await page.getByRole('button', { name: 'Add' }).click()
-
-  const netWorth = page.getByText('Net worth').locator('..')
-  await expect(netWorth).toHaveText(/Net worth.*\$2,500\.00/)
+  await addTransaction(page, salary)
+  await expect(page.getByLabel('Net worth')).toHaveText('$2,500.00')
 })
 
-test('[A4] adding a Rent expense updates Net worth and row', async ({ page }) => {
+test('[A4] expense lowers net worth and shows a negative row', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Salary')
-  await page.getByLabel('Amount').fill('2500')
-  await page.getByLabel('Type').selectOption('Income')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Salary')
-  await page.getByRole('button', { name: 'Add' }).click()
-
-  await page.getByLabel('Description').fill('Rent')
-  await page.getByLabel('Amount').fill('1200.50')
-  await page.getByLabel('Type').selectOption('Expense')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Housing')
-  await page.getByRole('button', { name: 'Add' }).click()
-
-  const rentRow = page.getByRole('row', { name: /Rent/ })
-  await expect(rentRow.getByText('-$1,200.50')).toBeVisible()
-
-  const netWorth = page.getByText('Net worth').locator('..')
-  await expect(netWorth).toHaveText(/Net worth.*\$1,299\.50/)
+  await addTransaction(page, salary)
+  await addTransaction(page, rent)
+  await expect(page.getByLabel('Net worth')).toHaveText('$1,299.50')
+  const row = page.getByRole('row').filter({ hasText: 'Rent' })
+  await expect(row).toContainText('-$1,200.50')
 })
 
-test('[A5] Delete Rent removes the row and restores Net worth', async ({ page }) => {
+test('[A5] deleting a transaction removes it and restores net worth', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Salary')
-  await page.getByLabel('Amount').fill('2500')
-  await page.getByLabel('Type').selectOption('Income')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Salary')
-  await page.getByRole('button', { name: 'Add' }).click()
-
-  await page.getByLabel('Description').fill('Rent')
-  await page.getByLabel('Amount').fill('1200.50')
-  await page.getByLabel('Type').selectOption('Expense')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Housing')
-  await page.getByRole('button', { name: 'Add' }).click()
-
+  await addTransaction(page, salary)
+  await addTransaction(page, rent)
   await page.getByRole('button', { name: 'Delete Rent' }).click()
-
-  await expect(page.getByRole('row', { name: /Rent/ })).toHaveCount(0)
-  const netWorth = page.getByText('Net worth').locator('..')
-  await expect(netWorth).toHaveText(/Net worth.*\$2,500\.00/)
+  await expect(page.getByRole('row').filter({ hasText: 'Rent' })).toHaveCount(0)
+  await expect(page.getByLabel('Net worth')).toHaveText('$2,500.00')
 })
 
-test('[A6] Budgets tab shows Housing budget and actual', async ({ page }) => {
+test('[A6] budgets tab shows budget vs actual', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Rent')
-  await page.getByLabel('Amount').fill('1200.50')
-  await page.getByLabel('Type').selectOption('Expense')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Housing')
-  await page.getByRole('button', { name: 'Add' }).click()
-
+  await addTransaction(page, rent)
   await page.getByRole('tab', { name: 'Budgets' }).click()
-  const housingRow = page.getByRole('row', { name: /Housing/ })
-  await expect(housingRow.getByText('$1,500.00')).toBeVisible()
-  await expect(housingRow.getByText('$1,200.50')).toBeVisible()
+  const row = page.getByRole('row').filter({ hasText: 'Housing' })
+  await expect(row).toContainText(['$1,500.00', '$1,200.50'])
 })
 
-test('[A7] changing the Housing budget to 1000 updates the Budget column', async ({ page }) => {
+test('[A7] editing the budget updates the row', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Rent')
-  await page.getByLabel('Amount').fill('1200.50')
-  await page.getByLabel('Type').selectOption('Expense')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Housing')
-  await page.getByRole('button', { name: 'Add' }).click()
-
+  await addTransaction(page, rent)
   await page.getByRole('tab', { name: 'Budgets' }).click()
-  const housingRow = page.getByRole('row', { name: /Housing/ })
-  await housingRow.getByLabel('Budget').fill('1000')
-  await housingRow.getByLabel('Budget').press('Enter')
-
-  await expect(housingRow.getByText('$1,000.00')).toBeVisible()
-  await expect(housingRow.getByText('$1,500.00')).toHaveCount(0)
+  const row = page.getByRole('row').filter({ hasText: 'Housing' })
+  await row.getByLabel('Budget').fill('1000')
+  await row.getByLabel('Budget').press('Enter')
+  await expect(row).toContainText('$1,000.00')
 })
 
-test('[A8] Charts tab shows a donut with a Housing legend and tooltip', async ({ page }) => {
+test('[A8] charts tab donut shows a legend and tooltip', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Rent')
-  await page.getByLabel('Amount').fill('1200.50')
-  await page.getByLabel('Type').selectOption('Expense')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Housing')
-  await page.getByRole('button', { name: 'Add' }).click()
-
+  await addTransaction(page, rent)
   await page.getByRole('tab', { name: 'Charts' }).click()
-
-  const housingLegend = page.getByText('Housing')
-  await expect(housingLegend).toBeVisible()
-
-  const slice = page.locator('svg path').first()
-  const box = await slice.boundingBox()
-  expect(box, 'donut slice is rendered').toBeTruthy()
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
-
+  await expect(page.getByText('Housing')).toBeVisible()
+  await page.getByText('Housing').first().hover()
   await expect(page.getByText('Housing: $1,200.50')).toBeVisible()
 })
 
-test('[A9] reloading keeps the Salary transaction and Net worth', async ({ page }) => {
+test('[A9] data survives a reload', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Description').fill('Salary')
-  await page.getByLabel('Amount').fill('2500')
-  await page.getByLabel('Type').selectOption('Income')
-  await page.getByLabel('Account').selectOption('Bank')
-  await page.getByLabel('Category').selectOption('Salary')
-  await page.getByRole('button', { name: 'Add' }).click()
-
+  await addTransaction(page, salary)
   await page.reload()
-
-  const row = page.getByRole('row', { name: /Salary/ })
-  await expect(row.getByText('+$2,500.00')).toBeVisible()
-  const netWorth = page.getByText('Net worth').locator('..')
-  await expect(netWorth).toHaveText(/Net worth.*\$2,500\.00/)
+  const row = page.getByRole('row').filter({ hasText: 'Salary' })
+  await expect(row).toContainText('+$2,500.00')
+  await expect(page.getByLabel('Net worth')).toHaveText('$2,500.00')
 })

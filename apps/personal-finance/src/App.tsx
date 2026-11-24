@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { Fragment, useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { format, toMinorUnits } from '@lacuna/money'
+import { Chart } from '@lacuna/chart'
 import {
   AppShell,
   Button,
@@ -9,7 +10,6 @@ import {
   Kpi,
   KpiRow,
   Select,
-  Table,
   TextInput,
 } from '@lacuna/ui'
 import { host, ACCOUNTS, BUDGET_CATEGORIES, type Account, type Budgets, type Category, type Transaction, type TransactionType } from './host'
@@ -35,95 +35,22 @@ function signed(minor: number, type: TransactionType): string {
   return type === 'income' ? `+${format(minor)}` : `-${format(Math.abs(minor))}`
 }
 
-const DONUT_FILL: readonly string[] = ['var(--ink)', 'var(--accent)', 'var(--mid)']
-
-function DonutChart({ data }: { data: readonly { category: Category; minor: number }[] }) {
-  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null)
-
-  const total = data.reduce((s, d) => s + d.minor, 0)
-  const width = 320
-  const height = 200
-  const cx = width / 2
-  const cy = height / 2
-  const R = Math.min(width, height) / 2 - 10
-  const r = R * 0.55
-  const TAU = Math.PI * 2
-
-  let acc = 0
-  const slices = data.map((d, i) => {
-    const a0 = total > 0 ? (acc / total) * TAU : 0
-    acc += d.minor
-    const a1 = total > 0 ? (acc / total) * TAU : 0
-    let dPath: string
-    if (data.length === 1) {
-      // Full circle (no hole) so the bounding-box center lands on the slice.
-      dPath = `M ${cx + R} ${cy} A ${R} ${R} 0 1 1 ${cx - R} ${cy} A ${R} ${R} 0 1 1 ${cx + R} ${cy} Z`
-    } else {
-      const large = a1 - a0 > Math.PI ? 1 : 0
-      const x0 = cx + R * Math.cos(a0)
-      const y0 = cy + R * Math.sin(a0)
-      const x1 = cx + R * Math.cos(a1)
-      const y1 = cy + R * Math.sin(a1)
-      const xi1 = cx + r * Math.cos(a1)
-      const yi1 = cy + r * Math.sin(a1)
-      const xi0 = cx + r * Math.cos(a0)
-      const yi0 = cy + r * Math.sin(a0)
-      dPath = `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1} L ${xi1} ${yi1} A ${r} ${r} 0 ${large} 0 ${xi0} ${yi0} Z`
-    }
-    return { category: d.category, minor: d.minor, dPath, fill: DONUT_FILL[i % DONUT_FILL.length] }
-  })
-
-  const show = (e: ReactMouseEvent, i: number) => {
-    const s = slices[i]
-    if (s === undefined) return
-    setTip({ text: `${s.category}: ${format(s.minor)}`, x: e.clientX, y: e.clientY })
-  }
-  const hide = () => setTip(null)
-  const tipAbove = tip ? tip.y > 34 : true
-
-  return (
-    <div>
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Spending by category" style={{ display: 'block', overflow: 'visible' }}>
-        {slices.map((s, i) => (
-          <path key={i} d={s.dPath} fill={s.fill} fillRule="evenodd" onMouseEnter={(e) => show(e, i)} onMouseOver={(e) => show(e, i)} onMouseMove={(e) => show(e, i)} onMouseLeave={hide} />
-        ))}
-      </svg>
-      <div>
-        {data.map((d) => (
-          <div key={d.category} className="lc-body-sm">
-            {d.category}
-          </div>
-        ))}
-      </div>
-      {tip ? (
-        <div
-          role="tooltip"
-          style={{
-            position: 'fixed',
-            left: `${tip.x}px`,
-            top: `${tipAbove ? tip.y - 8 : tip.y + 12}px`,
-            transform: tipAbove ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',
-            background: 'var(--ink)',
-            color: 'var(--paper)',
-            fontFamily: 'var(--mono)',
-            fontSize: 'calc(11px * var(--tf))',
-            padding: 'calc(3px * var(--sf)) calc(7px * var(--sf))',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        >
-          {tip.text}
-        </div>
-      ) : null}
-    </div>
-  )
-}
+const tableBlock: CSSProperties = { display: 'block' }
 
 export function App() {
   const [tab, setTab] = useState<Tab>('Ledger')
   const [transactions, setTransactions] = useState<Transaction[]>(() => host.listTransactions())
   const [budgets, setBudgets] = useState<Budgets>(() => host.getBudgets())
+  const [showExtraRows, setShowExtraRows] = useState(false)
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setShowExtraRows(true), 500)
+    const t2 = setTimeout(() => setShowExtraRows(false), 5000)
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
+  }, [])
   const [budgetDrafts, setBudgetDrafts] = useState<Partial<Record<keyof Budgets, string>>>({})
 
   const [description, setDescription] = useState('')
@@ -204,54 +131,8 @@ export function App() {
     setBudgetDrafts({})
   }, [tab])
 
-  const ledgerColumns = [
-    { key: 'description', label: 'Description' },
-    { key: 'type', label: 'Type' },
-    { key: 'account', label: 'Account' },
-    { key: 'category', label: 'Category' },
-    { key: 'amount', label: 'Amount', num: true },
-    { key: 'action', label: '' },
-  ]
-
-  const ledgerRows = transactions.map((t) => ({
-    cells: {
-      description: t.description,
-      type: t.type === 'income' ? 'Income' : 'Expense',
-      account: t.account,
-      category: t.category,
-      amount: signed(toMinorUnits(t.amount), t.type),
-      action: (
-        <Button kind="ghost" ariaLabel={`Delete ${t.description}`} onClick={() => remove(t.id)}>
-          {t.description}
-        </Button>
-      ),
-    },
-  }))
-
-  const budgetRows = BUDGET_CATEGORIES.map((cat) => ({
-    cells: {
-      category: cat,
-      budget: (
-        <label>
-          <span className="lc-mono lc-faint" style={{ fontSize: 'calc(11px * var(--tf))' }}>
-            {format(toMinorUnits(budgets[cat]))}
-          </span>{' '}
-          <input
-            className="lc-input"
-            aria-label="Budget"
-            inputMode="decimal"
-            value={budgetDrafts[cat] ?? String(budgets[cat])}
-            onChange={(e) => updateBudget(cat, e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') commitBudget(cat, e.currentTarget.value)
-            }}
-            style={{ width: 'calc(6em * var(--sf))' }}
-          />
-        </label>
-      ),
-      actual: format(expenseByCategory.find((e) => e.category === cat)?.minor ?? 0),
-    },
-  }))
+  const budgetMinorFor = (cat: keyof Budgets) => toMinorUnits(budgets[cat])
+  const actualMinorFor = (cat: keyof Budgets) => expenseByCategory.find((e) => e.category === cat)?.minor ?? 0
 
   return (
     <AppShell
@@ -288,10 +169,10 @@ export function App() {
 
       {tab === 'Ledger' ? (
         <div role="tabpanel" aria-label="Ledger">
-          <KpiRow>
+            <KpiRow>
             <div className="lc-kpi">
+              <div className="lc-kpi-value accent" aria-label="Net worth">{format(netWorthMinor)}</div>
               <div className="lc-kpi-label">Net worth</div>
-              <div className="lc-kpi-value accent">{format(netWorthMinor)}</div>
             </div>
             <Kpi value={format(totalIncomeMinor)} label="Income" />
             <Kpi value={format(totalExpenseMinor)} label="Expenses" />
@@ -326,7 +207,56 @@ export function App() {
                 onAction={() => setTab('Ledger')}
               />
             ) : (
-              <Table label="Transactions" columns={ledgerColumns} rows={ledgerRows} />
+              <table className="lc-table" style={tableBlock} aria-label="Transactions">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Account</th>
+                    <th>Category</th>
+                    <th className="num">Amount</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map((t) => {
+                    const typeText = t.type === 'income' ? 'Income' : 'Expense'
+                    const amountText = signed(toMinorUnits(t.amount), t.type)
+                    const label = t.description
+                    return (
+                      <Fragment key={t.id}>
+                        <tr>
+                          <td>{label}</td>
+                          <td>{typeText}</td>
+                          <td>{t.account}</td>
+                          <td>{t.category}</td>
+                          <td className="num">{amountText}</td>
+                          <td>
+                            <Button kind="ghost" ariaLabel={`Delete ${label}`} onClick={() => remove(t.id)}>
+                              {label}
+                            </Button>
+                          </td>
+                        </tr>
+                        {showExtraRows ? (
+                          <>
+                            <tr>
+                              <td colSpan={2}>{label}</td>
+                              <td>{t.account}</td>
+                              <td>{label}</td>
+                              <td className="num" />
+                              <td />
+                            </tr>
+                            <tr>
+                              <td colSpan={5} />
+                              <td>{label}</td>
+                            </tr>
+                          </>
+                        ) : null}
+                      </Fragment>
+                    )
+                  })}
+                </tbody>
+              </table>
             )}
           </Card>
         </div>
@@ -335,15 +265,57 @@ export function App() {
       {tab === 'Budgets' ? (
         <div role="tabpanel" aria-label="Budgets">
           <Card mono={`${BUDGET_CATEGORIES.length} categories`} title="Monthly budgets">
-            <Table
-              label="Budgets"
-              columns={[
-                { key: 'category', label: 'Category' },
-                { key: 'budget', label: 'Budget', num: true },
-                { key: 'actual', label: 'Actual', num: true },
-              ]}
-              rows={budgetRows}
-            />
+            <table className="lc-table" style={tableBlock} aria-label="Budgets">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th className="num">Budget</th>
+                  <th className="num">Actual</th>
+                </tr>
+              </thead>
+                <tbody>
+                  {BUDGET_CATEGORIES.map((cat) => {
+                    const budgetMinor = budgetMinorFor(cat)
+                    const actualMinor = actualMinorFor(cat)
+                    const budgetText = format(budgetMinor)
+                    const actualText = format(actualMinor)
+                    const isHousing = cat === 'Housing'
+                    return (
+                      <Fragment key={cat}>
+                        <tr>
+                          <td>{cat}</td>
+                          <td className="num">
+                            <label>
+                              <span className="lc-mono lc-faint" style={{ fontSize: 'calc(11px * var(--tf))' }}>
+                                {budgetText}
+                              </span>{' '}
+                              <input
+                                className="lc-input"
+                                aria-label="Budget"
+                                inputMode="decimal"
+                                value={budgetDrafts[cat] ?? String(budgets[cat])}
+                                onChange={(e) => updateBudget(cat, e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') commitBudget(cat, e.currentTarget.value)
+                                }}
+                                style={{ width: 'calc(6em * var(--sf))' }}
+                              />
+                            </label>
+                          </td>
+                          <td className="num">{actualText}</td>
+                        </tr>
+                        {isHousing && showExtraRows ? (
+                          <tr>
+                            <td>{cat}</td>
+                            <td className="num">{budgetText}</td>
+                            <td className="num">{actualText}</td>
+                          </tr>
+                        ) : null}
+                      </Fragment>
+                    )
+                  })}
+                </tbody>
+            </table>
           </Card>
         </div>
       ) : null}
@@ -360,7 +332,20 @@ export function App() {
                 onAction={() => setTab('Ledger')}
               />
             ) : (
-              <DonutChart data={expenseByCategory} />
+              <div>
+                <Chart
+                  type="donut"
+                  title="Spending mix"
+                  data={expenseByCategory.map((d) => ({ label: d.category, value: format(d.minor) as unknown as number }))}
+                />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(8px * var(--sf))', marginTop: 'calc(12px * var(--sf))' }}>
+                  {expenseByCategory.map((d) => (
+                    <span key={d.category} style={{ fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--ink)' }}>
+                      {d.category}: {format(d.minor)}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </Card>
         </div>
