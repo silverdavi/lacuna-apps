@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "17fd179896144e087593a584cabcadff54643374b444a80782aad5baddfb8ea8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Resume Builder\" and the tab buttons \"Edit\" and \"Preview\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Jane Doe\" in the field labelled \"Full Name\" and \"jane@example.com\" in the field labelled \"Email\" updates the form state; clicking the button \"Add experience\" adds a new experience entry with empty fields."
+    },
+    {
+      "id": "A3",
+      "text": "In the first experience entry, typing \"Software Engineer\" in the field labelled \"Job Title\", \"Acme Corp\" in the field labelled \"Company\", and \"2020\" in the field labelled \"Start Year\" saves the entry; the Preview tab shows the text \"Software Engineer\" and \"Acme Corp\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"- Led team of 5\\n- Built API\" in the textarea labelled \"Summary\" and switching to the Preview tab renders a bulleted list with the items \"Led team of 5\" and \"Built API\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Export Markdown\" downloads a file named \"resume.md\" containing the text \"Jane Doe\" and \"Software Engineer\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"JavaScript, Python\" in the field labelled \"Skills\" and switching to the Preview tab shows the text \"JavaScript, Python\" in the Skills section."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete experience\" on the first experience entry removes it; the Preview tab no longer shows \"Software Engineer\"."
+    },
+    {
+      "id": "A8",
+      "text": "After entering \"Jane Doe\" in \"Full Name\" and \"jane@example.com\" in \"Email\", reloading the page still shows \"Jane Doe\" in the \"Full Name\" field and \"jane@example.com\" in the \"Email\" field."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "11beef1ee048728a83cc4db35fe320504957cf48d33b6a5664a159af22e4eb90"
+    }
+  ]
+}
