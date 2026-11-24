@@ -549,6 +549,9 @@ importers:
       '@lacuna/filter-bar':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/filter-bar/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
       '@lacuna/json-backup':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/json-backup/0.1.0

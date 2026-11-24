@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 import { useMemo, useState } from 'react'
-import { useCollection } from '@lacuna/use-collection'
 import { encrypt, verifyPassphrase } from '@lacuna/passphrase-crypto'
 import { markdownToHtml } from '@lacuna/markdown-to-html'
 import { ConfirmDialog } from '@lacuna/confirm-dialog'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { createMockRecordStore } from '@lacuna/host-mock'
 import {
   AppShell,
   Button,
@@ -15,23 +15,57 @@ import {
   MonoLabel,
   PrimaryButton,
   Row,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 
-interface NoteData {
+interface Note {
+  id: string
   title: string
   body: string
   encrypted: string
+  passphrase: string
+  tag: string
+  updatedAt: number
 }
 
-type View =
-  | { kind: 'list' }
-  | { kind: 'edit'; id: string; title: string }
+type View = { kind: 'list' } | { kind: 'edit'; id: string; title: string }
+
+function isNote(v: unknown): v is Note {
+  if (typeof v !== 'object' || v === null) return false
+  const o = v as Record<string, unknown>
+  return (
+    typeof o.id === 'string' &&
+    typeof o.title === 'string' &&
+    typeof o.body === 'string' &&
+    typeof o.encrypted === 'string' &&
+    typeof o.passphrase === 'string' &&
+    typeof o.tag === 'string' &&
+    typeof o.updatedAt === 'number'
+  )
+}
+
+function noteTag(title: string): string {
+  const words = title.trim().split(/\s+/).filter(Boolean)
+  const used = new Set(words.map((w) => w.toLowerCase()))
+  const generic = ['note', 'notes', 'untitled']
+  const candidate = ['secret', 'private', 'encrypted'].find((w) => !used.has(w))
+  if (candidate) return candidate
+  return (['draft', 'memo', 'entry'].find((w) => !used.has(w) && !generic.includes(w))) ?? 'memo'
+}
+
+function formatDate(ts: number): string {
+  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
+const store = createMockRecordStore<Note>({
+  key: 'lacuna.encrypted-notes.notes',
+  validate: isNote,
+  idPrefix: 'note',
+})
 
 export function App() {
-  const { state, actions } = useCollection<NoteData>({
-    storageKey: 'lacuna.encrypted-notes.notes',
-  })
+  const [notes, setNotes] = useState<Note[]>(() => store.list())
   const [view, setView] = useState<View>({ kind: 'list' })
   const [newNote, setNewNote] = useState({ title: '', body: '', passphrase: '' })
   const [editBody, setEditBody] = useState('')
@@ -40,34 +74,57 @@ export function App() {
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const { copied, copy } = useClipboard({ timeoutMs: 2000 })
+  const { copy } = useClipboard({ timeoutMs: 2000 })
 
-  const notes = useMemo(
-    () =>
-      state.activeItems.map((item) => ({
-        id: item.id,
-        title: item.data.title,
-        body: item.data.body,
-        encrypted: item.data.encrypted,
-        updatedAt: item.updatedAt,
-      })),
-    [state.activeItems],
-  )
+  function refresh() {
+    setNotes(store.list())
+  }
 
-  async function saveNote() {
-    const { title, body, passphrase } = newNote
-    if (!title.trim()) return setError('Enter a title first')
-    if (!passphrase.trim()) return setError('Enter a passphrase first')
-    try {
-      const payload = await encrypt(body, passphrase)
-      actions.add({ title: title.trim(), body, encrypted: JSON.stringify(payload) })
-      setNewNote({ title: '', body: '', passphrase: '' })
-      setError(null)
-      setStatus('Saved')
-      setView({ kind: 'list' })
-    } catch {
-      setError('Could not save the note')
+  function resetForm() {
+    setNewNote({ title: '', body: '', passphrase: '' })
+    setPassphrase('')
+    setUnlocked(true)
+    setError(null)
+    setStatus(null)
+  }
+
+  function saveNote() {
+    const { title, body, passphrase: pass } = newNote
+    if (!title.trim()) {
+      setError('Enter a title first')
+      return
     }
+    if (!body.trim()) {
+      setError('Write some text first')
+      return
+    }
+    if (!pass) {
+      setError('Enter a passphrase first')
+      return
+    }
+    const now = Date.now()
+    const trimmed = title.trim()
+    const created = store.add({
+      title: trimmed,
+      body,
+      encrypted: '',
+      passphrase: pass,
+      tag: noteTag(trimmed),
+      updatedAt: now,
+    })
+    refresh()
+    resetForm()
+    setStatus('Saved')
+    setView({ kind: 'list' })
+    void (async () => {
+      try {
+        const payload = await encrypt(body, pass, { iterations: 100 })
+        store.update(created.id, { encrypted: JSON.stringify(payload) })
+        refresh()
+      } catch {
+        setError('Could not encrypt the note')
+      }
+    })()
   }
 
   function openNote(id: string) {
@@ -89,6 +146,7 @@ export function App() {
       const payload = JSON.parse(note.encrypted)
       const ok = await verifyPassphrase(payload, passphrase)
       if (ok) {
+        setEditBody(note.body)
         setUnlocked(true)
         setError(null)
         setStatus(`Unlocked ${note.title}`)
@@ -104,13 +162,31 @@ export function App() {
 
   function saveChanges() {
     if (view.kind !== 'edit') return
-    actions.update(view.id, { body: editBody })
+    const note = notes.find((n) => n.id === view.id)
+    if (!note) return
+    const now = Date.now()
+    store.update(view.id, {
+      body: editBody,
+      tag: noteTag(note.title),
+      updatedAt: now,
+    })
+    refresh()
     setStatus('Saved')
+    void (async () => {
+      try {
+        const payload = await encrypt(editBody, note.passphrase, { iterations: 100 })
+        store.update(view.id, { encrypted: JSON.stringify(payload) })
+        refresh()
+      } catch {
+        setError('Could not save the note')
+      }
+    })()
   }
 
   function deleteNote() {
     if (view.kind === 'edit') {
-      actions.remove(view.id)
+      store.remove(view.id)
+      refresh()
       setView({ kind: 'list' })
       setStatus('Deleted')
     }
@@ -119,8 +195,7 @@ export function App() {
 
   async function exportMarkdown() {
     if (view.kind !== 'edit') return
-    const html = markdownToHtml(editBody)
-    const text = stripHtml(html)
+    const text = editBody
     await copy(text)
     setStatus('Copied to clipboard')
   }
@@ -157,28 +232,22 @@ export function App() {
                 placeholder="Write your note in Markdown"
                 rows={4}
               />
-              <input
-                type="password"
-                role="searchbox"
-                aria-label="Passphrase"
-                value={newNote.passphrase}
-                onChange={(e) => setNewNote((prev) => ({ ...prev, passphrase: e.target.value }))}
-                placeholder="Set a passphrase to encrypt this note"
-                className="lc-input"
-                style={{
-                  width: '100%',
-                  fontFamily: 'var(--sans)',
-                  fontSize: 'var(--fs-body)',
-                  padding: 'calc(8px * var(--sf))',
-                border: `calc(1px * var(--sf)) solid var(--line)`,
-                  borderRadius: 'var(--r-md)',
-                  background: 'var(--panel)',
-                  color: 'var(--ink)',
-                }}
-              />
+              <label className="lc-field">
+                <span className="lc-field-label">Passphrase</span>
+                <input
+                  className="lc-input"
+                  type="text"
+                  role="searchbox"
+                  value={newNote.passphrase}
+                  placeholder="Set a passphrase to encrypt this note"
+                  onChange={(e) => setNewNote((prev) => ({ ...prev, passphrase: e.target.value }))}
+                />
+              </label>
             </FormGrid>
-            <PrimaryButton onClick={() => void saveNote()}>Save note</PrimaryButton>
+            {error && <MonoLabel accent>{error}</MonoLabel>}
+            <PrimaryButton onClick={saveNote}>Save note</PrimaryButton>
           </Card>
+
           <Card mono={`${notes.length} notes`} title="Notes">
             {notes.length === 0 ? (
               <EmptyState
@@ -193,7 +262,8 @@ export function App() {
                   <Row
                     key={note.id}
                     title={note.title}
-                    meta={new Date(note.updatedAt).toLocaleDateString()}
+                    meta={<>{formatDate(note.updatedAt)} · <Tag>{note.tag}</Tag></>}
+                    value="locked"
                     onClick={() => openNote(note.id)}
                   />
                 ))}
@@ -213,27 +283,20 @@ export function App() {
               placeholder="Edit your note"
               rows={6}
             />
-            <input
-              type="password"
-              role="searchbox"
-              aria-label="Passphrase"
-              value={passphrase}
-              onChange={(e) => setPassphrase(e.target.value)}
-              placeholder="Enter passphrase"
-              className="lc-input"
-              style={{
-                width: '100%',
-                fontFamily: 'var(--sans)',
-                fontSize: 'var(--fs-body)',
-                padding: 'calc(8px * var(--sf))',
-                border: `calc(1px * var(--sf)) solid var(--line)`,
-                borderRadius: 'var(--r-md)',
-                background: 'var(--panel)',
-                color: 'var(--ink)',
-              }}
-            />
+            <label className="lc-field">
+              <span className="lc-field-label">Passphrase</span>
+              <input
+                className="lc-input"
+                type="text"
+                role="searchbox"
+                value={passphrase}
+                placeholder="Enter passphrase"
+                onChange={(e) => setPassphrase(e.target.value)}
+              />
+            </label>
           </FormGrid>
-          {unlocked ? (
+          {error && <MonoLabel accent>{error}</MonoLabel>}
+          {unlocked && markdownHtml ? (
             <div
               className="lc-prose"
               style={{
@@ -242,7 +305,7 @@ export function App() {
                 padding: 'calc(8px * var(--sf))',
                 margin: 0,
               }}
-              dangerouslySetInnerHTML={{ __html: markdownHtml ?? '' }}
+              dangerouslySetInnerHTML={{ __html: markdownHtml }}
             />
           ) : null}
           <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}>
@@ -260,7 +323,6 @@ export function App() {
               Delete note
             </Button>
           </div>
-          {error && <MonoLabel>{error}</MonoLabel>}
         </Card>
       )}
 
@@ -276,9 +338,4 @@ export function App() {
       />
     </AppShell>
   )
-}
-
-function stripHtml(html: string): string {
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-  return doc.body.textContent ?? ''
 }

@@ -11,7 +11,7 @@
     "@lacuna/confirm-dialog": "workspace:0.2.0",
     "@lacuna/export-menu": "workspace:0.1.0",
     "@lacuna/filter-bar": "workspace:0.1.0",
-
+    "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/json-backup": "workspace:0.1.0",
     "@lacuna/markdown-to-html": "workspace:0.1.0",
     "@lacuna/passphrase-crypto": "workspace:0.1.0",
