@@ -1,499 +1,441 @@
-import { useMemo, useState, type FormEvent } from 'react'
-import {
-  Actions,
-  AppShell,
-  Button,
-  Card,
-  EmptyState,
-  FormGrid,
-  Kpi,
-  KpiRow,
-  MonoLabel,
-  PrimaryButton,
-  Select,
-  Stack,
-  TextInput,
-} from '@lacuna/ui'
+// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
+import { useEffect, useMemo, useState } from 'react'
+import { AppShell, Button, Card, Checkbox, SectionLabel, Stack, TextInput } from '@lacuna/ui'
+import { toISODate, fromISODate } from '@lacuna/date-math'
 import { useClipboard } from '@lacuna/use-clipboard'
-import {
-  WEEKDAYS,
-  calendarEventsFor,
-  monthCells,
-  monthLabel,
-  taskDueDates,
-  todayISO,
-  weekDays,
-} from './lib/dates'
+import { useHostMock } from './host/mock'
+import { monthCells, monthLabel, weekDays, occurrencesByDate, taskDueDates, type CalendarEvent } from './lib/dates'
 import { eventsToIcs } from './lib/ics'
-import { buildReport } from './lib/report'
-import { useEvents } from './lib/useEvents'
-import { useTasks } from './lib/useTasks'
-import type { EventData, EventItem, Recurrence } from './lib/types'
+import type { EventItem, Recurrence, Task } from './lib/types'
+
+type Tab = 'Tasks' | 'Calendar'
+
+function todayISO(): string {
+  return toISODate(new Date())
+}
 
 const RECURRENCE_OPTIONS = [
-  { value: 'none', label: 'Once' },
+  { value: 'none', label: 'None' },
   { value: 'Daily', label: 'Daily' },
   { value: 'Weekly', label: 'Weekly' },
   { value: 'Monthly', label: 'Monthly' },
 ]
 
-interface Draft {
-  id?: string
-  title: string
-  date: string
-  time: string
-  recurrence: Recurrence
-}
-
-function emptyDraft(today: string): Draft {
-  return { title: '', date: today, time: '', recurrence: 'none' }
-}
-
 export function App() {
-  const today = todayISO()
-  const [tab, setTab] = useState('Tasks')
-  const [view, setView] = useState('Month')
+  const { tasks, events, addTask, addEvent, toggleTask, removeTask, removeEvent, error, reset } = useHostMock()
+  const { copy, copied } = useClipboard()
 
-  const { tasks, add, check, remove, clearFinished } = useTasks()
-  const { events, add: addEvent, update: updateEvent, remove: removeEvent } = useEvents()
+  const [tab, setTab] = useState<Tab>('Tasks')
+  const [calendarView, setCalendarView] = useState<'Month' | 'Week'>('Month')
 
   const [taskTitle, setTaskTitle] = useState('')
-  const [taskDue, setTaskDue] = useState(today)
   const [taskRecurrence, setTaskRecurrence] = useState<Recurrence>('none')
-  const [taskError, setTaskError] = useState<string | null>(null)
 
-  const [draft, setDraft] = useState<Draft | null>(null)
-  const [draftError, setDraftError] = useState<string | null>(null)
+  const [eventFormOpen, setEventFormOpen] = useState(false)
+  const [eventTitle, setEventTitle] = useState('')
+  const [eventDate, setEventDate] = useState(todayISO())
+  const [eventTime, setEventTime] = useState('09:00')
+  const [eventRecurrence, setEventRecurrence] = useState<Recurrence>('none')
 
-  const [monthNav, setMonthNav] = useState<Date | null>(null)
-  const [weekAnchorNav, setWeekAnchorNav] = useState<string | null>(null)
-  const [selectedDay, setSelectedDay] = useState(today)
+  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null)
+  const [editRecurrence, setEditRecurrence] = useState<Recurrence>('none')
 
-  const { copy, copied } = useClipboard({ timeoutMs: 1500 })
+  const [selectedISO, setSelectedISO] = useState<string>(todayISO())
+  const [viewMonth, setViewMonth] = useState(() => {
+    const d = new Date()
+    return { year: d.getFullYear(), month: d.getMonth() }
+  })
 
-  const latestEvent = events.length > 0 ? events[events.length - 1] : null
-  const latestMonth = useMemo(() => {
-    if (!latestEvent) return null
-    const evDate = new Date(`${latestEvent.date}T00:00:00`)
-    return new Date(evDate.getFullYear(), evDate.getMonth(), 1)
-  }, [latestEvent?.date])
-  const month = monthNav ?? latestMonth ?? new Date()
+  useEffect(() => {
+    document.title = 'Daily Planner'
+  }, [])
 
-  const latestWeekAnchor = useMemo(() => {
-    if (!latestEvent) return null
-    const evDate = new Date(`${latestEvent.date}T00:00:00`)
-    const day = evDate.getDay()
-    const monday = new Date(evDate)
-    monday.setDate(evDate.getDate() - ((day + 6) % 7))
-    return toISODateString(monday)
-  }, [latestEvent?.date])
-  const weekAnchor = weekAnchorNav ?? latestWeekAnchor ?? today
+  useEffect(() => {
+    if (events.length > 0) setTab('Calendar')
+  }, [events])
+
+  const today = todayISO()
+
+  const todayTasks = useMemo(() => tasks.filter((t: Task) => t.due === today), [tasks, today])
+  const doneCount = todayTasks.filter((t) => t.done).length
+  const total = todayTasks.length
+
+  const monthCellsISO = useMemo(
+    () => monthCells(viewMonth.year, viewMonth.month),
+    [viewMonth.year, viewMonth.month],
+  )
+
+  const byDate = useMemo(
+    () => occurrencesByDate(events, monthCellsISO[0], monthCellsISO[monthCellsISO.length - 1]),
+    [events, monthCellsISO],
+  )
+  const dueDates = useMemo(
+    () => taskDueDates(tasks, monthCellsISO[0], monthCellsISO[monthCellsISO.length - 1]),
+    [tasks, monthCellsISO],
+  )
+
+  const week = useMemo(() => weekDays(selectedISO), [selectedISO])
+  const weekByDate = useMemo(
+    () => occurrencesByDate(events, week[0], week[6]),
+    [events, week],
+  )
+
+  function shiftMonth(delta: number) {
+    setViewMonth((m) => {
+      const d = new Date(m.year, m.month + delta, 1)
+      return { year: d.getFullYear(), month: d.getMonth() }
+    })
+  }
 
   function submitTask() {
-    const clean = taskTitle.trim()
-    if (!clean) {
-      setTaskError('Give the task a name')
-      return
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(taskDue)) {
-      setTaskError('Pick a due date')
-      return
-    }
-    add({ title: clean, due: taskDue, done: false, recurrence: taskRecurrence })
+    const title = taskTitle.trim()
+    if (title.length === 0) return
+    addTask({ title, due: todayISO(), done: false, recurrence: 'none' })
     setTaskTitle('')
-    setTaskRecurrence('none')
-    setTaskError(null)
   }
 
-  function openCreate() {
-    setDraft(emptyDraft(today))
-    setDraftError(null)
+  function openEventForm() {
+    setEventFormOpen(true)
+    setEventTitle('')
+    setEventDate(selectedISO)
+    setEventTime('09:00')
+    setEventRecurrence('none')
   }
 
-  function openEdit(event: EventItem) {
-    setDraft({ id: event.id, title: event.title, date: event.date, time: event.time, recurrence: event.recurrence })
-    setDraftError(null)
+  function submitEvent() {
+    const title = eventTitle.trim()
+    if (title.length === 0) return
+    addEvent({ title, date: eventDate, time: eventTime, recurrence: eventRecurrence })
+    const d = fromISODate(eventDate)
+    if (d !== null) setViewMonth({ year: d.getFullYear(), month: d.getMonth() })
+    setSelectedISO(eventDate)
+    setEventFormOpen(false)
+    setEventTitle('')
   }
 
-  function saveDraft() {
-    if (!draft) return
-    const clean = draft.title.trim()
-    if (!clean) {
-      setDraftError('Give the event a title')
-      return
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) {
-      setDraftError('Pick a date')
-      return
-    }
-    const data: EventData = {
-      title: clean,
-      date: draft.date,
-      time: /^\d{2}:\d{2}$/.test(draft.time) ? draft.time : '',
-      recurrence: draft.recurrence,
-    }
-    if (draft.id) {
-      updateEvent(draft.id, data)
-    } else {
-      addEvent(data)
-    }
-    setDraft(null)
-    setDraftError(null)
+  function startEditEvent(event: EventItem) {
+    setEditingEvent(event)
+    setEditRecurrence(event.recurrence)
+  }
+
+  function saveEditEvent() {
+    if (editingEvent === null) return
+    addEvent({ title: editingEvent.title, date: editingEvent.date, time: editingEvent.time, recurrence: editRecurrence })
+    removeEvent(editingEvent.id)
+    setEditingEvent(null)
   }
 
   function exportIcs() {
     void copy(eventsToIcs(events))
   }
 
-  const openCount = tasks.filter((t) => !t.done).length
-  const doneCount = tasks.filter((t) => t.done).length
-  const report = useMemo(() => buildReport(tasks, today), [tasks, today])
-
-  const monthISO = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`
-  const monthDays = useMemo(
-    () => monthCells(month.getFullYear(), month.getMonth()),
-    [month],
-  )
-  const monthEvents = useMemo(
-    () => calendarEventsFor(events, monthDays[0], monthDays[monthDays.length - 1]),
-    [events, monthDays],
-  )
-  const monthByDate = useMemo(() => {
-    const byDate = new Map<string, typeof monthEvents>()
-    for (const event of monthEvents) {
-      if (!event.date.startsWith(monthISO)) continue
-      const list = byDate.get(event.date) ?? []
-      list.push(event)
-      byDate.set(event.date, list)
-    }
-    return byDate
-  }, [monthEvents, monthISO])
-
-  const daysOfWeek = useMemo(() => weekDays(weekAnchor), [weekAnchor])
-  const weekEvents = useMemo(
-    () => calendarEventsFor(events, daysOfWeek[0], daysOfWeek[6]),
-    [events, daysOfWeek],
-  )
-  const weekByDate = useMemo(() => {
-    const byDate = new Map<string, typeof weekEvents>()
-    for (const event of weekEvents) {
-      const list = byDate.get(event.date) ?? []
-      list.push(event)
-      byDate.set(event.date, list)
-    }
-    return byDate
-  }, [weekEvents])
-
-  const dueByDate = useMemo(
-    () => taskDueDates(tasks, daysOfWeek[0], daysOfWeek[6]),
-    [tasks, daysOfWeek],
-  )
-
-  function shiftMonth(delta: number) {
-    setMonthNav(new Date(month.getFullYear(), month.getMonth() + delta, 1))
-  }
-
-  function shiftWeek(delta: number) {
-    setWeekAnchorNav(() => {
-      const base = new Date(`${weekAnchor}T00:00:00`)
-      base.setDate(base.getDate() + delta * 7)
-      return toISODateString(base)
-    })
-  }
-
-  function toISODateString(date: Date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-  }
-
-  const dayTitle = new Date(`${selectedDay}T00:00:00`).toLocaleString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-  const dayEvents = calendarEventsFor(events, selectedDay, selectedDay)
-  const dayTasks = tasks.filter((t) => t.due === selectedDay)
-
-  function handleTaskFormSubmit(e: FormEvent) {
-    e.preventDefault()
-    submitTask()
-  }
-
   return (
-    <AppShell name="Daily Planner" hue="teal" category="Planning" meta={`${report.streak}-day streak`}>
-      <Card mono="Checklist" title="New task">
-        <form onSubmit={handleTaskFormSubmit}>
-          <FormGrid>
-            <TextInput
-              label="New task"
-              value={taskTitle}
-              onChange={setTaskTitle}
-              placeholder="What needs doing?"
-              error={taskError}
-            />
-            <TextInput label="Task due" type="date" value={taskDue} onChange={setTaskDue} />
-            <Select
-              label="Repeats"
-              value={taskRecurrence}
-              onChange={(value) => setTaskRecurrence(value as Recurrence)}
-              options={RECURRENCE_OPTIONS}
-            />
-          </FormGrid>
-          <Actions>
-            <PrimaryButton type="submit">Add task</PrimaryButton>
-            <Button kind="ghost" onClick={clearFinished}>
-              Clear done
-            </Button>
-          </Actions>
-        </form>
-      </Card>
+    <AppShell name="Daily Planner" icon="docs" hue="gold" category="Productivity">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(16px * var(--sf))' }}>
+        <div role="tablist" aria-label="Daily Planner views" style={{ display: 'flex', gap: 'calc(16px * var(--sf))' }}>
+          {(['Tasks', 'Calendar'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={tab === t}
+              className="dp-tab"
+              style={{
+                fontFamily: 'var(--sans)',
+                fontSize: 'calc(14px * var(--tf))',
+                fontWeight: 600,
+                color: tab === t ? 'var(--ink)' : 'var(--ink-60)',
+                padding: 'calc(6px * var(--sf)) calc(8px * var(--sf))',
+                border: 'none',
+                background: 'none',
+                borderBottom: `calc(2px * var(--sf)) solid ${tab === t ? 'var(--accent)' : 'transparent'}`,
+                cursor: 'pointer',
+              }}
+              onClick={() => setTab(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
 
-      <div role="tablist" className="lc-tabs">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'Tasks'}
-          className={`lc-tab${tab === 'Tasks' ? ' active' : ''}`}
-          onClick={() => setTab('Tasks')}
-        >
-          Tasks
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'Calendar'}
-          className={`lc-tab${tab === 'Calendar' ? ' active' : ''}`}
-          onClick={() => {
-            setTab('Calendar')
-            setView('Month')
-          }}
-        >
-          Calendar
-        </button>
-      </div>
-
-      {tab === 'Tasks' ? (
-        <Card
-          mono="List"
-          title="Tasks"
-          actions={
-            <Button kind="ghost" onClick={exportIcs} ariaLabel="Export ICS">
-              Export ICS
-            </Button>
-          }
-        >
-          <Stack>
-            <KpiRow>
-              <Kpi value={`${doneCount}/${tasks.length}`} label="Progress" accent />
-              <Kpi value={String(openCount)} label="Open" />
-              <Kpi value={String(report.streak)} label="Streak" />
-            </KpiRow>
-            {tasks.length === 0 ? (
-              <EmptyState mono="Empty" title="No tasks yet" detail="Add your first task above." actionLabel="Add a task" onAction={submitTask} />
-            ) : (
-              <ul className="lk-list" aria-label="Tasks">
-                {tasks.map((task) => (
-                  <li key={task.id} className={task.done ? 'task-row done' : 'task-row'}>
-                    <input
-                      type="checkbox"
-                      className="task-check"
-                      checked={task.done}
-                      aria-label={`Mark ${task.title} done`}
-                      onChange={() => check(task.id)}
-                    />
-                    <span className={task.done ? 'task-title done' : 'task-title'}>{task.title}</span>
-                    <span className="task-due">{task.due}</span>
-                    <Button kind="ghost" ariaLabel={`Delete ${task.title}`} onClick={() => remove(task.id)}>
-                      Delete
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Stack>
-        </Card>
-      ) : null}
-
-      {tab === 'Calendar' ? (
-        <Stack>
-          <Card mono="Calendar" title="Events" actions={<Button kind="ghost" onClick={exportIcs} ariaLabel="Export ICS">Export ICS</Button>}>
-            <Stack>
-              <div role="tablist" className="lc-tabs">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={view === 'Month'}
-                  className={`lc-tab${view === 'Month' ? ' active' : ''}`}
-                  onClick={() => setView('Month')}
+        {tab === 'Tasks' && (
+          <Card title="Tasks" mono={`${doneCount}/${total}`}>
+            <Stack lg>
+              <Stack>
+                <div
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      submitTask()
+                    }
+                  }}
                 >
-                  Month
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={view === 'Week'}
-                  className={`lc-tab${view === 'Week' ? ' active' : ''}`}
-                  onClick={() => setView('Week')}
-                >
-                  Week
-                </button>
-              </div>
-
-                {view === 'Month' ? (
-                  <Stack>
-                    <div className="cal-head">
-                      <Button kind="ghost" ariaLabel="Previous month" onClick={() => shiftMonth(-1)}>
-                        Prev
-                      </Button>
-                      <span className="cal-month-label">{monthLabel(month.getFullYear(), month.getMonth())}</span>
-                      <Button kind="ghost" ariaLabel="Next month" onClick={() => shiftMonth(1)}>
-                        Next
-                      </Button>
-                    </div>
-                    <div className="cal-grid" role="grid">
-                      <div role="row">
-                        {WEEKDAYS.map((day) => (
-                          <div key={day} className="cal-dow" role="columnheader">
-                            {day.slice(0, 3)}
-                          </div>
-                        ))}
-                      </div>
-                      {Array.from({ length: Math.ceil(monthDays.length / 7) }, (_, weekIdx) => {
-                        const weekDaysSlice = monthDays.slice(weekIdx * 7, weekIdx * 7 + 7)
-                        return (
-                          <div key={weekIdx} role="row">
-                            {weekDaysSlice.map((date) => {
-                              const dayEventsList = monthByDate.get(date) ?? []
-                              const inMonth = date.startsWith(monthISO)
-                              return (
-                                <div
-                                  key={date}
-                                  role="gridcell"
-                                  className={`cal-cell${inMonth ? '' : ' out'}${date === today ? ' today' : ''}${
-                                    date === selectedDay ? ' selected' : ''
-                                  }`}
-                                  onClick={() => setSelectedDay(date)}
-                                >
-                                  <span className="cal-num">{Number(date.slice(8))}</span>
-                                  {dayEventsList.map((event) => {
-                                    const original = events.find((e) => e.id === event.id)!
-                                    return (
-                                        <button
-                                          key={event.id}
-                                          type="button"
-                                          className="cal-event"
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            openEdit(original)
-                                          }}
-                                         >
-                                           {event.time ? `${event.title} ${event.time}` : event.title}
-                                         </button>
-                                    )
-                                  })}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </Stack>
-                ) : (
-                <Stack>
-                  <div className="cal-head">
-                    <Button kind="ghost" ariaLabel="Previous week" onClick={() => shiftWeek(-1)}>
-                      Prev
-                    </Button>
-                    <MonoLabel accent>
-                      Week of {daysOfWeek[0]}
-                    </MonoLabel>
-                    <Button kind="ghost" ariaLabel="Next week" onClick={() => shiftWeek(1)}>
-                      Next
-                    </Button>
+                  <TextInput
+                    label="New task"
+                    value={taskTitle}
+                    onChange={setTaskTitle}
+                    placeholder="Buy milk"
+                    error={null}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    <select
+                      className="lc-input"
+                      aria-label="Repeat"
+                      value={taskRecurrence}
+                      onChange={(e) => setTaskRecurrence(e.target.value as Recurrence)}
+                      style={{ width: '100%' }}
+                    >
+                      {RECURRENCE_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
                   </div>
-                    <table className="cal-week-table" aria-label="Week view">
-                      <thead>
-                        <tr>
-                          {daysOfWeek.map((date, index) => {
-                            const dayEventsList = weekByDate.get(date) ?? []
-                            const dueTitles = dueByDate.get(date) ?? []
-                            return (
-                              <th key={date} scope="col">
-                                <div className="cal-week-dayname">
-                                  {WEEKDAYS[index]}
-                                </div>
-                                <div className="cal-week-date">
-                                  {Number(date.slice(8))} {monthLabel(new Date(`${date}T00:00:00`).getFullYear(), new Date(`${date}T00:00:00`).getMonth()).slice(0, 3)}
-                                </div>
-                                {dayEventsList.map((event) => {
-                                  const original = events.find((e) => e.id === event.id)!
-                                  return (
-                                    <button
-                                      key={event.id}
-                                      type="button"
-                                      className="cal-event-btn"
-                                      onClick={() => openEdit(original)}
-                                     >
-                                       {event.time ? `${event.title} ${event.time}` : event.title}
-                                     </button>
-                                  )
-                                })}
-                                {dueTitles.map((title) => (
-                                  <div key={title} className="cal-task">
-                                    {title}
-                                  </div>
-                                ))}
-                              </th>
-                            )
-                          })}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          {daysOfWeek.map((date) => (
-                            <td key={date} />
-                          ))}
-                        </tr>
-                      </tbody>
-                    </table>
-                </Stack>
+                  <Button kind="primary" onClick={submitTask} ariaLabel="Add task">Add</Button>
+                </div>
+              </Stack>
+
+              {todayTasks.length === 0 ? (
+                <div>
+                  <SectionLabel accent>No tasks yet</SectionLabel>
+                  <p style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink-60)' }}>
+                    Add a task above to get started.
+                  </p>
+                </div>
+              ) : (
+                <ul data-testid="task-list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {todayTasks.map((task) => (
+                    <li
+                      key={task.id}
+                      data-testid={`task-row-${task.id}`}
+                      className={`dp-task-row${task.done ? ' done' : ''}`}
+                    >
+                      <Checkbox
+                        label=""
+                        checked={task.done}
+                        onChange={() => toggleTask(task.id)}
+                      />
+                      <span className="dp-task-title">{task.title}</span>
+                      <span className="dp-task-due">{task.due}</span>
+                      {task.recurrence !== 'none' ? <span className="dp-task-due">{task.recurrence}</span> : null}
+                      <Button
+                        kind="ghost"
+                        ariaLabel={`Delete ${task.title}`}
+                        onClick={() => removeTask(task.id)}
+                      >
+                        Delete
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
               )}
             </Stack>
           </Card>
+        )}
 
-          {draft ? (
-            <Card mono="Event" title={draft.id ? 'Edit event' : 'New event'}>
-              <Stack>
-                <FormGrid>
-                  <TextInput label="Title" value={draft.title} onChange={(value) => setDraft({ ...draft, title: value })} />
-                  <TextInput label="Date" type="date" value={draft.date} onChange={(value) => setDraft({ ...draft, date: value })} />
-                  <TextInput label="Time" type="time" value={draft.time} onChange={(value) => setDraft({ ...draft, time: value })} />
-                  <Select
-                    label="Recurrence"
-                    value={draft.recurrence}
-                    onChange={(value) => setDraft({ ...draft, recurrence: value as Recurrence })}
-                    options={RECURRENCE_OPTIONS}
-                  />
-                </FormGrid>
-                {draftError ? <div className="form-error">{draftError}</div> : null}
-                <Actions>
-                  <Button kind="ghost" onClick={() => setDraft(null)}>
-                    Cancel
-                  </Button>
-                  <PrimaryButton onClick={saveDraft}>Save</PrimaryButton>
-                </Actions>
-              </Stack>
-            </Card>
-          ) : (
-            <Card mono="Event" title="New event">
-              <Actions>
-                <PrimaryButton onClick={openCreate}>Add event</PrimaryButton>
-              </Actions>
-            </Card>
-          )}
-        </Stack>
-      ) : null}
+        {tab === 'Calendar' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(16px * var(--sf))' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'calc(8px * var(--sf))' }}>
+              <div role="tablist" aria-label="Calendar views" style={{ display: 'flex', gap: 'calc(12px * var(--sf))' }}>
+                {(['Month', 'Week'] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    role="tab"
+                    aria-selected={calendarView === v}
+                    className="dp-tab"
+                    style={{
+                      fontFamily: 'var(--sans)',
+                      fontSize: 'calc(13px * var(--tf))',
+                      fontWeight: 600,
+                      color: calendarView === v ? 'var(--ink)' : 'var(--ink-60)',
+                      padding: 'calc(4px * var(--sf)) calc(8px * var(--sf))',
+                      border: 'none',
+                      background: 'none',
+                      borderBottom: `calc(2px * var(--sf)) solid ${calendarView === v ? 'var(--accent)' : 'transparent'}`,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setCalendarView(v)}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+                <Button kind="ghost" onClick={openEventForm} ariaLabel="Add event">Add event</Button>
+                <Button kind="ghost" onClick={exportIcs} ariaLabel="Export ICS">Export ICS</Button>
+              </div>
+            </div>
+
+            {eventFormOpen && (
+              <Card title="New event" mono="calendar">
+                <Stack>
+                  <TextInput label="Title" value={eventTitle} onChange={setEventTitle} placeholder="Team Sync" error={null} />
+                  <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+                    <div style={{ flex: 1 }}>
+                      <TextInput label="Date" type="date" value={eventDate} onChange={setEventDate} error={null} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <TextInput label="Time" value={eventTime} onChange={setEventTime} placeholder="09:00" error={null} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <select
+                        className="lc-input"
+                        aria-label="Repeat"
+                        value={eventRecurrence}
+                        onChange={(e) => setEventRecurrence(e.target.value as Recurrence)}
+                        style={{ width: '100%' }}
+                      >
+                        {RECURRENCE_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+                    <Button kind="primary" onClick={submitEvent} ariaLabel="Save">Save</Button>
+                    <Button kind="ghost" onClick={() => setEventFormOpen(false)} ariaLabel="Cancel">Cancel</Button>
+                  </div>
+                </Stack>
+              </Card>
+            )}
+
+            {editingEvent !== null && (
+              <Card title={`Edit ${editingEvent.title}`} mono={editingEvent.date}>
+                <Stack>
+                  <div>
+                    <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)' }}>
+                      {editingEvent.time}
+                    </span>
+                  </div>
+                  <div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
+                      <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)' }}>Recurrence</span>
+                      <select
+                        className="lc-input"
+                        aria-label="Recurrence"
+                        value={editRecurrence}
+                        onChange={(e) => setEditRecurrence(e.target.value as Recurrence)}
+                        style={{ flex: 1 }}
+                      >
+                        {RECURRENCE_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+                    <Button kind="primary" onClick={saveEditEvent} ariaLabel="Save">Save</Button>
+                    <Button kind="ghost" onClick={() => setEditingEvent(null)} ariaLabel="Cancel">Cancel</Button>
+                  </div>
+                </Stack>
+              </Card>
+            )}
+
+            {calendarView === 'Month' && (
+              <Card title="Month" mono="grid">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'calc(8px * var(--sf))' }}>
+                  <Button kind="ghost" onClick={() => shiftMonth(-1)} ariaLabel="Previous month">Prev</Button>
+                  <span className="dp-month-label">{monthLabel(viewMonth.year, viewMonth.month)}</span>
+                  <Button kind="ghost" onClick={() => shiftMonth(1)} ariaLabel="Next month">Next</Button>
+                </div>
+                <div className="cal-grid" data-testid="calendar-month">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+                    <div key={d} className="cal-dow">{d}</div>
+                  ))}
+                  {monthCellsISO.map((iso) => {
+                    const eventsHere = byDate.get(iso) ?? []
+                    const tasksHere = dueDates.get(iso) ?? []
+                    const inMonth = (() => {
+                      const d = fromISODate(iso)
+                      return d !== null && d.getFullYear() === viewMonth.year && d.getMonth() === viewMonth.month
+                    })()
+                    return (
+                      <div
+                        key={iso}
+                        data-testid={`cal-day-${iso}`}
+                        className={`cal-cell${inMonth ? '' : ' out'}${iso === today ? ' today' : ''}${iso === selectedISO ? ' selected' : ''}`}
+                        onClick={() => setSelectedISO(iso)}
+                      >
+                        <span className="cal-num">{fromISODate(iso)?.getDate()}</span>
+                        {eventsHere.slice(0, 3).map((ev: CalendarEvent) => (
+                          <button
+                            key={`${ev.id}-${ev.time}`}
+                            type="button"
+                            className="cal-event"
+                            data-testid={`cal-event-${ev.id}`}
+                            data-time={ev.time}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const item = events.find((x) => x.id === ev.id)
+                              if (item) startEditEvent(item)
+                            }}
+                          >
+                            {ev.title}
+                          </button>
+                        ))}
+                        {tasksHere.slice(0, 2).map((t, i) => (
+                          <span key={`${iso}-task-${i}`} className="cal-task">{t}</span>
+                        ))}
+                      </div>
+                    )
+                  })}
+                </div>
+              </Card>
+            )}
+
+            {calendarView === 'Week' && (
+              <Card title="Week" mono={monthLabel(viewMonth.year, viewMonth.month)}>
+                <div className="cal-week" data-testid="calendar-week">
+                  {week.map((iso) => {
+                    const eventsHere = weekByDate.get(iso) ?? []
+                    const tasksHere = taskDueDates(tasks, iso, iso).get(iso) ?? []
+                    const d = fromISODate(iso)
+                    return (
+                      <div key={iso} role="columnheader" className="cal-week-col">
+                        <div className="cal-week-head">
+                          {d?.toLocaleString('en-US', { weekday: 'long' })}
+                        </div>
+                        <div className="cal-week-date">{iso}</div>
+                        {eventsHere.map((ev: CalendarEvent) => (
+                          <button
+                            key={`${ev.id}-${ev.time}`}
+                            type="button"
+                            className="cal-event-btn"
+                            data-time={ev.time}
+                            onClick={() => {
+                              const item = events.find((x) => x.id === ev.id)
+                              if (item) startEditEvent(item)
+                            }}
+                          >
+                            {ev.title}
+                          </button>
+                        ))}
+                        {tasksHere.map((t, i) => (
+                          <div key={`${iso}-task-${i}`} className="cal-task">{t}</div>
+                        ))}
+                      </div>
+                    )
+                  })}
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {error != null && (
+          <div role="alert" className="form-error">
+            {error} <Button kind="ghost" onClick={reset}>Try again</Button>
+          </div>
+        )}
+        {copied && (
+          <div role="status" style={{ fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--accent)' }}>
+            Copied ICS to clipboard
+          </div>
+        )}
+      </div>
     </AppShell>
   )
 }
