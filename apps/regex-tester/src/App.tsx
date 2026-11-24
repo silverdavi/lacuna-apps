@@ -8,6 +8,7 @@ import {
   EmptyState,
   FormGrid,
   List,
+  Rail,
   Row,
   Stack,
   TextInput,
@@ -67,8 +68,7 @@ export function App() {
   const [text, setText] = useState(() => host.state().text)
   const [tab, setTab] = useState<Tab>('Test')
   const [history, setHistory] = useState<HistoryEntry[]>(() => host.history())
-  const [copied, setCopied] = useState(false)
-  const { copy } = useClipboard()
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
   useEffect(() => {
     host.saveState({ pattern, flags, text })
@@ -98,22 +98,36 @@ export function App() {
     setHistory((prev) => prev.filter((e) => e !== entry))
   }
 
-  const copyResult = async () => {
-    try {
-      await copy(lines.map((line) => line.text).join('\n'))
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1500)
-    } catch {
-      // Clipboard unavailable: the button simply does not flip to "Copied".
-    }
+  const copyResult = () => {
+    void copy(lines.map((line) => line.text).join('\n'))
   }
+
+  const flagsLabel = flags === '' ? 'no flags' : flags
 
   return (
     <AppShell
       name="Regex Tester"
       icon="search"
-      hue="rust"
+      hue="blue"
       category="Productivity"
+      meta={`${history.length} ${history.length === 1 ? 'pattern' : 'patterns'} saved`}
+      status={
+        error
+          ? `Pattern error: ${error}`
+          : tab === 'Test'
+            ? `Ready · ${flagsLabel} · sample ${text.length} chars`
+            : `Library · ${history.length} ${history.length === 1 ? 'pattern' : 'patterns'}`
+      }
+      side={
+        <Rail
+          title="Pattern"
+          chips={[
+            `Flags: ${flagsLabel}`,
+            `Case ${caseInsensitive ? 'insensitive' : 'sensitive'}`,
+            `Sample ${text.length} chars`,
+          ]}
+        />
+      }
     >
       <div role="tablist" aria-label="Sections" className="lc-tabs">
         {TABS.map((t) => (
@@ -122,96 +136,107 @@ export function App() {
             type="button"
             role="tab"
             aria-selected={tab === t}
-            className="lc-tab"
-            style={{
-              fontFamily: 'var(--sans)',
-              fontSize: 'calc(12.5px * var(--tf))',
-              fontWeight: 600,
-              color: tab === t ? 'var(--ink)' : 'var(--ink-80)',
-              padding: '0 calc(2px * var(--sf)) calc(11px * var(--sf))',
-              border: 'none',
-              background: 'none',
-              borderBottom: `calc(2px * var(--sf)) solid ${tab === t ? 'var(--accent)' : 'transparent'}`,
-              cursor: 'pointer',
-            }}
+            className={tab === t ? 'lc-tab active' : 'lc-tab'}
+            style={tab === t ? undefined : { color: 'var(--ink-60)' }}
             onClick={() => setTab(t)}
           >
             {t}
           </button>
         ))}
       </div>
-      <div role="tabpanel" aria-label={tab}>
-      {tab === 'Test' ? (
-        <Stack lg>
-          <Card mono="TEST" title="Test a pattern">
-            <FormGrid>
-              <TextInput label="Pattern" value={pattern} onChange={setPattern} placeholder="Type a regular expression" />
-              <TextInput label="Sample text" value={text} onChange={setText} placeholder="Paste text to test against" />
-              <TextInput label="Flags" value={flags} onChange={setFlags} placeholder="gim" />
-              <Checkbox label="Case insensitive" checked={caseInsensitive} onChange={setCaseInsensitive} />
-            </FormGrid>
-            <Actions>
-              <Button kind="primary" onClick={savePattern} disabled={!pattern}>
-                Save pattern
-              </Button>
-              <Button kind="ghost" onClick={() => void copyResult()} disabled={!matchesReady}>
-                Copy result
-              </Button>
-            </Actions>
-          </Card>
+      <Stack lg>
+        {tab === 'Test' ? (
+          <>
+            <Card mono="TEST" title="Test a pattern">
+              <FormGrid>
+                <TextInput
+                  label="Pattern"
+                  value={pattern}
+                  onChange={setPattern}
+                  placeholder="Type a regular expression"
+                />
+                <TextInput
+                  label="Sample text"
+                  value={text}
+                  onChange={setText}
+                  placeholder="Paste text to test against"
+                />
+                <TextInput label="Flags" value={flags} onChange={setFlags} placeholder="gim" />
+                <Checkbox
+                  label="Case insensitive"
+                  checked={caseInsensitive}
+                  onChange={setCaseInsensitive}
+                />
+              </FormGrid>
+              <Actions>
+                <Button kind="primary" onClick={savePattern} disabled={!pattern}>
+                  Save pattern
+                </Button>
+                <Button kind="ghost" onClick={copyResult} disabled={!matchesReady}>
+                  {copied ? 'Copied' : 'Copy result'}
+                </Button>
+              </Actions>
+            </Card>
 
-          <Card
-            title="Results"
-            mono="MATCHES"
-            actions={
-              <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--ink-60)' }}>
-                {error ? 'No matches' : `Matches: ${lines.length}`}
-              </span>
-            }
-          >
-            {error ? (
-              <EmptyState title="Invalid pattern" detail={error} actionLabel="Fix the pattern" />
-            ) : !matchesReady ? (
-              <EmptyState title="No matches" detail="No part of the sample text matches this pattern." actionLabel="Try a different pattern" />
+            <Card
+              title="Results"
+              mono="MATCHES"
+              actions={
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--ink-60)' }}>
+                  {error ? 'No matches' : `Matches: ${lines.length}`}
+                </span>
+              }
+            >
+              {error ? (
+                <EmptyState title="Invalid pattern" detail={error} actionLabel="Fix the pattern" />
+              ) : !matchesReady ? (
+                <EmptyState
+                  title="No matches"
+                  detail="No part of the sample text matches this pattern."
+                  actionLabel="Try a different pattern"
+                />
+              ) : (
+                <List label="Matches">
+                  {lines.map((line, i) => {
+                    const groups = line.groups.map((g) => `Group ${g.name}: ${g.value}`).join(' · ')
+                    const meta = groups ? `position ${line.index} · ${groups}` : `position ${line.index}`
+                    return <Row key={`${line.index}-${i}`} title={line.text} meta={meta} />
+                  })}
+                </List>
+              )}
+            </Card>
+          </>
+        ) : (
+          <Card mono="HISTORY" title="Saved patterns">
+            {history.length === 0 ? (
+              <EmptyState
+                title="No saved patterns"
+                detail="Save a pattern on the Test tab to keep it here."
+                actionLabel="Test a pattern"
+              />
             ) : (
-              <List label="Matches">
-                {lines.map((line, i) => {
-                  const groups = line.groups.map((g) => `Group ${g.name}: ${g.value}`).join(' · ')
-                  const meta = groups ? `position ${line.index} · ${groups}` : `position ${line.index}`
-                  return <Row key={`${line.index}-${i}`} title={line.text} meta={meta} />
-                })}
+              <List label="Saved patterns">
+                {history.map((entry) => (
+                  <Row
+                    key={`tab-${entry.pattern}-${entry.flags}`}
+                    title={entry.pattern}
+                    meta={`${entry.flags === '' ? 'no flags' : entry.flags} · ${entry.matches}`}
+                    action={
+                      <Button
+                        kind="ghost"
+                        ariaLabel={`Delete ${entry.pattern}`}
+                        onClick={() => deletePattern(entry)}
+                      >
+                        Delete
+                      </Button>
+                    }
+                  />
+                ))}
               </List>
             )}
           </Card>
-        </Stack>
-      ) : (
-        <Card mono="HISTORY" title="Saved patterns">
-          {history.length === 0 ? (
-            <EmptyState title="No saved patterns" detail="Save a pattern on the Test tab to keep it here." actionLabel="Test a pattern" />
-          ) : (
-            <List label="Saved patterns">
-              {history.map((entry) => (
-                <Row
-                  key={`tab-${entry.pattern}-${entry.flags}`}
-                  title={entry.pattern}
-                  meta={`${entry.flags} · ${entry.matches}`}
-                  action={
-                    <Button kind="ghost" ariaLabel={`Delete ${entry.pattern}`} onClick={() => deletePattern(entry)}>
-                      Delete
-                    </Button>
-                  }
-                />
-              ))}
-            </List>
-          )}
-        </Card>
-      )}
-      </div>
-      {copied && (
-        <div role="status" style={{ position: 'fixed', bottom: 'calc(18px * var(--sf))', right: 'calc(18px * var(--sf))', padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))', background: 'var(--accent)', color: 'var(--on-accent)', borderRadius: 'calc(6px * var(--sf))', fontFamily: 'var(--mono)', fontSize: 'calc(10.5px * var(--tf))' }}>
-          Copied
-        </div>
-      )}
+        )}
+      </Stack>
     </AppShell>
   )
 }
