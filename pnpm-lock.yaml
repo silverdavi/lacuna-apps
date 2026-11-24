@@ -266,12 +266,42 @@ importers:
 
   apps/calorie-counter:
     dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
+      '@lacuna/csv-parse':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/csv-parse/0.1.0
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/date-math/0.1.0
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/date-picker/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
+      '@lacuna/heatmap':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/heatmap/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
+      '@lacuna/streak-calc':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/streak-calc/0.1.0
+      '@lacuna/tracker-kit':
+        specifier: workspace:0.2.0
+        version: link:../../toolbox/modules/tracker-kit/0.2.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-collection/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1

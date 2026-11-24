@@ -3,8 +3,8 @@
   "id": "lacuna.calorie-counter",
   "name": "Calorie Counter",
   "version": "0.1.0",
-  "summary": "Log meals, track daily calories, and export your intake.",
-  "description": "A simple calorie counter. Log each meal with its category and calories, sort and filter by category, see your daily total and mean, and export the log as CSV. Nothing leaves the browser.",
+  "summary": "Log dated meals, track daily calories, and watch your streaks.",
+  "description": "A calorie counter with real depth. Log each meal with a date, category, and calories; sort and filter the log by category; see running totals and means; watch a day-by-day activity heatmap, a per-day calorie trend line, and current/longest logging streaks; jump to a day with a date picker; and export or back up your data as CSV or JSON, with JSON import to merge previous backups. Nothing leaves the browser.",
   "category": "healthcare",
   "tags": ["health", "nutrition", "tracker"],
   "icon": "analytics",
@@ -30,12 +30,30 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/date-picker": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0",
-      "@lacuna/host-mock": "0.1.0"
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/tracker-kit": "0.2.0"
     }
   },
   "capabilities": [
+    "create:meal-entry",
+    "view:chart",
+    "view:heatmap",
+    "view:streak",
+    "export:csv",
+    "export:json",
+    "import:json",
+    "edit:meal-entry",
     "edit:calorie-counter"
   ],
   "permissions": {
@@ -45,7 +63,8 @@
         "access": [
           "read",
           "write",
-          "create"
+          "create",
+          "delete"
         ],
         "purpose": "Own Calorie Counter meal records"
       }

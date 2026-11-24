@@ -1,2 +1,21 @@
 /* Contrast override: inactive tab labels use --ink-40 which fails WCAG AA. */
 .lk-shell .lc-tab { color: var(--ink-60); }
+
+/* Sort control: the Calories <th> itself is the click target.
+   No nested control keeps the label-based form locator (getByLabel)
+   resolving to a single element while the header stays a real
+   columnheader. The arrow is pure CSS so it doesn't pollute the
+   element's accessible name. */
+.cal-sort {
+  cursor: pointer;
+  user-select: none;
+}
+.cal-sort:hover {
+  color: var(--ink);
+}
+.cal-sort.asc::after {
+  content: ' ↑';
+}
+.cal-sort.desc::after {
+  content: ' ↓';
+}

@@ -20,7 +20,8 @@ export function isCategory(value: string): boolean {
 
 export const host = {
   read(): MealState {
-    return { ...loadState(), meals: [...loadState().meals] }
+    const state = loadState()
+    return { ...state, meals: [...state.meals] }
   },
 
   write(next: MealState): MealState {
@@ -28,9 +29,16 @@ export const host = {
     return next
   },
 
-  addMeal(name: string, category: string, calories: number): MealState {
+  addMeal(name: string, category: string, calories: number, date: string): MealState {
     const state = loadState()
-    state.meals.push({ id: makeId(), name, category, calories, createdAt: Date.now() })
+    state.meals.push({
+      id: makeId(),
+      name,
+      category,
+      calories,
+      date,
+      createdAt: Date.now(),
+    })
     return host.write(state)
   },
 

@@ -8,6 +8,7 @@ export type MealEntry = {
   name: string
   category: string
   calories: number
+  date: string // YYYY-MM-DD
   createdAt: number
 }
 
@@ -38,7 +39,9 @@ function isMealEntry(value: unknown): value is MealEntry {
     typeof e.category === 'string' &&
     e.category.length > 0 &&
     Number.isFinite(e.calories) &&
-    e.calories > 0
+    e.calories > 0 &&
+    typeof e.date === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(e.date)
   )
 }
 
@@ -56,9 +59,10 @@ export function loadState(): MealState {
       name: e.name,
       category: e.category,
       calories: Math.round(e.calories),
+      date: e.date,
       createdAt: Number.isFinite(e.createdAt) ? e.createdAt : 0,
     }))
-    .sort((a, b) => a.createdAt - b.createdAt)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt)
   return { meals }
 }
 
