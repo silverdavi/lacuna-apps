@@ -154,24 +154,18 @@ export function App() {
         }
       >
         <div role="tablist" className="ct-tablist">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'Week'}
-            className={`ct-tab${tab === 'Week' ? ' active' : ''}`}
-            onClick={() => setTab('Week')}
-          >
-            Week
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'Table'}
-            className={`ct-tab${tab === 'Table' ? ' active' : ''}`}
-            onClick={() => setTab('Table')}
-          >
-            Table
-          </button>
+          {['Week', 'Table'].map((item) => (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={tab === item}
+              className={`ct-tab${tab === item ? ' active' : ''}`}
+              onClick={() => setTab(item)}
+            >
+              {item}
+            </button>
+          ))}
         </div>
         {tab === 'Week' ? (
           <div className="ct-grid">
@@ -191,8 +185,7 @@ export function App() {
                           className="ct-block"
                           onClick={() => setSelectedId(c.id)}
                         >
-                          {c.name}
-                          <span className="ct-block-time"> {c.start}–{c.end}</span>
+                          {`${c.name} ${c.start}–${c.end}`}
                         </button>
                       ))
                     )}
