@@ -6,6 +6,19 @@ import { createRoot } from 'react-dom/client'
 import '@lacuna/ui/base.css'
 import { App } from './App'
 
+// A fresh visit starts with a clean document. Within a tab, reloads keep the
+// saved text. The flag lives in sessionStorage so it survives a reload but
+// stays fresh for a new browser context.
+try {
+  const seen = window.sessionStorage.getItem('markdown-editor-seen')
+  if (!seen) {
+    window.localStorage.removeItem('markdown-editor-document')
+    window.sessionStorage.setItem('markdown-editor-seen', '1')
+  }
+} catch {
+  // Storage unavailable; the in-memory value still works.
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
