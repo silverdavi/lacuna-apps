@@ -4,7 +4,7 @@
   "name": "Quiz Maker",
   "version": "0.1.0",
   "summary": "Build multiple-choice question banks and run shuffled study sessions.",
-  "description": "Add multiple-choice questions with a correct answer and two wrong answers, review the bank, then start a shuffled study session. Answer each question, follow the score, and review which ones were right. Questions stay on this device.",
+  "description": "Add multiple-choice questions with a correct answer and two wrong answers, review the bank, then start a shuffled study session. Answer each question, follow the score, and review which ones were right. Export your bank to a JSON file or copy it to the clipboard, import a bank from another device, and keep a rolling history of your session scores. Everything stays on this device.",
   "category": "productivity",
   "tags": [
     "quiz",
@@ -37,12 +37,15 @@
       "@lacuna/ui": "^0.1.0",
       "@lacuna/quiz-engine": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
-      "@lacuna/random": "0.1.0"
+      "@lacuna/random": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
     "create:quiz-question",
-    "edit:quiz-question"
+    "edit:quiz-question",
+    "export:quiz-bank"
   ],
   "permissions": {
     "records": [
@@ -54,6 +57,14 @@
           "create"
         ],
         "purpose": "Store the multiple-choice questions the user builds"
+      },
+      {
+        "kind": "quiz-session",
+        "access": [
+          "read",
+          "create"
+        ],
+        "purpose": "Keep a rolling history of study session scores"
       }
     ],
     "platform": [],
@@ -69,7 +80,8 @@
   },
   "sharing": {
     "owns": [
-      "quiz-question"
+      "quiz-question",
+      "quiz-session"
     ],
     "reads": [],
     "handoffs": []
