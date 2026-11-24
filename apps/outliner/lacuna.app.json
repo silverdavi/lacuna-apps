@@ -31,6 +31,7 @@
     "modules": {
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-drag-reorder": "0.1.0",
       "@lacuna/ui": "^0.1.0"
     }
   },

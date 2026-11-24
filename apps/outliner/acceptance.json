@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "a295b6846f8ea65e608758e289895196f4d75e347476fccabd91cde37b88f38f"
+      "sha256": "44a6a4988084d75076305715f3324b52d2479573a6bb3192e82e2fd44ff5c5f7"
     }
   ]
 }

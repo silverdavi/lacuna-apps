@@ -16,6 +16,12 @@
   background: var(--ui-bg);
 }
 
+.ol-row.selected {
+  background: var(--ui-bg);
+  outline: 0.08em solid var(--accent);
+  outline-offset: -0.08em;
+}
+
 .ol-row.drop-top {
   box-shadow: 0 -0.14em 0 0 var(--accent);
 }

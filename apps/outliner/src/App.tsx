@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { useDragReorder } from '@lacuna/use-drag-reorder'
 import {
   Actions,
   AppShell,
@@ -27,9 +28,7 @@ export function App() {
   const [editValue, setEditValue] = useState('')
   const [focusKey, setFocusKey] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
-  const [dragKey, setDragKey] = useState<string | null>(null)
-  const [overKey, setOverKey] = useState<string | null>(null)
-  const [overHalf, setOverHalf] = useState<'top' | 'bottom'>('top')
+  const [selected, setSelected] = useState<string | null>(null)
   const itemRefs = useRef(new Map<string, HTMLInputElement>())
   const touched = useRef(new Set<string>())
 
@@ -100,6 +99,7 @@ export function App() {
     })
     setItems(outlineStore.list())
     setEditing(record.id)
+    setSelected(record.id)
     setEditValue(record.text)
     setFocusKey(record.id)
   }
@@ -149,20 +149,17 @@ export function App() {
     return true
   }
 
-  function onDrop(targetKey: string) {
-    if (dragKey === null || dragKey === targetKey) return
-    if (isDescendant(dragKey, targetKey)) return
-    const sortedCopy = [...sorted]
-    const fromIdx = sortedCopy.findIndex((i) => i.id === dragKey)
-    const toIdx = sortedCopy.findIndex((i) => i.id === targetKey)
-    if (fromIdx < 0 || toIdx < 0) return
-    const [moved] = sortedCopy.splice(fromIdx, 1)
-    const insertAt = overHalf === 'bottom' ? toIdx + 1 : toIdx
-    sortedCopy.splice(insertAt, 0, moved)
-    commit(sortedCopy.map((i, idx) => ({ ...i, order: idx })))
-    setDragKey(null)
-    setOverKey(null)
-  }
+  const { itemProps, listProps, isDragging, draggingItem } = useDragReorder({
+    onReorder: (fromList, fromIndex, toList, toIndex) => {
+      if (fromList !== toList) return
+      const sortedCopy = [...sorted]
+      const fromIdx = sortedCopy.findIndex((i) => i.order === fromIndex)
+      if (fromIdx < 0) return
+      const [moved] = sortedCopy.splice(fromIdx, 1)
+      sortedCopy.splice(toIndex, 0, moved)
+      commit(sortedCopy.map((i, idx) => ({ ...i, order: idx })))
+    },
+  })
 
   function toggleCollapse(key: string) {
     setCollapsed((prev) => {
@@ -210,53 +207,30 @@ export function App() {
             actionLabel="Add item"
           />
         ) : (
-          <ul className="ol-tree" aria-label="Outline">
-            {rows.map((row) => {
+          <ul className="ol-tree" aria-label="Outline" {...listProps(0)}>
+            {rows.map((row, idx) => {
               const isEditing = editing === row.id
-              const isDragOver =
-                overKey === row.id &&
-                dragKey !== null &&
-                dragKey !== row.id &&
-                !isDescendant(dragKey, row.id)
+              const isDraggingThis =
+                isDragging && draggingItem?.itemIndex === idx
               return (
                 <li
                   key={row.id}
                   className={[
                     'ol-row',
                     isEditing && 'editing',
-                    isDragOver && `drop-${overHalf}`,
-                    dragKey === row.id && 'dragging',
+                    isDraggingThis && 'dragging',
+                    selected === row.id && 'selected',
                   ]
                     .filter(Boolean)
                     .join(' ')}
                   style={{ paddingLeft: `${row.level * 1.25}em` }}
-                  onDragOver={(e) => {
-                    e.preventDefault()
-                    e.dataTransfer.dropEffect = 'move'
-                    const rect = e.currentTarget.getBoundingClientRect()
-                    setOverKey(row.id)
-                    setOverHalf(e.clientY - rect.top < rect.height / 2 ? 'top' : 'bottom')
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault()
-                    onDrop(row.id)
-                  }}
+                  {...itemProps(0, idx)}
                 >
                   <button
                     type="button"
                     className="ol-drag"
                     aria-label="Drag handle"
                     title="Drag to reorder"
-                    draggable
-                    onDragStart={(e) => {
-                      e.stopPropagation()
-                      setDragKey(row.id)
-                      e.dataTransfer.effectAllowed = 'move'
-                    }}
-                    onDragEnd={() => {
-                      setDragKey(null)
-                      setOverKey(null)
-                    }}
                   >
                     ::
                   </button>
@@ -265,6 +239,7 @@ export function App() {
                       type="button"
                       className="ol-toggle"
                       aria-label={row.collapsed ? `Expand ${row.text}` : `Collapse ${row.text}`}
+                      aria-expanded={!row.collapsed}
                       onClick={() => toggleCollapse(row.id)}
                     >
                       {row.collapsed ? '+' : '\u2212'}
@@ -278,6 +253,7 @@ export function App() {
                       onClick={() => {
                         if (!isEditing) {
                           setEditing(row.id)
+                          setSelected(row.id)
                           setEditValue(row.text)
                           if (row.text === 'New item') touched.current.add(row.id)
                         }
@@ -297,6 +273,7 @@ export function App() {
                       onClick={() => {
                         if (!isEditing) {
                           setEditing(row.id)
+                          setSelected(row.id)
                           setEditValue(row.text)
                           if (row.text === 'New item') touched.current.add(row.id)
                         }
@@ -308,10 +285,20 @@ export function App() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
+                          e.stopPropagation()
                           saveEdit()
                         } else if (e.key === 'Escape') {
                           e.preventDefault()
+                          e.stopPropagation()
                           cancelEdit()
+                        } else if (
+                          (e.key === 'ArrowUp' ||
+                            e.key === 'ArrowDown' ||
+                            e.key === 'ArrowLeft' ||
+                            e.key === 'ArrowRight') &&
+                          isEditing
+                        ) {
+                          e.stopPropagation()
                         }
                       }}
                       onBlur={() => {
@@ -319,16 +306,18 @@ export function App() {
                       }}
                     />
                   </div>
-                  <div className="ol-actions">
-                    <Button kind="ghost" ariaLabel="Indent" onClick={() => indent(row.id)}>
-                      Indent
-                    </Button>
-                    {row.level > 0 && (
-                      <Button kind="ghost" ariaLabel="Outdent" onClick={() => outdent(row.id)}>
-                        Outdent
+                  {selected === row.id && (
+                    <div className="ol-actions">
+                      <Button kind="ghost" ariaLabel="Indent" onClick={() => indent(row.id)}>
+                        Indent
                       </Button>
-                    )}
-                  </div>
+                      {row.level > 0 && (
+                        <Button kind="ghost" ariaLabel="Outdent" onClick={() => outdent(row.id)}>
+                          Outdent
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </li>
               )
             })}
