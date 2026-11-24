@@ -146,7 +146,7 @@ export function App() {
           <Card mono="TEST" title="Test a pattern">
             <FormGrid>
               <TextInput label="Pattern" value={pattern} onChange={setPattern} placeholder="Type a regular expression" />
-              <TextInput label="Sample text" value={text} onChange={setText} rows={5} placeholder="Paste text to test against" />
+              <TextInput label="Sample text" value={text} onChange={setText} placeholder="Paste text to test against" />
               <TextInput label="Flags" value={flags} onChange={setFlags} placeholder="gim" />
               <Checkbox label="Case insensitive" checked={caseInsensitive} onChange={setCaseInsensitive} />
             </FormGrid>
@@ -208,7 +208,7 @@ export function App() {
       )}
       </div>
       {copied && (
-        <div role="status" style={{ position: 'fixed', bottom: 'calc(18px * var(--sf))', right: 'calc(18px * var(--sf))', padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))', background: 'var(--accent)', color: 'var(--on-accent)', borderRadius: '6px', fontFamily: 'var(--mono)', fontSize: 'calc(10.5px * var(--tf))' }}>
+        <div role="status" style={{ position: 'fixed', bottom: 'calc(18px * var(--sf))', right: 'calc(18px * var(--sf))', padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))', background: 'var(--accent)', color: 'var(--on-accent)', borderRadius: 'calc(6px * var(--sf))', fontFamily: 'var(--mono)', fontSize: 'calc(10.5px * var(--tf))' }}>
           Copied
         </div>
       )}
