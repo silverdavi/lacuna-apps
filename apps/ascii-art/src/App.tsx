@@ -1,22 +1,26 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import {
-  Actions,
   AppShell,
-  Body,
   Button,
   Card,
   EmptyState,
   ErrorState,
   FormGrid,
+  Kpi,
+  KpiRow,
   Rail,
+  SectionLabel,
   Select,
   Stack,
   TextInput,
 } from '@lacuna/ui'
 import { saveText } from '@lacuna/file-save-open'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { useLocalRecord } from '@lacuna/use-local-record'
 import { host } from './host'
 import type { AsciiArtRecord } from './host'
+import './app.css'
 
 const CHARACTER_SETS = [
   { value: 'Default', chars: (c: string) => c },
@@ -31,6 +35,30 @@ const MIN_WIDTH = 1
 const MAX_WIDTH = 120
 
 type TabKey = 'Text' | 'Image'
+
+interface HistoryEntry {
+  id: number
+  source: 'text' | 'image'
+  characterSet: string
+  width: number
+  lines: number
+  at: string
+  text: string
+}
+
+interface PersistedState {
+  characterSet: string
+  width: number
+  history: HistoryEntry[]
+}
+
+const DEFAULT_STATE: PersistedState = {
+  characterSet: 'Default',
+  width: 80,
+  history: [],
+}
+
+const MAX_HISTORY = 12
 
 function generateTextAscii(input: string, charFn: (c: string) => string, width: number): string {
   const lines: string[] = []
@@ -90,13 +118,23 @@ const INITIAL_OUTPUT = INITIAL?.text ?? ''
 export function App() {
   const [tab, setTab] = useState<TabKey>('Text')
   const [inputText, setInputText] = useState('')
-  const [characterSet, setCharacterSet] = useState(INITIAL?.characterSet ?? 'Default')
   const [widthText, setWidthText] = useState(String(INITIAL?.width ?? 80))
   const [output, setOutput] = useState(INITIAL_OUTPUT)
   const [error, setError] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [decodedImage, setDecodedImage] = useState<HTMLImageElement | null>(null)
+  const [historyId, setHistoryId] = useState(0)
+  const fileRef = useRef<HTMLInputElement>(null)
   const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+
+  const { value: settings, set: setSettings } = useLocalRecord<PersistedState>({
+    key: 'lacuna.ascii-art.settings',
+    version: 1,
+    defaultValue: { ...DEFAULT_STATE, characterSet: INITIAL?.characterSet ?? 'Default' },
+  })
+
+  const characterSet = settings.characterSet
+  const history = settings.history
 
   const charFn = CHARACTER_SETS.find((s) => s.value === characterSet)?.chars ?? ((c: string) => c)
 
@@ -113,25 +151,38 @@ export function App() {
       return
     }
     setError('')
+    let result = ''
     if (tab === 'Text') {
       if (inputText.length === 0) {
         setOutput('')
         setError('Enter some text to convert')
         return
       }
-      const result = generateTextAscii(inputText, charFn, w)
-      setOutput(result)
-      host.saveRecord({ text: result, source: 'text', characterSet, width: w })
+      result = generateTextAscii(inputText, charFn, w)
     } else {
       if (decodedImage === null) {
         setOutput('')
         setError('Upload an image first')
         return
       }
-      const result = generateImageAscii(decodedImage, charFn, w)
-      setOutput(result)
-      host.saveRecord({ text: result, source: 'image', characterSet, width: w })
+      result = generateImageAscii(decodedImage, charFn, w)
     }
+    const lines = result.split('\n').length
+    const at = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const source = tab === 'Text' ? 'text' : 'image'
+    const entry: HistoryEntry = {
+      id: historyId + 1,
+      source,
+      characterSet,
+      width: w,
+      lines,
+      at,
+      text: result,
+    }
+    setHistoryId((n) => n + 1)
+    setSettings((prev) => ({ ...prev, characterSet, width: w, history: [entry, ...prev.history].slice(0, MAX_HISTORY) }))
+    setOutput(result)
+    host.saveRecord({ text: result, source, characterSet, width: w })
   }
 
   const handleCopy = () => {
@@ -142,7 +193,7 @@ export function App() {
     if (output) saveText(output, { filename: 'ascii-art.txt', mimeType: 'text/plain' })
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file === undefined) return
     const url = URL.createObjectURL(file)
@@ -158,29 +209,59 @@ export function App() {
     })
   }
 
+  const lineCount = output === '' ? 0 : output.split('\n').length
+  const charCount = output.length
+
+  const clearHistory = () => {
+    setSettings((prev) => ({ ...prev, history: [] }))
+  }
+
   return (
     <AppShell
       name="ASCII Art Generator"
       icon="paint"
-      hue="teal"
+      hue="blue"
       category="Productivity"
+      meta={`${CHARACTER_SETS.length} sets · max ${MAX_WIDTH}w`}
+      status={output !== '' ? `${lineCount} lines · ${charCount} chars` : 'Ready'}
       side={
-        <Rail title="How it works" note="Text or image to ASCII">
-          <Body sm>
-            Type text or upload an image, pick a character set and width, then press Generate.
-          </Body>
+        <Rail
+          title="ASCII Art"
+          note="Text or image to characters"
+          chips={output !== '' ? [`${lineCount} lines`, `${charCount} chars`] : []}
+        >
+          <SectionLabel>Recent</SectionLabel>
+          {history.length === 0 ? (
+            <p className="aa-rail-hint">Generations you make show up here.</p>
+          ) : (
+            <div className="aa-rail-history">
+              {history.slice(0, 5).map((h) => (
+                <button
+                  key={h.id}
+                  type="button"
+                  className="aa-rail-history-row"
+                  onClick={() => setOutput(h.text)}
+                >
+                  <span className="aa-rail-history-meta">{h.at} · {h.source}</span>
+                  <span className="aa-rail-history-set">{h.characterSet} · {h.width}w</span>
+                </button>
+              ))}
+              <button type="button" className="aa-rail-clear" onClick={clearHistory}>
+                Clear history
+              </button>
+            </div>
+          )}
         </Rail>
       }
     >
-      <div className="lc-tabs" role="tablist">
+      <div className="aa-tabs" role="tablist" aria-label="Source">
         {(['Text', 'Image'] as const).map((t) => (
           <button
             key={t}
             type="button"
             role="tab"
             aria-selected={tab === t}
-            className={`lc-tab${tab === t ? ' active' : ''}`}
-            style={tab !== t ? { color: 'var(--ink-60)' } : undefined}
+            className={`aa-tab${tab === t ? ' on' : ''}`}
             onClick={() => setTab(t)}
           >
             {t}
@@ -188,7 +269,7 @@ export function App() {
         ))}
       </div>
 
-      <Card mono={tab === 'Text' ? 'Text' : 'Image'} title={tab === 'Text' ? 'Text to ASCII' : 'Image to ASCII'}>
+      <Card mono="Input" title={tab === 'Text' ? 'Text to ASCII' : 'Image to ASCII'}>
         {tab === 'Text' ? (
           <Stack>
             <FormGrid>
@@ -198,66 +279,75 @@ export function App() {
                 onChange={setInputText}
                 placeholder="Type something…"
               />
-              <Select
-                label="Character set"
-                value={characterSet}
-                onChange={setCharacterSet}
-                options={CHARACTER_SETS.map((s) => s.value)}
-              />
-              <TextInput
-                label="Width"
-                type="number"
-                value={widthText}
-                onChange={setWidthText}
-              />
             </FormGrid>
-            <Actions>
-              <Button kind="primary" onClick={handleGenerate}>Generate</Button>
-            </Actions>
           </Stack>
         ) : (
           <Stack>
             <FormGrid>
               <label className="lc-field">
                 <span className="lc-field-label">Upload image</span>
-                <input type="file" accept="image/*" onChange={handleImageUpload} />
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
               </label>
-              <Select
-                label="Character set"
-                value={characterSet}
-                onChange={setCharacterSet}
-                options={CHARACTER_SETS.map((s) => s.value)}
-              />
-              <TextInput
-                label="Width"
-                type="number"
-                value={widthText}
-                onChange={setWidthText}
-              />
             </FormGrid>
-            <Actions>
-              <Button kind="primary" onClick={handleGenerate}>Generate</Button>
-            </Actions>
+            {imageUrl !== '' && (
+              <p className="aa-file-note">Image loaded, ready to convert.</p>
+            )}
           </Stack>
         )}
+        <FormGrid>
+          <Select
+            label="Character set"
+            value={characterSet}
+            onChange={(v) => setSettings((prev) => ({ ...prev, characterSet: v }))}
+            options={CHARACTER_SETS.map((s) => s.value)}
+          />
+          <TextInput
+            label="Width"
+            type="number"
+            value={widthText}
+            onChange={setWidthText}
+          />
+        </FormGrid>
         {error !== '' && <ErrorState title={error} />}
       </Card>
 
-      <Card mono="Output" title="ASCII art">
-        <Stack>
-          <div className="lc-field">
-            <span className="lc-field-label" id="ascii-output-label">ASCII output</span>
-            <pre aria-labelledby="ascii-output-label" style={{ whiteSpace: 'pre', overflowX: 'auto', fontFamily: 'var(--mono)', fontSize: 'calc(14px * var(--tf))', lineHeight: 'calc(20px * var(--tf))', color: 'var(--ink)', background: 'var(--paper-deep)', borderRadius: 'calc(4px * var(--sf))', padding: 'calc(8px * var(--sf))', minHeight: 'calc(80px * var(--sf))', minWidth: 'calc(800px * var(--sf))', margin: 0 }}>{output || '\u00A0'}</pre>
+      <Card mono="Output" title="ASCII art" actions={
+        output !== '' ? (
+          <div className="aa-card-actions">
+            <Button kind="secondary" onClick={handleCopy} ariaLabel="Copy">{copied ? 'Copied to clipboard' : 'Copy'}</Button>
+            <Button kind="ghost" onClick={handleDownload}>Download</Button>
           </div>
-          {output !== '' ? (
-            <Actions>
-              <Button kind="secondary" onClick={handleCopy}>{copied ? 'Copied to clipboard' : 'Copy'}</Button>
-              <Button kind="ghost" onClick={handleDownload}>Download</Button>
-            </Actions>
-          ) : (
-            <EmptyState mono="Empty" title="Nothing generated yet" detail="Fill in the fields above and press Generate." actionLabel="Start" onAction={() => setTab('Text')} />
-          )}
-        </Stack>
+        ) : undefined
+      }>
+        {output !== '' ? (
+          <Stack>
+            <KpiRow>
+              <Kpi value={String(lineCount)} label="Lines" />
+              <Kpi value={String(charCount)} label="Chars" />
+              <Kpi value={`${characterSet}`} label="Set" accent />
+            </KpiRow>
+            <pre role="textbox" aria-label="ASCII output" className="aa-output">{output}</pre>
+          </Stack>
+        ) : (
+          <EmptyState
+            mono="Empty"
+            title="Nothing generated yet"
+            detail="Pick a source, set the width, and press Generate."
+            actionLabel="Generate"
+          />
+        )}
+      </Card>
+
+      <Card mono="Run" title="Generate">
+        <div className="aa-run-row">
+          <Button kind="primary" onClick={handleGenerate}>Generate</Button>
+          <span className="aa-run-hint">Result stays editable and saves to history.</span>
+        </div>
       </Card>
     </AppShell>
   )
