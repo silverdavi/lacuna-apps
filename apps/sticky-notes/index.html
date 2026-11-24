@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light" />
     <title>Sticky Notes</title>
+    <script>
+      (() => {
+        let store = '';
+        const cb = navigator.clipboard;
+        if (!cb) return;
+        const ow = cb.writeText.bind(cb);
+        Object.defineProperty(cb, 'writeText', {
+          configurable: true,
+          value: async (t) => {
+            store = t;
+            try {
+              await ow(t)
+            } catch {}
+          },
+        })
+        Object.defineProperty(cb, 'readText', {
+          configurable: true,
+          value: async () => store,
+        })
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
