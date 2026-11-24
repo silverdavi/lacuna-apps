@@ -102,8 +102,7 @@ export function App() {
         ))}
       </div>
 
-      {tab === 'Generate' ? (
-        <div role="tabpanel" aria-label="Generate">
+      <div role="tabpanel" aria-label="Generate" hidden={tab !== 'Generate'}>
           <Card mono="Options" title="Generate">
             <FormGrid>
               <TextInput label="Seed" value={seed} onChange={setSeed} hint="Empty means a new result each time" />
@@ -129,15 +128,16 @@ export function App() {
                     borderRadius: 'calc(2px * var(--sf))',
                     background: 'var(--ui-card)',
                     padding: 'calc(12px * var(--sf))',
+                    fontFamily: 'var(--mono)',
+                    fontSize: 'calc(12px * var(--tf))',
+                    lineHeight: 1.6,
+                    color: 'var(--ink)',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    margin: 0,
                   }}
                 >
-                  <textarea
-                    className="lc-input"
-                    style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical' }}
-                    rows={6}
-                    value={output}
-                    readOnly
-                  />
+                  <pre style={{ margin: 0, fontFamily: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}>{output}</pre>
                 </div>
                 <Actions>
                   <Button kind="secondary" onClick={onCopy} ariaLabel="Copy">
@@ -157,9 +157,9 @@ export function App() {
             )}
           </Card>
         </div>
-      ) : (
-        <div role="tabpanel" aria-label="Saved">
-          <Card mono={`${snippets.length} saved`} title="Saved snippets">
+
+      <div role="tabpanel" aria-label="Saved" hidden={tab !== 'Saved'}>
+        <Card mono={`${snippets.length} saved`} title="Saved snippets">
             {snippets.length === 0 ? (
               <EmptyState
                 mono="Empty"
@@ -191,8 +191,7 @@ export function App() {
               </div>
             )}
           </Card>
-        </div>
-      )}
+      </div>
     </AppShell>
   )
 }
