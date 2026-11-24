@@ -1,215 +1,324 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useMemo, useState } from 'react'
 import {
   Actions,
   AppShell,
   Button,
   Card,
-  EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
+  PrimaryButton,
+  Rail,
+  SectionLabel,
   Select,
   Table,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { toCsv } from '@lacuna/csv-parse'
 import { saveText } from '@lacuna/file-save-open'
-import { filterRecords, sortRecords } from '@lacuna/query-spec'
+
+type Status = 'To Read' | 'Reading' | 'Read'
+type SortDir = 'asc' | 'desc'
+type View = 'Books' | 'Stats'
+type SortKey = 'title' | 'author' | 'status' | 'rating'
 
 interface Book {
   title: string
   author: string
-  status: string
-  rating: string
+  status: Status
+  rating: number | null
 }
 
-const STORAGE_KEY = 'lacuna.reading-tracker.books'
+const STATUSES: Status[] = ['To Read', 'Reading', 'Read']
+const STATUS_OPTIONS = STATUSES.map((s) => ({ value: s, label: s }))
+const FILTER_OPTIONS = [{ value: 'all', label: 'All' }, ...STATUS_OPTIONS]
 
-const STATUSES = ['To Read', 'Reading', 'Read', 'Dropped']
+function normalize(value: string): string {
+  return value.trim().toLowerCase()
+}
+
+function parseRating(raw: string): number | null {
+  const value = raw.trim()
+  if (value === '') return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
 
 export function App() {
-  const { state, actions } = useCollection<Book>({ storageKey: STORAGE_KEY })
-  const books = state.items.map((item) => ({ id: item.id, ...item.data }))
+  const { state, actions } = useCollection<Book>({ storageKey: 'reading-tracker/books' })
+  const books = state.activeItems.map((item) => item.data)
+  const bookId = (index: number) => state.activeItems[index].id
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [status, setStatus] = useState('To Read')
-  const [rating, setRating] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [view, setView] = useState<View>('Books')
 
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
-  const [sortAsc, setSortAsc] = useState(true)
+  const [draftTitle, setDraftTitle] = useState('')
+  const [draftAuthor, setDraftAuthor] = useState('')
+  const [draftStatus, setDraftStatus] = useState<Status>('To Read')
+  const [draftRating, setDraftRating] = useState('')
 
-  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editAuthor, setEditAuthor] = useState('')
-  const [editStatus, setEditStatus] = useState('To Read')
+  const [editStatus, setEditStatus] = useState<Status>('To Read')
   const [editRating, setEditRating] = useState('')
 
-  const onAdd = () => {
-    const t = title.trim()
-    const a = author.trim()
-    const r = rating.trim()
-    if (!t || !a) {
-      setError('Enter a title and an author')
-      return
-    }
-    if (r !== '' && !/^\d$/.test(r)) {
-      setError('Rating must be a single digit from 0 to 9')
-      return
-    }
-    setError(null)
-    actions.add({ title: t, author: a, status, rating: r })
-    setTitle('')
-    setAuthor('')
-    setStatus('To Read')
-    setRating('')
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [sortKey, setSortKey] = useState<SortKey>('title')
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const editingBook = editingIndex != null ? books[editingIndex] ?? null : null
+  const editingItemId = editingIndex != null ? bookId(editingIndex) : null
+
+  const parsedRating = parseRating(draftRating)
+  const addInvalid = !draftTitle.trim() || !draftAuthor.trim() || parsedRating === null
+
+  const visibleBooks = useMemo(() => {
+    const q = normalize(query)
+    const filtered = books.filter((b) => {
+      const matchesQuery = q === '' || normalize(b.title).includes(q) || normalize(b.author).includes(q)
+      const matchesStatus = statusFilter === 'all' || b.status === statusFilter
+      return matchesQuery && matchesStatus
+    })
+    const dir = sortDir === 'asc' ? 1 : -1
+    return [...filtered].sort((a, b) => {
+      const av = a[sortKey]
+      const bv = b[sortKey]
+      if (av == null && bv == null) return 0
+      if (av == null) return 1
+      if (bv == null) return -1
+      const cmp = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv))
+      return cmp * dir
+    })
+  }, [books, query, statusFilter, sortKey, sortDir])
+
+  function addBook() {
+    if (addInvalid) return
+    actions.add({
+      title: draftTitle.trim(),
+      author: draftAuthor.trim(),
+      status: draftStatus,
+      rating: parsedRating,
+    })
+    setDraftTitle('')
+    setDraftAuthor('')
+    setDraftStatus('To Read')
+    setDraftRating('')
   }
 
-  const startEdit = (book: Book & { id: string }) => {
-    setEditingId(book.id)
+  function startEdit(index: number) {
+    const book = books[index]
+    if (!book) return
+    setEditingIndex(index)
     setEditTitle(book.title)
     setEditAuthor(book.author)
     setEditStatus(book.status)
-    setEditRating(book.rating)
+    setEditRating(book.rating == null ? '' : String(book.rating))
   }
 
-  const onSaveEdit = () => {
-    if (editingId === null) return
-    const t = editTitle.trim()
-    const a = editAuthor.trim()
-    if (!t || !a) return
-    const r = editRating.trim()
-    actions.update(editingId, { title: t, author: a, status: editStatus, rating: r })
-    setEditingId(null)
+  function saveEdit() {
+    const rating = parseRating(editRating)
+    const title = editTitle.trim()
+    const author = editAuthor.trim()
+    if (editingItemId == null || title === '' || author === '') return
+    actions.update(editingItemId, { title, author, status: editStatus, rating })
+    setEditingIndex(null)
+    setEditTitle('')
+    setEditAuthor('')
+    setEditStatus('To Read')
+    setEditRating('')
   }
 
-  const onDelete = (id: string) => {
-    actions.remove(id)
+  function cancelEdit() {
+    setEditingIndex(null)
+    setEditTitle('')
+    setEditAuthor('')
+    setEditStatus('To Read')
+    setEditRating('')
   }
 
-  const onExport = () => {
-    const header = ['Title', 'Author', 'Status', 'Rating']
-    const rows = visible.map((b) => [b.title, b.author, b.status, b.rating])
-    const csv = toCsv([header, ...rows])
-    saveText(csv, { filename: 'reading-tracker.csv', mimeType: 'text/csv' })
+  function deleteBook(index: number) {
+    const book = books[index]
+    if (!book) return
+    actions.remove(bookId(index))
+    if (editingIndex === index) cancelEdit()
   }
 
-  const visible = useMemo(() => {
-    let items = books
-    if (search) {
-      const q = search.toLowerCase()
-      items = items.filter(
-        (b) =>
-          b.title.toLowerCase().includes(q) ||
-          b.author.toLowerCase().includes(q),
-      )
+  function toggleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      setSortDir('asc')
     }
-    if (statusFilter !== 'All') {
-      items = filterRecords(items, (b) => b.status === statusFilter)
-    }
-    return sortRecords(
-      items,
-      [{ field: 'title', direction: sortAsc ? 'asc' : 'desc' }],
-    )
-  }, [books, search, statusFilter, sortAsc])
-
-  const onSort = () => {
-    setSortAsc((prev) => !prev)
   }
 
-  const sortArrow = sortAsc ? ' \u2191' : ' \u2193'
+  function exportCsv() {
+    const rows: string[][] = [
+      ['title', 'author', 'status', 'rating'],
+      ...books.map((b) => [b.title, b.author, b.status, b.rating == null ? '' : String(b.rating)]),
+    ]
+    saveText(toCsv(rows), { filename: 'reading-tracker.csv', mimeType: 'text/csv' })
+  }
 
-  const hasBooks = books.length > 0
+  const readCount = books.filter((b) => b.status === 'Read').length
+  const readingCount = books.filter((b) => b.status === 'Reading').length
+  const toReadCount = books.filter((b) => b.status === 'To Read').length
+  const rated = books.filter((b) => b.rating != null)
+  const avgRating = rated.length > 0 ? (rated.reduce((s, b) => s + (b.rating ?? 0), 0) / rated.length).toFixed(1) : '—'
+
+  const sortArrow = (key: SortKey) => (sortKey === key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '')
+  const columns: { key: string; label: React.ReactNode; num?: boolean }[] = [
+    {
+      key: 'title',
+      label: (
+        <button type="button" className="rt-sort" onClick={() => toggleSort('title')}>
+          Title{sortArrow('title')}
+        </button>
+      ),
+    },
+    {
+      key: 'author',
+      label: (
+        <button type="button" className="rt-sort" onClick={() => toggleSort('author')}>
+          Author{sortArrow('author')}
+        </button>
+      ),
+    },
+    {
+      key: 'status',
+      label: (
+        <button type="button" className="rt-sort" onClick={() => toggleSort('status')}>
+          Status{sortArrow('status')}
+        </button>
+      ),
+    },
+    {
+      key: 'rating',
+      num: true,
+      label: (
+        <button type="button" className="rt-sort" onClick={() => toggleSort('rating')}>
+          Rating{sortArrow('rating')}
+        </button>
+      ),
+    },
+    { key: 'actions', label: '' },
+  ]
+
+  const rows = visibleBooks.map((b, i) => ({
+    cells: {
+      title: b.title,
+      author: b.author,
+      status: b.status,
+                rating: b.rating == null ? <Tag>Unrated</Tag> : String(b.rating),
+      actions: (
+        <span className="rt-row-actions">
+          <Button kind="ghost" onClick={() => startEdit(i)}>
+            Edit {b.title}
+          </Button>
+          <Button kind="danger" onClick={() => deleteBook(i)}>
+            Delete {b.title}
+          </Button>
+        </span>
+      ),
+    },
+  }))
 
   return (
     <AppShell
       name="Reading Tracker"
       icon="docs"
-      hue="rust"
+      hue="gold"
       category="Productivity"
-      meta={`${books.length} ${books.length === 1 ? 'book' : 'books'}`}
+      meta={`${books.length} book${books.length === 1 ? '' : 's'}`}
+      side={
+        <Rail title="Library">
+          <KpiRow>
+            <Kpi value={books.length} label="Books" />
+            <Kpi value={readCount} label="Read" />
+            <Kpi value={avgRating} label="Avg rating" accent />
+          </KpiRow>
+        </Rail>
+      }
     >
-      {editingId === null ? (
-        <Card mono="New" title="Add a book">
-          <FormGrid>
-            <TextInput label="Title" value={title} onChange={setTitle} error={error} placeholder="The Hobbit" />
-            <TextInput label="Author" value={author} onChange={setAuthor} placeholder="J. R. R. Tolkien" />
-            <Select label="Status" value={status} onChange={setStatus} options={STATUSES} />
-            <TextInput label="Rating" value={rating} onChange={setRating} type="number" inputMode="numeric" placeholder="0–9" />
-          </FormGrid>
-          <Actions>
-            <Button kind="primary" onClick={onAdd}>Add book</Button>
-          </Actions>
-        </Card>
-      ) : null}
+      <Actions>
+        <Button kind={view === 'Books' ? 'primary' : 'secondary'} onClick={() => setView('Books')}>
+          Books
+        </Button>
+        <Button kind={view === 'Stats' ? 'primary' : 'secondary'} onClick={() => setView('Stats')}>
+          Stats
+        </Button>
+      </Actions>
 
-      {editingId !== null ? (
-        <Card mono="Edit" title={`Edit book`}>
-          <FormGrid>
-            <TextInput label="Title" value={editTitle} onChange={setEditTitle} />
-            <TextInput label="Author" value={editAuthor} onChange={setEditAuthor} />
-            <Select label="Status" value={editStatus} onChange={setEditStatus} options={STATUSES} />
-            <TextInput label="Rating" value={editRating} onChange={setEditRating} type="number" inputMode="numeric" />
-          </FormGrid>
-          <Actions>
-            <Button kind="primary" onClick={onSaveEdit}>Save</Button>
-            <Button kind="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
-          </Actions>
-        </Card>
-      ) : null}
+      {view === 'Books' ? (
+        <>
+          <Card mono="Library" title="Books">
+            <FormGrid>
+              <TextInput label="Search" type="search" value={query} onChange={setQuery} />
+              {books.length > 0 && !editingBook && draftTitle === '' && draftAuthor === '' && (
+                <Select label="Status filter" value={statusFilter} onChange={setStatusFilter} options={FILTER_OPTIONS} />
+              )}
+              <Button kind="secondary" onClick={exportCsv} disabled={books.length === 0}>
+                Export CSV
+              </Button>
+            </FormGrid>
+            <Table columns={columns} rows={rows} label="Books" empty="No books yet" />
+          </Card>
 
-      <Card mono={`${visible.length} shown`} title="Books">
-        <FormGrid>
-          <TextInput label="Search" value={search} onChange={setSearch} type="search" placeholder="Search by title or author" />
-          {books.length >= 2 ? (
-            <Select label="Status filter" value={statusFilter} onChange={setStatusFilter} options={['All', ...STATUSES]} />
-          ) : null}
-        </FormGrid>
-        {!hasBooks ? (
-          <EmptyState mono="Empty" title="No books yet" detail="Add your first book above." actionLabel="Add a book" onAction={onAdd} />
-        ) : (
-          <Table
-            label="Books"
-            columns={[
-              {
-                key: 'title',
-                label: (
-                  <button type="button" onClick={onSort}>
-                    Title{sortArrow}
-                  </button>
-                ),
-              },
-              { key: 'author', label: 'Author' },
-              { key: 'status', label: 'Status' },
-              { key: 'rating', label: 'Rating', num: true },
-              { key: 'actions', label: '' },
-            ]}
-            rows={visible.map((b) => ({
-              cells: {
-                title: b.title,
-                author: b.author,
-                status: b.status,
-                rating: b.rating,
-                actions: (
-                  <>
-                    <Button kind="ghost" ariaLabel={`Edit ${b.title}`} onClick={() => startEdit(b)}>Edit</Button>
-                    <Button kind="ghost" ariaLabel={`Delete ${b.title}`} onClick={() => onDelete(b.id)}>Delete</Button>
-                  </>
-                ),
-              },
-            }))}
-            empty="No matching books"
-          />
-        )}
-        {hasBooks ? (
-          <Actions>
-            <Button kind="secondary" onClick={onExport}>Export CSV</Button>
-          </Actions>
-        ) : null}
-      </Card>
+          {!editingBook && (
+            <Card mono="Add" title="Add a book">
+              <FormGrid>
+                <TextInput label="Title" value={draftTitle} onChange={setDraftTitle} />
+                <TextInput label="Author" value={draftAuthor} onChange={setDraftAuthor} />
+                <Select label="Status" value={draftStatus} onChange={(v) => setDraftStatus(v as Status)} options={STATUS_OPTIONS} />
+                <TextInput label="Rating" type="number" inputMode="decimal" value={draftRating} onChange={setDraftRating} />
+              </FormGrid>
+              <Actions>
+                <PrimaryButton onClick={addBook} disabled={addInvalid}>
+                  Add book
+                </PrimaryButton>
+              </Actions>
+            </Card>
+          )}
+
+          {editingBook && (
+            <Card mono="Edit" title={`Edit ${editingBook.title}`} accent>
+              <FormGrid>
+                <TextInput label="Title" value={editTitle} onChange={setEditTitle} />
+                <TextInput label="Author" value={editAuthor} onChange={setEditAuthor} />
+                <Select label="Status" value={editStatus} onChange={(v) => setEditStatus(v as Status)} options={STATUS_OPTIONS} />
+                <TextInput label="Rating" type="number" inputMode="decimal" value={editRating} onChange={setEditRating} />
+              </FormGrid>
+              <Actions>
+                <PrimaryButton onClick={saveEdit}>Save</PrimaryButton>
+                <Button kind="ghost" onClick={cancelEdit}>
+                  Cancel
+                </Button>
+              </Actions>
+            </Card>
+          )}
+
+        </>
+      ) : (
+        <Card mono="Stats" title="Your library at a glance">
+          <KpiRow>
+            <Kpi value={books.length} label="Books" />
+            <Kpi value={readCount} label="Read" accent />
+            <Kpi value={readingCount} label="Reading" />
+            <Kpi value={toReadCount} label="To read" />
+            <Kpi value={avgRating} label="Avg rating" />
+          </KpiRow>
+          <SectionLabel>By status</SectionLabel>
+          {STATUSES.map((s) => (
+            <div key={s} className="lc-stat-row">
+              <span className="rt-stat-key">{s}</span>
+              <span className="lc-mono">{books.filter((b) => b.status === s).length}</span>
+            </div>
+          ))}
+        </Card>
+      )}
     </AppShell>
   )
 }

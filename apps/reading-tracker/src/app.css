@@ -1,0 +1,37 @@
+/* App-specific layout. The kit owns the visual language; this file only adds
+   structure that the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+.rt-sort {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.rt-sort:hover {
+  color: var(--ink);
+}
+
+.rt-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap) / 4);
+  justify-content: flex-end;
+}
+
+.rt-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--gap) / 2);
+  padding: calc(6px * var(--sf)) 0;
+  border-top: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.rt-stat-key {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-80);
+}
