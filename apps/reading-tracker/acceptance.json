@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "3c7fef83b17daf945309e926cff38f485bb960c690020253ae1cd796c8d6175f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Reading Tracker\" and, with no records, the text \"No books yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Dune\" in the field labelled \"Title\", \"Frank Herbert\" in the field labelled \"Author\", selecting \"Read\" in the select labelled \"Status\", typing \"5\" in the field labelled \"Rating\", and clicking the button \"Add book\" adds a row to the table containing \"Dune\", \"Frank Herbert\", \"Read\", and \"5\"; the text \"No books yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second book with Title \"Neuromancer\", Author \"William Gibson\", Status \"To Read\", and Rating \"4\", the table shows two rows; clicking the header \"Title\" sorts the rows so \"Dune\" appears before \"Neuromancer\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Dun\" in the search box labelled \"Search\" filters the table to show only the row containing \"Dune\" and hides the row containing \"Neuromancer\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Edit Dune\" opens a form pre-filled with \"Dune\" and \"Frank Herbert\"; changing the field labelled \"Rating\" to \"4\" and clicking \"Save\" updates the table row for \"Dune\" to show \"4\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete Dune\" removes that row from the table; the table now shows only \"Neuromancer\"."
+    },
+    {
+      "id": "A7",
+      "text": "Selecting \"To Read\" in the filter labelled \"Status filter\" shows only rows where the Status column reads \"To Read\"; selecting \"All\" shows all rows again."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose content includes the line \"Dune,Frank Herbert,Read,5\" (or the current state of the records)."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the book \"Dune\" with author \"Frank Herbert\" and status \"Read\" visible in the table after a page reload."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "570c7ca4743e5f48ef39c4be1b4dbf310e98ee7230b458d0d158a3a4b39b1ef3"
+    }
+  ]
+}
