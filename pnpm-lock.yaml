@@ -144,6 +144,58 @@ importers:
         specifier: ^6.2.0
         version: 6.4.5
 
+  apps/birthday-reminder:
+    dependencies:
+      '@lacuna/csv-parse':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/csv-parse/0.1.0
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/date-picker/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
+      '@lacuna/file-save-open':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/file-save-open/0.1.0
+      '@lacuna/heatmap':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/heatmap/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      '@lacuna/use-reminder':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-reminder/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/bmi-calculator:
     dependencies:
       '@lacuna/export-menu':
