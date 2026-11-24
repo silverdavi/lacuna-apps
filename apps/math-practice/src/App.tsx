@@ -136,11 +136,19 @@ export function App() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [answers, setAnswers] = useState<Record<number, Answer>>({})
   const [history, setHistory] = useState<HistoryEntry[]>(() => historyStore.list())
-  const [printMode, setPrintMode] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [lastChecked, setLastChecked] = useState<number | null>(null)
 
-  const answeredCount = Object.values(answers).filter((a) => a.checked).length
-  const sessionComplete = questions.length > 0 && answeredCount === questions.length
+  // The Study panel walks question 1..N in order, showing exactly one
+  // question's answer box at a time. Each "Check" records the status for the
+  // current question and advances to the next. The session is complete once
+  // every question has been checked.
+  const currentIndex = (() => {
+    for (let i = 0; i < questions.length; i += 1) {
+      if (!answers[i]?.checked) return i
+    }
+    return questions.length - 1
+  })()
+  const sessionComplete = questions.length > 0 && Object.values(answers).filter((a) => a.checked).length === questions.length
   const disabledTabs = !sessionComplete ? (['Results'] as Tab[]) : []
 
   function generate() {
@@ -156,55 +164,48 @@ export function App() {
       }
       attempts += 1
     }
-    setQuestions(next)
-    setAnswers({})
-    setPrintMode(false)
-    setCurrentIndex(0)
+      setQuestions(next)
+      setAnswers({})
+      setLastChecked(null)
+      setTab('Generate')
   }
 
-  function setAnswer(index: number, value: string) {
+  function setAnswer(value: string) {
     setAnswers((prev) => ({
       ...prev,
-      [index]: { value, checked: prev[index]?.checked ?? false, correct: prev[index]?.correct ?? null },
+      [currentIndex]: { value, checked: false, correct: null },
     }))
   }
 
-  function check(index: number) {
-    const q = questions[index]
+  function check() {
+    const q = questions[currentIndex]
     if (!q) return
+    const idx = currentIndex
     setAnswers((prev) => {
-      const existing = prev[index] ?? { value: '', checked: false, correct: null }
+      const existing = prev[idx] ?? { value: '', checked: false, correct: null }
       const correct = Number(existing.value) === correctAnswer(q, operation)
-      const next = { ...prev, [index]: { value: existing.value, checked: true, correct } }
-      const checkedCount = Object.values(next).filter((a) => a.checked).length
-      if (checkedCount === questions.length) {
-        const score = questions.filter((_, i) => next[i]?.correct).length
+      const next = { ...prev, [idx]: { value: existing.value, checked: true, correct } }
+      if (idx === questions.length - 1) {
+        const score = Object.values(next).filter((a) => a.correct).length
         const entry: HistoryEntry = {
           id: `${Date.now()}`,
           date: new Date().toISOString(),
           count: questions.length,
           score,
         }
-        setHistory((hist) => {
-          const updated = [entry, ...hist]
-          historyStore.replaceAll(updated)
-          return updated
-        })
+        const updated = [entry, ...history]
+        historyStore.replaceAll(updated)
+        setHistory(updated)
       }
       return next
     })
-  }
-
-  function advance() {
-    setCurrentIndex((i) => Math.min(i + 1, questions.length - 1))
+    setLastChecked(idx)
   }
 
   function removeEntry(id: string) {
-    setHistory((prev) => {
-      const next = prev.filter((e) => e.id !== id)
-      historyStore.replaceAll(next)
-      return next
-    })
+    const next = history.filter((e) => e.id !== id)
+    setHistory(next)
+    historyStore.replaceAll(next)
   }
 
   function changeDifficulty(nextDifficulty: Difficulty) {
@@ -217,15 +218,27 @@ export function App() {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   }
 
-  const correctCount = questions.filter((_, i) => answers[i]?.correct).length
+  function openPrintSheet() {
+    const qs = questions.map((q) => `<li>${q.text}</li>`).join('')
+    const html = `<html><head><meta charset="utf-8"><title>Math Practice</title></head><body><h1>Math Practice</h1><ul>${qs}</ul></body></html>`
+    const w = window.open('', '_blank')
+    if (w) {
+      w.document.open()
+      w.document.write(html)
+      w.document.close()
+    }
+  }
 
   const resultRows = questions.map((q, i) => {
     const a = answers[i]
+    const answered = Boolean(a?.checked)
+    const correct = answered && Boolean(a?.correct)
+    const shown = answered ? (a.value !== '' ? a.value : String(correctAnswer(q, operation))) : ''
     return {
       cells: {
         q: q.text,
-        ans: a ? a.value : '',
-        status: a?.correct ? 'Correct' : 'Incorrect',
+        ans: shown,
+        status: answered ? (correct ? 'Correct' : 'Incorrect') : '',
       },
     }
   })
@@ -240,8 +253,8 @@ export function App() {
     >
       <AppTabs active={tab} disabled={disabledTabs} onSelect={setTab} />
 
-      {tab === 'Generate' && (
-        <Stack>
+      <Stack>
+        {(tab === 'Generate' || tab === 'Settings') && (
           <Card mono="Set up" title="New practice set">
             <FormGrid>
               <Select
@@ -262,13 +275,15 @@ export function App() {
               <PrimaryButton onClick={generate}>Generate</PrimaryButton>
             </Actions>
           </Card>
+        )}
 
+        {tab === 'Generate' && (
           <Card
             mono="Preview"
             title="Generated questions"
             actions={
               questions.length > 0 ? (
-                <Button kind="secondary" onClick={() => setPrintMode(true)}>
+                <Button kind="secondary" onClick={openPrintSheet}>
                   Print Sheet
                 </Button>
               ) : undefined
@@ -281,7 +296,7 @@ export function App() {
                 detail="Set the operation and count, then click Generate."
                 actionLabel="Generate a set"
               />
-            ) : printMode ? null : (
+            ) : (
               <List label="Questions">
                 {questions.map((q, i) => (
                   <Row key={i} title={q.text} />
@@ -289,32 +304,11 @@ export function App() {
               </List>
             )}
           </Card>
+        )}
 
-          {printMode && (
-            <Card mono="Print" title="Print sheet">
-              <Stack>
-                <div style={{ fontSize: '1.25rem', fontWeight: 600 }}>Math Practice</div>
-                <List label="Questions to print">
-                  {questions.map((q, i) => (
-                    <Row key={i} title={q.text} />
-                  ))}
-                </List>
-                <Actions>
-                  <PrimaryButton onClick={() => window.print()}>Print</PrimaryButton>
-                  <Button kind="ghost" onClick={() => setPrintMode(false)}>
-                    Close
-                  </Button>
-                </Actions>
-              </Stack>
-            </Card>
-          )}
-        </Stack>
-      )}
-
-      {tab === 'Study' && (
-        <Stack>
+        {tab === 'Study' && (
           <Card
-            mono={questions.length > 0 ? `${answeredCount} of ${questions.length} answered` : 'Session'}
+            mono={questions.length > 0 ? 'Study session' : 'Session'}
             title="Study session"
           >
             {questions.length === 0 ? (
@@ -333,61 +327,31 @@ export function App() {
                     </li>
                   ))}
                 </List>
-                <Stack style={{ gap: '10px' }}>
-                  {questions.slice(0, currentIndex + 1).map((q, i) => {
-                    const a = answers[i]
-                    const isCurrent = i === currentIndex
-                    const checked = a?.checked && a.correct != null
-                    return (
-                      <Card key={i} mono={`Question ${i + 1}`} title={q.text}>
-                        <FormGrid>
-                          <TextInput
-                            label="Answer"
-                            type="number"
-                            value={a?.value ?? ''}
-                            onChange={(v) => setAnswer(i, v)}
-                            placeholder="Your answer"
-                          />
-                        </FormGrid>
-                        {checked && (
-                          <div role="status" style={{ fontWeight: 600 }}>
-                            {a.correct ? 'Correct' : 'Incorrect'}
-                          </div>
-                        )}
-                        {isCurrent && (
-                          <Actions>
-                            <PrimaryButton onClick={() => check(i)}>Check</PrimaryButton>
-                            <Button kind="secondary" onClick={() => advance()}>
-                              Next
-                            </Button>
-                          </Actions>
-                        )}
-                      </Card>
-                    )
-                  })}
-                </Stack>
-                {sessionComplete && (
-                  <List label="Session record">
-                    <Row
-                      title={dateLabel(new Date().toISOString())}
-                      meta={`${questions.length} questions`}
-                      value={`${correctCount}/${questions.length}`}
-                      action={
-                        <Button kind="ghost" ariaLabel="Delete session" onClick={() => {}}>
-                          Delete
-                        </Button>
-                      }
+                <Card mono={`Question ${currentIndex + 1}`} title={questions[currentIndex].text}>
+                  <FormGrid>
+                    <TextInput
+                      label="Answer"
+                      type="number"
+                      value={answers[currentIndex]?.value ?? ''}
+                      onChange={setAnswer}
+                      placeholder="Your answer"
                     />
-                  </List>
-                )}
+                  </FormGrid>
+                  {lastChecked != null && answers[lastChecked]?.checked && answers[lastChecked]?.correct != null && (
+                    <div role="status" style={{ fontWeight: 600 }}>
+                      {answers[lastChecked].correct ? 'Correct' : 'Incorrect'}
+                    </div>
+                  )}
+                  <Actions>
+                    <PrimaryButton onClick={check}>Check</PrimaryButton>
+                  </Actions>
+                </Card>
               </Stack>
             )}
           </Card>
-        </Stack>
-      )}
+        )}
 
-      {tab === 'Results' && (
-        <Stack>
+        {tab === 'Results' && (
           <Card mono="Summary" title="Results">
             {questions.length === 0 ? (
               <EmptyState
@@ -399,8 +363,15 @@ export function App() {
             ) : (
               <Stack>
                 <div style={{ fontWeight: 600 }}>
-                  Score: {correctCount}/{questions.length}
+                  Score: {Object.values(answers).filter((a) => a.correct).length}/{questions.length}
                 </div>
+                <List label="Questions">
+                  {questions.map((q, i) => (
+                    <li key={i} style={{ margin: 0 }}>
+                      {q.text}
+                    </li>
+                  ))}
+                </List>
                 <Table
                   label="Question results"
                   columns={[
@@ -413,11 +384,9 @@ export function App() {
               </Stack>
             )}
           </Card>
-        </Stack>
-      )}
+        )}
 
-      {tab === 'History' && (
-        <Stack>
+        {tab === 'History' && (
           <Card
             mono={`${history.length} ${history.length === 1 ? 'entry' : 'entries'}`}
             title="Session history"
@@ -432,26 +401,19 @@ export function App() {
             ) : (
               <List label="Sessions">
                 {history.map((e) => (
-                  <Row
-                    key={e.id}
-                    title={dateLabel(e.date)}
-                    meta={`${e.count} questions`}
-                    value={`${e.score}/${e.count}`}
-                    action={
-                      <Button kind="ghost" ariaLabel="Delete session" onClick={() => removeEntry(e.id)}>
-                        Delete
-                      </Button>
-                    }
-                  />
+                  <li key={e.id}>
+                    {dateLabel(e.date)} {e.count} questions {e.score}/{e.count}{' '}
+                    <Button kind="ghost" ariaLabel="Delete session" onClick={() => removeEntry(e.id)}>
+                      Delete
+                    </Button>
+                  </li>
                 ))}
               </List>
             )}
           </Card>
-        </Stack>
-      )}
+        )}
 
-      {tab === 'Settings' && (
-        <Stack>
+        {tab === 'Settings' && (
           <Card mono="Preferences" title="Difficulty">
             <FormGrid>
               <Select
@@ -465,8 +427,8 @@ export function App() {
               Easy keeps operands at or below 10. Hard pushes them above 20.
             </p>
           </Card>
-        </Stack>
-      )}
+        )}
+      </Stack>
     </AppShell>
   )
 }
