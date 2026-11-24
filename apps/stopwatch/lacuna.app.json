@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.stopwatch",
+  "name": "Stopwatch App",
+  "version": "0.1.0",
+  "summary": "A stopwatch with laps.",
+  "description": "Tracks elapsed time with centisecond precision, records laps, and persists state across reloads.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/stopwatch",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:stopwatch"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "stopwatch",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own stopwatch records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "stopwatch"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

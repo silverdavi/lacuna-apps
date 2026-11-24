@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a42f6a1761f4926a532e35b9c8ca91ae6d5782ea8e762d58c709a7a6608004c3",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Stopwatch App\" and the text \"0:00.00\" in the time display."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Start\" changes the button label to \"Stop\" and the time display begins counting up; after waiting 2 seconds, the time display shows a value greater than \"1:50.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "While the timer is running, clicking the button \"Lap\" adds a list item that contains \"Lap 1\" and a duration string matching the pattern `\\d+:\\d{2}\\.\\d{2}`."
+    },
+    {
+      "id": "A4",
+      "text": "After clicking \"Lap\" once, clicking \"Lap\" again adds a second list item containing \"Lap 2\" and a duration string; the list now contains two items."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Stop\" changes the button label to \"Start\" and the time display stops incrementing; the displayed time remains constant for 2 seconds."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Reset\" clears the time display to \"0:00.00\" and removes all lap list items, showing the text \"No laps yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding two laps and reloading the page, the lap list still contains items with \"Lap 1\" and \"Lap 2\" and their original duration strings."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Copy laps\" copies the lap list to the clipboard; the clipboard content contains \"Lap 1\" and \"Lap 2\" with their durations."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the lap list: after adding a lap and reloading, the list item with \"Lap 1\" and its duration string is still visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1308eaf554f785f95ca9311cf495b983006c4a6dffb4b11594ac2f377ac17251"
+    }
+  ]
+}
