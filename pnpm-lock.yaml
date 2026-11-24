@@ -1531,6 +1531,9 @@ importers:
       '@lacuna/markdown-to-html':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/markdown-to-html/0.1.0
+      '@lacuna/markdown-view':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/markdown-view/0.1.0
       '@lacuna/passphrase-crypto':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/passphrase-crypto/0.1.0

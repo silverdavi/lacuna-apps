@@ -12,6 +12,7 @@
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/json-backup": "workspace:0.1.0",
     "@lacuna/markdown-to-html": "workspace:0.1.0",
+    "@lacuna/markdown-view": "workspace:0.1.0",
     "@lacuna/passphrase-crypto": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
     "react": "^19.0.0",

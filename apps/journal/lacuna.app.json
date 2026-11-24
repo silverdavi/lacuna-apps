@@ -36,6 +36,7 @@
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/json-backup": "0.1.0",
       "@lacuna/markdown-to-html": "0.1.0",
+      "@lacuna/markdown-view": "0.1.0",
       "@lacuna/passphrase-crypto": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0"
@@ -80,6 +81,7 @@
   },
   "quality": {
     "tests": [
+      "tests/00-readonly-matcher.spec.ts",
       "tests/acceptance.spec.ts"
     ],
     "themeMatrix": true,

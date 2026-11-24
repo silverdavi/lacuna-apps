@@ -1,6 +1,6 @@
-import { entryStore, type EntryDoc, type EncryptedPayload } from './mock'
+import { entryStore, historyStore, type EntryDoc, type EncryptedPayload, type Snapshot } from './mock'
 
-export { entryStore, type EntryDoc, type EncryptedPayload }
+export { entryStore, historyStore, type EntryDoc, type EncryptedPayload, type Snapshot }
 
 export function loadEntry(): { plaintext: string | null; encrypted: unknown } {
   return entryStore.get()

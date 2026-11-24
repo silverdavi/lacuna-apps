@@ -1,4 +1,4 @@
-import { createMockValue } from '@lacuna/host-mock'
+import { createMockRecordStore, createMockValue } from '@lacuna/host-mock'
 
 export interface EncryptedPayload {
   salt: string
@@ -12,10 +12,18 @@ export interface EntryDoc {
   plaintext: string | null
   encrypted: EncryptedPayload | null
   /** Present when an empty entry was locked, so the passphrase can still be verified on unlock. */
-  lockMarker?: string | null
+  lockMarker?: EncryptedPayload | null
+}
+
+export interface Snapshot {
+  id: string
+  date: string
+  text: string
+  savedAt: number
 }
 
 export const ENTRY_KEY = 'lacuna.journal.mock.entry.v1'
+export const HISTORY_KEY = 'lacuna.journal.mock.history.v1'
 
 function isPayload(v: unknown): v is EncryptedPayload {
   const p = v as {
@@ -41,7 +49,19 @@ function isDoc(v: unknown): v is EntryDoc {
     d !== null &&
     (d.plaintext === null || typeof d.plaintext === 'string') &&
     (d.encrypted === null || isPayload(d.encrypted)) &&
-    (m === undefined || m === null || typeof m === 'string')
+    (m === undefined || m === null || isPayload(m))
+  )
+}
+
+function isSnapshot(v: unknown): v is Snapshot {
+  const s = v as { id?: unknown; date?: unknown; text?: unknown; savedAt?: unknown }
+  return (
+    typeof s === 'object' &&
+    s !== null &&
+    typeof s.id === 'string' &&
+    typeof s.date === 'string' &&
+    typeof s.text === 'string' &&
+    typeof s.savedAt === 'number'
   )
 }
 
@@ -49,4 +69,10 @@ export const entryStore = createMockValue<EntryDoc>({
   key: ENTRY_KEY,
   fallback: { plaintext: '', encrypted: null },
   validate: isDoc,
+})
+
+export const historyStore = createMockRecordStore<Snapshot>({
+  key: HISTORY_KEY,
+  idPrefix: 'snap',
+  validate: isSnapshot,
 })
