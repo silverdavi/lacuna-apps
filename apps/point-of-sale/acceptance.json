@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "db6b42b21306936461a272cb0b48853fbd2a2a91be281f12a7ce21157d9d2f60",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Point of Sale\" and two tabs labelled \"Sales\" and \"Inventory\". The \"Sales\" tab is active by default and shows a table with columns \"ID\", \"Date\", \"Items\", \"Total\", and \"Actions\"."
+    },
+    {
+      "id": "A2",
+      "text": "On the \"Sales\" tab, clicking the button \"New sale\" opens a form with fields labelled \"Item\", \"Quantity\", \"Unit price\", \"Discount\", and \"Tax rate\". Selecting \"Widget\" from the \"Item\" field, typing \"2\" in \"Quantity\", \"10.00\" in \"Unit price\", \"5\" in \"Discount\", and \"10\" in \"Tax rate\", then clicking \"Add line\" adds a line item row showing \"Widget\", \"2\", \"$10.00\", \"-$5.00\", and \"$1.90\". The subtotal shows \"$13.90\" and the total shows \"$15.80\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the line item from A2, clicking \"Save sale\" closes the form and adds a row to the sales table with ID \"S-001\", Date \"2024-01-15\", Items \"1\", Total \"$15.80\", and a button \"View\". The text \"No sales yet\" is gone."
+    },
+    {
+      "id": "A4",
+      "text": "On the \"Inventory\" tab, the table shows columns \"Name\", \"Stock\", \"Price\", and \"Actions\". Clicking the button \"Add item\" opens a form with fields \"Name\", \"Stock\", and \"Price\". Typing \"Widget\" in \"Name\", \"100\" in \"Stock\", and \"10.00\" in \"Price\", then clicking \"Save\" adds a row containing \"Widget\", \"100\", and \"$10.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "On the \"Inventory\" tab, with \"Widget\" in stock 100, clicking the \"Edit\" button on the Widget row opens a form pre-filled with \"Widget\", \"100\", and \"10.00\". Changing \"Stock\" to \"85\" and clicking \"Save\" updates the row to show \"85\"."
+    },
+    {
+      "id": "A6",
+      "text": "On the \"Sales\" tab, with sale S-001 present, clicking the \"View\" button on that row shows a detail panel with the line item \"Widget\", quantity \"2\", unit price \"$10.00\", discount \"-$5.00\", tax \"$1.90\", subtotal \"$13.90\", and total \"$15.80\"."
+    },
+    {
+      "id": "A7",
+      "text": "On the \"Inventory\" tab, typing \"Wid\" in the search field labelled \"Search\" filters the table to show only the row containing \"Widget\". Clearing the search field shows all rows again."
+    },
+    {
+      "id": "A8",
+      "text": "On the \"Sales\" tab, clicking the button \"Export CSV\" downloads a file containing the header \"ID,Date,Items,Total\" and the row \"S-001,2024-01-15,1,15.80\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the sale: after saving sale S-001 from A3, reloading the page still shows the row with ID \"S-001\" and Total \"$15.80\" in the sales table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "48284910b3232e5eb90724df894227f0d75b11f5b07ec1ce2a01fe3074954418"
+    }
+  ]
+}
