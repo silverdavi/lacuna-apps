@@ -23,41 +23,32 @@ export function App() {
   const [running, setRunning] = useState(false)
   const [task, setTask] = useState('')
   const [elapsedMs, setElapsedMs] = useState(0)
-  const runningRef = useRef(false)
-  const startRef = useRef(0)
-  const rafRef = useRef<number>(0)
+
+  // Elapsed is measured with performance.now(), which the page clock (real or
+  // mocked) drives. startStampRef holds the moment the timer started; accumulated
+  // holds time banked across pause/resume. This matches the shared timer pattern.
+  const startStampRef = useRef(0)
+  const accumulatedRef = useRef(0)
 
   useEffect(() => {
-    if (!running) {
-      runningRef.current = false
-      cancelAnimationFrame(rafRef.current)
-      return
-    }
-    runningRef.current = true
-    setElapsedMs(0)
-    startRef.current = performance.now()
-    const tick = () => {
-      if (!runningRef.current) return
-      setElapsedMs(performance.now() - startRef.current)
-      rafRef.current = requestAnimationFrame(tick)
-    }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => {
-      runningRef.current = false
-      cancelAnimationFrame(rafRef.current)
-    }
+    if (!running) return
+    startStampRef.current = performance.now()
+    const id = window.setInterval(() => {
+      setElapsedMs(accumulatedRef.current + (performance.now() - startStampRef.current))
+    }, 50)
+    return () => window.clearInterval(id)
   }, [running])
 
   const totalMs = sessions.reduce((sum, s) => sum + s.durationMs, 0)
 
   function start() {
+    accumulatedRef.current = 0
+    setElapsedMs(0)
     setRunning(true)
   }
 
   function stop() {
-    // elapsedMs is the last driven tick, so stop reads the live value rather
-    // than re-deriving it from the (possibly paused) clock at click time.
-    const durationMs = Math.round(elapsedMs)
+    const durationMs = Math.round(accumulatedRef.current + (performance.now() - startStampRef.current))
     setRunning(false)
     setElapsedMs(0)
     if (durationMs > 0) {
