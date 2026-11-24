@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "com.example.json-formatter",
+  "id": "lacuna.json-formatter",
   "name": "JSON Formatter",
   "version": "0.1.0",
   "summary": "Format and validate JSON.",
@@ -16,9 +16,9 @@
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "contact": "apps@lacunaos.com"
   },
   "pricing": {
     "model": "free",

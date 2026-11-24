@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import type { ChangeEvent, CSSProperties } from 'react'
 import {
   AppShell,
   Body,
@@ -8,9 +7,11 @@ import {
   EmptyState,
   List,
   PrimaryButton,
+  Rail,
   Row,
   Stack,
 } from '@lacuna/ui'
+import { CodeArea } from '@lacuna/code-area'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { addHistory, clearHistory, listHistory, workspaceStore, type HistoryEntry } from './host/mock'
 
@@ -20,10 +21,6 @@ interface ParseResult {
   error?: string
 }
 
-// V8's message for a truncated object (e.g. `{"name":"Alice"`) is
-// "Expected ',' or '}' after property value ...", but the spec (and older
-// engines) phrase a cut-off JSON document as "Unexpected end of JSON input".
-// Normalise the truncated-object / truncated-stream forms to that wording.
 function normalizeParseError(message: string, text: string): string {
   const truncated = !/\}\s*$|\]\s*$/.test(text.trimEnd())
   if (truncated && /^(Expected ','|Expected property name|Unexpected end of JSON input)/.test(message)) {
@@ -61,24 +58,6 @@ function validateJson(text: string): { ok: boolean; problem?: string } {
   return { ok: true }
 }
 
-function cx(...parts: (string | false | null | undefined)[]): string {
-  return parts.filter(Boolean).join(' ')
-}
-
-const EDITOR_STYLE: CSSProperties = {
-  fontFamily: 'var(--mono)',
-  fontSize: 'calc(14px * var(--tf))',
-  lineHeight: 'calc(20px * var(--tf))',
-  background: 'var(--paper)',
-  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-  borderRadius: 'calc(4px * var(--sf))',
-  padding: 'calc(8px * var(--sf)) calc(10px * var(--sf))',
-  color: 'var(--ink)',
-  boxSizing: 'border-box',
-  width: '100%',
-  minHeight: 'calc(120px * var(--sf))',
-}
-
 export function App() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
@@ -86,6 +65,7 @@ export function App() {
   const [validation, setValidation] = useState<{ ok: boolean; problem?: string } | null>(null)
   const [history, setHistory] = useState<HistoryEntry[]>(() => listHistory())
   const [tab, setTab] = useState('Tool')
+  const [toast, setToast] = useState<string | null>(null)
   const { copied, copy, reset } = useClipboard({ timeoutMs: 4000 })
 
   useEffect(() => {
@@ -98,11 +78,13 @@ export function App() {
     workspaceStore.set({ input, output })
   }, [input, output])
 
-  const hasInput = input.trim() !== ''
+  useEffect(() => {
+    if (toast === null) return
+    const id = window.setTimeout(() => setToast(null), 3000)
+    return () => window.clearTimeout(id)
+  }, [toast])
 
-  function onInputChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setInput(event.target.value)
-  }
+  const hasInput = input.trim() !== ''
 
   function formatJson() {
     const result = parseJson(input)
@@ -112,6 +94,7 @@ export function App() {
       setValidation(null)
       addHistory({ input: input.trim(), formatted: result.formatted })
       setHistory(listHistory())
+      setToast('Saved to history')
     } else if (result.error !== undefined) {
       setOutput('')
       setParseError(`Invalid JSON: ${result.error}`)
@@ -154,13 +137,37 @@ export function App() {
     return inputText.length > 80 ? `${inputText.slice(0, 80)}…` : inputText
   }
 
+  const inputLines = input === '' ? 0 : input.split('\n').length
+  const outputLines = output === '' ? 0 : output.split('\n').length
+
+  const sideChips = [
+    `${history.length} ${history.length === 1 ? 'snippet' : 'snippets'} in history`,
+    `${inputLines} input line${inputLines === 1 ? '' : 's'}`,
+    `${outputLines} output line${outputLines === 1 ? '' : 's'}`,
+  ]
+
+  const shellStatus = copied
+    ? 'Copied to clipboard'
+    : toast !== null
+      ? toast
+      : parseError !== null
+        ? 'Parse error'
+        : validation !== null && !validation.ok
+          ? 'Validation failed'
+          : undefined
+
   return (
     <AppShell
       name="JSON Formatter"
       icon="docs"
       hue="cobalt"
       category="Productivity"
-      status={copied ? 'Copied to clipboard' : undefined}
+      status={shellStatus}
+      side={
+        <Rail title="Session" chips={sideChips}>
+          <Body sm>Paste JSON, format it to one-space indents, validate it, and copy the result. Snippets are kept on this device in the history.</Body>
+        </Rail>
+      }
     >
       <div className="lc-tabs" role="tablist" aria-label="Sections">
         {(['Tool', 'History'] as const).map((item) => (
@@ -169,7 +176,7 @@ export function App() {
             type="button"
             role="tab"
             aria-selected={tab === item}
-            className={cx('lc-tab', 'jf-tab', tab === item && 'active')}
+            className={'lc-tab jf-tab' + (tab === item ? ' active' : '')}
             onClick={() => setTab(item)}
           >
             {item}
@@ -181,27 +188,23 @@ export function App() {
         <Stack>
           <Card title="Formatter">
             <Stack>
-              <label className="lc-field-label" htmlFor="jf-input">
-                Input JSON
-              </label>
-              <textarea
-                id="jf-input"
-                className="lc-input"
+              <label className="lc-field-label">Input JSON</label>
+              <CodeArea
+                ariaLabel="Input JSON"
+                language="json"
                 value={input}
-                onChange={onInputChange}
-                spellCheck={false}
-                style={EDITOR_STYLE}
+                onChange={(v) => {
+                  setInput(v)
+                  if (parseError !== null) setParseError(null)
+                  if (validation !== null) setValidation(null)
+                }}
               />
-              <label className="lc-field-label" htmlFor="jf-output">
-                Output JSON
-              </label>
-              <textarea
-                id="jf-output"
-                className="lc-input"
+              <label className="lc-field-label">Output JSON</label>
+              <CodeArea
+                ariaLabel="Output JSON"
+                language="json"
                 value={output}
                 readOnly
-                spellCheck={false}
-                style={EDITOR_STYLE}
               />
               {parseError !== null && <Body>{parseError}</Body>}
               {validation !== null && !validation.ok && validation.problem !== 'Invalid JSON' && (
@@ -223,7 +226,10 @@ export function App() {
                 <Button
                   kind="secondary"
                   ariaLabel="Copy Output"
-                  onClick={() => void copy(output !== '' ? output : input)}
+                  onClick={() => {
+                    void copy(output !== '' ? output : input)
+                    reset()
+                  }}
                 >
                   {copied ? 'Copied' : 'Copy'}
                 </Button>
