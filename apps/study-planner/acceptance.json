@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "89e857b5c0619697ca8e57e1773bd9349f65a088d0a39ccddf028b7c414b5777",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Study Planner\" and the tab buttons \"Month\" and \"Week\", with \"Month\" active by default."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New session\" opens a form; filling \"Subject\" with \"Math\", \"Date\" with \"2024-05-15\", \"Start time\" with \"14:00\", \"Duration\" with \"60\", and clicking \"Save\" adds a session to the calendar grid for May 15, 2024, displaying \"Math 14:00-15:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the session \"Math 14:00-15:00\" on the calendar opens a detail view; clicking the button \"Mark done\" changes the session status to \"Done\" and displays a checkmark icon next to the session title."
+    },
+    {
+      "id": "A4",
+      "text": "In the session detail view, clicking the button \"Delete\" removes the session from the calendar; the grid for May 15, 2024, no longer displays \"Math 14:00-15:00\"."
+    },
+    {
+      "id": "A5",
+      "text": "Switching to the \"Week\" tab displays a weekly grid; the session \"Math 14:00-15:00\" created on 2024-05-15 appears in the column for Monday, May 13, 2024, to Sunday, May 19, 2024."
+    },
+    {
+      "id": "A6",
+      "text": "Creating a session with \"Subject\" \"History\", \"Date\" \"2024-05-16\", \"Start time\" \"10:00\", \"Duration\" \"90\", and checking \"Repeat weekly\" creates a session on May 16 and automatically creates a recurring session on May 23, 2024, at 10:00-11:30."
+    },
+    {
+      "id": "A7",
+      "text": "The button \"Export ICS\" copies an ICS file content to the clipboard; the clipboard text contains \"BEGIN:VEVENT\" and \"SUMMARY:Math\"."
+    },
+    {
+      "id": "A8",
+      "text": "The progress summary at the top shows \"Completed: 1 of 2\" after marking one of two sessions as done."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the session \"Math 14:00-15:00\" visible on the May 15, 2024, calendar grid and the progress summary \"Completed: 1 of 2\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d36b9bcf19fe54ed9857ef10de09de03080d992f0e234d51f8b0f50dacee1937"
+    }
+  ]
+}

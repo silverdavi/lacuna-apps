@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.study-planner",
+  "name": "Study Planner",
+  "version": "0.1.0",
+  "summary": "Plan study sessions on a monthly or weekly calendar, mark them done, and export to ICS.",
+  "description": "A small shelf app. One list of items. Shared buttons and cards. Token colors and type. Copy this starter, rename the id, and keep the manifest valid.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/study-planner",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:study-planner"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "study-planner",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Study Planner records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "study-planner"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

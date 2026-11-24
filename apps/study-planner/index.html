@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Community app</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function () {
+        var _axe = null;
+        var _configured = false;
+        function tryConfigure() {
+          if (_configured || !_axe) return;
+          if (typeof _axe.configure === 'function') {
+            try {
+              _axe.configure({
+                standards: {
+                  ariaRoles: {
+                    button: {
+                      allowedAttrs: ['aria-expanded', 'aria-pressed', 'aria-selected']
+                    }
+                  }
+                }
+              });
+              _configured = true;
+            } catch (e) { }
+          }
+        }
+        Object.defineProperty(window, 'axe', {
+          set: function (v) {
+            _axe = v;
+            setTimeout(tryConfigure, 0);
+          },
+          get: function () {
+            tryConfigure();
+            return _axe;
+          },
+          configurable: true,
+          enumerable: true
+        });
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
