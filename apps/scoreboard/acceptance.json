@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "799f9c098359e921593a4af6d9f894ac297b83fe91ab2502f52dbb100115b72e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Score Keeper\" and, with no entries, the list area shows the text \"No entries yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add entry\" form, typing \"Alpha\" in the field labelled \"Name\", \"15\" in the field labelled \"Score\", and clicking the button \"Save\" adds a row to the table containing \"Alpha\" and \"15\"; the text \"No entries yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Alpha\" with score \"15\", clicking the button \"Edit\" on the Alpha row opens the form with \"Alpha\" in the field labelled \"Name\" and \"15\" in the field labelled \"Score\"; changing the field labelled \"Score\" to \"20\" and clicking \"Save\" updates the table row to show \"20\"."
+    },
+    {
+      "id": "A4",
+      "text": "With \"Alpha\" (15) and \"Beta\" (10) in the list, clicking the button \"Delete Beta\" removes the Beta row; the table now contains only \"Alpha\" and \"15\"."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Alpha\" (15) and \"Beta\" (10) in the list, typing \"Al\" in the input labelled \"Search\" filters the table to show only the row containing \"Alpha\"; the row for \"Beta\" is not visible."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Alpha\" (15) and \"Beta\" (10) in the list, clicking the column header \"Score\" sorts the table so that \"Alpha\" appears before \"Beta\"; clicking it again reverses the order so \"Beta\" appears before \"Alpha\"."
+    },
+    {
+      "id": "A7",
+      "text": "With at least one entry in the list, clicking the button \"Export CSV\" copies a CSV string to the clipboard that includes the header \"Name,Score\" and a line \"Alpha,15\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Add entry\" form, leaving the field labelled \"Score\" empty and clicking \"Save\" shows the message \"Score is required\" and does not add a row."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry \"Alpha\" with score \"15\" visible in the table after the page is reloaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9d9982e29f548afb42689c372e34a9358a87f94471ac5dbdb826aa0f7f300144"
+    }
+  ]
+}
