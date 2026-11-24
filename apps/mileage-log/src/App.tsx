@@ -13,7 +13,7 @@ interface Entry {
   note: string
 }
 
-const fmt = (n: number) => String(Math.round(n * 100) / 100)
+const fmt = (n: number) => String(n)
 
 const emptyDraft = { odometer: '', gallons: '', cost: '', note: '' }
 
@@ -60,7 +60,7 @@ export function App() {
     const cost = entries.reduce((s, e) => s + e.cost, 0)
     const totalMiles = entries.length ? entries[entries.length - 1].odometer : 0
     const span = entries.length > 1 ? entries[entries.length - 1].odometer - entries[0].odometer : 0
-    const mpg = gallons > 0 ? Math.round((span / gallons) * 10) / 10 : 0
+    const mpg = gallons > 0 ? span / gallons : 0
     return { miles: totalMiles, gallons, cost, mpg }
   }, [entries])
 
@@ -188,7 +188,7 @@ export function App() {
                 { cells: { metric: 'Total miles', value: fmt(summary.miles) } },
                 { cells: { metric: 'Total gallons', value: fmt(summary.gallons) } },
                 { cells: { metric: 'Total cost', value: `$${summary.cost.toFixed(2)}` } },
-                { cells: { metric: 'Average MPG', value: fmt(summary.mpg) } },
+                { cells: { metric: 'Average MPG', value: summary.mpg.toFixed(1) } },
               ]}
             />
             {entries.length === 0 ? (
