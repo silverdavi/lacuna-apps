@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2a50b2470cba973669001a6434e9ee913fa5ee5774234cac7902c560aed2c6b8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Gym Workout Logger\" and, with no data, shows the text \"No workouts yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add workout\" opens a form. Entering \"Bench Press\" in the field labelled \"Exercise\", \"8\" in \"Reps\", \"100\" in \"Weight (lbs)\", and \"1\" in \"Sets\", then clicking \"Save exercise\" adds a row to the table containing \"Bench Press\", \"8\", \"100\", and \"1\". Clicking \"Finish workout\" closes the form and adds a list item containing \"Bench Press\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second exercise \"Squat\" with Reps \"10\", Weight \"135\", Sets \"3\" to the same workout and clicking \"Finish workout\", the workout list item contains both \"Bench Press\" and \"Squat\". The total exercises count for that workout shows \"2\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete Squat\" within the workout detail view removes the Squat row. The workout list item now contains only \"Bench Press\" and the total exercises count shows \"1\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the workout list, clicking the button \"Delete Bench Press\" removes the entire workout entry. The list shows \"No workouts yet\" again."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export CSV\" generates a file download with the name \"workouts.csv\". The file content includes the header \"Exercise,Reps,Weight,Sets\" and a row \"Bench Press,8,100,1\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"Squat\" in the search box labelled \"Search workouts\" filters the list to show only workouts containing \"Squat\". Typing \"Bench\" shows only workouts containing \"Bench\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab \"History\" shows a table of all past workouts. Clicking the column header \"Date\" sorts the table in descending order by date."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the workout entry: after adding a workout with \"Deadlift\" and reloading the page, the list item containing \"Deadlift\" is still visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d3a11dbc982bbef13494f195dfea1d24fd25c95dbca7b783c2023da411a4b52d"
+    }
+  ]
+}
