@@ -11,7 +11,7 @@
     "@lacuna/format-duration": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
-    "@lacuna/use-timer": "workspace:0.1.0",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
