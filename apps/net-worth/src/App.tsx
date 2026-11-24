@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Net Worth Tracker: add assets and liabilities, watch net worth update live,
 // browse a per-category breakdown, export the ledger as CSV.
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -16,6 +16,7 @@ import {
   Select,
   TextInput,
 } from '@lacuna/ui'
+import { Chart } from '@lacuna/chart'
 import { formatMoney, toCsv, useEntries, type EntryData, type EntryKind } from './host'
 
 const ASSET_CATEGORIES: string[] = [
@@ -34,15 +35,6 @@ const LIABILITY_CATEGORIES: string[] = [
   'Other',
 ]
 
-const PALETTE = [
-  'var(--geo-cobalt)',
-  'var(--geo-gold)',
-  'var(--geo-verm)',
-  'var(--geo-green)',
-  'var(--geo-teal)',
-  'var(--geo-legal)',
-]
-
 type BreakdownSlice = { label: string; value: number }
 
 function computeBreakdown(items: Array<EntryData>): BreakdownSlice[] {
@@ -53,77 +45,6 @@ function computeBreakdown(items: Array<EntryData>): BreakdownSlice[] {
   return Array.from(totals.entries())
     .filter(([, value]) => value > 0)
     .map(([label, value]) => ({ label, value }))
-}
-
-function DonutChart({ slices }: { slices: BreakdownSlice[] }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const total = slices.reduce((sum, s) => sum + s.value, 0)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const dpr = window.devicePixelRatio || 1
-    const size = 220
-    canvas.width = size * dpr
-    canvas.height = size * dpr
-    const ctx = canvas.getContext('2d')
-    if (!ctx || total === 0) return
-    ctx.scale(dpr, dpr)
-    ctx.clearRect(0, 0, size, size)
-
-    const cx = size / 2
-    const cy = size / 2
-    const outer = size / 2 - 4
-    const inner = outer * 0.58
-    let angle = -Math.PI / 2
-
-    slices.forEach((slice, index) => {
-      const fraction = slice.value / total
-      const sweep = fraction * Math.PI * 2
-      const color = PALETTE[index % PALETTE.length]
-      ctx.beginPath()
-      ctx.moveTo(cx + outer * Math.cos(angle), cy + outer * Math.sin(angle))
-      ctx.arc(cx, cy, outer, angle, angle + sweep)
-      ctx.lineTo(cx + inner * Math.cos(angle + sweep), cy + inner * Math.sin(angle + sweep))
-      ctx.arc(cx, cy, inner, angle + sweep, angle, true)
-      ctx.closePath()
-      ctx.fillStyle = color
-      ctx.fill()
-      angle += sweep
-    })
-  }, [slices, total])
-
-  return (
-    <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
-      <canvas
-        ref={canvasRef}
-        width={220}
-        height={220}
-        style={{ width: 220, height: 220 }}
-        aria-label={`Category breakdown: ${slices.map((s) => `${s.label} ${formatMoney(s.value)}`).join(', ')}`}
-        role="img"
-      />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {slices.map((slice, index) => (
-          <div key={slice.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 999,
-                background: PALETTE[index % PALETTE.length],
-                display: 'inline-block',
-                flexShrink: 0,
-              }}
-              aria-hidden
-            />
-            <span>{slice.label}</span>
-            <span style={{ fontFamily: 'var(--mono)' }}>{formatMoney(slice.value)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 export function App() {
@@ -211,9 +132,9 @@ export function App() {
         {(['Entries', 'Breakdown'] as const).map((item) => (
           <button
             type="button"
+            key={item}
             role="tab"
             aria-selected={tab === item}
-            key={item}
             className={`lc-tab${tab === item ? ' active' : ''}`}
             style={tab !== item ? { color: 'var(--ink-60)' } : undefined}
             onClick={() => setTab(item)}
@@ -325,7 +246,24 @@ export function App() {
               onAction={() => setTab('Entries')}
             />
           ) : (
-            <DonutChart slices={breakdown} />
+            <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+              <Chart
+                type="donut"
+                data={breakdown}
+                width={220}
+                height={220}
+                ariaLabel="Category breakdown"
+              />
+              <List label="Breakdown">
+                {breakdown.map((slice) => (
+                  <Row
+                    key={slice.label}
+                    title={slice.label}
+                    value={formatMoney(slice.value)}
+                  />
+                ))}
+              </List>
+            </div>
           )}
         </Card>
       )}

@@ -8,6 +8,7 @@
     "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
+    "@lacuna/chart": "workspace:0.1.0",
     "@lacuna/csv-parse": "workspace:0.1.0",
     "@lacuna/money": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",

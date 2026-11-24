@@ -1900,6 +1900,9 @@ importers:
 
   apps/net-worth:
     dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
       '@lacuna/csv-parse':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/csv-parse/0.1.0
