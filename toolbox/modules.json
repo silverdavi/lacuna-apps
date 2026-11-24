@@ -2496,6 +2496,58 @@
       }
     },
     {
+      "id": "@lacuna/ledger-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Personal ledger: transaction record table, add-transaction dialog, budget and chart panels.",
+      "today": [
+        "toolbox/modules/ledger-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/chart",
+        "@lacuna/combobox",
+        "@lacuna/money-input",
+        "@lacuna/record-table",
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "LedgerKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/ledger-kit/0.1.0",
+      "bridge": {
+        "component": "LedgerKit",
+        "kind": "kit",
+        "exports": [
+          "LedgerKit"
+        ],
+        "types": [
+          "Transaction",
+          "Category",
+          "LedgerKitProps"
+        ],
+        "signature": "LedgerKit(props: LedgerKitProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c2e4b76cabd8df3ca579ecdaa827e41b9ed664e",
+            "source": "8fb54c5c80e1e5cf",
+            "lines": 342,
+            "dependencies": {
+              "@lacuna/chart": "0.1.0",
+              "@lacuna/combobox": "0.1.0",
+              "@lacuna/money-input": "0.1.0",
+              "@lacuna/record-table": "0.1.0",
+              "@lacuna/ui": "*"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/line-items",
       "layer": 3,
       "status": "exists",

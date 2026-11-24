@@ -5243,6 +5243,31 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/ledger-kit/0.1.0:
+    dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../chart/0.1.0
+      '@lacuna/combobox':
+        specifier: workspace:0.1.0
+        version: link:../../combobox/0.1.0
+      '@lacuna/money-input':
+        specifier: workspace:0.1.0
+        version: link:../../money-input/0.1.0
+      '@lacuna/record-table':
+        specifier: workspace:0.1.0
+        version: link:../../record-table/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/line-items/0.1.0:
     dependencies:
       '@lacuna/money':
