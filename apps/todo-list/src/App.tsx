@@ -19,7 +19,7 @@ type Task = {
   due: string | null
 }
 
-function formatDue(due: string | null) {
+function formatDue(due: string | null): string | null {
   if (!due) return null
   const [y, m, d] = due.split('-')
   if (!y || !m || !d) return null
@@ -35,11 +35,11 @@ export function App() {
   const [due, setDue] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  const tasks = state.items
+  const tasks = state.activeItems
 
   const { itemProps, listProps } = useDragReorder({
     listCount: 1,
-    onReorder: (from, to) => actions.reorder(from, to),
+    onReorder: (_fromList, fromIndex, _toList, toIndex) => actions.reorder(fromIndex, toIndex),
   })
 
   const total = tasks.length
@@ -99,11 +99,6 @@ export function App() {
         </Card>
 
         <Card mono={`${total} saved`} title="Tasks">
-          {error !== null && (
-            <div role="status" aria-live="polite">
-              {error}
-            </div>
-          )}
           {total === 0 ? (
             <EmptyState
               mono="Empty"
@@ -113,41 +108,42 @@ export function App() {
               onAction={addTask}
             />
           ) : (
-            <ul aria-label="Tasks" {...listProps(0)}>
+            <ul aria-label="Tasks" {...listProps(0)} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {tasks.map((task, index) => {
                 const drag = itemProps(0, index)
                 const dueText = formatDue(task.data.due)
                 return (
-                  <li key={task.id} {...drag}>
-                    <div className="lk-row">
-                      <span className="lk-row-text">
-                        <span
-                          className="lk-row-title"
-                          style={{ textDecoration: task.data.done ? 'line-through' : undefined }}
-                        >
-                          {task.data.title}
-                        </span>
-                        {dueText !== null && <span className="lk-row-meta">{dueText}</span>}
+                  <li key={task.id} {...drag} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <input
+                      type="checkbox"
+                      aria-label={task.data.title}
+                      checked={task.data.done}
+                      onChange={(e) => actions.update(task.id, { done: e.target.checked })}
+                    />
+                    <span style={{ flex: 1 }}>
+                      <span style={{ textDecoration: task.data.done ? 'line-through' : undefined }}>
+                        {task.data.title}
                       </span>
-                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <input
-                          type="checkbox"
-                          aria-label={task.data.title}
-                          checked={task.data.done}
-                          onChange={(e) => actions.update(task.id, { done: e.target.checked })}
-                        />
-                        <Button kind="ghost" ariaLabel={`Drag ${task.data.title}`} title={`Drag ${task.data.title}`}>
-                          Drag
-                        </Button>
-                        <Button
-                          kind="ghost"
-                          ariaLabel={`Delete ${task.data.title}`}
-                          onClick={() => actions.remove(task.id)}
-                        >
-                          Delete {task.data.title}
-                        </Button>
-                      </div>
-                    </div>
+                      {dueText !== null && (
+                        <span style={{ marginLeft: 8, fontSize: '0.85em', opacity: 0.7 }}>
+                          {dueText}
+                        </span>
+                      )}
+                    </span>
+                    <Button
+                      kind="ghost"
+                      ariaLabel={`Drag ${task.data.title}`}
+                      title={`Drag ${task.data.title}`}
+                    >
+                      Drag
+                    </Button>
+                    <Button
+                      kind="ghost"
+                      ariaLabel={`Delete ${task.data.title}`}
+                      onClick={() => actions.remove(task.id)}
+                    >
+                      Delete {task.data.title}
+                    </Button>
                   </li>
                 )
               })}
