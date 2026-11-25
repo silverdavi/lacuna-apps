@@ -66,3 +66,26 @@ export function updateCard(deckId: string, cardId: string, next: CardState) {
     cards: deck.cards.map((c) => (c.id === cardId ? { ...c, ...next } : c)),
   })
 }
+
+export function exportAll() {
+  const file = {
+    version: 1,
+    appId: 'lacuna.flashcards',
+    exportedAt: Date.now(),
+    records: store.list().map((d) => ({
+      id: d.id,
+      data: d,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    })),
+  }
+  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'lacuna-flashcards-backup.json'
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}

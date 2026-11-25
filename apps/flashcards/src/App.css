@@ -1,0 +1,29 @@
+.fc-tab {
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--sans);
+}
+
+.fc-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.fc-card-front {
+  font-size: calc(19px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+  margin: calc(14px * var(--sf)) 0 0;
+}
+
+.fc-card-back {
+  font-size: calc(14px * var(--tf));
+  color: var(--ink-60);
+  margin: calc(10px * var(--sf)) 0 0;
+}
