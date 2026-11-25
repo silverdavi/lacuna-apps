@@ -1,11 +1,8 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-test('[A1] page heading is "Bookmark Manager"', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Bookmark Manager' })).toBeVisible()
-})
+import { readFileSync } from 'node:fs'
 
-async function addBookmark(page: any, title: string, url: string, tags: string) {
+async function addBookmark(page: Page, title: string, url: string, tags: string) {
   await page.getByRole('button', { name: 'Add bookmark' }).click()
   await page.getByLabel('Title').fill(title)
   await page.getByLabel('URL').fill(url)
@@ -13,79 +10,99 @@ async function addBookmark(page: any, title: string, url: string, tags: string) 
   await page.getByRole('button', { name: 'Save' }).click()
 }
 
-test('[A2] adding a bookmark adds a row to the table', async ({ page }) => {
+function row(page: Page, title: string) {
+  return page.getByRole('row').filter({ hasText: title })
+}
+
+test('[A1] the page heading is "Bookmark Manager"', async ({ page }) => {
   await page.goto('/')
-  await addBookmark(page, 'Lacuna Docs', 'https://lacuna.dev/docs', 'docs')
-  const row = page.getByRole('row').filter({ hasText: 'Lacuna Docs' })
-  await expect(row).toContainText('https://lacuna.dev/docs')
+  await expect(page.getByRole('heading', { name: 'Bookmark Manager' })).toBeVisible()
 })
 
-test('[A3] search filters the table', async ({ page }) => {
+test('[A2] adding a bookmark adds a row with its title and url', async ({ page }) => {
   await page.goto('/')
   await addBookmark(page, 'Lacuna Docs', 'https://lacuna.dev/docs', 'docs')
+  const r = row(page, 'Lacuna Docs')
+  await expect(r).toContainText('Lacuna Docs')
+  await expect(r).toContainText('https://lacuna.dev/docs')
+})
+
+test('[A3] typing in the Search bookmarks input filters the table', async ({ page }) => {
+  await page.goto('/')
+  await addBookmark(page, 'Lacuna Docs', 'https://lacuna.dev/docs', 'docs')
+  await addBookmark(page, 'Zeta Notes', 'https://zeta.example.com', 'notes')
   await page.getByLabel('Search bookmarks').fill('lac')
-  await expect(page.getByRole('row').filter({ hasText: 'Lacuna Docs' })).toBeVisible()
+  await expect(row(page, 'Lacuna Docs')).toBeVisible()
+  await expect(row(page, 'Zeta Notes')).toHaveCount(0)
 })
 
-test('[A4] clicking the Title column header sorts and re-sorts', async ({ page }) => {
+test('[A4] rows are in insertion order, and the Title header sorts ascending then descending', async ({
+  page,
+}) => {
   await page.goto('/')
-  await addBookmark(page, 'Beta', 'https://beta.example.com', 'b')
-  await addBookmark(page, 'Alpha', 'https://alpha.example.com', 'a')
-  const titleHeader = page.getByRole('columnheader', { name: 'Title' })
-  await titleHeader.click()
-  let rows = page.locator('tr').filter({ hasText: /https?:\/\// }).allInnerTexts()
-  expect(rows.findIndex((t) => t.includes('Alpha'))).toBeLessThan(rows.findIndex((t) => t.includes('Beta')))
-  await titleHeader.click()
-  rows = await page.locator('tr').filter({ hasText: /https?:\/\// }).allInnerTexts()
-  expect(rows.findIndex((t) => t.includes('Alpha'))).toBeGreaterThan(rows.findIndex((t) => t.includes('Beta')))
+  await addBookmark(page, 'Beta Site', 'https://beta.example.com', 'b')
+  await addBookmark(page, 'Alpha Site', 'https://alpha.example.com', 'a')
+  const rows = await page.getByRole('row').allInnerTexts()
+  expect(rows, 'initial insertion order').toHaveLength(3)
+  expect(rows[1]).toContain('Beta Site')
+  expect(rows[2]).toContain('Alpha Site')
+  await page.getByRole('columnheader', { name: 'Title' }).click()
+  const asc = await page.getByRole('row').allInnerTexts()
+  expect(asc[1]).toContain('Alpha Site')
+  expect(asc[2]).toContain('Beta Site')
+  await page.getByRole('columnheader', { name: 'Title' }).click()
+  const desc = await page.getByRole('row').allInnerTexts()
+  expect(desc[1]).toContain('Beta Site')
+  expect(desc[2]).toContain('Alpha Site')
 })
 
-test('[A5] exporting CSV downloads the selected row', async ({ page }) => {
+test('[A5] ticking a row checkbox and clicking Export CSV downloads its csv line', async ({ page }) => {
   await page.goto('/')
   await addBookmark(page, 'Lacuna Docs', 'https://lacuna.dev/docs', 'docs')
-  const row = page.getByRole('row').filter({ hasText: 'Lacuna Docs' })
-  await row.locator('input[type="checkbox"]').first().check()
+  await row(page, 'Lacuna Docs').getByLabel('Select Lacuna Docs').check()
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Export CSV' }).click(),
   ])
-  const path = await download.path()
-  const { readFileSync } = await import('node:fs')
-  const content = readFileSync(path, 'utf8')
+  const content = readFileSync((await download.path())!, 'utf8')
   expect(content).toContain('Lacuna Docs,https://lacuna.dev/docs,docs')
 })
 
-test('[A6] editing a bookmark updates the row', async ({ page }) => {
+test('[A6] editing a bookmark pre-fills the form and saves the change', async ({ page }) => {
   await page.goto('/')
   await addBookmark(page, 'Lacuna Docs', 'https://lacuna.dev/docs', 'docs')
-  const row = page.getByRole('row').filter({ hasText: 'Lacuna Docs' })
-  await row.getByRole('button', { name: 'Edit' }).click()
+  await row(page, 'Lacuna Docs').getByRole('button', { name: 'Edit', exact: true }).click()
   await expect(page.getByLabel('Title')).toHaveValue('Lacuna Docs')
   await page.getByLabel('Title').fill('Lacuna Guide')
   await page.getByRole('button', { name: 'Save' }).click()
-  await expect(page.getByRole('row').filter({ hasText: 'Lacuna Guide' })).toContainText('https://lacuna.dev/docs')
+  await expect(row(page, 'Lacuna Guide')).toBeVisible()
+  await expect(row(page, 'Lacuna Docs')).toHaveCount(0)
 })
 
-test('[A7] deleting the only bookmark shows the empty state', async ({ page }) => {
+test('[A7] deleting the only bookmark leaves the table empty', async ({ page }) => {
   await page.goto('/')
-  await addBookmark(page, 'Lacuna Docs', 'https://lacuna.dev/docs', 'docs')
-  const row = page.getByRole('row').filter({ hasText: 'Lacuna Docs' })
-  await row.getByRole('button', { name: 'Delete' }).click()
+  await addBookmark(page, 'Lacuna Guide', 'https://lacuna.dev/guide', 'docs')
+  await row(page, 'Lacuna Guide').getByRole('button', { name: 'Delete', exact: true }).click()
+  await expect(row(page, 'Lacuna Guide')).toHaveCount(0)
   await expect(page.getByText('No bookmarks yet')).toBeVisible()
 })
 
-test('[A8] a bookmark survives a reload', async ({ page }) => {
+test('[A8] an added bookmark survives a reload', async ({ page }) => {
   await page.goto('/')
   await addBookmark(page, 'Test Link', 'https://example.com', 'test')
+  await expect(row(page, 'Test Link')).toBeVisible()
   await page.reload()
-  const row = page.getByRole('row').filter({ hasText: 'Test Link' })
-  await expect(row).toContainText('https://example.com')
+  const r = row(page, 'Test Link')
+  await expect(r).toContainText('Test Link')
+  await expect(r).toContainText('https://example.com')
 })
 
-test('[A9] reload keeps the bookmark in the table', async ({ page }) => {
+// A9: same as A8 in a fresh run; both assert the row persists across reload.
+test('[A9] a separately added bookmark still shows after reload', async ({ page }) => {
   await page.goto('/')
   await addBookmark(page, 'Test Link', 'https://example.com', 'test')
   await page.reload()
-  const row = page.getByRole('row').filter({ hasText: 'Test Link' })
-  await expect(row).toContainText('https://example.com')
+  const r = row(page, 'Test Link')
+  await expect(r).toContainText('Test Link')
+  await expect(r).toContainText('https://example.com')
 })

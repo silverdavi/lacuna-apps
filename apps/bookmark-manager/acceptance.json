@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "39447af21d2eb770a1e34b3a7a854ee9858a85167f9cc52d59d4633800bf1682",
+  "spec_sha256": "6c038257c6cb678e3259196259b5a2f0596a0f2db9cf687b3bf36ec4b6b577b1",
   "checks": [
     {
       "id": "A1",
@@ -8,41 +8,41 @@
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"Add bookmark\" opens a form with fields labelled \"Title\", \"URL\", and \"Tags\". Typing \"Lacuna Docs\" in \"Title\", \"https://lacuna.dev/docs\" in \"URL\", and \"docs\" in \"Tags\", then clicking \"Save\" adds a row to the table containing \"Lacuna Docs\" and \"https://lacuna.dev/docs\"."
+      "text": "Clicking the button \"Add bookmark\" opens a form with fields labelled \"Title\", \"URL\", and \"Tags\". Typing \"Lacuna Docs\" in \"Title\", \"https://lacuna.dev/docs\" in \"URL\", and \"docs\" in \"Tags\", then clicking \"Save\" adds a table data row containing \"Lacuna Docs\" and \"https://lacuna.dev/docs\"."
     },
     {
       "id": "A3",
-      "text": "Typing \"lac\" in the search box labelled \"Search bookmarks\" filters the table to show only the row containing \"Lacuna Docs\"."
+      "text": "With bookmarks \"Lacuna Docs\" (https://lacuna.dev/docs, tag docs) and \"Zeta Notes\" (https://zeta.example.com, tag notes) added, typing \"lac\" in the search box labelled \"Search bookmarks\" leaves exactly one data row, the one containing \"Lacuna Docs\"; no row contains \"Zeta Notes\"."
     },
     {
       "id": "A4",
-      "text": "Clicking the column header \"Title\" in the table sorts rows alphabetically by title; clicking it again reverses the order."
+      "text": "With bookmarks \"Beta Site\" (https://beta.example.com, tag b) added first and \"Alpha Site\" (https://alpha.example.com, tag a) added second, the rows appear in insertion order (Beta Site first, Alpha Site second). The first click on the column header \"Title\" orders the data rows Alpha Site, Beta Site; a second click orders them Beta Site, Alpha Site."
     },
     {
       "id": "A5",
-      "text": "Selecting the row for \"Lacuna Docs\" and clicking the button \"Export CSV\" downloads a file whose content includes the line \"Lacuna Docs,https://lacuna.dev/docs,docs\"."
+      "text": "With \"Lacuna Docs\" added, ticking the checkbox \"Select Lacuna Docs\" in its row and clicking the button \"Export CSV\" downloads a file whose content includes the line \"Lacuna Docs,https://lacuna.dev/docs,docs\"."
     },
     {
       "id": "A6",
-      "text": "Clicking the button \"Edit\" on the \"Lacuna Docs\" row opens the form with \"Title\" pre-filled as \"Lacuna Docs\". Changing \"Title\" to \"Lacuna Guide\" and clicking \"Save\" updates the table row to show \"Lacuna Guide\"."
+      "text": "With \"Lacuna Docs\" added, clicking the button \"Edit\" in its row opens the form with \"Title\" pre-filled as \"Lacuna Docs\". Changing \"Title\" to \"Lacuna Guide\" and clicking \"Save\" shows a row containing \"Lacuna Guide\" and no row containing \"Lacuna Docs\"."
     },
     {
       "id": "A7",
-      "text": "Clicking the button \"Delete\" on the \"Lacuna Guide\" row removes it from the table; the table shows \"No bookmarks yet\"."
+      "text": "With \"Lacuna Guide\" being the only bookmark, clicking the button \"Delete\" in its row removes it; the table area shows the text \"No bookmarks yet\"."
     },
     {
       "id": "A8",
-      "text": "After adding a bookmark with Title \"Test Link\", URL \"https://example.com\", and Tags \"test\", reloading the page still shows the row containing \"Test Link\" and \"https://example.com\"."
+      "text": "After adding a bookmark with Title \"Test Link\", URL \"https://example.com\", and Tags \"test\", reloading the page still shows a row containing \"Test Link\" and \"https://example.com\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the bookmark with Title \"Test Link\" and URL \"https://example.com\" in the table."
+      "text": "Same as A8 with a separate fresh run: after adding \"Test Link\" / \"https://example.com\" and reloading, the row is still in the table."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "c41993b7c70e541d842a9207290eb4186e5493a13874d02d76fdc9fa0689d792"
+      "sha256": "77fb2afbd9c12eeac0d22d5236220db4891474691285c8aa5a2e68a726e39766"
     }
   ]
 }
