@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "81a6ebe84a53f05aa7f44274b905b2e52da9389129589448cccdfbae2c71f95a",
+  "spec_sha256": "daae7aa3602a359cf1be1ec2938081cdbfe8a154dc85ffcefd58c01613039b65",
   "checks": [
     {
       "id": "A1",
-      "text": "The page heading is \"Math Editor\" and the tab labelled \"Source\" is active by default, showing the code area with the placeholder text \"Type Markdown and TeX here\"."
+      "text": "The page heading is \"Math Editor\" and the tab \"Source\" is selected by default, showing the code area with the placeholder text \"Type Markdown and TeX here\"."
     },
     {
       "id": "A2",
-      "text": "Typing `# Title\\n\\nHello $x^2$ world` into the code area and waiting 500 ms shows the tab labelled \"Preview\" containing an `<h1>` with the text \"Title\" and a paragraph containing the text \"Hello\" followed by a rendered math element with the accessible text \"x squared\" and then the text \"world\"."
+      "text": "Filling the code area with `# Title`, a blank line, then `Hello $x^2$ world` and waiting for the preview, the tab \"Preview\" shows an `<h1>` with the text \"Title\" and a paragraph that contains \"Hello\", a math element whose accessible name is \"x squared\", and \"world\"."
     },
     {
       "id": "A3",
-      "text": "Typing `| A | B |\\n|---|---|\\n| 1 | 2 |` into the code area shows in the Preview tab a table with two columns and two rows, where the first body cell contains \"1\" and the second body cell contains \"2\"."
+      "text": "Filling the code area with the three lines `| A | B |`, `|---|---|`, `| 1 | 2 |` makes the Preview tab show a table with two column headers (\"A\" and \"B\"), two rows in total (one header row, one body row), whose first body cell is \"1\" and second body cell is \"2\"."
     },
     {
       "id": "A4",
-      "text": "Typing `- [ ] Task one\\n- [x] Task two` into the code area shows in the Preview tab a list with two items: the first item has an unchecked checkbox and the text \"Task one\", the second item has a checked checkbox and the text \"Task two\"."
+      "text": "Filling the code area with `- [ ] Task one` and `- [x] Task two` (two lines) makes the Preview tab show a list with two items: the first has an unchecked checkbox and the text \"Task one\", the second a checked checkbox and the text \"Task two\"."
     },
     {
       "id": "A5",
-      "text": "Clicking the button labelled \"Copy Markdown\" copies the exact text currently in the code area to the clipboard; with the code area containing `# Hi\\n\\n$y$`, the clipboard content is `# Hi\\n\\n$y$`."
+      "text": "With the code area containing `# Hi`, a blank line, then `$y$`, clicking the button \"Copy Markdown\" puts exactly that same text on the clipboard."
     },
     {
       "id": "A6",
-      "text": "Clicking the button labelled \"Export HTML\" downloads a file named `math-editor.html` whose content includes the string `<h1>Hi</h1>` when the code area contains `# Hi`."
+      "text": "With the code area containing `# Hi`, clicking the button \"Export HTML\" downloads a file named \"math-editor.html\" whose content includes `<h1>Hi</h1>`."
     },
     {
       "id": "A7",
-      "text": "Clicking the tab labelled \"History\" shows a list of saved snapshots; after typing `# First` and waiting for autosave (2 seconds), then typing `# Second` and waiting for autosave, the History tab shows two entries with the texts \"First\" and \"Second\"."
+      "text": "After filling `# First` and waiting for an autosave, then filling `# Second` and waiting for another autosave, the tab \"History\" shows two entries: one containing \"First\" and one containing \"Second\"."
     },
     {
       "id": "A8",
-      "text": "In the History tab, clicking the button labelled \"Restore\" on the entry containing \"First\" changes the code area content to `# First` and the Preview tab shows an `<h1>` with the text \"First\"."
+      "text": "After A7's steps, clicking the button \"Restore\" in the History entry containing \"First\" sets the code area to `# First` (Source tab) and the Preview tab shows an `<h1>` with the text \"First\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the document: after typing `# Saved Doc` into the code area and waiting 2 seconds for autosave, reloading the page shows the code area containing `# Saved Doc` and the Preview tab showing an `<h1>` with the text \"Saved Doc\"."
+      "text": "After filling `# Saved Doc` and waiting for autosave, reloading shows the code area containing `# Saved Doc` and the Preview tab showing an `<h1>` with the text \"Saved Doc\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "ecf97b0fb01a77fa119828b5b970925741649c0165fa1dfa5b33d0a6e75584fd"
+      "sha256": "6c7e44949f11c3dfb62cf0517608befff90237fe3d15f1687f3893dc18bbd1bc"
     }
   ]
 }

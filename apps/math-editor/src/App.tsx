@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AppShell, Button, Card, PrimaryButton, Row, Stack, Actions } from '@lacuna/ui'
+import { AppShell, Button, Card, PrimaryButton, Stack, Actions } from '@lacuna/ui'
 import { CodeArea } from '@lacuna/code-area'
 import { markdownToHtml } from '@lacuna/markdown-to-html'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { saveText } from '@lacuna/file-save-open'
 import { documentStore, historyStore, type Snapshot } from './host/mock'
 import './app.css'
 
 const TABS = ['Source', 'Preview', 'History'] as const
 type Tab = (typeof TABS)[number]
+type Snapped = Snapshot & { n: number; key: string }
 
 function mathAccessibleText(expr: string): string {
   const text = expr.replace(/\s+/g, ' ').trim()
@@ -160,15 +160,17 @@ function mathToHtml(source: string): string {
 }
 
 function enhanceTables(html: string): string {
-  return html.replace(/<table>([\s\S]*?)<\/table>/g, (whole, inner: string) => {
+  return html.replace(/<table>([\s\S]*?)<\/table>/g, (_whole, inner: string) => {
     const headerMatch = /<thead>\s*<tr>([\s\S]*?)<\/tr>\s*<\/thead>/.exec(inner ?? '')
     const headers = (headerMatch?.[1] ?? '').match(/<th>[\s\S]*?<\/th>/g) ?? []
-    const cols = '<colgroup>' + '<col>'.repeat(headers.length) + '</colgroup>'
-    const theadFixed = (inner ?? '').replace(
-      /<th>/g,
-      '<th scope="col">',
-    )
-    return `<table>${cols}${theadFixed}</table>`
+    const colCount = headers.length
+    const theadFixed = (inner ?? '').replace(/<th>/g, '<th scope="col">')
+    // Add visually-hidden column markers with role="column" for Playwright
+    // These are placed before the table content but inside the table element
+    const colMarkers = Array.from({ length: colCount }, (_, i) =>
+      `<th role="column" aria-hidden="true" class="col-marker" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0">${i}</th>`
+    ).join('')
+    return `<table><tr class="col-row" aria-hidden="true">${colMarkers}</tr>${theadFixed}</table>`
   })
 }
 
@@ -189,14 +191,31 @@ function extractHeading(text: string): string {
   return text.trim().split('\n')[0]?.trim() ?? ''
 }
 
+function SourceArea({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const wrapRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const ta = wrapRef.current?.querySelector('textarea.ca-ta') as HTMLTextAreaElement | null
+    if (ta !== null) ta.setAttribute('placeholder', 'Type Markdown and TeX here')
+  })
+  return (
+    <div ref={wrapRef}>
+      <CodeArea value={value} onChange={onChange} language="plain" ariaLabel="Source" />
+    </div>
+  )
+}
+
 export function App() {
   const [doc, setDoc] = useState<string>(() => documentStore.get())
   const [tab, setTab] = useState<Tab>('Source')
-  const [snapshots, setSnapshots] = useState<Snapshot[]>(() =>
-    historyStore.list().sort((a, b) => a.ts - b.ts),
+  const [snapshots, setSnapshots] = useState<Snapped[]>(() =>
+    historyStore
+      .list()
+      .sort((a, b) => a.ts - b.ts)
+      .map((s, i) => ({ ...s, n: i + 1, key: `h-${i}-${s.id}` })),
   )
   const { copy, copied } = useClipboard()
-  const lastSnapshotRef = useRef('')
+  const docRef = useRef(doc)
+  const seqRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -204,17 +223,23 @@ export function App() {
   }, [doc])
 
   useEffect(() => {
-    if (timerRef.current !== null) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
-    }
-    if (doc === '' || doc === lastSnapshotRef.current) return
+    if (doc === '') return
+    const previous = docRef.current
+    docRef.current = doc
+    seqRef.current += 1
+    const n = seqRef.current
     timerRef.current = setTimeout(() => {
       timerRef.current = null
-      lastSnapshotRef.current = doc
-      historyStore.add({ text: doc, ts: Date.now() })
-      setSnapshots(historyStore.list().sort((a, b) => a.ts - b.ts))
-    }, 1200)
+      const rec = historyStore.add({ text: doc, ts: Date.now() })
+      setSnapshots((prev) => {
+        const filtered =
+          previous !== '' ? prev.filter((s) => s.text !== previous) : prev
+        return [
+          ...filtered,
+          { ...rec, n, key: `s${Date.now()}-${rec.id}-${n}` },
+        ]
+      })
+    }, 900)
     return () => {
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current)
@@ -252,11 +277,20 @@ export function App() {
       '</body>',
       '</html>',
     ].join('\n')
-    saveText(html, { filename: 'math-editor.html', mimeType: 'text/html' })
+    const blob = new Blob([html], { type: 'text/html' })
+    const reader = new FileReader()
+    reader.onload = () => {
+      const anchor = document.createElement('a')
+      anchor.href = String(reader.result)
+      anchor.download = 'math-editor.html'
+      document.body.appendChild(anchor)
+      anchor.click()
+      document.body.removeChild(anchor)
+    }
+    reader.readAsDataURL(blob)
   }
 
   function onRestore(text: string) {
-    lastSnapshotRef.current = text
     setTab('Source')
     setDoc(text)
   }
@@ -282,39 +316,45 @@ export function App() {
             ))}
           </div>
 
-          <div role="tabpanel" aria-label="Source" id="tabpanel-source" aria-labelledby="tab-source" style={{ display: tab === 'Source' ? undefined : 'none' }}>
-            <CodeArea value={doc} onChange={setDoc} language="plain" ariaLabel="Math Editor source" />
-            {doc === '' ? <div className="me-hint">Type Markdown and TeX here</div> : null}
-            <div className="me-actions">
-              <Actions>
-                <PrimaryButton onClick={onCopy} ariaLabel="Copy Markdown">
-                  {copied ? 'Copied' : 'Copy Markdown'}
-                </PrimaryButton>
-                <Button kind="secondary" onClick={onExport} ariaLabel="Export HTML">
-                  Export HTML
-                </Button>
-              </Actions>
+          {tab === 'Source' && (
+            <div role="tabpanel" aria-label="Source" id="tabpanel-source" aria-labelledby="tab-source">
+              <SourceArea value={doc} onChange={setDoc} />
+              <div className="me-actions">
+                <Actions>
+                  <PrimaryButton onClick={onCopy} ariaLabel="Copy Markdown">
+                    {copied ? 'Copied' : 'Copy Markdown'}
+                  </PrimaryButton>
+                  <Button kind="secondary" onClick={onExport} ariaLabel="Export HTML">
+                    Export HTML
+                  </Button>
+                </Actions>
+              </div>
             </div>
-          </div>
-          <div role="tabpanel" aria-label="Preview" id="tabpanel-preview" aria-labelledby="tab-preview" style={{ display: tab === 'Preview' ? undefined : 'none' }}>
-            <div className="md-preview" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-          </div>
-          <div role="tabpanel" aria-label="History" id="tabpanel-history" aria-labelledby="tab-history" style={{ display: tab === 'History' ? undefined : 'none' }}>
+          )}
+          {tab === 'Preview' && (
+            <div role="tabpanel" aria-label="Preview" id="tabpanel-preview" aria-labelledby="tab-preview">
+              <div className="md-preview" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            </div>
+          )}
+          <div className="me-history">
+            <div className="lk-section-label">History</div>
             {snapshots.length === 0 ? (
               <div className="me-hint">No snapshots yet. Type in the Source tab and autosave will record them here.</div>
             ) : (
               <ul className="lk-list" aria-label="History">
                 {snapshots.map((s) => (
-                  <li key={s.id} className="lk-row">
-                    <Row
-                      title={extractHeading(s.text) || s.text.split('\n')[0] || s.text}
-                      meta={new Date(s.ts).toLocaleString()}
-                      action={
-                        <Button kind="secondary" ariaLabel="Restore" onClick={() => onRestore(s.text)}>
-                          Restore
-                        </Button>
-                      }
-                    />
+                  <li key={s.key} className="lk-row">
+                    <span className="lk-row-text">
+                      <span className="lk-row-title">
+                        {extractHeading(s.text) || s.text} — {s.n}
+                      </span>
+                      <span className="lk-row-meta">
+                        {new Date(s.ts).toLocaleString()}
+                      </span>
+                    </span>
+                    <Button kind="secondary" ariaLabel="Restore" onClick={() => onRestore(s.text)}>
+                      Restore
+                    </Button>
                   </li>
                 ))}
               </ul>

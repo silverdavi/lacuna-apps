@@ -24,7 +24,6 @@
   border-bottom-color: var(--accent);
 }
 
-/* Code area hint */
 .me-hint {
   margin-top: calc(6px * var(--sf));
   font-family: var(--sans);
