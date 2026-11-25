@@ -769,6 +769,56 @@
       }
     },
     {
+      "id": "@lacuna/calculator-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.2.0",
+      "summary": "Inputs panel, result summary, breakdown table, and optional chart for calculator-style apps.",
+      "today": [
+        "toolbox/modules/calculator-kit/0.2.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/chart",
+        "@lacuna/number-input",
+        "@lacuna/record-table",
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "CalculatorKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/calculator-kit/0.2.0",
+      "bridge": {
+        "component": "CalculatorKit",
+        "kind": "kit",
+        "exports": [
+          "CalculatorKit"
+        ],
+        "types": [
+          "CalculatorKitInput",
+          "CalculatorKitResult",
+          "CalculatorKitProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.2.0": {
+            "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+            "source": "20c949f21c2e919c",
+            "lines": 156,
+            "dependencies": {
+              "@lacuna/chart": "0.1.0",
+              "@lacuna/number-input": "0.1.0",
+              "@lacuna/record-table": "0.1.0",
+              "@lacuna/ui": "*"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/chart",
       "layer": 2,
       "status": "exists",
@@ -1671,6 +1721,44 @@
       }
     },
     {
+      "id": "@lacuna/number-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Locale-aware numeric input with optional stepper buttons, min/max clamping, and a unit suffix.",
+      "today": [
+        "toolbox/modules/number-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "NumberInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/number-input/0.1.0",
+      "bridge": {
+        "component": "NumberInput",
+        "kind": "widget",
+        "exports": [
+          "NumberInput"
+        ],
+        "types": [
+          "NumberInputProps"
+        ],
+        "signature": "NumberInput({ value, onChange, min, max, step = 1, unit, locale = 'en-US', disabled = false, id, ...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "f93ff2554ebb824c",
+            "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/password-generate",
       "layer": 3,
       "status": "exists",
@@ -1712,6 +1800,50 @@
             "dependencies": {
               "@lacuna/random": "0.1.0"
             }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/query-spec",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for multi-key sorting, predicate filtering, and group-by aggregation over arrays of records.",
+      "today": [
+        "toolbox/modules/query-spec/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "querySpec"
+      ],
+      "public": true,
+      "path": "toolbox/modules/query-spec/0.1.0",
+      "bridge": {
+        "component": "querySpec",
+        "kind": "logic",
+        "exports": [
+          "sortRecords",
+          "filterRecords",
+          "groupRecords"
+        ],
+        "types": [
+          "SortDirection",
+          "SortKey",
+          "FilterPredicate",
+          "GroupKey",
+          "GroupResult"
+        ],
+        "signature": "sortRecords( records: T[], keys: SortKey<T>[] ); filterRecords( records: T[], predicate: FilterPredicate<T> ); groupRecords( records: T[], key: GroupKey<T> )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "09542eb0e6765652",
+            "lines": 64,
+            "dependencies": {}
           }
         }
       }
@@ -1794,6 +1926,50 @@
             "source": "f8c5c7e28e4c81c8",
             "lines": 193,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/record-table",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A sortable, selectable record table with configurable columns, multi-key sorting, filtering, and group-by support.",
+      "today": [
+        "toolbox/modules/record-table/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/query-spec"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "RecordTable"
+      ],
+      "public": true,
+      "path": "toolbox/modules/record-table/0.1.0",
+      "bridge": {
+        "component": "RecordTable",
+        "kind": "widget",
+        "exports": [
+          "RecordTable"
+        ],
+        "types": [
+          "ColumnDef",
+          "GroupDef",
+          "RecordTableProps"
+        ],
+        "signature": "RecordTable( props: RecordTableProps<T>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "bedc5e2865668475",
+            "lines": 239,
+            "dependencies": {
+              "@lacuna/query-spec": "0.1.0"
+            }
           }
         }
       }
