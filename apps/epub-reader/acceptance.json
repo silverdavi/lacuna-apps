@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "f1abe9806fa70e9887239e7e2630342f16515a994fe5124bae98f7ccb84a2285",
+  "spec_sha256": "922422033a20893e33dbb7ded8b8fc311d9f4cd4d9f4cf42a2c540427af86ab0",
   "checks": [
     {
       "id": "A1",
@@ -8,41 +8,41 @@
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"Choose file\" and selecting a file named \"test.epub\" with content \"Hello World\" loads the book; the page shows the text \"test.epub\" and the PagedReader displays the text \"Hello World\" on page 1."
+      "text": "Clicking the button \"Choose file\" opens a file chooser; selecting a file named \"test.epub\" (fixture content in Test notes) loads the book; the page shows the text \"test.epub\", the progress indicator reads \"Page 1 of 5\", and the reader region shows the text \"Hello World\"."
     },
     {
       "id": "A3",
-      "text": "After loading \"test.epub\", clicking the button \"Next page\" advances to page 2; the progress indicator shows \"Page 2 of 5\" and the PagedReader displays the text for page 2."
+      "text": "After loading \"test.epub\", clicking the button \"Next page\" once shows \"Page 2 of 5\" and the reader region shows \"Second page\"."
     },
     {
       "id": "A4",
-      "text": "After loading \"test.epub\" and navigating to page 3, clicking the button \"Add bookmark\" adds a bookmark; the bookmarks list shows an item with the text \"Page 3\" and the text \"No bookmarks\" is gone."
+      "text": "After loading \"test.epub\" and clicking \"Next page\" twice (page 3), clicking the button \"Add bookmark\" adds one item to the bookmarks list containing the text \"Page 3\"; the text \"No bookmarks\" is gone."
     },
     {
       "id": "A5",
-      "text": "After adding a bookmark on page 3, clicking the button \"Delete Page 3\" in the bookmarks list removes that item; the bookmarks list shows the text \"No bookmarks\"."
+      "text": "After adding the page-3 bookmark, clicking the button \"Delete Page 3\" removes that item; the bookmarks list shows the text \"No bookmarks\"."
     },
     {
       "id": "A6",
-      "text": "After loading \"test.epub\", clicking the button \"Export page\" copies the text \"Hello World\" to the clipboard and shows the message \"Copied page text\"."
+      "text": "After loading \"test.epub\" (page 1), clicking the button \"Export page\" puts exactly \"Hello World\" on the clipboard and shows the message \"Copied page text\"."
     },
     {
       "id": "A7",
-      "text": "After loading \"test.epub\" and navigating to page 2, clicking the select labelled \"Font size\" and choosing \"Large\" changes the PagedReader text size; the PagedReader displays the same text \"Hello World\" but with a larger font size."
+      "text": "After loading \"test.epub\" and clicking \"Next page\" once (page 2, text \"Second page\"), choosing \"Large\" in the select labelled \"Font size\" makes the computed font size of the reader region strictly larger than it was with the default option, while the page text is still \"Second page\"."
     },
     {
       "id": "A8",
-      "text": "After loading \"test.epub\" and navigating to page 3, reloading the page still shows the text \"test.epub\", the PagedReader displays the text for page 3, and the progress indicator shows \"Page 3 of 5\"."
+      "text": "After loading \"test.epub\" and clicking \"Next page\" twice, reloading the page shows the text \"test.epub\", the reader region shows \"Third page\", and the progress indicator reads \"Page 3 of 5\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the loaded book \"test.epub\" and the bookmark on page 3; after reload, the bookmarks list shows an item with the text \"Page 3\"."
+      "text": "After loading \"test.epub\", moving to page 3 and adding a bookmark, reloading keeps \"test.epub\" and the bookmarks list shows an item containing \"Page 3\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "ed74443a6abb263228fc502a5a52688a922bbcc12c0a5c0d49fc5abc1b8370d1"
+      "sha256": "6e06867fa33e4149bc4cb416c144b9f2e75913b592fd52b73c1c2bfa2a7a912b"
     }
   ]
 }

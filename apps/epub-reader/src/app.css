@@ -105,18 +105,14 @@
   border-radius: calc(6px * var(--sf));
   padding: calc(16px * var(--sf));
   min-height: calc(200px * var(--sf));
-}
-
-.er-page span {
-  display: inline-block;
   font-size: calc(16px * var(--tf));
 }
 
-.er-page.small span {
+.er-page.small {
   font-size: calc(14px * var(--tf));
 }
 
-.er-page.large span {
+.er-page.large {
   font-size: calc(19px * var(--tf));
 }
 

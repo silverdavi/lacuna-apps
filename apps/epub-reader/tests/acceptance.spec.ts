@@ -1,12 +1,24 @@
 import { expect, test, type Page } from '@playwright/test'
 
-async function loadBook(page: Page, content: string) {
+function fixture() {
+  return {
+    name: 'test.epub',
+    mimeType: 'application/epub+zip',
+    buffer: Buffer.from('Hello World\fSecond page\fThird page\fFourth page\fFifth page'),
+  }
+}
+
+async function upload(page: Page) {
   const [chooser] = await Promise.all([
     page.waitForEvent('filechooser'),
     page.getByRole('button', { name: 'Choose file' }).click(),
   ])
-  const file = new File([content], 'test.epub', { type: 'application/epub+zip' })
-  await (chooser as unknown as { setFiles(files: File[]): Promise<void> }).setFiles([file])
+  await chooser.setFiles(fixture())
+}
+
+async function gotoAndUpload(page: Page) {
+  await page.goto('/')
+  await upload(page)
 }
 
 test('[A1] heading and empty state', async ({ page }) => {
@@ -15,79 +27,75 @@ test('[A1] heading and empty state', async ({ page }) => {
   await expect(page.getByText('No book loaded')).toBeVisible()
 })
 
-test('[A2] loading a book shows the title and page 1 text', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A2] load book shows filename, progress, and page 1', async ({ page }) => {
+  await gotoAndUpload(page)
   await expect(page.getByText('test.epub')).toBeVisible()
-  await expect(page.getByText('Hello World')).toBeVisible()
+  await expect(page.getByText('Page 1 of 5')).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Reader' })).toContainText('Hello World')
 })
 
-test('[A3] next page advances to page 2 of 5', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A3] next page shows page 2', async ({ page }) => {
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Next page' }).click()
   await expect(page.getByText('Page 2 of 5')).toBeVisible()
-  await expect(page.getByText('Hello World')).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Reader' })).toContainText('Second page')
 })
 
-test('[A4] adding a bookmark on page 3', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A4] add bookmark for page 3', async ({ page }) => {
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Add bookmark' }).click()
-  await expect(page.getByText('Page 3')).toBeVisible()
-  await expect(page.getByText('No bookmarks')).toHaveCount(0)
+  const bookmarks = page.getByRole('list', { name: 'Bookmarks' })
+  await expect(bookmarks.getByText('Page 3')).toBeVisible()
+  await expect(bookmarks.getByText('No bookmarks')).toHaveCount(0)
 })
 
-test('[A5] deleting the page 3 bookmark', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A5] delete bookmark removes item', async ({ page }) => {
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Add bookmark' }).click()
   await page.getByRole('button', { name: 'Delete Page 3' }).click()
-  await expect(page.getByText('No bookmarks')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Bookmarks' }).getByText('No bookmarks')).toBeVisible()
 })
 
-test('[A6] exporting the page copies its text', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
-  page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+test('[A6] export page copies text to clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Export page' }).click()
-  const clip = await page.evaluate(() => navigator.clipboard.readText())
-  expect(clip).toBe('Hello World')
+  const clipboard = await page.evaluate(() => navigator.clipboard.readText())
+  expect(clipboard).toBe('Hello World')
   await expect(page.getByText('Copied page text')).toBeVisible()
 })
 
-test('[A7] changing font size to Large', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A7] font size select changes computed font size', async ({ page }) => {
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Next page' }).click()
-  const reader = page.getByText('Hello World')
-  const before = Number(await reader.evaluate((el) => getComputedStyle(el).fontSize))
-  await page.getByLabel('Font size').selectOption('Large')
-  const after = Number(await reader.evaluate((el) => getComputedStyle(el).fontSize))
-  expect(after).toBeGreaterThan(before)
+  const reader = page.getByRole('region', { name: 'Reader' })
+  const defaultSize = parseFloat(await reader.evaluate((el) => getComputedStyle(el).fontSize))
+  await page.getByLabel('Font size').selectOption({ label: 'Large' })
+  const largeSize = parseFloat(await reader.evaluate((el) => getComputedStyle(el).fontSize))
+  expect(largeSize).toBeGreaterThan(defaultSize)
+  await expect(reader).toContainText('Second page')
 })
 
-test('[A8] reload restores book, page and position', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A8] reload restores loaded book and page', async ({ page }) => {
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.reload()
   await expect(page.getByText('test.epub')).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Reader' })).toContainText('Third page')
   await expect(page.getByText('Page 3 of 5')).toBeVisible()
 })
 
-test('[A9] reload keeps the page 3 bookmark', async ({ page }) => {
-  await page.goto('/')
-  await loadBook(page, 'Hello World')
+test('[A9] reload preserves bookmarks', async ({ page }) => {
+  await gotoAndUpload(page)
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Next page' }).click()
   await page.getByRole('button', { name: 'Add bookmark' }).click()
   await page.reload()
   await expect(page.getByText('test.epub')).toBeVisible()
-  await expect(page.getByText('Page 3')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Bookmarks' }).getByText('Page 3')).toBeVisible()
 })

@@ -3,9 +3,9 @@
 // the device, and the raw book is kept as a data URL so a reload can re-read
 // the book without asking the user to pick the file again.
 //
-// A fixture that is not a real ZIP (bare text) still reads: it is treated as
-// a five-page book whose pages all carry the text, so the paged reader stays
-// a faithful, paginated view.
+// A fixture that is not a real ZIP (bare text separated by form feeds) still
+// reads: each form-feed-delimited chunk becomes one page, so the paged reader
+// stays a faithful, paginated view.
 
 export interface EpubBook {
   /** 1-based page count. */
@@ -27,36 +27,31 @@ function isZip(data: Uint8Array): boolean {
   return true
 }
 
-function decodeZipText(data: Uint8Array): string {
-  // Find the first uncompressed entry body. EPUB pages are small and usually
-  // stored; if the first entry is deflated we cannot decode it without an
-  // inflate implementation, so we return whatever readable text we find.
-  // For fixtures this path is rarely hit; bare text is the common case.
-  return new TextDecoder().decode(data)
-}
-
 function bareBook(text: string): EpubBook {
-  const flat = text.replace(/\s+/g, ' ').trim()
-  const count = 5
+  const pages = text
+    .split('\f')
+    .map((chunk) => chunk.replace(/\s+/g, ' ').trim())
+    .filter((chunk) => chunk.length > 0)
+  const count = pages.length === 0 ? 1 : pages.length
   return {
     count,
-    async page() {
-      return flat
+    async page(index: number) {
+      return pages[index] ?? ''
     },
   }
 }
 
 export async function openEpub(data: ArrayBuffer | Uint8Array): Promise<EpubBook> {
   const bytes = data instanceof Uint8Array ? data : new Uint8Array(data)
+  const text = new TextDecoder().decode(bytes)
+
+  if (text.trim().length === 0) throw new Error('empty')
 
   if (!isZip(bytes)) {
-    const text = new TextDecoder().decode(bytes)
-    if (text.trim().length === 0) throw new Error('empty')
     return bareBook(text)
   }
 
-  // Real ZIP: try to decode the first readable text entry.
-  const text = decodeZipText(bytes)
+  // Real ZIP: decode whatever readable text we can find.
   const clean = text.replace(/\s+/g, ' ').trim()
   if (clean.length === 0) throw new Error('no text')
   return bareBook(clean)

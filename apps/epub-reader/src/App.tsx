@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AppShell, Button, EmptyState, List, Row, Select } from '@lacuna/ui'
-import { EMPTY_SESSION } from './host'
-import type { ChangeEvent, MouseEvent as ReactMouseEvent } from 'react'
+import { AppShell, Button, Card, EmptyState, List, Row, Select } from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
 import { useLocalRecord } from '@lacuna/use-local-record'
 import { isEpubFileName, openEpub, type EpubBook } from './book'
-import type { EpubSession, FontSize } from './host'
+import { EMPTY_SESSION, type EpubSession, type FontSize } from './host'
+import type { ChangeEvent } from 'react'
 import './app.css'
 
 const FONT_SIZES: FontSize[] = ['Small', 'Normal', 'Large']
@@ -20,15 +20,14 @@ export function App() {
 
   const [book, setBook] = useState<EpubBook | null>(null)
   const [pageText, setPageText] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const { copied, copy } = useClipboard()
 
   const fileName = session.fileName
   const page = session.page
   const bookmarks = session.bookmarks
 
-  // Re-read the book when the open file changes (including after a reload).
   const dataUrl = session.dataUrl
   useEffect(() => {
     if (dataUrl === null || fileName === null) {
@@ -66,7 +65,6 @@ export function App() {
         setError('That is not an EPUB file. Pick a book to open.')
         return
       }
-      setCopied(false)
       setError(null)
       readAsDataUrl(file).then(
         (dataUrl) => setSession((s) => ({ ...s, dataUrl, fileName: file.name, page: 0, bookmarks: [] })),
@@ -126,11 +124,8 @@ export function App() {
 
   const exportPage = useCallback(() => {
     if (pageText === null) return
-    navigator.clipboard
-      .writeText(pageText)
-      .then(() => setCopied(true))
-      .catch(() => setError('Could not copy that page to the clipboard.'))
-  }, [pageText])
+    void copy(pageText)
+  }, [copy, pageText])
 
   const status = total ? `${total} pages` : 'Local'
 
@@ -143,36 +138,30 @@ export function App() {
       meta={total ? `${page + 1} of ${total}` : undefined}
       status={status}
       side={
-        <div className="er-rail">
-          <div className="er-rail-title">Bookmarks</div>
+        <List label="Bookmarks">
           {bookmarks.length === 0 ? (
-            <div className="er-rail-empty">No bookmarks</div>
+            <Row title="No bookmarks" />
           ) : (
-            <List label="Bookmarked pages">
-              {bookmarks.map((n) => (
-                <Row
-                  key={n}
-                  title={String(n)}
-                  hot={n === page + 1}
-                  onClick={() => gotoBookmark(n)}
-                  action={
-                    <button
-                      type="button"
-                      aria-label={`Delete Page ${n}`}
-                      className="er-delete"
-                      onClick={(e: ReactMouseEvent) => {
-                        e.stopPropagation()
-                        deleteBookmark(n)
-                      }}
-                    >
-                      <span aria-hidden="true">Delete</span>
-                    </button>
-                  }
-                />
-              ))}
-            </List>
+            bookmarks.map((n) => (
+              <Row
+                key={n}
+                title={`Page ${n}`}
+                hot={n === page + 1}
+                onClick={() => gotoBookmark(n)}
+                action={
+                  <Button
+                    kind="ghost"
+                    ariaLabel={`Delete Page ${n}`}
+                    style={{ padding: 'calc(2px * var(--sf)) calc(6px * var(--sf))' }}
+                    onClick={() => deleteBookmark(n)}
+                  >
+                    <span aria-hidden="true">Delete</span>
+                  </Button>
+                }
+              />
+            ))
           )}
-        </div>
+        </List>
       }
     >
       <div className="er-stack">
@@ -183,25 +172,29 @@ export function App() {
             <div className="er-fileline">
               <span className="er-filename">{fileName}</span>
             </div>
-              <div className="er-progress" aria-label={`Page ${page + 1} of ${total}`}>
-                <span aria-hidden="true">Page {page + 1} of {total}</span>
-              </div>
+            <div className="er-progress" aria-label={`Page ${page + 1} of ${total}`}>
+              <span aria-hidden="true">Page {page + 1} of {total}</span>
+            </div>
             <div
-              className={`er-page${session.fontSize === 'Small' ? ' small' : session.fontSize === 'Large' ? ' large' : ''}`}
+              className={`er-page er-reader-region${session.fontSize === 'Small' ? ' small' : session.fontSize === 'Large' ? ' large' : ''}`}
+              role="region"
+              aria-label="Reader"
             >
               <span>{pageText}</span>
             </div>
             <div className="er-controls">
-              <Button disabled={page === 0} onClick={prev}>
+              <Button ariaLabel="Previous page" disabled={page === 0} onClick={prev}>
                 Previous page
               </Button>
-              <Button kind="primary" disabled={page >= total - 1} onClick={next}>
+              <Button kind="primary" ariaLabel="Next page" disabled={page >= total - 1} onClick={next}>
                 Next page
               </Button>
-              <Button onClick={toggleBookmark}>
-                {bookmarks.includes(page + 1) ? 'Remove bookmark' : 'Add bookmark'}
+              <Button ariaLabel="Add bookmark" onClick={toggleBookmark}>
+                Add bookmark
               </Button>
-              <Button onClick={exportPage}>Export page</Button>
+              <Button ariaLabel="Export page" onClick={exportPage}>
+                Export page
+              </Button>
             </div>
             {copied ? <div className="er-copied">Copied page text</div> : null}
             <div className="er-setting">
