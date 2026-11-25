@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "06ee25c1b6130f1b36ba5b1d8bfe94992bd6901d70c51cf6c55a6427ffb68514",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Plant Watering Tracker\", the text \"No plants yet\", and the tab labelled \"Log\" is present."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Plant name\" with \"Fern\" and the field labelled \"Interval (days)\" with \"3\", then clicking the button \"Add plant\" adds a list item containing \"Fern\" and \"every 3 days\"; the text \"No plants yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "With the plant \"Fern\" present, clicking the button \"Water Fern\" adds a log entry and the list item for Fern shows \"Last watered: today\" and \"Streak: 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "After clicking \"Water Fern\" once, switching to the tab labelled \"Log\" shows a table row containing \"Fern\" and the text \"1\"; the heatmap in the Log tab shows a single filled cell."
+    },
+    {
+      "id": "A5",
+      "text": "With the plant \"Fern\" present, clicking the button \"Delete Fern\" removes the list item and the text \"No plants yet\" reappears."
+    },
+    {
+      "id": "A6",
+      "text": "Filling the field labelled \"Plant name\" with \"Cactus\" and the field labelled \"Interval (days)\" with \"7\", then clicking \"Add plant\", adds a list item containing \"Cactus\" and \"every 7 days\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the plant \"Fern\" (interval 3) present, clicking the button \"Advance day\" three times changes the Fern list item to show \"Due in: 0 days\" and triggers the in-app alert banner with the text \"Fern is due for water\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the plant \"Fern\" present, clicking the button \"Export log\" shows the toast \"Log copied to clipboard\" and the clipboard contains a line starting with \"Fern,\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the plant \"Fern\" with the text \"every 3 days\" and the log entry showing \"Streak: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7cecd562687ffa24ba5beb228ec14a21b85631ea4ba95ac574f658308b311a67"
+    }
+  ]
+}
