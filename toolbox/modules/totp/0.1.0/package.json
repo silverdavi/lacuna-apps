@@ -1,0 +1,29 @@
+{
+  "name": "@lacuna/totp",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Generates RFC 6238 TOTP codes from a base32 secret and parses otpauth:// URIs into structured parameters.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "totp",
+    "kind": "logic",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "be98489ddb00bb99",
+    "lines": 397,
+    "exports": [
+      "base32Decode",
+      "totp",
+      "parseOtpauth"
+    ],
+    "types": [
+      "TotpOptions",
+      "OtpauthParams",
+      "TotpAlgorithm"
+    ],
+    "signature": ""
+  }
+}

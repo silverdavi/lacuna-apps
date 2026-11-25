@@ -1580,6 +1580,44 @@
       }
     },
     {
+      "id": "@lacuna/crop-box",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Resizable and draggable crop rectangle with handles over an image, with optional aspect-ratio locking.",
+      "today": [
+        "toolbox/modules/crop-box/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "CropBox"
+      ],
+      "public": true,
+      "path": "toolbox/modules/crop-box/0.1.0",
+      "bridge": {
+        "component": "CropBox",
+        "kind": "widget",
+        "exports": [
+          "CropBox"
+        ],
+        "types": [
+          "CropBoxProps"
+        ],
+        "signature": "CropBox({ imageWidth, imageHeight, crop, onCropChange, aspectRatio, minSize = 10, label = 'Cr...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "35dd5cd1e7cfc44d",
+            "lines": 209,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/csv-parse",
       "layer": 3,
       "status": "exists",
@@ -3192,6 +3230,46 @@
       }
     },
     {
+      "id": "@lacuna/print-sheet",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Paper-sized layout container (A4 or Letter) with print-specific CSS for generating printable documents.",
+      "today": [
+        "toolbox/modules/print-sheet/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "PrintSheet"
+      ],
+      "public": true,
+      "path": "toolbox/modules/print-sheet/0.1.0",
+      "bridge": {
+        "component": "PrintSheet",
+        "kind": "widget",
+        "exports": [
+          "PrintSheet"
+        ],
+        "types": [
+          "PaperSize",
+          "SheetOrientation",
+          "PrintSheetProps"
+        ],
+        "signature": "PrintSheet(props: PrintSheetProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "e314db790e9342d7",
+            "lines": 148,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/progress-ring",
       "layer": 2,
       "status": "exists",
@@ -3539,6 +3617,57 @@
       }
     },
     {
+      "id": "@lacuna/record-list-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Full record-list composition: search, create/edit, delete with confirm, and CSV export over a local collection.",
+      "today": [
+        "toolbox/modules/record-list-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/confirm-dialog",
+        "@lacuna/export-menu",
+        "@lacuna/record-form",
+        "@lacuna/record-table",
+        "@lacuna/use-collection"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "RecordListKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/record-list-kit/0.1.0",
+      "bridge": {
+        "component": "RecordListKit",
+        "kind": "kit",
+        "exports": [
+          "RecordListKit"
+        ],
+        "types": [
+          "RecordListKitColumn",
+          "RecordListKitProps"
+        ],
+        "signature": "RecordListKit({ storageKey, fields, columns, searchFields, emptyMessage = 'No records', createLabel...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "d07b27a350fcd3d6",
+            "lines": 352,
+            "dependencies": {
+              "@lacuna/confirm-dialog": "0.2.0",
+              "@lacuna/export-menu": "0.1.0",
+              "@lacuna/record-form": "0.1.0",
+              "@lacuna/record-table": "0.1.0",
+              "@lacuna/use-collection": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/record-table",
       "layer": 2,
       "status": "exists",
@@ -3710,6 +3839,52 @@
             "lines": 234,
             "dependencies": {
               "@lacuna/fuzzy-search": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/settle-up",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions that compute each participant's net balance from shared expenses and produce a minimal who-pays-whom settlement plan.",
+      "today": [
+        "toolbox/modules/settle-up/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/money"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "settleUp"
+      ],
+      "public": true,
+      "path": "toolbox/modules/settle-up/0.1.0",
+      "bridge": {
+        "component": "settleUp",
+        "kind": "logic",
+        "exports": [
+          "settleExpenses",
+          "formatSettleAmount"
+        ],
+        "types": [
+          "Expense",
+          "Balance",
+          "Transfer",
+          "SettlementResult"
+        ],
+        "signature": "settleExpenses(expenses: readonly Expense[]); formatSettleAmount(amount: number, currency: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "80da96668ac6ee52",
+            "lines": 113,
+            "dependencies": {
+              "@lacuna/money": "0.1.0"
             }
           }
         }
@@ -3932,6 +4107,44 @@
       }
     },
     {
+      "id": "@lacuna/text-stats",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Computes word, character, sentence, paragraph counts and estimated reading time from a text string.",
+      "today": [
+        "toolbox/modules/text-stats/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "textStats"
+      ],
+      "public": true,
+      "path": "toolbox/modules/text-stats/0.1.0",
+      "bridge": {
+        "component": "textStats",
+        "kind": "logic",
+        "exports": [
+          "textStats"
+        ],
+        "types": [
+          "TextStats"
+        ],
+        "signature": "textStats(text: string, wpm: number = DEFAULT_WPM)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "edf5253e9db3b5ba",
+            "lines": 44,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/text-transforms",
       "layer": 3,
       "status": "exists",
@@ -4021,6 +4234,88 @@
       }
     },
     {
+      "id": "@lacuna/toast",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Transient status message with optional undo action and auto-dismiss timer.",
+      "today": [
+        "toolbox/modules/toast/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "Toast"
+      ],
+      "public": true,
+      "path": "toolbox/modules/toast/0.1.0",
+      "bridge": {
+        "component": "Toast",
+        "kind": "widget",
+        "exports": [
+          "Toast"
+        ],
+        "types": [
+          "ToastProps"
+        ],
+        "signature": "Toast(props: ToastProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "386bec07d67ca354",
+            "lines": 93,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/tone-synth",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for scheduling Web Audio tones, clicks, and notes with sample-accurate timing.",
+      "today": [
+        "toolbox/modules/tone-synth/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "toneSynth"
+      ],
+      "public": true,
+      "path": "toolbox/modules/tone-synth/0.1.0",
+      "bridge": {
+        "component": "toneSynth",
+        "kind": "logic",
+        "exports": [
+          "midiToFreq",
+          "scheduleTone",
+          "createNoiseBuffer",
+          "scheduleClick",
+          "scheduleNote"
+        ],
+        "types": [
+          "ToneOptions",
+          "ClickOptions",
+          "NoteOptions"
+        ],
+        "signature": "midiToFreq(midi: number); scheduleTone(ctx: AudioContext, opts?: ToneOptions); createNoiseBuffer(ctx: AudioContext, duration: number); scheduleClick(ctx: AudioContext, opts?: ClickOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "997f34a3748d03a7",
+            "lines": 129,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/toolbar",
       "layer": 2,
       "status": "exists",
@@ -4059,6 +4354,48 @@
             "dependencies": {
               "@lacuna/use-hotkeys": "0.1.0"
             }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/totp",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Generates RFC 6238 TOTP codes from a base32 secret and parses otpauth:// URIs into structured parameters.",
+      "today": [
+        "toolbox/modules/totp/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "totp"
+      ],
+      "public": true,
+      "path": "toolbox/modules/totp/0.1.0",
+      "bridge": {
+        "component": "totp",
+        "kind": "logic",
+        "exports": [
+          "base32Decode",
+          "totp",
+          "parseOtpauth"
+        ],
+        "types": [
+          "TotpOptions",
+          "OtpauthParams",
+          "TotpAlgorithm"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "be98489ddb00bb99",
+            "lines": 397,
+            "dependencies": {}
           }
         }
       }
