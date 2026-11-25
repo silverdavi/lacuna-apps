@@ -1,72 +1,137 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useMemo, useState } from 'react'
-import { AppShell, Button, Card, EmptyState, FormGrid, Select, Stack, Table, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, Stack, Table } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { store, type Conversion } from './host'
 
-const TZ_LABELS: [string, string][] = [
-  ['UTC', 'UTC'],
-  ['America/New_York', 'New York'],
-  ['America/Chicago', 'Chicago'],
-  ['America/Denver', 'Denver'],
-  ['America/Los_Angeles', 'Los Angeles'],
-  ['America/Sao_Paulo', 'Sao Paulo'],
-  ['Europe/London', 'London'],
-  ['Europe/Paris', 'Paris'],
-  ['Europe/Berlin', 'Berlin'],
-  ['Europe/Moscow', 'Moscow'],
-  ['Asia/Tokyo', 'Tokyo'],
-  ['Asia/Shanghai', 'Shanghai'],
-  ['Asia/Kolkata', 'Kolkata'],
-  ['Asia/Seoul', 'Seoul'],
-  ['Australia/Sydney', 'Sydney'],
-  ['Pacific/Auckland', 'Auckland'],
+const TZ: [string, string][] = [
+  ['UTC', 'Etc/UTC'],
+  ['New York', 'America/New_York'],
+  ['London', 'Europe/London'],
+  ['Tokyo', 'Asia/Tokyo'],
+  ['Sydney', 'Australia/Sydney'],
 ]
 
-const TZ_OPTIONS = TZ_LABELS.map(([value, label]) => ({ value, label }))
+const TZ_OPTIONS = TZ.map(([label]) => ({ value: label, label }))
+const IANA: Record<string, string> = Object.fromEntries(TZ)
 
-const OFFSET_H: Record<string, number> = {
-  'UTC': 0,
-  'America/New_York': -5,
-  'America/Chicago': -6,
-  'America/Denver': -7,
-  'America/Los_Angeles': -8,
-  'America/Sao_Paulo': -3,
-  'Europe/London': 0,
-  'Europe/Paris': 1,
-  'Europe/Berlin': 1,
-  'Europe/Moscow': 3,
-  'Asia/Tokyo': 9,
-  'Asia/Shanghai': 8,
-  'Asia/Kolkata': 5.5,
-  'Asia/Seoul': 9,
-  'Australia/Sydney': 10,
-  'Pacific/Auckland': 12,
+function zonedTimeToUtcMs(ianaTz: string, date: string, time: string): number | null {
+  const [y, mo, d] = date.split('-').map(Number)
+  const [h, mi] = time.split(':').map(Number)
+  if ([y, mo, d, h, mi].some((v) => Number.isNaN(v))) return null
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: ianaTz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+  function offsetAt(utcMs: number): number {
+    const parts = Object.fromEntries(dtf.formatToParts(utcMs).map((p) => [p.type, p.value]))
+    const tzAsUtc = Date.UTC(
+      +parts.year!,
+      +parts.month! - 1,
+      +parts.day!,
+      +parts.hour! % 24,
+      +parts.minute!,
+      +parts.second!,
+    )
+    return tzAsUtc - utcMs
+  }
+  const guess = Date.UTC(y, mo - 1, d, h, mi)
+  let utcMs = guess - offsetAt(guess)
+  const offset2 = offsetAt(utcMs)
+  if (offset2 !== offsetAt(guess)) {
+    utcMs = guess - offset2
+  }
+  return utcMs
 }
 
-function labelOf(tz: string): string {
-  return TZ_LABELS.find(([value]) => value === tz)?.[1] ?? tz
+function utcMsToZonedTime(ianaTz: string, utcMs: number): string {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: ianaTz,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+  const parts = Object.fromEntries(dtf.formatToParts(utcMs).map((p) => [p.type, p.value]))
+  const hh = (+parts.hour!) % 24 === 0 && +parts.hour! === 24 ? '00' : String(+parts.hour!).padStart(2, '0')
+  return `${hh}:${parts.minute!}`
 }
 
-function convert(sourceTz: string, targetTz: string, date: string, time: string): string | null {
+function convert(sourceLabel: string, targetLabel: string, date: string, time: string): string | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null
-  const fromHour = OFFSET_H[sourceTz] ?? 0
-  const toHour = OFFSET_H[targetTz] ?? 0
-  const utcMs =
-    Date.UTC(
-      +date.slice(0, 4),
-      +date.slice(5, 7) - 1,
-      +date.slice(8, 10),
-      +time.slice(0, 2),
-      +time.slice(3, 5),
-    ) - fromHour * 3600_000
-  const targetMs = utcMs + toHour * 3600_000
-  const totalMin = Math.round(targetMs / 60_000) % 1440
-  const min = (totalMin + 1440) % 1440
-  const hh = String(Math.floor(min / 60)).padStart(2, '0')
-  const mm = String(min % 60).padStart(2, '0')
-  return `${hh}:${mm}`
+  const sourceIana = IANA[sourceLabel]
+  const targetIana = IANA[targetLabel]
+  if (!sourceIana || !targetIana) return null
+  const utcMs = zonedTimeToUtcMs(sourceIana, date, time)
+  if (utcMs === null) return null
+  return utcMsToZonedTime(targetIana, utcMs)
+}
+
+function LabeledSelect({
+  id,
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  id: string
+  label: string
+  value: string
+  onChange: (value: string) => void
+  options: { value: string; label: string }[]
+}) {
+  return (
+    <div className="tzc-field">
+      <label className="tzc-field-label" htmlFor={id}>
+        {label}
+      </label>
+      <select className="lc-input" id={id} value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function LabeledInput({
+  id,
+  label,
+  type,
+  value,
+  onChange,
+  readOnly,
+}: {
+  id: string
+  label: string
+  type: string
+  value: string
+  onChange: (value: string) => void
+  readOnly?: boolean
+}) {
+  return (
+    <div className="tzc-field">
+      <label className="tzc-field-label" htmlFor={id}>
+        {label}
+      </label>
+      <input
+        className="lc-input"
+        id={id}
+        type={type}
+        value={value}
+        readOnly={readOnly}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  )
 }
 
 function HistoryTable({ history }: { history: Conversion[] }) {
@@ -105,9 +170,9 @@ function HistoryTable({ history }: { history: Conversion[] }) {
 
 export function App() {
   const [source, setSource] = useState('UTC')
-  const [target, setTarget] = useState('America/New_York')
-  const [date, setDate] = useState('')
-  const [time, setTime] = useState('')
+  const [target, setTarget] = useState('New York')
+  const [date, setDate] = useState('2024-01-15')
+  const [time, setTime] = useState('14:30')
   const [tab, setTab] = useState<'Convert' | 'History'>('Convert')
   const [history, setHistory] = useState<Conversion[]>(() => store.list())
 
@@ -118,15 +183,14 @@ export function App() {
   function save() {
     if (!result) return
     const entry = {
-      source: labelOf(source),
-      target: labelOf(target),
+      source,
+      target,
       date,
       time,
       result,
     }
-    const record = store.add(entry)
+    store.add(entry)
     setHistory(store.list())
-    void record
   }
 
   function swap() {
@@ -164,23 +228,25 @@ export function App() {
       {tab === 'Convert' ? (
         <Stack>
           <Card mono="Input" title="Convert">
-            <FormGrid>
-              <Select
+            <div className="lk-form">
+              <LabeledSelect
+                id="source-tz"
                 label="Source timezone"
                 value={source}
                 onChange={setSource}
                 options={TZ_OPTIONS}
               />
-              <Select
+              <LabeledSelect
+                id="target-tz"
                 label="Target timezone"
                 value={target}
                 onChange={setTarget}
                 options={TZ_OPTIONS}
               />
-              <TextInput label="Date" type="date" value={date} onChange={setDate} />
-              <TextInput label="Time" type="time" value={time} onChange={setTime} />
-              <TextInput label="Result time" type="text" value={result ?? ''} onChange={() => {}} />
-            </FormGrid>
+              <LabeledInput id="date" label="Date" type="date" value={date} onChange={setDate} />
+              <LabeledInput id="time" label="Time" type="time" value={time} onChange={setTime} />
+              <LabeledInput id="result" label="Result time" type="text" value={result ?? ''} onChange={() => {}} readOnly />
+            </div>
             <div className="tzc-actions">
               <Button kind="primary" onClick={save} disabled={!result}>
                 Save conversion

@@ -10,7 +10,7 @@
 
 .tzc-tab {
   font-family: var(--sans);
-  font-size: calc(12.5px * var(--tf));
+  font-size: calc(13px * var(--tf));
   font-weight: 600;
   color: var(--ink-80);
   padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
@@ -29,4 +29,16 @@
   display: flex;
   gap: calc(8px * var(--sf));
   margin-top: calc(12px * var(--sf));
+}
+
+.tzc-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.tzc-field-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+  margin-bottom: calc(4px * var(--sf));
 }

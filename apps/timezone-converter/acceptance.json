@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "6d4704c1f08bec35014d48bbac6a5139503013ae936d3b8017afd24a56c8a086",
+  "spec_sha256": "9515a9c06853f06e71c027ff7eb926b62cb70766c2461e4d0bac4e40512840fc",
   "checks": [
     {
       "id": "A1",
@@ -28,7 +28,7 @@
     },
     {
       "id": "A7",
-      "text": "With the source timezone set to \"UTC\" and the target timezone set to \"Sydney\", entering \"2024-01-15\" in the date field and \"00:00\" in the time field shows \"10:00\" in the output time field."
+      "text": "With the source timezone set to \"UTC\" and the target timezone set to \"Sydney\", entering \"2024-01-15\" in the date field and \"00:00\" in the time field shows \"11:00\" in the output time field."
     },
     {
       "id": "A8",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "7f36a8db251f3bc0fb77b6f69b55f60f82abda4cd92cb46844603f6984a62bce"
+      "sha256": "8793b04be645fdedb133e94c732bd387f9cf948b02e1245096a7e280640b1d53"
     }
   ]
 }
