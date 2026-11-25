@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "d5dad797a7d76caab31c5b2abe157315eb40fab224fc64ee7fab5baf41bee347",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Word Scramble Game\", the text \"No active round\", and the score display \"Score: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the field labelled \"Seed\" set to \"42\" and the select labelled \"Difficulty\" set to \"Easy\", clicking the button \"Start round\" shows the text \"Round started\", a timer displaying \"00:30\", and the scrambled word \"ELP\"."
+    },
+    {
+      "id": "A3",
+      "text": "After starting a round with Seed \"42\" and Difficulty \"Easy\", typing \"HELP\" in the field labelled \"Answer\" and clicking the button \"Submit\" shows the toast \"Correct! +10 points\", updates the score display to \"Score: 10\", and displays the next scrambled word \"WORLD\"."
+    },
+    {
+      "id": "A4",
+      "text": "After starting a round with Seed \"42\" and Difficulty \"Easy\", typing \"HELQ\" in the field labelled \"Answer\" and clicking the button \"Submit\" shows the toast \"Incorrect\", keeps the score display at \"Score: 0\", and keeps the scrambled word \"ELP\"."
+    },
+    {
+      "id": "A5",
+      "text": "After starting a round with Seed \"42\" and Difficulty \"Easy\", clicking the button \"Pause\" changes the button label to \"Resume\" and stops the timer at its current value, e.g., \"00:25\"."
+    },
+    {
+      "id": "A6",
+      "text": "After starting a round with Seed \"42\" and Difficulty \"Easy\", clicking the button \"Give up\" shows the toast \"Round over\", displays the text \"Final score: 0\", and updates the \"Best score\" display to \"Best: 0\"."
+    },
+    {
+      "id": "A7",
+      "text": "After starting a round with Seed \"42\" and Difficulty \"Easy\", solving the first word \"HELP\" to reach \"Score: 10\", then reloading the page, the page still shows the text \"Round started\", the scrambled word \"WORLD\", and the score display \"Score: 10\"."
+    },
+    {
+      "id": "A8",
+      "text": "After starting a round with Seed \"42\" and Difficulty \"Easy\", solving the first word \"HELP\" to reach \"Score: 10\", then clicking the button \"Restart\", the page shows the text \"No active round\", the score display \"Score: 0\", and the \"Best score\" display \"Best: 10\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0cb61cbe438b7774e26504371fd3327aa9bcd923a798009c9988f65a751250ef"
+    }
+  ]
+}

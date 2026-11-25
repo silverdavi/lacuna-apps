@@ -1,0 +1,88 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.word-scramble",
+  "name": "Word Scramble",
+  "version": "0.1.0",
+  "summary": "Unscramble words against the clock to score points.",
+  "description": "A timed word game. Each word arrives scrambled; type the answer before the timer runs out. Correct answers earn points, and your score and best survive a reload.",
+  "category": "personal",
+  "tags": [],
+  "icon": "whiteboard",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/word-scramble"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/use-timer": "0.1.0",
+      "@lacuna/toast": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:game"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "game",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the score and the best score between sessions"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "game"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
