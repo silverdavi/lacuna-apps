@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "eb73973210f959dab8950c7488eec500cbc28083b6a08ae428be286dd1e61321",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Cron Explainer\" and the tab labelled \"Expression to Text\" is active by default."
+    },
+    {
+      "id": "A2",
+      "text": "In the tab labelled \"Expression to Text\", typing `0 9 * * 1` in the field labelled \"Cron expression\" shows the text \"At 09:00 on Monday\" in the element labelled \"Description\" and the first row of the table labelled \"Next occurrences\" contains the date \"2025-01-06\" and the time \"09:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the tab labelled \"Expression to Text\", typing `*/15 8-10 * * *` in the field labelled \"Cron expression\" shows the text \"Every 15 minutes between 08:00 and 10:00\" in the element labelled \"Description\" and the first row of the table labelled \"Next occurrences\" contains the time \"08:00\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the tab labelled \"Expression to Text\", clicking the button \"Copy description\" after entering `0 9 * * 1` shows the toast \"Description copied\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the tab labelled \"Text to Expression\", selecting \"Every day\" in the select labelled \"Frequency\", selecting \"09:00\" in the field labelled \"Time\", and clicking the button \"Generate\" shows `0 9 * * *` in the field labelled \"Cron expression\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the tab labelled \"Text to Expression\", selecting \"Weekly\" in the select labelled \"Frequency\", clicking the checkbox labelled \"Monday\", selecting \"14:30\" in the field labelled \"Time\", and clicking the button \"Generate\" shows `30 14 * * 1` in the field labelled \"Cron expression\"."
+    },
+    {
+      "id": "A7",
+      "text": "In the tab labelled \"Expression to Text\", typing `99 99 * * *` in the field labelled \"Cron expression\" shows the message \"Invalid cron expression\" in the element labelled \"Description\" and the table labelled \"Next occurrences\" is hidden."
+    },
+    {
+      "id": "A8",
+      "text": "In the tab labelled \"Expression to Text\", typing `0 0 1 1 *` in the field labelled \"Cron expression\" shows the text \"At 00:00 on January 1\" in the element labelled \"Description\" and the first row of the table labelled \"Next occurrences\" contains the date \"2025-01-01\" and the time \"00:00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the cron expression \"0 9 * * 1\" in the field labelled \"Cron expression\" and the text \"At 09:00 on Monday\" in the element labelled \"Description\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "dd853b45442bffdc2367156781d7eaab9d9baa9c63df5a6715d106b301feaa73"
+    }
+  ]
+}

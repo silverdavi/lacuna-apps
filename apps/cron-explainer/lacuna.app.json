@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.cron-explainer",
+  "name": "Cron Explainer",
+  "version": "0.1.0",
+  "summary": "Read a cron schedule in plain words, or build one.",
+  "description": "Type a cron expression to see what it means in plain words and when it next fires, or describe the schedule in a few choices and get the expression back.",
+  "category": "productivity",
+  "tags": [
+    "cron",
+    "schedule",
+    "automation"
+  ],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "contact": "apps@lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/cron-explainer",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:cron-explainer"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "cron-explainer",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Cron Explainer records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "cron-explainer"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
