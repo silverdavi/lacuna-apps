@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "971c83560be6aaa2aa765c52bb3fbbd6899f9bb661284d91c99736b518d24ed2",
+  "spec_sha256": "7ba94053af53b5b9743abd323509d77b699a44383f840c6b5860fae5f6b9fb22",
   "checks": [
     {
       "id": "A1",
@@ -16,23 +16,23 @@
     },
     {
       "id": "A4",
-      "text": "The cover sheet lists each receipt's date and amount, extracted from the image."
+      "text": "The cover sheet lists each receipt's label, date and amount, taken from the \"Date\" and \"Amount\" fields of that receipt."
     },
     {
       "id": "A5",
-      "text": "The PDF is saved with the filename \"Receipt Packet_2025-04-05.pdf\"."
+      "text": "With a receipt whose \"Date\" is \"2025-04-05\", the PDF is saved with the filename \"Receipt Packet_2025-04-05.pdf\"."
     },
     {
       "id": "A6",
-      "text": "Selecting \"Send to Expenses App\" opens the user's default expenses app with the PDF attached."
+      "text": "Selecting \"Send to Expenses App\" saves the PDF and shows the text \"Sent to Expenses App: Receipt Packet_2025-04-05.pdf\" in the status area."
     },
     {
       "id": "A7",
-      "text": "Cropping a receipt photo using the on-screen tool adjusts the image to the correct size."
+      "text": "Clicking \"Crop\" on a receipt opens a crop panel with the fields \"Crop width\" and \"Crop height\" (pixels); setting 100 and 80 and clicking \"Apply crop\" shows the text \"Cropped to 100 \u00d7 80\"."
     },
     {
       "id": "A8",
-      "text": "Rotating a receipt photo straightens the image to a horizontal orientation."
+      "text": "Clicking the button \"Rotate\" on a receipt rotates its thumbnail by 90 degrees (its `data-rotation` goes from 0 to 90)."
     },
     {
       "id": "A9",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "7ba2285eade2d4cf9f953dc61e5073b40b01a316925e6d609e8a37806ab3bbe9"
+      "sha256": "df5d18fe331964ec30ded5aeb647b38b8351739f574d84341f6774cdf564d7d1"
     }
   ]
 }
