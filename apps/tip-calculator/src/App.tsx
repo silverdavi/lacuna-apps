@@ -2,7 +2,7 @@
 // Tip calculator: enter the bill and tax, pick a tip percentage, and see the total and per-person share.
 // Split the check and see who pays whom. Everything persists locally.
 import { useEffect, useMemo, useState } from 'react'
-import { AppShell, Button, Card, FormGrid, Select, Stack, Table } from '@lacuna/ui'
+import { AppShell, Button, Card, FormGrid, Stack, Table } from '@lacuna/ui'
 import { add, format } from '@lacuna/money'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { tipStore, type TipRecord } from './host/mock'
@@ -11,12 +11,12 @@ const TABS = ['Bill', 'Split'] as const
 type Tab = (typeof TABS)[number]
 
 const TIP_PRESETS = [
-  { value: '0', label: '0%' },
-  { value: '5', label: '5%' },
-  { value: '10', label: '10%' },
-  { value: '15', label: '15%' },
-  { value: '20', label: '20%' },
-  { value: '25', label: '25%' },
+  { value: '0%', label: '0%' },
+  { value: '5%', label: '5%' },
+  { value: '10%', label: '10%' },
+  { value: '15%', label: '15%' },
+  { value: '20%', label: '20%' },
+  { value: '25%', label: '25%' },
 ]
 
 function moneyInputStyle(): React.CSSProperties {
@@ -84,13 +84,11 @@ export function App() {
     }
   })
 
-  const perPersonSplit = people > 0 ? Math.round(billMinor / people) + Math.round(tipMinor / people) + Math.round(taxMinor / (2 * people)) : 0
-
   const transfers = useMemo(() => {
     const diffList: { person: number; diff: number }[] = []
     for (const i of peopleList) {
       const paidMinor = paid[String(i)] ?? 0
-      diffList.push({ person: i, diff: paidMinor - perPersonSplit })
+      diffList.push({ person: i, diff: paidMinor - perPerson })
     }
     const lines: string[] = []
     const remaining = [...diffList]
@@ -110,7 +108,7 @@ export function App() {
       remaining[debtorIdx].diff += pay
     }
     return lines
-  }, [peopleList, paid, perPersonSplit])
+  }, [peopleList, paid, perPerson])
 
   function setBill(v: number): void {
     setRecord((prev) => ({ ...prev, bill: v }))
@@ -128,7 +126,7 @@ export function App() {
     setRecord((prev) => ({ ...prev, paid: { ...prev.paid, [String(person)]: v } }))
   }
   function setPreset(v: string): void {
-    setTip(Number(v))
+    setTip(Number(v.replace('%', '')))
   }
 
   function parseMoney(text: string): number {
@@ -239,7 +237,20 @@ export function App() {
                 </label>
               </div>
               <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
-                <Select label="Tip preset" value={String(tipPercent)} onChange={setPreset} options={TIP_PRESETS} />
+                <div className="lc-field">
+                  <span className="lc-field-label" id="tip-preset-label">Tip preset</span>
+                  <select
+                    className="lc-input"
+                    aria-labelledby="tip-preset-label"
+                    value={`${tipPercent}%`}
+                    onChange={(e) => setPreset(e.target.value)}
+                    style={moneyInputStyle()}
+                  >
+                    {TIP_PRESETS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </Card>
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "80c2a6f83d524e6e8839435b5de38cb38692793ee714b36447ffd01778433cd7",
+  "spec_sha256": "dead62014044452ca83d9696e205b9d5c57f5ea64cd6b50bd4b381d2b599ae27",
   "checks": [
     {
       "id": "A1",
@@ -20,11 +20,11 @@
     },
     {
       "id": "A5",
-      "text": "Clicking the tab \"Split\" shows the table with the header row \"Person\", \"Paid\", \"Owes\", and the row \"1\", \"$30.75\", \"$0.00\"."
+      "text": "Clicking the tab \"Split\" (with 4 people) shows the table with the header row \"Person\", \"Paid\", \"Owes\", and the row \"1\", \"$0.00\", \"$30.75\"."
     },
     {
       "id": "A6",
-      "text": "In the Split tab, typing 25 in the field labelled \"Person 1 paid\" and 35 in the field labelled \"Person 2 paid\" shows the transfer line \"Person 1 pays Person 2 $4.75\"."
+      "text": "In the Split tab with bill 100, tax 8, tip 15% and \"Number of people\" set to 2 (share $61.50), typing 50 in the field labelled \"Person 1 paid\" and 73 in the field labelled \"Person 2 paid\" shows the transfer line \"Person 1 pays Person 2 $11.50\"."
     },
     {
       "id": "A7",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "c0233b6c570b517b88a2c45f55547f61074a4ae525a78f5cfaa4bd81379405ca"
+      "sha256": "81531b31db97644535bc18c7282e7bab1fee31b2ba1ceb28a1a489bd919c5c2c"
     }
   ]
 }
