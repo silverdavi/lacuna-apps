@@ -42,6 +42,7 @@ interface TimerState {
   remainingMs: number
   workMs: number
   restMs: number
+  holdTicks: number
 }
 
 function isTimerState(value: unknown): value is TimerState {
@@ -51,12 +52,13 @@ function isTimerState(value: unknown): value is TimerState {
   if (t.phase !== 'work' && t.phase !== 'rest') return false
   if (!num(t.workMs) || !num(t.restMs) || !num(t.remainingMs)) return false
   if (!num(t.round) || (t.round as number) < 1) return false
+  if (typeof t.holdTicks !== 'number' || t.holdTicks < 0) return false
   return typeof t.running === 'boolean'
 }
 
 const timerStore = createMockValue<TimerState>({
   key: TIMER_KEY,
-  fallback: { phase: 'ready', round: 1, running: false, remainingMs: 0, workMs: 30000, restMs: 15000 },
+  fallback: { phase: 'ready', round: 1, running: false, remainingMs: 0, workMs: 30000, restMs: 15000, holdTicks: 0 },
   validate: isTimerState,
 })
 
@@ -81,6 +83,9 @@ export function App() {
   tickRef.current = () => {
     setTimerState((cur) => {
       if (!cur.running || cur.phase === 'ready') return cur
+      if (cur.holdTicks > 0) {
+        return { ...cur, holdTicks: cur.holdTicks - 1 }
+      }
       const next = cur.remainingMs - 1000
       if (next > 1000) {
         return { ...cur, remainingMs: next }
@@ -89,19 +94,19 @@ export function App() {
         return { ...cur, remainingMs: 1000 }
       }
       if (cur.phase === 'work') {
-        return { ...cur, phase: 'rest', remainingMs: cur.restMs }
+        return { ...cur, phase: 'rest', remainingMs: cur.restMs, holdTicks: 3 }
       }
       const round = cur.round
       const workSec = Math.round(cur.workMs / 1000)
       const restSec = Math.round(cur.restMs / 1000)
       window.setTimeout(() => actions.add({ round, workSec, restSec, date: today() }), 0)
-      return { ...cur, phase: 'work', round: cur.round + 1, remainingMs: cur.workMs }
+      return { ...cur, phase: 'work', round: cur.round + 1, remainingMs: cur.workMs, holdTicks: 3 }
     })
   }
 
   useEffect(() => {
     if (!timer.running || timer.phase === 'ready') return
-    const id = window.setInterval(() => tickRef.current(), 100)
+    const id = window.setInterval(() => tickRef.current(), 80)
     return () => window.clearInterval(id)
   }, [timer.running, timer.phase])
 
@@ -124,6 +129,7 @@ export function App() {
       phase: 'work',
       remainingMs: work,
       running: true,
+      holdTicks: 0,
     }))
   }
 
@@ -136,6 +142,7 @@ export function App() {
       remainingMs: 0,
       workMs: Math.max(1, Math.round(Number(workSec)) || 1) * 1000,
       restMs: Math.max(1, Math.round(Number(restSec)) || 1) * 1000,
+      holdTicks: 0,
     }))
   }
 
