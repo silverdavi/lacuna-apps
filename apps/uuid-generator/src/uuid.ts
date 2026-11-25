@@ -15,6 +15,12 @@ function bytesToHex(bytes: Uint8Array): string {
 
 export type UuidVersion = 'v1' | 'v4'
 
+export type { UuidVersion as Version }
+
+export function formatUuid(uuid: string, upper: boolean): string {
+  return upper ? uuid.toUpperCase() : uuid
+}
+
 export function generateUuid(version: UuidVersion): string {
   const bytes = randomBytes(16)
   if (version === 'v1') {

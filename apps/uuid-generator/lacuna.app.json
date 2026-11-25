@@ -3,8 +3,8 @@
   "id": "lacuna.uuid-generator",
   "name": "UUID Generator",
   "version": "0.1.0",
-  "summary": "Generate v1 and v4 UUIDs, one or a batch at a time.",
-  "description": "Pick a version and a batch size, press Generate, and keep the result on this page. Copy all, clear, or delete any ID. The history is stored on this device and survives reloads.",
+  "summary": "Generate v1 and v4 UUIDs in batches, keep a history, and export to .txt or .json.",
+  "description": "Pick a version, batch size, and case, press Generate, and keep the result on this page. Copy all, clear, or delete any ID. Export the whole history as .txt or .json. Settings and history are stored on this device and survive reloads.",
   "category": "productivity",
   "icon": "vault",
   "relationship": {
@@ -33,7 +33,8 @@
     "hostApi": "^1.0.0",
     "modules": {
       "@lacuna/host-mock": "0.1.0",
-      "@lacuna/use-clipboard": "0.1.0"
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
     }
   },
   "capabilities": [
