@@ -5,9 +5,14 @@ import {
   Button,
   Card,
   Checkbox,
+  EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
+  Rail,
   Stack,
   Table,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -250,6 +255,44 @@ function FrequencySelect({ value, onChange, options }: { value: string; onChange
   )
 }
 
+const FIELD_GUIDE = [
+  {
+    position: 1,
+    label: 'Minute',
+    range: '0–59',
+    meaning: 'Which minute within the hour fires.',
+    examples: ['0 top of the hour', '*/15 every 15', '30 mid-hour'],
+  },
+  {
+    position: 2,
+    label: 'Hour',
+    range: '0–23',
+    meaning: 'Which hour of the day fires.',
+    examples: ['9 at 09:00', '8-10 the 8, 9 and 10 o’clock hours', '*/6 every six hours'],
+  },
+  {
+    position: 3,
+    label: 'Day of month',
+    range: '1–31',
+    meaning: 'Which day of the month fires. Combined with day-of-week, either match wins.',
+    examples: ['1 first of the month', '1,15 paydays', '*/2 alternate days'],
+  },
+  {
+    position: 4,
+    label: 'Month',
+    range: '1–12',
+    meaning: 'Which month of the year fires.',
+    examples: ['3 March', '12-2 year-end and new year', '*/6 half-yearly'],
+  },
+  {
+    position: 5,
+    label: 'Day of week',
+    range: '0–7 (0 or 7 = Sunday)',
+    meaning: 'Which weekday fires. Used alone it ignores day-of-month.',
+    examples: ['1 Monday', '0,6 weekend', '1-5 weekdays'],
+  },
+]
+
 function generateExpression(frequency: string, days: boolean[], time: string): string {
   const [hText, mText] = time.split(':')
   const h = Number(hText)
@@ -266,6 +309,7 @@ function generateExpression(frequency: string, days: boolean[], time: string): s
 
 export function App() {
   const [tab, setTab] = useState('Expression to Text')
+  type TabName = 'Expression to Text' | 'Text to Expression' | 'Field guide'
   const [expression, setExpression] = useState('')
   const [frequency, setFrequency] = useState('Every day')
   const [dayFlags, setDayFlags] = useState<boolean[]>([false, false, false, false, false, false, false])
@@ -292,6 +336,8 @@ export function App() {
   const invalid = trimmed !== '' && fields === null
   const occurrences = fields !== null ? nextOccurrences(fields) : []
   const description = fields !== null ? descriptionOf(fields) : ''
+  const nextLabel =
+    fields !== null && occurrences[0] !== undefined ? `${fmtDate(occurrences[0])} ${fmtTime(occurrences[0])}` : null
 
   function copyDescription() {
     if (description === '') return
@@ -306,25 +352,48 @@ export function App() {
     setToast('Expression generated')
   }
 
+  const TABS: TabName[] = ['Expression to Text', 'Text to Expression', 'Field guide']
+
+  const railChips = fields
+    ? [
+        `${fields.minutes.size} min`,
+        `${fields.hours.size} hr`,
+        `${fields.daysOfMonth.size} dom`,
+        `${fields.months.size} mo`,
+        `${fields.daysOfWeek.size} dow`,
+      ]
+    : ['minute', 'hour', 'day', 'month', 'weekday']
+
   const shellStatus =
-    toast !== null
-      ? toast
-      : invalid
-        ? 'Invalid expression'
-        : fields !== null && occurrences[0]
-          ? `Next: ${fmtDate(occurrences[0])} ${fmtTime(occurrences[0])}`
-          : undefined
+    toast !== null ? toast : invalid ? 'Invalid expression' : nextLabel !== null ? `Next run ${nextLabel}` : 'Enter an expression to see what it does'
 
   return (
     <AppShell
       name="Cron Explainer"
       icon="timesheets"
-      hue="cobalt"
+      hue="blue"
       category="Productivity"
+      meta={invalid ? 'invalid' : fields !== null ? description : 'no expression yet'}
       status={shellStatus}
+      side={
+        <Rail title="Next run" note={nextLabel !== null ? 'UTC, five shown' : 'parse an expression'} chips={railChips}>
+          {nextLabel !== null ? (
+            <KpiRow>
+              <Kpi accent label="Next" value={nextLabel} />
+              <Kpi label="Shown" value={String(occurrences.length)} />
+            </KpiRow>
+          ) : (
+            <EmptyState
+              title="Nothing to show yet"
+              detail="Type a cron expression to see when it fires."
+              actionLabel="Enter an expression"
+            />
+          )}
+        </Rail>
+      }
     >
       <div className="lc-tabs" role="tablist" aria-label="Sections">
-        {['Expression to Text', 'Text to Expression'].map((item) => (
+        {TABS.map((item) => (
           <button
             key={item}
             type="button"
@@ -426,6 +495,44 @@ export function App() {
             />
           </Stack>
         </Card>
+      )}
+
+      {tab === 'Field guide' && (
+        <Stack>
+          <Card mono="5 fields, left to right" title="Anatomy of an expression">
+            <Body>
+              A cron expression is five space-separated fields. Each field is a value, a
+              range (<Tag>8-10</Tag>), a step (<Tag>*/15</Tag>), a list (<Tag>1,15</Tag>),
+              or a wildcard (<Tag>*</Tag>).
+            </Body>
+            <Table
+              label="Cron fields"
+              columns={[
+                { key: 'position', label: 'Field', num: true },
+                { key: 'range', label: 'Range' },
+                { key: 'meaning', label: 'Meaning' },
+                { key: 'examples', label: 'Examples' },
+              ]}
+              rows={FIELD_GUIDE.map((f) => ({
+                cells: {
+                  position: `${f.position} · ${f.label}`,
+                  range: f.range,
+                  meaning: f.meaning,
+                  examples: f.examples.join('  ·  '),
+                },
+              }))}
+            />
+          </Card>
+          <Card mono="Try one" title="Check a field here">
+            <Body sm>
+              Drop any field into the expression on the Expression to Text tab and watch
+              the description and next run update.
+            </Body>
+            <Button kind="ghost" onClick={() => setTab('Expression to Text')}>
+              Go to Expression to Text
+            </Button>
+          </Card>
+        </Stack>
       )}
     </AppShell>
   )
