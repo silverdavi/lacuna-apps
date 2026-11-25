@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.job-tracker",
+  "name": "Job Application Tracker",
+  "version": "0.1.0",
+  "summary": "Track every job application, from the first apply to the final decision.",
+  "description": "Keep every job application in one list: company, role, status, and interview date. Search, filter by status, sort by interview date, edit and delete entries, and export the whole list to CSV. The list survives reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["jobs", "career", "applications"],
+  "icon": "briefcase",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/job-tracker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:application",
+    "edit:application"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "application",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the company, role, status, and interview date of each job application"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "application"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
