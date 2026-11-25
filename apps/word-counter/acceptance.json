@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "e056a062749561435c3848f230c4a0b44b1d8e5554e532e550854060b7f95a28",
+  "spec_sha256": "4cf89b82830e8b5469e7c1cfdc54bdd24535e445ee3d8ed3b85ef64e3d019aff",
   "checks": [
     {
       "id": "A1",
@@ -8,15 +8,15 @@
     },
     {
       "id": "A2",
-      "text": "Typing \"Hello world. This is a test.\" into the CodeArea updates the stats to \"Words: 6\", \"Characters: 27\", \"Sentences: 2\", \"Paragraphs: 1\", and \"Reading time: 0 min\"."
+      "text": "Typing \"Hello world. This is a test.\" into the editor updates the stats to \"Words: 6\", \"Characters: 28\", \"Sentences: 2\", \"Paragraphs: 1\", and \"Reading time: 0 min\"."
     },
     {
       "id": "A3",
-      "text": "Clearing the editor and typing \"One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty.\" updates the stats to \"Words: 20\", \"Characters: 100\", \"Sentences: 1\", \"Paragraphs: 1\", and \"Reading time: 1 min\"."
+      "text": "Clearing the editor and typing \"One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty.\" updates the stats to \"Words: 20\", \"Characters: 132\", \"Sentences: 1\", \"Paragraphs: 1\", and \"Reading time: 0 min\"."
     },
     {
       "id": "A4",
-      "text": "With the text \"First paragraph. Second paragraph.\" in the editor, clicking the tab labelled \"Report\" shows a table with rows \"Words: 4\", \"Characters: 31\", \"Sentences: 2\", \"Paragraphs: 2\", and \"Reading time: 0 min\"."
+      "text": "With the text \"First paragraph.\", a blank line, then \"Second paragraph.\" in the editor, clicking the tab labelled \"Report\" shows a table with rows \"Words: 4\", \"Characters: 35\", \"Sentences: 2\", \"Paragraphs: 2\", and \"Reading time: 0 min\"."
     },
     {
       "id": "A5",
@@ -28,7 +28,7 @@
     },
     {
       "id": "A7",
-      "text": "With the text \"Hello world.\" in the editor, toggling the switch labelled \"Count punctuation\" to off changes the \"Characters\" stat from \"12\" to \"10\"."
+      "text": "With the text \"Hello world.\" in the editor, toggling the switch labelled \"Count punctuation\" to off changes the \"Characters\" stat from \"12\" to \"11\"."
     },
     {
       "id": "A8",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "0145c124e367b93b090f918a67c1e17517a1f7842016a91b0cb25147c7be0f91"
+      "sha256": "e39c7a2f2ff6c7570a617131e0fc2e3240b9e14dddd2415a5b7f381b66031aed"
     }
   ]
 }

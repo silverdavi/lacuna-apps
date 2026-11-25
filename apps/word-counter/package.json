@@ -10,7 +10,6 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@lacuna/code-area": "workspace:0.1.0",
     "@lacuna/file-save-open": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
     "@lacuna/use-clipboard": "workspace:0.1.0",

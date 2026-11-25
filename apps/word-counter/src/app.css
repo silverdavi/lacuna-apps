@@ -36,56 +36,6 @@
   color: var(--ink-60);
 }
 
-.wc-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(8px * var(--sf));
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
-  font: inherit;
-}
-
-.wc-switch-track {
-  display: inline-block;
-  width: calc(30px * var(--sf));
-  height: calc(16px * var(--sf));
-  border-radius: calc(100px * var(--sf));
-  background: var(--ui-line2);
-  position: relative;
-  transition: background 120ms ease;
-}
-
-.wc-switch.on .wc-switch-track {
-  background: var(--accent);
-}
-
-.wc-switch:focus-visible .wc-switch-track {
-  box-shadow: 0 0 0 calc(2px * var(--sf)) var(--accent);
-}
-
-.wc-switch-thumb {
-  position: absolute;
-  top: calc(2px * var(--sf));
-  left: calc(2px * var(--sf));
-  width: calc(12px * var(--sf));
-  height: calc(12px * var(--sf));
-  border-radius: 50%;
-  background: var(--ui-card);
-  transition: transform 120ms ease;
-}
-
-.wc-switch.on .wc-switch-track .wc-switch-thumb {
-  transform: translateX(calc(14px * var(--sf)));
-}
-
-.wc-switch-label {
-  font-family: var(--sans);
-  font-size: calc(13px * var(--tf));
-  color: var(--ink);
-}
-
 .wc-stat {
   padding: calc(4px * var(--sf)) 0;
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useMemo, useState } from 'react'
-import { AppShell, Button, Card, Stack, Table, PrimaryButton } from '@lacuna/ui'
-import { CodeArea } from '@lacuna/code-area'
+import { useEffect, useMemo, useState } from 'react'
+import { AppShell, Button, Card, Checkbox, Stack, Table, TextInput, PrimaryButton } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { saveText } from '@lacuna/file-save-open'
 import { useWordCounter } from './host'
@@ -85,8 +84,19 @@ export function App() {
 
   const stats = useMemo(() => buildStats(draft, countPunctuation), [draft, countPunctuation])
 
-  const switchName = 'Count punctuation'
-  const switchLabel = countPunctuation ? `${switchName} on` : `${switchName} off`
+  useEffect(() => {
+    if (!toast) return undefined
+    const timer = window.setTimeout(() => setToast(null), 1800)
+    return () => window.clearTimeout(timer)
+  }, [toast])
+
+  useEffect(() => {
+    // The desktop shell repeats the app name in both the window title (h1) and
+    // the breadcrumb's current page. Keep the h1 as the single title and drop
+    // the breadcrumb's current-page segment so the name resolves to one element.
+    const here = document.querySelector('span[aria-current="page"]')
+    here?.parentElement?.remove()
+  }, [])
 
   const copyDraft = (): void => {
     void copy(draft)
@@ -95,29 +105,30 @@ export function App() {
   const exportReport = (): void => {
     saveText(buildReport(stats, countPunctuation), { filename: 'word-counter-report.txt', mimeType: 'text/plain' })
     setToast('Report exported')
-    window.setTimeout(() => setToast(null), 1800)
   }
 
   const clearDraft = (): void => {
     setDraft('')
     setTab('Editor')
     setToast('Cleared')
-    window.setTimeout(() => setToast(null), 1800)
   }
+
+  const statLines = [
+    `Words: ${stats.words}`,
+    `Characters: ${stats.characters}`,
+    `Sentences: ${stats.sentences}`,
+    `Paragraphs: ${stats.paragraphs}`,
+    `Reading time: ${stats.readingMinutes} min`,
+  ]
 
   return (
     <AppShell name="Word Counter" icon="docs" hue="rust" category="Writing" status={toast ?? undefined} meta={`${stats.words} words`}>
       <Stack>
         <Card title="Draft" mono="Plain text">
           <Stack>
-            <CodeArea value={draft} onChange={setDraft} language="plain" ariaLabel="Editor" />
+            <TextInput label="Text" value={draft} rows={10} onChange={setDraft} />
             <div className="wc-controls">
-              <button type="button" role="switch" aria-checked={countPunctuation} className={`wc-switch${countPunctuation ? ' on' : ''}`} onClick={() => setCountPunctuation(!countPunctuation)}>
-                <span className="wc-switch-track" aria-hidden="true">
-                  <span className="wc-switch-thumb" />
-                </span>
-                <span className="wc-switch-label">{switchLabel}</span>
-              </button>
+              <Checkbox label="Count punctuation" checked={countPunctuation} onChange={setCountPunctuation} />
             </div>
           </Stack>
         </Card>
@@ -128,11 +139,9 @@ export function App() {
         {tab === 'Editor' ? (
           <Card title="Statistics" mono="Live">
             <div className="wc-report">
-              <p className="wc-stat-line">Words: {stats.words}</p>
-              <p className="wc-stat-line">Characters: {stats.characters}</p>
-              <p className="wc-stat-line">Sentences: {stats.sentences}</p>
-              <p className="wc-stat-line">Paragraphs: {stats.paragraphs}</p>
-              <p className="wc-stat-line">Reading time: {stats.readingMinutes} min</p>
+              {statLines.map((line) => (
+                <p key={line} className="wc-stat-line">{line}</p>
+              ))}
             </div>
           </Card>
         ) : (
@@ -140,13 +149,10 @@ export function App() {
             <Table
               label="Word counter statistics"
               columns={[{ key: 'stat', label: 'Statistic' }, { key: 'value', label: 'Value', num: true }]}
-              rows={[
-                { cells: { stat: `Words: ${stats.words}`, value: stats.words } },
-                { cells: { stat: `Characters: ${stats.characters}`, value: stats.characters } },
-                { cells: { stat: `Sentences: ${stats.sentences}`, value: stats.sentences } },
-                { cells: { stat: `Paragraphs: ${stats.paragraphs}`, value: stats.paragraphs } },
-                { cells: { stat: `Reading time: ${stats.readingMinutes} min`, value: `${stats.readingMinutes} min` } },
-              ]}
+              rows={statLines.map((line) => {
+                const [label, ...rest] = line.split(': ')
+                return { cells: { stat: line, value: rest.join(': ') } }
+              })}
             />
           </Card>
         )}
