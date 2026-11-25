@@ -7,42 +7,32 @@
 }
 
 /* Rail */
-.er-rail {
+.er-rail-list {
   display: flex;
   flex-direction: column;
-  gap: calc(6px * var(--sf));
+  gap: calc(4px * var(--sf));
 }
 
-.er-rail-title {
-  font-family: var(--mono);
-  font-size: calc(12px * var(--tf));
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--mid);
-  padding: calc(2px * var(--sf)) 0;
+.er-rail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(6px * var(--sf));
 }
 
 .er-rail-empty {
   font-family: var(--mono);
   font-size: calc(12px * var(--tf));
-  color: var(--mid);
+  color: var(--ink-60);
   padding: calc(4px * var(--sf)) calc(2px * var(--sf));
 }
 
-/* Bookmark delete */
-.er-delete {
+/* Copied confirmation */
+.er-copied {
   font-family: var(--mono);
   font-size: calc(12px * var(--tf));
-  color: var(--mid);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: calc(2px * var(--sf)) calc(4px * var(--sf));
-}
-
-.er-delete:hover {
-  color: var(--danger);
+  color: var(--ok);
+  margin-bottom: calc(4px * var(--sf));
 }
 
 /* Error */
@@ -59,53 +49,8 @@
 }
 
 /* Reader */
-.er-reader {
-  display: flex;
-  flex-direction: column;
-  gap: calc(8px * var(--sf));
-}
-
-/* File name */
-.er-fileline {
-  display: flex;
-  align-items: baseline;
-  gap: calc(8px * var(--sf));
-}
-
-.er-filename {
-  font-family: var(--mono);
-  font-size: calc(13px * var(--tf));
-  font-weight: 600;
-  color: var(--accent);
-}
-
-/* Progress */
-.er-progress {
-  font-family: var(--mono);
-  font-weight: 600;
-  color: var(--ink);
-  background: var(--paper-deep);
-  border: calc(1px * var(--sf)) solid var(--hair-strong);
-  border-radius: calc(2px * var(--sf));
-  padding: calc(2px * var(--sf)) calc(10px * var(--sf));
-}
-
-.er-progress span {
-  display: inline-block;
-  font-size: calc(13px * var(--tf));
-}
-
-/* Page */
 .er-page {
-  font-family: var(--serif);
-  line-height: 1.6;
-  color: var(--ink);
-  background: var(--paper-deep);
-  border: calc(1px * var(--sf)) solid var(--hair);
-  border-radius: calc(6px * var(--sf));
-  padding: calc(16px * var(--sf));
-  min-height: calc(200px * var(--sf));
-  font-size: calc(16px * var(--tf));
+  font-size: calc(18px * var(--tf));
 }
 
 .er-page.small {
@@ -113,7 +58,11 @@
 }
 
 .er-page.large {
-  font-size: calc(19px * var(--tf));
+  font-size: calc(24px * var(--tf));
+}
+
+.er-pageline {
+  margin: 0;
 }
 
 /* Controls */
@@ -121,17 +70,4 @@
   display: flex;
   flex-wrap: wrap;
   gap: calc(8px * var(--sf));
-}
-
-/* Copied note */
-.er-copied {
-  font-family: var(--mono);
-  font-size: calc(12px * var(--tf));
-  color: var(--accent);
-}
-
-/* Font size select */
-.er-setting {
-  display: flex;
-  justify-content: flex-end;
 }

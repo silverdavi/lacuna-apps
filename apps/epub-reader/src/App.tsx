@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AppShell, Button, Card, EmptyState, List, Row, Select } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, Keys, Rail, Select } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useLocalRecord } from '@lacuna/use-local-record'
 import { isEpubFileName, openEpub, type EpubBook } from './book'
@@ -127,7 +127,13 @@ export function App() {
     void copy(pageText)
   }, [copy, pageText])
 
-  const status = total ? `${total} pages` : 'Local'
+  const status =
+    error ??
+    (copied
+      ? 'Exported page'
+      : total
+        ? `${bookmarks.length} bookmark${bookmarks.length === 1 ? '' : 's'} · ${total} pages`
+        : `${FONT_SIZES.indexOf(session.fontSize) + 1} of 3 type sizes`)
 
   return (
     <AppShell
@@ -135,52 +141,52 @@ export function App() {
       icon="docs"
       hue="rust"
       category="Productivity"
-      meta={total ? `${page + 1} of ${total}` : undefined}
+      meta={total ? `${total} pages` : undefined}
       status={status}
       side={
-        <List label="Bookmarks">
-          {bookmarks.length === 0 ? (
-            <Row title="No bookmarks" />
-          ) : (
-            bookmarks.map((n) => (
-              <Row
-                key={n}
-                title={`Page ${n}`}
-                hot={n === page + 1}
-                onClick={() => gotoBookmark(n)}
-                action={
-                  <Button
-                    kind="ghost"
-                    ariaLabel={`Delete Page ${n}`}
-                    style={{ padding: 'calc(2px * var(--sf)) calc(6px * var(--sf))' }}
-                    onClick={() => deleteBookmark(n)}
-                  >
-                    <span aria-hidden="true">Delete</span>
-                  </Button>
-                }
-              />
-            ))
-          )}
-        </List>
+        <Rail title="Bookmarks" note={bookmarks.length ? `${bookmarks.length} marked page${bookmarks.length === 1 ? '' : 's'}` : 'Mark pages to keep'}>
+          <div role="list" aria-label="Bookmarks">
+            {bookmarks.length === 0 ? (
+              <p role="listitem" className="er-rail-empty">No bookmarks</p>
+            ) : (
+              <div className="er-rail-list">
+                {bookmarks.map((n) => (
+                  <div key={n} role="listitem" className="er-rail-row">
+                    <Button kind="ghost" ariaLabel={`Go to Page ${n}`} onClick={() => gotoBookmark(n)}>
+                      Page {n}
+                    </Button>
+                    <Button kind="ghost" ariaLabel={`Delete Page ${n}`} onClick={() => deleteBookmark(n)}>
+                      <span aria-hidden="true">Delete</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <Select
+            label="Font size"
+            value={session.fontSize}
+            onChange={(v) => setSession((s) => ({ ...s, fontSize: v as FontSize }))}
+            options={FONT_SIZES}
+          />
+          <Keys items={[['←', 'Previous page'], ['→', 'Next page']]} />
+        </Rail>
       }
     >
       <div className="er-stack">
         <input ref={fileRef} type="file" accept=".epub,application/epub+zip" className="er-file" onChange={onPick} />
 
         {book && total > 0 ? (
-          <div className="er-reader">
-            <div className="er-fileline">
-              <span className="er-filename">{fileName}</span>
-            </div>
-            <div className="er-progress" aria-label={`Page ${page + 1} of ${total}`}>
+          <Card mono="Reader" title={fileName ?? ''} accent>
+            <div className="er-progress">
               <span aria-hidden="true">Page {page + 1} of {total}</span>
             </div>
             <div
-              className={`er-page er-reader-region${session.fontSize === 'Small' ? ' small' : session.fontSize === 'Large' ? ' large' : ''}`}
+              className={`er-page${session.fontSize === 'Small' ? ' small' : session.fontSize === 'Large' ? ' large' : ''}`}
               role="region"
               aria-label="Reader"
             >
-              <span>{pageText}</span>
+              <p className="er-pageline">{pageText}</p>
             </div>
             <div className="er-controls">
               <Button ariaLabel="Previous page" disabled={page === 0} onClick={prev}>
@@ -196,16 +202,7 @@ export function App() {
                 Export page
               </Button>
             </div>
-            {copied ? <div className="er-copied">Copied page text</div> : null}
-            <div className="er-setting">
-              <Select
-                label="Font size"
-                value={session.fontSize}
-                onChange={(v) => setSession((s) => ({ ...s, fontSize: v as FontSize }))}
-                options={FONT_SIZES}
-              />
-            </div>
-          </div>
+          </Card>
         ) : (
           <EmptyState
             mono="Waiting"
@@ -216,7 +213,8 @@ export function App() {
           />
         )}
 
-        {error ? <div className="er-error">{error}</div> : null}
+        {copied ? <div className="er-copied">Copied page text</div> : null}
+        {error ? <div className="er-error" role="alert">{error}</div> : null}
       </div>
     </AppShell>
   )
