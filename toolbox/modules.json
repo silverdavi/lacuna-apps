@@ -1632,6 +1632,48 @@
       }
     },
     {
+      "id": "@lacuna/markdown-view",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Safe rendered Markdown viewer with interactive task-list toggles.",
+      "today": [
+        "toolbox/modules/markdown-view/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/markdown-to-html"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "MarkdownView"
+      ],
+      "public": true,
+      "path": "toolbox/modules/markdown-view/0.1.0",
+      "bridge": {
+        "component": "MarkdownView",
+        "kind": "widget",
+        "exports": [
+          "MarkdownView"
+        ],
+        "types": [
+          "MarkdownViewProps"
+        ],
+        "signature": "MarkdownView({ source, onTaskToggle, disabled = false, label, className, style, children }: Markdo...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "5a2695c06b0cb3a1d47407a70c19e9bd82e2fcf0",
+            "source": "59514237159e42ae",
+            "lines": 100,
+            "dependencies": {
+              "@lacuna/markdown-to-html": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/money",
       "layer": 3,
       "status": "exists",
@@ -1753,6 +1795,49 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "f93ff2554ebb824c",
             "lines": 183,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/passphrase-crypto",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "AES-GCM encryption and decryption with PBKDF2-derived keys for passphrase-protected local data.",
+      "today": [
+        "toolbox/modules/passphrase-crypto/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "passphraseCrypto"
+      ],
+      "public": true,
+      "path": "toolbox/modules/passphrase-crypto/0.1.0",
+      "bridge": {
+        "component": "passphraseCrypto",
+        "kind": "logic",
+        "exports": [
+          "encrypt",
+          "decrypt",
+          "verifyPassphrase",
+          "generateSalt",
+          "generateIv"
+        ],
+        "types": [
+          "EncryptedPayload",
+          "CryptoOptions"
+        ],
+        "signature": "encrypt(plaintext: string, passphrase: string, options?: CryptoOptions); decrypt(payload: EncryptedPayload, passphrase: string); verifyPassphrase(payload: EncryptedPayload, passphrase: string); generateSalt(length?: number)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "09ffa3a5fcb5061c",
+            "lines": 105,
             "dependencies": {}
           }
         }
