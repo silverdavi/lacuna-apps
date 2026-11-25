@@ -8,7 +8,6 @@
     "check": "node ../scripts/check-app.mjs"
   },
   "dependencies": {
-    "@lacuna/code-area": "workspace:0.1.0",
     "@lacuna/file-save-open": "workspace:0.1.0",
     "@lacuna/markdown-to-html": "workspace:0.1.0",
     "@lacuna/text-transforms": "workspace:0.1.0",

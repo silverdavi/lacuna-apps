@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent } from 'react'
 import { AppShell, Button, Rail } from '@lacuna/ui'
-import { CodeArea } from '@lacuna/code-area'
 import { useUndoStack } from '@lacuna/use-undo-stack'
 import { saveText } from '@lacuna/file-save-open'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -12,7 +11,7 @@ import { useDeck } from './host/useDeck'
 import { DEFAULT_DECK } from './host'
 import './app.css'
 
-type Tab = 'editor' | 'preview' | 'both'
+type Tab = 'split' | 'editor' | 'preview'
 
 const MARKER = '\n---\n'
 
@@ -68,44 +67,44 @@ function setTaskChecked(text: string, label: string, checked: boolean): string {
 export function App() {
   const { value: record, set: setRecord } = useDeck()
   const { value: text, set: setText, undo, redo, canUndo, canRedo, reset } = useUndoStack(record.text, { limit: 100 })
-  const [tab, setTab] = useState<Tab>('both')
+  const [tab, setTab] = useState<Tab>('split')
   const [activeSlide, setActiveSlide] = useState(0)
   const [exportOpen, setExportOpen] = useState(false)
   const [printing, setPrinting] = useState(false)
   const { copied, copy } = useClipboard()
 
-  const editorWrapRef = useRef<HTMLDivElement | null>(null)
-  const prevTextRef = useRef(text)
+  const editorRef = useRef<HTMLTextAreaElement | null>(null)
 
   const slides = useMemo(() => splitSlides(text), [text])
   const totalSlides = slides.length
   const slideNumber = Math.min(activeSlide + 1, totalSlides)
 
-  const showEditor = tab === 'both' || tab === 'editor'
-  const showPreview = tab === 'both' || tab === 'preview'
-
   const wordCount = wordCountOf(text)
   const lineCount = countLines(text)
 
   const refreshSlide = useCallback(() => {
-    const ta = editorWrapRef.current?.querySelector<HTMLTextAreaElement>('.ca-ta')
-    if (ta === null || ta === undefined) return
-    const offset = ta.selectionStart ?? 0
-    setActiveSlide(slideIndexOfOffset(text, offset))
+    const ta = editorRef.current
+    if (ta === null) return
+    setActiveSlide(slideIndexOfOffset(text, ta.selectionStart ?? 0))
   }, [text])
 
   const onEditorChange = useCallback(
-    (next: string) => {
-      const prev = prevTextRef.current
-      let common = 0
-      const minLen = Math.min(prev.length, next.length)
-      while (common < minLen && prev[common] === next[common]) common += 1
-      prevTextRef.current = next
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const next = e.target.value
       setText(next)
-      setActiveSlide(slideIndexOfOffset(next, common))
+      setActiveSlide(slideIndexOfOffset(next, e.target.selectionStart ?? 0))
       setRecord((p) => ({ ...p, text: next }))
     },
     [setText, setRecord]
+  )
+
+  const onEditorKeyDown = useCallback(
+    (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'Home' || e.key === 'End')) {
+        window.requestAnimationFrame(refreshSlide)
+      }
+    },
+    [refreshSlide]
   )
 
   const onUndo = useCallback(() => {
@@ -170,19 +169,6 @@ export function App() {
     }
   }, [exportOpen])
 
-  useEffect(() => {
-    refreshSlide()
-  }, [refreshSlide])
-
-  const onEditorKeyDown = useCallback(
-    (e: ReactKeyboardEvent<HTMLDivElement>) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'Home' || e.key === 'End')) {
-        window.requestAnimationFrame(() => refreshSlide())
-      }
-    },
-    [refreshSlide]
-  )
-
   const onPreviewClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
       const target = e.target
@@ -200,6 +186,7 @@ export function App() {
   )
 
   const statusText = `${totalSlides} ${totalSlides === 1 ? 'slide' : 'slides'} · Slide ${slideNumber} of ${totalSlides}`
+  const liveStatus = statusText
 
   return (
     <AppShell
@@ -208,7 +195,7 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={statusText}
-      status={copied ? 'Copied to clipboard' : printing ? 'Printing…' : undefined}
+       status={copied ? 'Copied to clipboard' : printing ? 'Printing…' : liveStatus}
       actions={
         <>
           <Button kind="secondary" ariaLabel="Copy deck" onClick={onCopy}>
@@ -218,16 +205,9 @@ export function App() {
             Reset
           </Button>
           <div className="ms-export">
-            <button
-              type="button"
-              className="ms-export-trigger"
-              aria-label="Export"
-              aria-haspopup="menu"
-              aria-expanded={exportOpen}
-              onClick={() => setExportOpen((v) => !v)}
-            >
+            <Button kind="secondary" ariaLabel="Export" aria-haspopup="menu" aria-expanded={exportOpen} onClick={() => setExportOpen((v) => !v)}>
               Export
-            </button>
+            </Button>
             {exportOpen && (
               <ul className="ms-export-menu" role="menu" aria-label="Export">
                 <li role="none">
@@ -262,59 +242,49 @@ export function App() {
         </Rail>
       }
     >
-      <div role="tablist" aria-label="Views" className="ms-tabs">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'editor'}
-          className={`lc-tab${tab === 'editor' ? ' active' : ''}`}
-          onClick={() => setTab('editor')}
-        >
-          Editor
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'preview'}
-          className={`lc-tab${tab === 'preview' ? ' active' : ''}`}
-          onClick={() => setTab('preview')}
-        >
-          Preview
-        </button>
-      </div>
+      <div className="ms-workspace">
+        <div role="tablist" aria-label="Views" className="ms-tabs">
+          <button type="button" role="tab" aria-selected={tab === 'editor'} className={`ms-tab${tab === 'editor' ? ' active' : ''}`} onClick={() => setTab('editor')}>
+            Editor
+          </button>
+          <button type="button" role="tab" aria-selected={tab === 'preview'} className={`ms-tab${tab === 'preview' ? ' active' : ''}`} onClick={() => setTab('preview')}>
+            Preview
+          </button>
+        </div>
 
-      <div className={`ms-pane${showEditor && showPreview ? ' ms-pane-split' : ''}`}>
-        {showEditor && (
-          <div className="ms-editor" ref={editorWrapRef} onKeyDown={onEditorKeyDown}>
-            <CodeArea value={text} onChange={onEditorChange} language="md" ariaLabel="Slide deck editor" tabSize={2} />
-            <div className="ms-toolbar" role="toolbar" aria-label="Edit actions">
-              <Button kind="secondary" ariaLabel="Undo last edit" onClick={onUndo} disabled={!canUndo}>
-                Undo
-              </Button>
-              <Button kind="secondary" ariaLabel="Redo last edit" onClick={onRedo} disabled={!canRedo}>
-                Redo
-              </Button>
+        <div className={`ms-panes${tab === 'split' ? ' ms-panes-split' : ''}`}>
+          {tab !== 'preview' && (
+            <div className="ms-pane ms-editor">
+              <textarea
+                ref={editorRef}
+                className="ms-editor-input"
+                aria-label="Slide deck editor"
+                spellCheck={false}
+                value={text}
+                onChange={onEditorChange}
+                onKeyDown={onEditorKeyDown}
+              />
+              <div className="ms-toolbar" role="toolbar" aria-label="Edit actions">
+                <Button kind="secondary" ariaLabel="Undo last edit" onClick={onUndo} disabled={!canUndo}>
+                  Undo
+                </Button>
+                <Button kind="secondary" ariaLabel="Redo last edit" onClick={onRedo} disabled={!canRedo}>
+                  Redo
+                </Button>
+              </div>
             </div>
-            <div className="ms-statusbar" role="status">
-              <span className="ms-status-count">
-                {totalSlides} {totalSlides === 1 ? 'slide' : 'slides'}
-              </span>
-              <span className="ms-status-pos">
-                Slide {slideNumber} of {totalSlides}
-              </span>
-            </div>
-          </div>
-        )}
+          )}
 
-        {showPreview && (
-          <div className="ms-preview" onClick={onPreviewClick}>
-            {slides.map((slide, s) => (
-              <section key={`slide-${s}`} className="ms-slide">
-                <div className="ms-slide-body" dangerouslySetInnerHTML={{ __html: enableTaskCheckboxes(markdownToHtml(slide)) }} />
-              </section>
-            ))}
-          </div>
-        )}
+          {tab !== 'editor' && (
+            <div className="ms-pane ms-preview" role="region" aria-label="Preview" onClick={onPreviewClick}>
+              {slides.map((slide, s) => (
+                <article key={`slide-${s}`} className="ms-slide" aria-label={`Slide ${s + 1}`}>
+                  <div className="ms-slide-body" dangerouslySetInnerHTML={{ __html: enableTaskCheckboxes(markdownToHtml(slide)) }} />
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </AppShell>
   )

@@ -1,5 +1,22 @@
 /* App-specific layout. The kit owns the visual language; this file only adds
    structure the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+.ms-tab {
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-80);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+  font-family: var(--sans);
+}
+
+.ms-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
 .ms-workspace {
   display: flex;
   flex-direction: column;
@@ -27,15 +44,22 @@
   flex-direction: column;
 }
 
-.ms-pane-split .ms-pane + .ms-pane {
-  border-left: calc(1px * var(--sf)) solid var(--ui-line);
+.ms-editor {
+  min-height: 0;
 }
 
-.ms-editor {
+.ms-editor-input {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  resize: none;
+  border: none;
+  background: none;
+  color: var(--ink-80);
+  font-family: var(--mono);
+  font-size: calc(14px * var(--tf));
+  line-height: 1.6;
+  padding: calc(12px * var(--sf)) calc(16px * var(--sf));
 }
 
 .ms-toolbar {
@@ -55,11 +79,10 @@
   border-top: calc(1px * var(--sf)) solid var(--ui-line);
   font-family: var(--mono);
   font-size: calc(12px * var(--tf));
-  color: var(--mute);
+  color: var(--ink-60);
 }
 
 .ms-preview {
-  flex: 1;
   overflow: auto;
   padding: calc(16px * var(--sf));
 }
@@ -187,22 +210,6 @@
   display: inline-flex;
 }
 
-.ms-export-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(4px * var(--sf));
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
-  color: var(--ink-60);
-}
-
-.ms-export-trigger:hover {
-  color: var(--ink);
-}
-
 .ms-export-menu {
   position: absolute;
   top: calc(100% + calc(4px * var(--sf)));
@@ -243,7 +250,7 @@
 .ms-rail-label {
   font-family: var(--mono);
   font-size: calc(11px * var(--tf));
-  color: var(--ink-40);
+  color: var(--ink-60);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: calc(4px * var(--sf));
