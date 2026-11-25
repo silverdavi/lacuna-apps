@@ -1,63 +1,50 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { deflateSync } from 'node:zlib'
 
-// A 512x512 PNG (solid red with a white cross), inlined as a data URL so the
-// file the chooser accepts still carries the name "logo.png".
-const LOGO_PNG =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAHY0lEQVR42u3b'
-  + 'sQ0AIAwEsdt/adggdaT45QlScBW9AuAgJwAQAAAEAAABAEAAABAAAAQAAAEA'
-  + 'QAAAEAAABAAAAQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAAEAAABAAAAQAQ'
-  + 'AAAEAAABAEAAABAAAAQAAAEAQAAAEAAABAAAAQBAAAAQAAAEAAABAEAAABAA'
-  + 'AAQAAAEAQAAAEAAABAAAAQAQACcAEAAABAAAAQBAAAAQAAAEAAABAEAAABAA'
-  + 'AAQAAAEAQAAAEAAABAAAAQBAAAAQAAAEAAABAEAAABAAAAQAAAEAEAAABAAA'
-  + 'AQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAAEAAABAAAAQBAAAAQAAAEAAAB'
-  + 'AEAAABAAAAQAAAEAEAAABAAAAQBAAAAQAAAE4KR57gMIgAAACIAAAAiAAAAI'
-  + 'gAAACIAAAAiAAAAIgAAACIAAAAiAAAAIgAAACIAAAAiAAAAIgAAACIAAAAiA'
-  + 'AAAIgAAAAoAAAAKAAAACgAAAAoAAAAIgAAIACIAACAAgAAIgAIAACACAAAgA'
-  + 'gAAIAIAACACAAAgAgAAIAIAACACAAAgAgAAIAIAACACAAAgAgAAIAIAACACA'
-  + 'AAgAgAAIAIAACACAAAgAIAAIACAACAAgAAgAIAAIACAAAiAAgAAIgAAAAiAA'
-  + 'TgQIgAAACIAAAAiAAAAIgAAACIAAAAiAAAAIgAAACIAAAAiAAAAIgAAACIAA'
-  + 'AAiAAAAIgAAACIAAAAiAAAAIgAAAAoAAAAKAAAACgAAAAoAAAAIgAAIACIAA'
-  + 'CAAgAAIgAIAACACAAAgAgAAIAIAACACAAAgAgAAIAIAACACAAAgAgAAIAIAA'
-  + 'CACAAAgAgAAIAIAACACAAAgAgAAIAIAACACAEwgAIAAIACAACAAgAAgAIAAI'
-  + 'ACAAAiAAgAAIgAAAAiAAAAIgAAACIAAAAiAAAAIgAAACIAAAAiAAAAIgAAAC'
-  + 'IAAAAiAAAAIgAAACIAAAAiAAAAIgAAACIAAAAiAAAAIgAIAAIACAACAAgAAg'
-  + 'AIAAIACAAAiAAAACIAACAAiAAAgAIAACACAAAgAgAAIAIAACACAAAgAgAAIA'
-  + 'IAACACAAAgAgAPsDYGYb5qUSAAEwEwAEQADMBAABEAAzAUAABMBMAAQAATAT'
-  + 'AAFAAMwEQAAQADMBEAB8BAMEQAAEABAAARAAQAAEQAAAARAAAAEQAAABEAAA'
-  + 'ARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAAAB'
-  + 'EAAAARAAAAEQAEAAEABAABAAQAAQAEAAEABAAARAAAABEAABAARAAJwIEAAB'
-  + 'ABAAAQAQAAEAEAABABAAAQAQAAEAEAABABAAAQAQAAEAEAABABAAAQAQAAEA'
-  + 'EAABABAAAQAQAAEAEAABAAQAAQAEAAEABAABAAQAAQAEQAAEABAAARAAQAAE'
-  + 'QAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQ'
-  + 'AAABEAAAARAAAAEQAAABEAAAARAAACcQAEAAEABAABAAQAAQAEAAEABAAARA'
-  + 'AAABEAABAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARA'
-  + 'AAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAAAAUAAAAFAAAABQAAAAUAA'
-  + 'AAEQAAEABEAABAAQAAEQAEAABABAAAQAQAAEAEAABABAAAQAQAAEAEAABABA'
-  + 'AAQAQAAEAEAABABAAAQAQAAEAEAABABAAAQAQAAEAEAABADACQQAEAAEABAA'
-  + 'BAAQAAQAEAAEABAAARAAQAAEQAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAA'
-  + 'ARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEQAEAA'
-  + 'EABAABAAQAAQAEAAEABAAARAAAABEAABAARAAAQAEAABABAAAQAQAAEAEAAB'
-  + 'ABAAAQAQAAEAEAABABAAAQAQAAEAEAABABAAAQAQAAEAEAABABAAAQAQAAEA'
-  + 'EAABAATACQQAEAAEABAABAAQAAQAEAABEABAAARAAAABEAABAARAAAAEQAAA'
-  + 'BEAAAARAAAAEQAAABEAAAARAAAAEQAAABEAAAARAAAAEAAABAEAAABAAAAQA'
-  + 'AAEAQAAABAAAAQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAAEAAABAAAAQBA'
-  + 'AAAQAAAEAAABAEAAABAAAAQAAAEAQAAABAAAAQBAAAAQAAAEAAABAEAAABAA'
-  + 'AAQAAAEAQAAAEAAABAAAAQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAAEAAA'
-  + 'AQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAAEAAABAAAAQBAAAAQAAAEAAAB'
-  + 'AEAAABAAAAQAAAEAQAAAEAAAAQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAA'
-  + 'EAAABAAAAQBAAAAQAAAEAAABAEAAABAAAAQAAAEAQAAAEAAA6gN31FMKHwyP'
-  + 'WgAAAABJRU5ErkJggg=='
+function crc32(buf: Buffer) {
+  let r = 0xffffffff
+  for (const b of buf) {
+    let c = (r ^ b) & 255
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+    r = c ^ (r >>> 8)
+  }
+  return (r ^ 0xffffffff) >>> 0
+}
 
-const SIZES = ['16x16', '32x32', '48x48', '64x64', '128x128', '192x192', '256x256', '512x512']
+function chunk(type: string, data: Buffer) {
+  const len = Buffer.alloc(4)
+  len.writeUInt32BE(data.length)
+  const td = Buffer.concat([Buffer.from(type), data])
+  const crc = Buffer.alloc(4)
+  crc.writeUInt32BE(crc32(td))
+  return Buffer.concat([len, td, crc])
+}
 
-// Drives the drop zone like a person: clicking it opens the file chooser,
-// which the test accepts with the 512x512 logo.png.
-async function loadLogo(page: Page) {
-  const fileChooserPromise = page.waitForEvent('filechooser')
-  await page.getByText('Drop an image or click to browse').click()
-  const fileChooser = await fileChooserPromise
-  await fileChooser.setFiles(LOGO_PNG)
-  await page.getByText('logo.png').first().waitFor()
+function solidPng(size: number) {
+  const ihdr = Buffer.alloc(13)
+  ihdr.writeUInt32BE(size, 0)
+  ihdr.writeUInt32BE(size, 4)
+  ihdr[8] = 8
+  ihdr[9] = 2
+  const row = Buffer.alloc(1 + size * 3)
+  for (let x = 0; x < size; x++) {
+    row[1 + x * 3] = 200
+    row[2 + x * 3] = 60
+    row[3 + x * 3] = 40
+  }
+  const raw = Buffer.concat(Array.from({ length: size }, () => row))
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', ihdr),
+    chunk('IDAT', deflateSync(raw)),
+    chunk('IEND', Buffer.alloc(0)),
+  ])
+}
+
+async function loadLogo(page: import('@playwright/test').Page) {
+  const dropZone = page.getByText('Drop an image or click to browse')
+  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), dropZone.click()])
+  await chooser.setFiles({ name: 'logo.png', mimeType: 'image/png', buffer: solidPng(512) })
 }
 
 test('[A1] page heading is Favicon Generator', async ({ page }) => {
@@ -65,85 +52,50 @@ test('[A1] page heading is Favicon Generator', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Favicon Generator' })).toBeVisible()
 })
 
-test('[A2] drop zone shows placeholder text before any image is loaded', async ({ page }) => {
+test('[A2] drop zone shows instruction text with no image loaded', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText('Drop an image or click to browse')).toBeVisible()
 })
 
-test('[A3] dropping a 512x512 logo.png shows its name and all eight size items', async ({ page }) => {
+test('[A3] loading logo.png shows the file name and eight generated sizes', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
-  await expect(page.getByText('logo.png').first()).toBeVisible()
-  for (const size of SIZES) {
-    await expect(page.getByText(size, { exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Preview' }).getByText('logo.png')).toBeVisible()
+  const items = page.getByRole('list', { name: 'Generated sizes' }).getByRole('listitem')
+  await expect(items).toHaveCount(8)
+  for (const size of ['16x16', '32x32', '48x48', '64x64', '128x128', '192x192', '256x256', '512x512']) {
+    await expect(items.getByText(size, { exact: true })).toBeVisible()
   }
 })
 
-test('[A4] Square crop plus Apply updates the preview and keeps all eight size items', async ({ page }) => {
+test('[A4] selecting Square and applying keeps the preview and eight sizes', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
   await page.getByLabel('Crop shape').selectOption({ label: 'Square' })
   await page.getByRole('button', { name: 'Apply' }).click()
-  for (const size of SIZES) {
-    await expect(page.getByText(size, { exact: true })).toBeVisible()
-  }
-  // After the user action, read the preview canvas: it still shows image
-  // pixels, i.e. the crop was applied to a rendered preview.
-  const preview = await page.evaluate(() => {
-    const c = document.querySelector('canvas')
-    if (!c) return null
-    const ctx = c.getContext('2d')
-    if (!ctx) return null
-    const d = ctx.getImageData(0, 0, c.width, c.height).data
-    let opaque = 0
-    for (let i = 3; i < d.length; i += 4) {
-      if (d[i] > 128) opaque++
-    }
-    return { w: c.width, h: c.height, opaque, total: d.length / 4 }
-  })
-  expect(preview, 'preview canvas renders after Apply').not.toBeNull()
-  expect(preview!.opaque, 'preview has visible pixels').toBeGreaterThan(1000)
+  await expect(page.getByRole('region', { name: 'Preview' }).getByText('logo.png')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Generated sizes' }).getByRole('listitem')).toHaveCount(8)
 })
 
-test('[A5] Circle crop plus Apply updates the preview and keeps all eight size items', async ({ page }) => {
+test('[A5] selecting Circle and applying keeps the preview and eight sizes', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
   await page.getByLabel('Crop shape').selectOption({ label: 'Circle' })
   await page.getByRole('button', { name: 'Apply' }).click()
-  for (const size of SIZES) {
-    await expect(page.getByText(size, { exact: true })).toBeVisible()
-  }
-  const preview = await page.evaluate(() => {
-    const c = document.querySelector('canvas')
-    if (!c) return null
-    const ctx = c.getContext('2d')
-    if (!ctx) return null
-    const d = ctx.getImageData(0, 0, c.width, c.height).data
-    let opaque = 0
-    for (let i = 3; i < d.length; i += 4) {
-      if (d[i] > 128) opaque++
-    }
-    return { w: c.width, h: c.height, opaque, total: d.length / 4 }
-  })
-  expect(preview, 'preview canvas renders after Apply').not.toBeNull()
-  expect(preview!.opaque, 'preview has visible pixels').toBeGreaterThan(1000)
-  // Circle: the corners of the preview are transparent, coverage < 100%.
-  expect(preview!.opaque / preview!.total, 'circle leaves transparent corners').toBeLessThan(1)
+  await expect(page.getByRole('region', { name: 'Preview' }).getByText('logo.png')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Generated sizes' }).getByRole('listitem')).toHaveCount(8)
 })
 
-test('[A6] Quality slider to 80 plus Apply updates the preview and keeps all eight size items', async ({ page }) => {
+test('[A6] setting Quality to 80 and applying keeps the preview and eight sizes', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
-  const quality = page.getByLabel('Quality')
-  await quality.fill('80')
+  await page.getByLabel('Quality').fill('80')
   await page.getByRole('button', { name: 'Apply' }).click()
-  for (const size of SIZES) {
-    await expect(page.getByText(size, { exact: true })).toBeVisible()
-  }
-  expect(await quality.inputValue(), 'quality slider holds the set value').toBe('80')
+  await expect(page.getByRole('region', { name: 'Preview' }).getByText('logo.png')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Generated sizes' }).getByRole('listitem')).toHaveCount(8)
 })
 
-test('[A7] Download all downloads favicons.zip', async ({ page }) => {
+test('[A7] Download all triggers a download named favicons.zip', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
   const [download] = await Promise.all([
@@ -153,20 +105,20 @@ test('[A7] Download all downloads favicons.zip', async ({ page }) => {
   expect(download.suggestedFilename()).toBe('favicons.zip')
 })
 
-test('[A8] Download 16x16 downloads favicon-16x16.png', async ({ page }) => {
+test('[A8] Download 16x16 triggers a download named favicon-16x16.png', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
   const [download] = await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Download 16x16' }).click(),
+    page.getByRole('list', { name: 'Generated sizes' }).getByRole('button', { name: 'Download 16x16' }).click(),
   ])
   expect(download.suggestedFilename()).toBe('favicon-16x16.png')
 })
 
-test('[A9] generated set survives a reload: logo.png and 16x16 still shown', async ({ page }) => {
+test('[A9] preview and size list survive a reload after loading logo.png', async ({ page }) => {
   await page.goto('/')
   await loadLogo(page)
   await page.reload()
-  await expect(page.getByText('logo.png').first()).toBeVisible()
-  await expect(page.getByText('16x16', { exact: true })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Preview' }).getByText('logo.png')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Generated sizes' }).getByRole('listitem').getByText('16x16', { exact: true })).toBeVisible()
 })

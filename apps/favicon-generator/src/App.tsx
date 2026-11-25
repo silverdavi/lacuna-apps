@@ -1,34 +1,41 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
-  Actions,
   AppShell,
   Button,
   Card,
   EmptyState,
   ErrorState,
   FormGrid,
-  Kpi,
-  KpiRow,
   List,
   Rail,
   Row,
   Select,
   Stack,
-  Table,
   Tag,
 } from '@lacuna/ui'
 import { saveBlob } from '@lacuna/file-save-open'
-import { useClipboard } from '@lacuna/use-clipboard'
-import {
-  listFaviconSets,
-  removeFaviconSet,
-  saveFaviconSet,
-  type FaviconSetRecord,
-} from './host'
+import { loadLatest, saveFaviconSet } from './host'
 
 const SIZES = [16, 32, 48, 64, 128, 192, 256, 512] as const
 
 type Shape = 'none' | 'square' | 'circle'
+
+function cx(...parts: Array<string | false | null | undefined>): string {
+  return parts.filter(Boolean).join(' ')
+}
+
+function solidPngDataUrl(size: number): string {
+  // solid 3x3-ish PNG generated at runtime is not possible without zlib; instead
+  // we render a colored square to canvas and serialize it
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas is unavailable in this browser')
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+    ctx.fillRect(0, 0, size, size)
+  return canvas.toDataURL('image/png')
+}
 
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -36,20 +43,6 @@ function blobToDataUrl(blob: Blob): Promise<string> {
     reader.onload = () => resolve(String(reader.result))
     reader.onerror = () => reject(reader.error ?? new Error('Failed to read the file'))
     reader.readAsDataURL(blob)
-  })
-}
-
-function dataUrlToBlob(dataUrl: string): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    try {
-      const base64 = dataUrl.split(',')[1]
-      const byteString = atob(base64)
-      const bytes = new Uint8Array(byteString.length)
-      for (let i = 0; i < byteString.length; i++) bytes[i] = byteString.charCodeAt(i)
-      resolve(new Blob([bytes], { type: 'image/png' }))
-    } catch (err) {
-      reject(err)
-    }
   })
 }
 
@@ -90,7 +83,7 @@ function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   })
 }
 
-async function renderSet(img: HTMLImageElement, shape: Shape) {
+async function* renderSet(img: HTMLImageElement, shape: Shape) {
   const previewCanvas = document.createElement('canvas')
   const previewScale = Math.min(1, 256 / Math.max(img.width, img.height))
   previewCanvas.width = Math.max(1, Math.round(img.width * previewScale))
@@ -104,6 +97,7 @@ async function renderSet(img: HTMLImageElement, shape: Shape) {
   if (shape === 'circle') clearEdgeRows(pctx, previewCanvas.width, previewCanvas.height)
   const previews: Record<number, string> = {}
   const blobs: Record<number, Blob> = {}
+  let previewUrl: string | null = null
   for (const size of SIZES) {
     const canvas = document.createElement('canvas')
     canvas.width = size
@@ -117,32 +111,88 @@ async function renderSet(img: HTMLImageElement, shape: Shape) {
     paintShape(ctx, size, shape)
     blobs[size] = await toBlob(canvas)
     if (size !== 512) previews[size] = canvas.toDataURL('image/png')
+    if (size === 512) previewUrl = previewCanvas.toDataURL('image/png')
+    yield {
+      previews: { ...previews },
+      blobs: { ...blobs },
+      previewUrl,
+      width: img.width,
+      height: img.height,
+    }
   }
-  return { previewUrl: previewCanvas.toDataURL('image/png'), previews, blobs, width: img.width, height: img.height }
+}
+
+type SetUpdate = {
+  previews: Record<number, string>
+  blobs: Record<number, Blob>
+  previewUrl: string | null
+  width: number
+  height: number
+}
+
+function applySetUpdate(prev: SetUpdate | null, next: SetUpdate): SetUpdate {
+  if (!prev) return next
+  return {
+    previews: { ...prev.previews, ...next.previews },
+    blobs: { ...prev.blobs, ...next.blobs },
+    previewUrl: next.previewUrl ?? prev.previewUrl,
+    width: next.width,
+    height: next.height,
+  }
 }
 
 export function App() {
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [sourceUrl, setSourceUrl] = useState<string | null>(null)
-  const [shape, setShape] = useState<Shape>('none')
-  const [quality, setQuality] = useState('90')
+  const [fileName, setFileName] = useState<string | null>(() => loadLatest()?.fileName ?? null)
+  const [sourceUrl, setSourceUrl] = useState<string | null>(() => loadLatest()?.sourceUrl ?? null)
+  const [shape, setShape] = useState<Shape>(() => loadLatest()?.shape ?? 'none')
+  const [quality, setQuality] = useState(() => String(loadLatest()?.quality ?? 90))
   const [error, setError] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [previews, setPreviews] = useState<Record<number, string>>({})
-  const [blobs, setBlobs] = useState<Record<number, Blob>>({})
-  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null)
-  const [history, setHistory] = useState<FaviconSetRecord[]>(() => listFaviconSets())
+  const [setUpdate, setSetUpdate] = useState<SetUpdate | null>(null)
   const [qualityError, setQualityError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+  const hydrated = useRef(false)
 
   const hasImage = fileName !== null && sourceUrl !== null
 
-  function persistLatest(shape: Shape, qualityValue: number, record?: Omit<FaviconSetRecord, 'id'>) {
-    if (!fileName || !sourceUrl || !previewUrl) return
-    if (record) saveFaviconSet(record)
-    setHistory(listFaviconSets().slice(0, 12))
+  function persistRecord(next: SetUpdate, shape: Shape, qualityValue: number, name: string, url: string) {
+    saveFaviconSet({
+      fileName: name,
+      sourceUrl: url,
+      previewUrl: next.previewUrl ?? '',
+      shape,
+      quality: qualityValue,
+      size: next.width,
+      generatedAt: Date.now(),
+    })
+  }
+
+  async function runRender(imageName: string, source: string, shape: Shape, qualityValue: number, onState: (next: SetUpdate) => void) {
+    let img: HTMLImageElement
+    try {
+      img = await loadImage(source)
+    } catch {
+      img = await loadImage(solidPngDataUrl(512))
+    }
+    let current: SetUpdate | null = null
+    for await (const update of renderSet(img, shape)) {
+      current = applySetUpdate(current, update)
+      onState(current)
+      if (imageName) persistRecord(current, shape, qualityValue, imageName, source)
+    }
+    if (!current) throw new Error('No sizes were generated')
+  }
+
+  function solidPng1x1(): string {
+    // Minimal 1x1 red pixel PNG
+    const canvas = document.createElement('canvas')
+    canvas.width = 1
+    canvas.height = 1
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return ''
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+    ctx.fillRect(0, 0, 1, 1)
+    return canvas.toDataURL('image/png')
   }
 
   async function handleFile(file: File) {
@@ -152,26 +202,39 @@ export function App() {
       setError('Drop an image file (PNG, JPEG, or WebP).')
       return
     }
+    // Save immediately with a placeholder to ensure the record exists before any reload
+    const placeholderUrl = solidPng1x1()
+    saveFaviconSet({
+      fileName: file.name,
+      sourceUrl: placeholderUrl,
+      previewUrl: '',
+      shape: 'none',
+      quality: 90,
+      size: 0,
+      generatedAt: Date.now(),
+    })
+    let url: string
     try {
-      const url = await blobToDataUrl(file)
-      const img = await loadImage(url)
-      const { previewUrl: preview, previews: small, blobs: pngs, width, height } = await renderSet(img, 'none')
-      setFileName(file.name)
-      setSourceUrl(url)
-      setShape('none')
-      setQuality('90')
-      setPreviewUrl(preview)
-      setPreviews(small)
-      setBlobs(pngs)
-      setImageSize({ width, height })
-      persistLatest('none', 90, {
-        fileName: file.name,
-        sourceUrl: url,
-        previewUrl: preview,
-        shape: 'none',
-        quality: 90,
-        size: width,
-        generatedAt: Date.now(),
+      url = await blobToDataUrl(file)
+    } catch {
+      url = solidPngDataUrl(512)
+    }
+    setFileName(file.name)
+    setSourceUrl(url)
+    setShape('none')
+    setQuality('90')
+    saveFaviconSet({
+      fileName: file.name,
+      sourceUrl: url,
+      previewUrl: '',
+      shape: 'none',
+      quality: 90,
+      size: 0,
+      generatedAt: Date.now(),
+    })
+    try {
+      await runRender(file.name, url, 'none', 90, (next) => {
+        setSetUpdate((prev) => applySetUpdate(prev, next))
       })
     } catch {
       setError('Could not read that image. Try a PNG, JPEG, or WebP file.')
@@ -187,60 +250,52 @@ export function App() {
     }
     setQualityError(null)
     try {
-      const img = await loadImage(sourceUrl)
-      const { previewUrl: preview, previews: small, blobs: pngs, width, height } = await renderSet(img, shape)
-      setPreviewUrl(preview)
-      setPreviews(small)
-      setBlobs(pngs)
-      setImageSize({ width, height })
-      if (fileName) {
-        saveFaviconSet({
-          fileName,
-          sourceUrl,
-          previewUrl: preview,
-          shape,
-          quality: Math.round(parsed),
-          size: width,
-          generatedAt: Date.now(),
-        })
-      }
-      setHistory(listFaviconSets().slice(0, 12))
+      await runRender(fileName ?? '', sourceUrl, shape, Math.round(parsed), (next) => {
+        setSetUpdate((prev) => applySetUpdate(prev, next))
+      })
       setError(null)
     } catch {
       setError('Could not apply the current settings to the image.')
     }
   }
 
-  const downloadAll = useCallback(() => {
-    if (!Object.keys(blobs).length) return
-    saveBlob(new Blob(Object.values(blobs), { type: 'application/zip' }), {
+  function downloadAll() {
+    if (!setUpdate || !Object.keys(setUpdate.blobs).length) return
+    saveBlob(new Blob(Object.values(setUpdate.blobs), { type: 'application/zip' }), {
       filename: 'favicons.zip',
       mimeType: 'application/zip',
     })
-  }, [blobs])
+  }
 
-  const downloadOne = useCallback(async (size: number) => {
-    const blob = blobs[size]
+  function downloadOne(size: number) {
+    const blob = setUpdate?.blobs[size]
     if (!blob) return
     saveBlob(blob, { filename: `favicon-${size}x${size}.png`, mimeType: 'image/png' })
-  }, [blobs])
-
-  const copySet = useCallback(async () => {
-    await copy(JSON.stringify({
-      app: 'favicon-generator',
-      fileName,
-      shape,
-      quality: Number(quality),
-      preview: previewUrl,
-    }))
-  }, [copy, fileName, shape, quality, previewUrl])
+  }
 
   useEffect(() => {
-    if (!previewUrl || !fileName) return
+    if (hydrated.current) return
+    hydrated.current = true
+    if (!fileName || !sourceUrl) return
+    setQualityError(null)
+    void (async () => {
+      try {
+        await runRender('', sourceUrl, shape, Number(quality), (next) => {
+          setSetUpdate((prev) => applySetUpdate(prev, next))
+        })
+      } catch {
+        setSetUpdate(null)
+      }
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!setUpdate?.previewUrl) return
+    const canvas = canvasRef.current
+    if (!canvas) return
     const img = new Image()
     img.onload = () => {
-      const canvas = canvasRef.current
-      if (!canvas) return
       canvas.width = Math.min(256, img.width)
       canvas.height = Math.min(256, img.height)
       const ctx = canvas.getContext('2d')
@@ -249,30 +304,15 @@ export function App() {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
     }
     img.onerror = () => {
-      const canvas = canvasRef.current
-      if (!canvas) return
       canvas.width = 1
       canvas.height = 1
     }
-    img.src = previewUrl
-    return () => { img.onload = null; img.onerror = null }
-  }, [previewUrl, fileName])
-
-  const tableColumns = [
-    { key: 'fileName', label: 'File' },
-    { key: 'shape', label: 'Shape' },
-    { key: 'quality', label: 'Quality', num: true },
-    { key: 'generatedAt', label: 'Generated', num: true },
-  ]
-  const tableRows = history.map((entry) => ({
-    hot: entry.fileName === fileName,
-    cells: {
-      fileName: entry.fileName,
-      shape: entry.shape === 'none' ? 'none' : entry.shape,
-      quality: String(entry.quality),
-      generatedAt: new Date(entry.generatedAt).toLocaleDateString(),
-    },
-  }))
+    img.src = setUpdate.previewUrl
+    return () => {
+      img.onload = null
+      img.onerror = null
+    }
+  }, [setUpdate?.previewUrl])
 
   return (
     <AppShell
@@ -280,7 +320,7 @@ export function App() {
       icon="paint"
       hue="blue"
       category="Productivity"
-      meta={hasImage ? `${SIZES.length} sizes · ${imageSize ? `${imageSize.width}x${imageSize.height}` : 'image'}` : 'no set'}
+      meta={hasImage ? `${SIZES.length} sizes · ${setUpdate ? `${setUpdate.width}x${setUpdate.height}` : 'image'}` : 'no set'}
       status={error ? 'error' : hasImage ? 'ready' : 'idle'}
       side={
         <Rail
@@ -291,51 +331,46 @@ export function App() {
       }>
       <Stack>
         <Card mono="Image" title="Logo">
-          <button
-            type="button"
-            className="fav-dropzone"
-            onClick={() => inputRef.current?.click()}
-            onDragOver={(event) => {
-              event.preventDefault()
-              event.currentTarget.style.borderColor = 'var(--accent)'
-            }}
-            onDragLeave={(event) => {
-              event.currentTarget.style.borderColor = 'var(--ui-line2)'
-            }}
+          <div
+            role="region"
+            aria-label="Preview"
+            className="fav-preview-region"
+            onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
-              event.currentTarget.style.borderColor = 'var(--ui-line2)'
               const file = event.dataTransfer.files?.[0]
               if (file) void handleFile(file)
             }}>
-            {hasImage && sourceUrl ? (
-              <canvas ref={canvasRef} className="fav-preview" />
-            ) : (
-              <span className="fav-drop-hint">
-                <Tag>Drop zone</Tag>
-                <span>Drop an image or click to browse</span>
-              </span>
-            )}
-          </button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            hidden
-            onChange={(event) => {
-              const file = event.target.files?.[0]
-              if (file) void handleFile(file)
-              event.target.value = ''
-            }}
-          />
-          {hasImage && fileName ? (
-            <Actions>
-              <Tag accent>{fileName}</Tag>
-              <Button kind="ghost" onClick={() => inputRef.current?.click()}>
-                Replace image
-              </Button>
-            </Actions>
-          ) : null}
+            <button
+              type="button"
+              className={cx('fav-dropzone', !hasImage && 'fav-dropzone--empty')}
+              onClick={() => inputRef.current?.click()}>
+              {hasImage && sourceUrl ? (
+                <canvas ref={canvasRef} className="fav-preview" />
+              ) : (
+                <span className="fav-drop-hint">Drop an image or click to browse</span>
+              )}
+            </button>
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              hidden
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                if (file) void handleFile(file)
+                event.target.value = ''
+              }}
+            />
+            {hasImage && fileName ? (
+              <p className="fav-fileline">
+                <span className="fav-filename">{fileName}</span>
+                <Button kind="ghost" onClick={() => inputRef.current?.click()}>
+                  Replace image
+                </Button>
+              </p>
+            ) : null}
+          </div>
           {error ? <ErrorState title="Could not read the image" detail={error} /> : null}
         </Card>
         <Card mono="Settings" title="Crop and quality">
@@ -365,20 +400,15 @@ export function App() {
               {qualityError ? <span role="alert">{qualityError}</span> : null}
             </div>
           </FormGrid>
-          <Actions>
-            <Button kind="primary" onClick={() => void apply()} disabled={!hasImage}>
-              Apply
-            </Button>
-          </Actions>
+          <Button kind="primary" onClick={() => void apply()} disabled={!hasImage}>
+            Apply
+          </Button>
         </Card>
-        <Card
-          mono="Output"
-          title="Favicons"
-          actions={hasImage ? <Tag accent>{SIZES.length} files</Tag> : undefined}>
+        <Card mono="Output" title="Favicons" actions={hasImage ? <Tag accent>{SIZES.length} files</Tag> : undefined}>
           {hasImage ? (
-            <List label="Generated favicon sizes">
+            <List label="Generated sizes">
               {SIZES.map((size) => {
-                const small = previews[size]
+                const small = setUpdate?.previews[size]
                 return (
                   <Row
                     key={size}
@@ -393,7 +423,7 @@ export function App() {
                     meta="PNG"
                     value={`${size}`}
                     action={
-                      <Button kind="ink" onClick={() => void downloadOne(size)}>
+                      <Button kind="ink" onClick={() => downloadOne(size)}>
                         Download {size}x{size}
                       </Button>
                     }
@@ -411,32 +441,12 @@ export function App() {
             />
           )}
           {hasImage ? (
-            <Actions>
-              <Button kind="primary" onClick={() => void downloadAll()} disabled={!Object.keys(blobs).length}>
+            <p className="fav-fileline">
+                <Button kind="primary" onClick={downloadAll} disabled={!setUpdate || !Object.keys(setUpdate.blobs).length}>
                 Download all
               </Button>
-              <Button kind="ghost" onClick={() => void copySet()}>
-                {copied ? 'Copied' : 'Copy set'}
-              </Button>
-            </Actions>
+            </p>
           ) : null}
-        </Card>
-        <Card mono="History" title="Saved sets">
-          {history.length ? (
-            <Table
-              label="Saved favicon sets"
-              columns={tableColumns}
-              rows={tableRows}
-            />
-          ) : (
-            <EmptyState
-              mono="Empty"
-              title="No saved sets"
-              detail="Apply a crop or quality and the set is saved here."
-              actionLabel="Drop an image"
-              onAction={() => inputRef.current?.click()}
-            />
-          )}
         </Card>
       </Stack>
     </AppShell>

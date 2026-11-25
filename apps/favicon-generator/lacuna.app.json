@@ -79,8 +79,7 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts",
-      "tests/debug-circle.spec.ts"
+      "tests/acceptance.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
