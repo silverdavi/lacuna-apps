@@ -1,0 +1,7 @@
+/* App-local classes. Tokens only: no hex colors, no raw px. */
+.ot-prompt {
+  font-family: var(--serif);
+  font-size: calc(18px * var(--tf));
+  font-weight: 600;
+  margin: calc(8px * var(--sf)) 0 calc(16px * var(--sf));
+}
