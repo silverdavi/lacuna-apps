@@ -1,0 +1,45 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root. */
+/* Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy. */
+
+.pl-item-check {
+  margin-right: 0.5em;
+  vertical-align: middle;
+}
+
+.pl-row-name {
+  color: var(--ink);
+}
+
+.pl-item-actions {
+  display: inline-flex;
+  gap: 0.5em;
+}
+
+.pl-item-edit {
+  width: 9em;
+  margin-left: 0.5em;
+}
+
+.pl-tabs {
+  display: inline-flex;
+  gap: 0.25em;
+  border-bottom: 0.0625em solid var(--hair);
+}
+
+.pl-tab {
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-bottom: 0.125em solid transparent;
+  padding: 0.4em 0.9em;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.pl-tab.active {
+  color: var(--ink);
+  opacity: 1;
+  border-bottom-color: var(--accent);
+}
