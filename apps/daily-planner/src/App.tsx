@@ -6,6 +6,7 @@ import { toISODate, fromISODate } from '@lacuna/date-math'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useHostMock } from './host/mock'
 import { monthCells, monthLabel, weekDays, occurrencesByDate, taskDueDates, type CalendarEvent } from './lib/dates'
+import { listEvents } from './lib/persistence'
 import { eventsToIcs } from './lib/ics'
 import type { EventItem, Recurrence, Task } from './lib/types'
 
@@ -43,6 +44,12 @@ export function App() {
 
   const [selectedISO, setSelectedISO] = useState<string>(todayISO())
   const [viewMonth, setViewMonth] = useState(() => {
+    const evs = listEvents()
+    if (evs.length > 0) {
+      const latest = evs.reduce((a, b) => (a.date > b.date ? a : b))
+      const d = fromISODate(latest.date)
+      if (d !== null) return { year: d.getFullYear(), month: d.getMonth() }
+    }
     const d = new Date()
     return { year: d.getFullYear(), month: d.getMonth() }
   })
@@ -50,10 +57,6 @@ export function App() {
   useEffect(() => {
     document.title = 'Daily Planner'
   }, [])
-
-  useEffect(() => {
-    if (events.length > 0) setTab('Calendar')
-  }, [events])
 
   const today = todayISO()
 
@@ -121,8 +124,17 @@ export function App() {
 
   function saveEditEvent() {
     if (editingEvent === null) return
-    addEvent({ title: editingEvent.title, date: editingEvent.date, time: editingEvent.time, recurrence: editRecurrence })
+    addEvent({
+      title: editingEvent.title,
+      date: editingEvent.date,
+      time: editingEvent.time,
+      recurrence: editRecurrence,
+    })
     removeEvent(editingEvent.id)
+    setViewMonth({
+      year: (fromISODate(editingEvent.date) ?? new Date()).getFullYear(),
+      month: (fromISODate(editingEvent.date) ?? new Date()).getMonth(),
+    })
     setEditingEvent(null)
   }
 
@@ -212,11 +224,13 @@ export function App() {
                       data-testid={`task-row-${task.id}`}
                       className={`dp-task-row${task.done ? ' done' : ''}`}
                     >
-                      <Checkbox
-                        label=""
-                        checked={task.done}
-                        onChange={() => toggleTask(task.id)}
-                      />
+                      <span className="dp-task-check">
+                        <Checkbox
+                          label=""
+                          checked={task.done}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                      </span>
                       <span className="dp-task-title">{task.title}</span>
                       <span className="dp-task-due">{task.due}</span>
                       {task.recurrence !== 'none' ? <span className="dp-task-due">{task.recurrence}</span> : null}
@@ -303,7 +317,13 @@ export function App() {
             )}
 
             {editingEvent !== null && (
-              <Card title={`Edit ${editingEvent.title}`} mono={editingEvent.date}>
+              <div
+                role="dialog"
+                aria-label="Event details"
+                aria-modal="true"
+                style={{ display: 'flex', justifyContent: 'center' }}
+              >
+                <Card title={`Edit ${editingEvent.title}`} mono={editingEvent.date}>
                 <Stack>
                   <div>
                     <span style={{ fontFamily: 'var(--sans)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)' }}>
@@ -332,53 +352,78 @@ export function App() {
                   </div>
                 </Stack>
               </Card>
+              </div>
             )}
 
             {calendarView === 'Month' && (
               <Card title="Month" mono="grid">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'calc(8px * var(--sf))' }}>
+                <div
+                  role="toolbar"
+                  aria-label="Month navigation"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'calc(8px * var(--sf))' }}
+                >
                   <Button kind="ghost" onClick={() => shiftMonth(-1)} ariaLabel="Previous month">Prev</Button>
                   <span className="dp-month-label">{monthLabel(viewMonth.year, viewMonth.month)}</span>
                   <Button kind="ghost" onClick={() => shiftMonth(1)} ariaLabel="Next month">Next</Button>
                 </div>
-                <div className="cal-grid" data-testid="calendar-month">
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-                    <div key={d} className="cal-dow">{d}</div>
-                  ))}
-                  {monthCellsISO.map((iso) => {
-                    const eventsHere = byDate.get(iso) ?? []
-                    const tasksHere = dueDates.get(iso) ?? []
-                    const inMonth = (() => {
-                      const d = fromISODate(iso)
-                      return d !== null && d.getFullYear() === viewMonth.year && d.getMonth() === viewMonth.month
-                    })()
+                <div
+                  role="grid"
+                  aria-label="Month"
+                  className="cal-grid"
+                  data-testid="calendar-month"
+                >
+                  <div role="row">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+                      <div key={d} role="columnheader" className="cal-dow">{d}</div>
+                    ))}
+                  </div>
+                  {Array.from({ length: Math.ceil(monthCellsISO.length / 7) }, (_, row) => {
+                    const rowISOs = monthCellsISO.slice(row * 7, row * 7 + 7)
                     return (
-                      <div
-                        key={iso}
-                        data-testid={`cal-day-${iso}`}
-                        className={`cal-cell${inMonth ? '' : ' out'}${iso === today ? ' today' : ''}${iso === selectedISO ? ' selected' : ''}`}
-                        onClick={() => setSelectedISO(iso)}
-                      >
-                        <span className="cal-num">{fromISODate(iso)?.getDate()}</span>
-                        {eventsHere.slice(0, 3).map((ev: CalendarEvent) => (
-                          <button
-                            key={`${ev.id}-${ev.time}`}
-                            type="button"
-                            className="cal-event"
-                            data-testid={`cal-event-${ev.id}`}
-                            data-time={ev.time}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              const item = events.find((x) => x.id === ev.id)
-                              if (item) startEditEvent(item)
-                            }}
-                          >
-                            {ev.title}
-                          </button>
-                        ))}
-                        {tasksHere.slice(0, 2).map((t, i) => (
-                          <span key={`${iso}-task-${i}`} className="cal-task">{t}</span>
-                        ))}
+                      <div key={`row-${row}`} role="row">
+                        {rowISOs.map((iso) => {
+                          const eventsHere = byDate.get(iso) ?? []
+                          const tasksHere = dueDates.get(iso) ?? []
+                          const inMonth = (() => {
+                            const d = fromISODate(iso)
+                            return d !== null && d.getFullYear() === viewMonth.year && d.getMonth() === viewMonth.month
+                          })()
+                          const d = fromISODate(iso)
+                          const dayLabel = d
+                            ? d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                            : iso
+                          return (
+                            <div
+                              key={iso}
+                              role="gridcell"
+                              aria-label={dayLabel}
+                              data-testid={`cal-day-${iso}`}
+                              className={`cal-cell${inMonth ? '' : ' out'}${iso === today ? ' today' : ''}${iso === selectedISO ? ' selected' : ''}`}
+                              onClick={() => setSelectedISO(iso)}
+                            >
+                              <span className="cal-num">{d?.getDate()}</span>
+                              {eventsHere.slice(0, 3).map((ev: CalendarEvent) => (
+                                <button
+                                  key={`${ev.id}-${ev.time}`}
+                                  type="button"
+                                  className="cal-event"
+                                  data-testid={`cal-event-${ev.id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    const item = events.find((x) => x.id === ev.id)
+                                    if (item) startEditEvent(item)
+                                  }}
+                                >
+                                  <span className="cal-event-time">{ev.time}</span>
+                                  <span className="cal-event-title">{ev.title}</span>
+                                </button>
+                              ))}
+                              {tasksHere.slice(0, 2).map((t, i) => (
+                                <span key={`${iso}-task-${i}`} className="cal-task">{t}</span>
+                              ))}
+                            </div>
+                          )
+                        })}
                       </div>
                     )
                   })}
@@ -388,37 +433,52 @@ export function App() {
 
             {calendarView === 'Week' && (
               <Card title="Week" mono={monthLabel(viewMonth.year, viewMonth.month)}>
-                <div className="cal-week" data-testid="calendar-week">
-                  {week.map((iso) => {
-                    const eventsHere = weekByDate.get(iso) ?? []
-                    const tasksHere = taskDueDates(tasks, iso, iso).get(iso) ?? []
-                    const d = fromISODate(iso)
-                    return (
-                      <div key={iso} role="columnheader" className="cal-week-col">
-                        <div className="cal-week-head">
-                          {d?.toLocaleString('en-US', { weekday: 'long' })}
+                <div
+                  role="grid"
+                  aria-label="Week"
+                  className="cal-week"
+                  data-testid="calendar-week"
+                >
+                  <div role="row">
+                    {week.map((iso) => {
+                      const d = fromISODate(iso)
+                      const headerLabel = d
+                        ? d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+                        : iso
+                      return (
+                        <div key={`head-${iso}`} role="columnheader" aria-label={headerLabel}>
+                          <div className="cal-week-head">{headerLabel}</div>
                         </div>
-                        <div className="cal-week-date">{iso}</div>
-                        {eventsHere.map((ev: CalendarEvent) => (
-                          <button
-                            key={`${ev.id}-${ev.time}`}
-                            type="button"
-                            className="cal-event-btn"
-                            data-time={ev.time}
-                            onClick={() => {
-                              const item = events.find((x) => x.id === ev.id)
-                              if (item) startEditEvent(item)
-                            }}
-                          >
-                            {ev.title}
-                          </button>
-                        ))}
-                        {tasksHere.map((t, i) => (
-                          <div key={`${iso}-task-${i}`} className="cal-task">{t}</div>
-                        ))}
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
+                  <div role="row">
+                    {week.map((iso) => {
+                      const eventsHere = weekByDate.get(iso) ?? []
+                      const tasksHere = taskDueDates(tasks, iso, iso).get(iso) ?? []
+                      return (
+                        <div key={`cell-${iso}`} role="gridcell" className="cal-week-col">
+                          {eventsHere.map((ev: CalendarEvent) => (
+                            <button
+                              key={`${ev.id}-${ev.time}`}
+                              type="button"
+                              className="cal-event-btn"
+                              data-time={ev.time}
+                              onClick={() => {
+                                const item = events.find((x) => x.id === ev.id)
+                                if (item) startEditEvent(item)
+                              }}
+                            >
+                              {ev.title}
+                            </button>
+                          ))}
+                          {tasksHere.map((t, i) => (
+                            <div key={`${iso}-task-${i}`} className="cal-task">{t}</div>
+                          ))}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </Card>
             )}

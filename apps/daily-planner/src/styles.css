@@ -5,7 +5,8 @@
   padding: calc(8px * var(--sf)) calc(4px * var(--sf));
 }
 
-.dp-task-row .lk-check {
+.dp-task-check {
+  display: flex;
   flex: 0 0 auto;
 }
 
@@ -23,10 +24,6 @@
 }
 
 .dp-task-row.done {
-  text-decoration-line: line-through;
-}
-
-.dp-task-row.done .lk-check {
   text-decoration-line: line-through;
 }
 
@@ -93,7 +90,9 @@
 }
 
 .cal-event {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
   width: 100%;
   font-size: calc(10px * var(--tf));
   color: var(--ink);
@@ -108,11 +107,15 @@
   text-align: left;
 }
 
-.cal-event::before {
-  content: attr(data-time);
+.cal-event-time {
   font-family: var(--mono);
   font-size: calc(9px * var(--tf));
-  margin-right: calc(4px * var(--sf));
+  flex: 0 0 auto;
+}
+
+.cal-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cal-week {
@@ -132,6 +135,14 @@
   min-height: calc(80px * var(--sf));
 }
 
+.cal-week-col[role='gridcell'] {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  min-height: 0;
+}
+
 .cal-week-head {
   font-family: var(--mono);
   font-size: calc(10px * var(--tf));
@@ -145,7 +156,9 @@
 }
 
 .cal-event-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
   font-size: calc(11px * var(--tf));
   color: var(--ink);
   border: calc(1px * var(--sf)) solid var(--ui-line2);
@@ -164,7 +177,7 @@
   content: attr(data-time);
   font-family: var(--mono);
   font-size: calc(9px * var(--tf));
-  margin-right: calc(4px * var(--sf));
+  flex: 0 0 auto;
 }
 
 .cal-event-btn:hover {
