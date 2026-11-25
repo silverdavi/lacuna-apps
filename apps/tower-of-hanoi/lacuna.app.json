@@ -1,0 +1,85 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.tower-of-hanoi",
+  "name": "Tower of Hanoi",
+  "version": "0.1.0",
+  "summary": "Move the whole stack of disks to another peg, one disk at a time, never placing a larger disk on a smaller one.",
+  "description": "A player solves the classic disk-stacking puzzle by moving disks between three pegs. They choose a disk count, watch the move count and best score, and restart the board. The best score and the disk count survive reloads.",
+  "category": "personal",
+  "icon": "layers",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/tower-of-hanoi"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:puzzle",
+    "fill:puzzle"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "game",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the best score and the disk count"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "game"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
