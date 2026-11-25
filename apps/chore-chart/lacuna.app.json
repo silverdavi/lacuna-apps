@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.chore-chart",
+  "name": "Chore Chart",
+  "version": "0.1.0",
+  "summary": "Split household chores between members, tick them off, and export the chart as CSV.",
+  "description": "Add the people in your household, assign each one a chore, and see who is done. Check a chore off when it is finished, watch each member's progress fill in, and copy the whole chart to the clipboard as CSV. Everything is stored locally in your browser.",
+  "category": "productivity",
+  "tags": [
+    "household",
+    "tasks"
+  ],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/chore-chart",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:chore"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "chore",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store household chores and their members"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "chore"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
