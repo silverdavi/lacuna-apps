@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.maze-generator",
+  "name": "Maze Generator",
+  "version": "0.1.0",
+  "summary": "Generate and solve seeded mazes.",
+  "description": "A small shelf app. Generate a deterministic maze from a seed, track your path, and keep a running score of solved mazes.",
+  "category": "games",
+  "tags": ["maze", "puzzle", "game"],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/maze-generator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/random": "^0.1.0",
+      "@lacuna/host-mock": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:maze-generator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "maze-generator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Maze Generator records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "maze-generator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/community-app-open-and-reload.spec.ts",
+      "tests/edit-community-app.spec.ts",
+      "tests/community-app-denied-action.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

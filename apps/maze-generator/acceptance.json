@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "a3db51ccf196333b849ca0348d4c1152457c0dd654613292913160f35359eb97",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Maze Generator\", the text \"No maze generated yet\", and the score display \"Score: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Entering \"42\" in the field labelled \"Seed\", selecting \"5x5\" in the select labelled \"Size\", and clicking the button \"Generate\" creates a maze where the cell at row 1, column 1 (0-indexed) is open (not a wall) and the cell at row 0, column 0 is marked \"Start\"."
+    },
+    {
+      "id": "A3",
+      "text": "After generating a 5x5 maze with Seed \"42\", clicking the cell at row 0, column 0 (Start) and then the cell at row 0, column 1 shows the path indicator \"Path: 2\" and the score display remains \"Score: 0\"."
+    },
+    {
+      "id": "A4",
+      "text": "After generating a 5x5 maze with Seed \"42\", clicking the Start cell, then the cell at row 0, column 1, then the cell at row 1, column 1, then the cell at row 1, column 2, then the cell at row 2, column 2, then the cell at row 2, column 3, then the cell at row 3, column 3, then the cell at row 3, column 4, then the cell at row 4, column 4 (Finish) shows the message \"Maze solved!\" and the score display changes to \"Score: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "After solving a maze with Seed \"42\" (Score: 1), clicking the button \"New Maze\" with the same Seed \"42\" and Size \"5x5\" regenerates the identical maze (cell at row 1, column 1 is open) and the score display resets to \"Score: 0\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"History\" shows a table with the header \"Best Score\" and the value \"1\" in the first row, and the text \"1 maze solved\"."
+    },
+    {
+      "id": "A7",
+      "text": "After solving a maze with Seed \"42\", clicking the button \"Copy Solution\" shows the toast message \"Solution copied to clipboard\" and the clipboard contains the text \"0,0 -> 0,1 -> 1,1 -> 1,2 -> 2,2 -> 2,3 -> 3,3 -> 3,4 -> 4,4\"."
+    },
+    {
+      "id": "A8",
+      "text": "Entering \"99\" in the field labelled \"Seed\" and clicking \"Generate\" creates a different maze than Seed \"42\" (the cell at row 1, column 1 is a wall, not open)."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after solving a maze with Seed \"42\" (Score: 1), reloading the page still shows the score display \"Score: 0\" (reset for new maze) but the tab labelled \"History\" still shows \"Best Score\" with value \"1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9b407090330ec4f13986141385d31849c88e38c04944b6976c7699880b2563f5"
+    }
+  ]
+}
