@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "7482e2802adc824073d375197bcd2101c3874a21d714204bf9632e2c7b75d9c9",
+  "spec_sha256": "d5bab42706bcb30cfb1d6937cf04a83fbb5153799dcf037a1437870468c2a31d",
   "checks": [
     {
       "id": "A1",
@@ -8,41 +8,41 @@
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"Add entry\" opens a form. Typing \"12500\" in the field labelled \"Odometer\", \"10.5\" in the field labelled \"Gallons\", \"45.25\" in the field labelled \"Cost\", and \"Full tank\" in the field labelled \"Note\", then clicking \"Save\" adds a list item containing \"12500\", \"10.5\", \"$45.25\", and \"Full tank\"."
+      "text": "Clicking the button \"Add entry\" opens a form. Typing \"12500\" in the field labelled \"Odometer\", \"10.5\" in \"Gallons\", \"45.25\" in \"Cost\" and \"Full tank\" in \"Note\", then clicking \"Save\" adds a list item containing \"12500\", \"10.5\", \"$45.25\" and \"Full tank\"."
     },
     {
       "id": "A3",
-      "text": "After adding the entry from A2, the summary section shows \"Total miles: 12500\" and \"Total cost: $45.25\"."
+      "text": "After adding the entry from A2, the summary section shows the text \"Total miles: 12500\" and \"Total cost: $45.25\"."
     },
     {
       "id": "A4",
-      "text": "Clicking the button \"Add entry\" again, typing \"12800\" in \"Odometer\", \"8.2\" in \"Gallons\", \"38.10\" in \"Cost\", and \"Half tank\" in \"Note\", then clicking \"Save\" adds a second list item containing \"12800\", \"8.2\", \"$38.10\", and \"Half tank\". The summary now shows \"Total miles: 12800\" and \"Total cost: $83.35\"."
+      "text": "After adding the entry from A2, clicking \"Add entry\" again, typing \"12800\" in \"Odometer\", \"8.2\" in \"Gallons\", \"38.10\" in \"Cost\" and \"Half tank\" in \"Note\", then clicking \"Save\" adds a second list item containing \"12800\", \"8.2\", \"$38.10\" and \"Half tank\"; the summary shows \"Total miles: 12800\" and \"Total cost: $83.35\" (45.25 + 38.10 = 83.35)."
     },
     {
       "id": "A5",
-      "text": "Every list item has a button labelled \"Delete\". Clicking the \"Delete\" button on the first entry (the one with \"12500\") removes that item. The summary updates to \"Total miles: 12800\" and \"Total cost: $38.10\"."
+      "text": "With both entries added, clicking the button \"Delete\" in the first list item (the one containing \"12500\") removes it; one list item remains; the summary shows \"Total miles: 12800\" and \"Total cost: $38.10\"."
     },
     {
       "id": "A6",
-      "text": "Clicking the tab \"Summary\" shows a table with a row labelled \"Average MPG\" displaying \"14.4\" (calculated as (12800-12500) / (10.5+8.2) rounded to one decimal)."
+      "text": "With both entries added, clicking the tab \"Summary\" shows a table with a row whose first cell is \"Average MPG\" and whose second cell is \"16.0\". (Average MPG = (12800 - 12500) / (10.5 + 8.2) = 300 / 18.7 = 16.04, shown with one decimal as 16.0.)"
     },
     {
       "id": "A7",
-      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that starts with \"odometer,gallons,cost,note\" and contains the line \"12800,8.2,38.10,Half tank\"."
+      "text": "With both entries added, clicking the button \"Export CSV\" puts on the clipboard text that starts with \"odometer,gallons,cost,note\" and contains the line \"12800,8.2,38.10,Half tank\"."
     },
     {
       "id": "A8",
-      "text": "Typing \"Half\" in the search box labelled \"Search\" filters the list to show only the entry containing \"Half tank\"."
+      "text": "With both entries added, typing \"Half\" in the search box labelled \"Search\" leaves one list item, the one containing \"Half tank\"; the \"Full tank\" item is not present."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the entry with \"12800\" and \"Half tank\" visible in the list, and the summary shows \"Total cost: $38.10\"."
+      "text": "After adding only the second entry (12800, 8.2, 38.10, \"Half tank\") and reloading, the list shows an item containing \"12800\" and \"Half tank\", and the summary shows \"Total cost: $38.10\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "e94d60fdad1ac57c8b1e85bff84c51c6e743c5f2968a7a89bc337b4c0a57b6c6"
+      "sha256": "c6c01fd8d8a7a363e0d54920c14f7e5d20912a980b305e00ea4a6340be643eab"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "com.example.mileage-log",
+  "id": "lacuna.mileage-log",
   "name": "Vehicle Mileage Log",
   "version": "0.1.0",
   "summary": "Log fuel fills and read totals, average MPG, and a CSV export.",
@@ -12,9 +12,9 @@
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",
