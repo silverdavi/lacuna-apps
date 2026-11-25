@@ -155,7 +155,7 @@ export function App() {
       hue="brown"
       category="Personal"
       meta={`${meals.length} ${meals.length === 1 ? 'meal' : 'meals'}`}
-      status={copied ? 'List copied' : undefined}
+      status={copied ? 'List copied' : `${meals.length} planned, ${items.length} to buy`}
       actions={
         <Stack style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <Button ariaLabel="Copy List" onClick={() => void copy(copyText(items))}>
@@ -167,7 +167,10 @@ export function App() {
         </Stack>
       }
       side={
-        <Rail>
+        <Rail
+          note="Week plan"
+          chips={['Plan meals', 'Shopping list', 'Copy list', 'Export ICS', 'Delete meals']}
+        >
           <KpiRow>
             <Kpi value={meals.length} label="meals planned" />
             <Kpi value={items.length} label="items to buy" accent />
