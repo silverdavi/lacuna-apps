@@ -1,2 +1,1 @@
-/* Inactive tabs at the kit default (--ink-40) fail WCAG contrast; raise them to legible ink. */
-.lk-main .lc-tab:not(.active) { color: var(--ink-80); }
+.pos-tab { color: var(--ink-60); }

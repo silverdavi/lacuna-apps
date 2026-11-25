@@ -27,6 +27,7 @@ export type InventoryItem = {
 export const salesStore = createMockRecordStore<Sale>({
   key: 'lacuna.point-of-sale.sales',
   idPrefix: 'S-',
+
   validate: (v: unknown): v is Sale => {
     const s = v as Partial<Sale> | null
     return (
@@ -42,6 +43,7 @@ export const salesStore = createMockRecordStore<Sale>({
 export const inventoryStore = createMockRecordStore<InventoryItem>({
   key: 'lacuna.point-of-sale.inventory',
   idPrefix: 'inv-',
+
   validate: (v: unknown): v is InventoryItem => {
     const i = v as Partial<InventoryItem> | null
     return (

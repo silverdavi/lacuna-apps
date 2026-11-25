@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import {
   Actions,
   AppShell,
+  Body,
   Button,
   Card,
   EmptyState,
@@ -12,6 +13,8 @@ import {
   Kpi,
   KpiRow,
   PrimaryButton,
+  Rail,
+  SectionLabel,
   Table,
   Select,
   TextInput,
@@ -174,6 +177,25 @@ export function App() {
       hue="gold"
       category="Business"
       meta={tab === 'Sales' ? `${sales.length} sales` : `${inventory.length} items`}
+      side={
+        <Rail
+          title="Point of Sale"
+          note={`${inventory.length} items in stock`}
+          chips={['Sales', 'Inventory', 'Export CSV']}
+        >
+          <SectionLabel>Today</SectionLabel>
+          <KpiRow>
+            <Kpi value={`${sales.length}`} label="Sales" />
+          </KpiRow>
+          <SectionLabel>Low stock</SectionLabel>
+          {inventory.filter((i) => i.stock < 50).map((i) => (
+            <Body key={i.id} sm>
+              {i.name} · {i.stock} left
+            </Body>
+          ))}
+          {inventory.every((i) => i.stock >= 50) ? <Body sm>Nothing below 50 in stock.</Body> : null}
+        </Rail>
+      }
     >
       <div role="tablist" aria-label="Point of Sale views" className="lc-tabs">
         {(['Sales', 'Inventory'] as const).map((t) => (
@@ -182,7 +204,7 @@ export function App() {
             type="button"
             role="tab"
             aria-selected={tab === t}
-            className={`lc-tab${tab === t ? ' active' : ''}`}
+            className={`lc-tab pos-tab${tab === t ? ' active' : ''}`}
             onClick={() => setTab(t)}
           >
             {t}
