@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useMemo, useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Select, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, FormGrid, Rail, Select, TextInput } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useLocalRecord } from '@lacuna/use-local-record'
 
@@ -121,39 +121,47 @@ export function App() {
   return (
     <AppShell
       name="Cooking Unit Converter"
-      icon="docs"
-      hue="gold"
+      icon="grid"
+      hue="blue"
       category="Productivity"
       meta={history.length > 0 ? `${history.length} ${history.length === 1 ? 'conversion' : 'conversions'}` : 'No history'}
-      status={copied ? `Copied ${result} ${unitLabel(to)} to clipboard` : null}
+      status={copied ? `Copied ${result} ${unitLabel(to)} to clipboard` : 'Ready'}
+      side={
+        <Rail
+          title="Units"
+          note={result === null ? 'Awaiting amount' : `${amount} ${unitLabel(from)} = ${result} ${unitLabel(to)}`}
+          chips={['Cups', 'Tablespoons', 'Teaspoons', 'Grams', 'Ounces', 'Celsius', 'Fahrenheit']}
+        >
+          <Button kind="ghost" onClick={copyResult} disabled={result === null}>Copy result</Button>
+        </Rail>
+      }
     >
-      <div className="cv-tabs" role="tablist" aria-label="Converter sections">
-        {(['convert', 'history'] as const).map((id) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={tab === id}
-            className={`cv-tab${tab === id ? ' active' : ''}`}
-            onClick={() => setTab(id)}
-          >
-            {id === 'convert' ? 'Convert' : 'History'}
-          </button>
-        ))}
+      <div role="tablist" aria-label="Sections" className="lc-tabs">
+        <button type="button" role="tab" aria-selected={tab === 'convert'} className={`lc-tab${tab === 'convert' ? ' active' : ''}`} style={tab === 'convert' ? undefined : { color: 'var(--ink-60)' }} onClick={() => setTab('convert')}>Convert</button>
+        <button type="button" role="tab" aria-selected={tab === 'history'} className={`lc-tab${tab === 'history' ? ' active' : ''}`} style={tab === 'history' ? undefined : { color: 'var(--ink-60)' }} onClick={() => setTab('history')}>History</button>
       </div>
 
+      <div role="tabpanel" aria-label={tab === 'convert' ? 'Convert' : 'History'}>
       {tab === 'convert' ? (
+        <>
         <Card mono="Units" title="Convert">
           <FormGrid>
             <TextInput label="Amount" value={amount} onChange={setAmount} inputMode="decimal" placeholder="1 1/2" />
             <Select label="From unit" value={from} onChange={setFrom} options={UNITS.map((u) => ({ value: u.id, label: u.label }))} />
             <Select label="To unit" value={to} onChange={setTo} options={UNITS.map((u) => ({ value: u.id, label: u.label }))} />
-            <TextInput label="Result" value={result ?? ''} onChange={() => undefined} />
           </FormGrid>
-          <Actions>
-            <Button kind="ghost" onClick={copyResult} disabled={result === null}>Copy result</Button>
-          </Actions>
         </Card>
+        <Card mono="Result" title="Converted amount">
+          {result === null ? (
+            <EmptyState mono="Empty" title="No result yet" detail="Enter an amount and pick two units from the same family." actionLabel="Enter an amount" />
+          ) : (
+            <label className="lc-field">
+              <span className="lc-field-label">Result</span>
+              <input className={`lc-input${result ? ' filled' : ''}`} type="text" value={result} readOnly aria-readonly="true" />
+            </label>
+          )}
+        </Card>
+        </>
       ) : (
         <Card mono={`${history.length} kept`} title="History">
           {history.length === 0 ? (
@@ -165,7 +173,9 @@ export function App() {
                   const label = `${entry.amount} ${unitLabel(entry.from)} → ${entry.result} ${unitLabel(entry.to)}`
                   return (
                     <li key={`${entry.amount}-${entry.from}-${entry.to}-${index}`} className="lk-row" aria-label={label}>
-                      <span className="lk-row-text"><span className="lk-row-title">{label}</span></span>
+                      <span className="lk-row-text">
+                        <span className="lk-row-title">{label}</span>
+                      </span>
                     </li>
                   )
                 })}
@@ -177,6 +187,7 @@ export function App() {
           )}
         </Card>
       )}
+      </div>
     </AppShell>
   )
 }
