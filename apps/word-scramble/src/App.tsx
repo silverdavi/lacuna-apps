@@ -2,9 +2,26 @@
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { AppShell, Button, Card, PrimaryButton, Stack } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Board,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  Keys,
+  List,
+  MonoLabel,
+  Rail,
+  Row,
+  Stack,
+  Tag,
+} from '@lacuna/ui'
 import { mulberry32, shuffle } from '@lacuna/random'
 import { useTimer } from '@lacuna/use-timer'
+import { useClipboard } from '@lacuna/use-clipboard'
 import { createMockValue } from '@lacuna/host-mock'
 import { Toast } from '@lacuna/toast'
 
@@ -101,6 +118,11 @@ const inputStyle: CSSProperties = {
   fontFamily: 'inherit',
 }
 
+const errorInputStyle: CSSProperties = {
+  ...inputStyle,
+  border: 'calc(2px * var(--sf)) solid var(--bad)',
+}
+
 const labelStyle: CSSProperties = {
   fontSize: 'calc(14px * var(--tf))',
   fontWeight: 600,
@@ -125,7 +147,9 @@ export function App() {
   const [answer, setAnswer] = useState('')
   const [toast, setToast] = useState<{ message: string; variant: 'info' | 'success' | 'error' } | null>(null)
   const [finished, setFinished] = useState(false)
+  const [shakeKey, setShakeKey] = useState(0)
   const rngRef = useRef<() => number>(() => Math.random())
+  const clipboard = useClipboard({ timeoutMs: 1500 })
 
   const [timerState, timerControls] = useTimer({
     initialDurationMs: 30_000,
@@ -147,7 +171,7 @@ export function App() {
     setRecord({
       version: 1,
       score: 0,
-      best: 0,
+      best: record.best,
       wordIndex,
       difficulty,
       scrambled,
@@ -156,6 +180,7 @@ export function App() {
     })
     setAnswer('')
     setFinished(false)
+    setShakeKey(0)
     timerControls.reset()
     timerControls.start()
   }
@@ -174,10 +199,12 @@ export function App() {
       const nextScrambled = scrambleWord(nextWord, record.seed, nextIndex, rngRef.current)
       setRecord({ ...record, score: newScore, best: newBest, wordIndex: nextIndex, scrambled: nextScrambled })
       setAnswer('')
+      setShakeKey(0)
       timerControls.reset()
       timerControls.start()
       setToast({ message: 'Correct! +10 points', variant: 'success' })
     } else {
+      setShakeKey((k) => k + 1)
       setToast({ message: 'Incorrect', variant: 'error' })
     }
   }
@@ -203,24 +230,97 @@ export function App() {
     timerControls.reset()
     setAnswer('')
     setFinished(false)
+    setShakeKey(0)
+  }
+
+  function copySummary() {
+    const words = WORDS[record.difficulty]
+    const word = record.active ? words[record.wordIndex] : '—'
+    const text = [
+      `Score: ${record.score}`,
+      `Best: ${record.best}`,
+      `Difficulty: ${record.difficulty}`,
+      `Word: ${word}`,
+      record.active ? 'Round in progress' : 'No active round',
+    ].join('\n')
+    void clipboard.copy(text)
   }
 
   const timeDisplay = formatTime(timerState.remainingMs)
+  const isRunning = timerState.running
+  const hasError = shakeKey > 0 && record.active
 
   return (
-    <AppShell name="Word Scramble" icon="whiteboard" hue="gold" category="Games">
-      <Card mono="Game" title="Word Scramble">
+    <AppShell
+      name="Word Scramble"
+      icon="whiteboard"
+      hue="gold"
+      category="Games"
+      meta={record.active ? `Score ${record.score}` : undefined}
+      status={
+        record.active
+          ? `Round running · ${record.difficulty} · ${timeDisplay}`
+          : finished
+            ? `Round over · Final ${record.score}`
+            : 'Ready to play'
+      }
+      side={
+        <Rail title="Round" note={record.active ? 'in progress' : 'idle'}>
+          <KpiRow>
+            <Kpi label="Score" value={record.score} accent={record.active} />
+            <Kpi label="Best" value={record.best} />
+          </KpiRow>
+          <div style={{ marginTop: 'calc(4px * var(--sf))' }}>
+            <MonoLabel>Difficulty</MonoLabel>
+            <Tag accent>{difficulty}</Tag>
+          </div>
+          <Actions>
+            <Button onClick={copySummary} ariaLabel="Copy summary">
+              {clipboard.copied ? 'Copied' : 'Copy summary'}
+            </Button>
+          </Actions>
+          <Keys items={[['Enter', 'Submit answer'], ['P', 'Pause / resume']]} />
+        </Rail>
+      }
+    >
+      <Card
+        mono="Game"
+        title="Word Scramble Game"
+        actions={
+          record.active ? (
+            <Actions>
+              <Button kind="primary" onClick={submitAnswer} ariaLabel="Submit">
+                Submit
+              </Button>
+              {isRunning ? (
+                <Button kind="ghost" onClick={pauseTimer} ariaLabel="Pause">
+                  Pause
+                </Button>
+              ) : (
+                <Button kind="ghost" onClick={resumeTimer} ariaLabel="Resume">
+                  Resume
+                </Button>
+              )}
+              <Button kind="ghost" onClick={giveUp} ariaLabel="Give up">
+                Give up
+              </Button>
+              <Button kind="ghost" onClick={restart} ariaLabel="Restart">
+                Restart
+              </Button>
+            </Actions>
+          ) : undefined
+        }
+      >
         <Stack>
-          <h1 style={{ margin: 0, fontSize: 'calc(20px * var(--tf))' }}>Word Scramble Game</h1>
-
+          <h2 style={{ margin: 0, fontSize: 'calc(20px * var(--tf))', fontWeight: 700 }}>Word Scramble Game</h2>
           {!record.active ? (
-            <Stack>
-              <span>No active round</span>
-              <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))' }}>
-                <span>Score: {record.score}</span>
-                <span>Best: {record.best}</span>
-              </div>
-              {finished && <span>Final score: {record.score}</span>}
+            <EmptyState
+              title="No active round"
+              detail="Set a seed and difficulty, then start a round to begin unscrambling words against the clock."
+              mono="Setup"
+              actionLabel="Start round"
+              onAction={startRound}
+            >
               <Stack>
                 <div>
                   <label style={labelStyle} htmlFor="seed">
@@ -233,6 +333,7 @@ export function App() {
                     onChange={(e) => setSeed(e.target.value)}
                     placeholder="42"
                     style={inputStyle}
+                    aria-label="Seed"
                   />
                 </div>
                 <div>
@@ -241,6 +342,7 @@ export function App() {
                   </label>
                   <select
                     id="difficulty"
+                    aria-label="Difficulty"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value as Difficulty)}
                     style={selectStyle}
@@ -252,28 +354,53 @@ export function App() {
                     ))}
                   </select>
                 </div>
-                <PrimaryButton onClick={startRound} ariaLabel="Start round">
-                  Start round
-                </PrimaryButton>
+                <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))' }}>
+                  <span>Score: {record.score}</span>
+                  <span>Best: {record.best}</span>
+                </div>
+                {finished && <span>Final score: {record.score}</span>}
               </Stack>
-            </Stack>
+            </EmptyState>
           ) : (
             <Stack>
-              <span>Round started</span>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Tag accent>Round started</Tag>
                 <span style={timerStyle} aria-label="Timer">
                   {timeDisplay}
                 </span>
-                <span>Score: {record.score}</span>
               </div>
-              <div aria-label="Scrambled word" style={wordStyle}>
-                {record.scrambled}
-              </div>
+              <Board
+                cols={record.scrambled.length}
+                rows={1}
+                cell={48}
+                label="Scrambled word"
+                style={{ justifyContent: 'center', maxWidth: 400 }}
+              >
+                {record.scrambled.split('').map((ch, i) => (
+                  <span
+                    key={i}
+                    aria-label={`Letter ${i + 1}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 'calc(24px * var(--tf))',
+                      fontWeight: 800,
+                      background: 'var(--paper-deep)',
+                      border: 'calc(1px * var(--sf)) solid var(--mid)',
+                      borderRadius: 'calc(4px * var(--sf))',
+                    }}
+                  >
+                    {ch}
+                  </span>
+                ))}
+              </Board>
               <div>
                 <label style={labelStyle} htmlFor="answer">
                   Answer
                 </label>
                 <input
+                  key={shakeKey}
                   id="answer"
                   type="text"
                   value={answer}
@@ -282,37 +409,29 @@ export function App() {
                     if (e.key === 'Enter') submitAnswer()
                   }}
                   placeholder="Your answer"
-                  style={inputStyle}
+                  style={hasError ? errorInputStyle : inputStyle}
+                  aria-label="Answer"
                   autoFocus
                 />
               </div>
-              <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}>
-                <PrimaryButton onClick={submitAnswer} ariaLabel="Submit">
-                  Submit
-                </PrimaryButton>
-                {timerState.running ? (
-                  <Button kind="ghost" onClick={pauseTimer} ariaLabel="Pause">
-                    Pause
-                  </Button>
-                ) : (
-                  <Button kind="ghost" onClick={resumeTimer} ariaLabel="Resume">
-                    Resume
-                  </Button>
-                )}
-                <Button kind="ghost" onClick={giveUp} ariaLabel="Give up">
-                  Give up
-                </Button>
-                <Button kind="ghost" onClick={restart} ariaLabel="Restart">
-                  Restart
-                </Button>
-              </div>
               <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))' }}>
+                <span>Score: {record.score}</span>
                 <span>Best: {record.best}</span>
               </div>
             </Stack>
           )}
         </Stack>
       </Card>
+
+      <Card mono="Guide" title="How to play">
+        <List label="Game rules">
+          <Row title="Read the scrambled word" meta="letters are shuffled" value={<Tag>read</Tag>} />
+          <Row title="Type the original word" meta="case insensitive" value={<Tag>type</Tag>} />
+          <Row title="Submit before the timer" meta="30 seconds per word" value={<Tag accent>30s</Tag>} />
+          <Row title="Score points" meta="+10 per correct word" value={<Tag>+10</Tag>} />
+        </List>
+      </Card>
+
       {toast && <Toast message={toast.message} variant={toast.variant} onDismiss={() => setToast(null)} />}
     </AppShell>
   )

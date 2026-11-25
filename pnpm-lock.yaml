@@ -6268,6 +6268,9 @@ importers:
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-clipboard/0.1.0
       '@lacuna/use-timer':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/use-timer/0.1.0
