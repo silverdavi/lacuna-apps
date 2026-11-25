@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2448232de8fc682a1c090bb57ecf493ac84aaa1161195b4ce1daf68972e265f5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Simon Says Game\", the text \"Press Start to begin\", and the score line \"Score: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"42\" in the field labelled \"Seed\" and clicking the button \"Start\" plays a sequence of exactly 4 pads; the score line reads \"Score: 0\" and the pads become enabled for input."
+    },
+    {
+      "id": "A3",
+      "text": "With Seed \"42\", the first pad of the sequence is the pad labelled \"Red\"; clicking \"Red\" then \"Blue\" then \"Green\" then \"Yellow\" in that order advances the score line to \"Score: 1\" and plays a sequence of exactly 5 pads."
+    },
+    {
+      "id": "A4",
+      "text": "With Seed \"42\", clicking the pad labelled \"Blue\" as the first input (when the sequence starts with \"Red\") shows the message \"Wrong pad\" and the score line remains \"Score: 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "After reaching \"Score: 1\", clicking the button \"Restart\" resets the score line to \"Score: 0\", clears the message, and shows \"Press Start to begin\"."
+    },
+    {
+      "id": "A6",
+      "text": "With Seed \"42\", completing the first sequence (Score: 1) and then completing the second sequence of 5 pads (Red, Blue, Green, Yellow, Red) advances the score line to \"Score: 2\"."
+    },
+    {
+      "id": "A7",
+      "text": "The tab labelled \"History\" shows a table with the header \"Best Score\"; after achieving \"Score: 2\" in a round with Seed \"42\" and switching to the tab labelled \"History\", the table contains a row with \"42\" and \"2\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Copy best\" in the tab labelled \"History\" shows the toast text \"Best score copied\" and the clipboard contains \"Best score: 2\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after achieving \"Score: 2\" with Seed \"42\", reloading the page still shows \"Best Score: 2\" in the tab labelled \"History\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f1d1c02c3c220fb464c6316e239c51c2bc454cc300d2d7300726435d3bbe1b33"
+    }
+  ]
+}

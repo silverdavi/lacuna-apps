@@ -1,0 +1,110 @@
+.ss-layout {
+  max-width: calc(520px * var(--sf));
+  margin: 0 auto;
+  padding: calc(20px * var(--sf)) calc(16px * var(--sf));
+  display: flex;
+  flex-direction: column;
+  gap: calc(12px * var(--sf));
+}
+
+.ss-tabs {
+  display: flex;
+  gap: calc(4px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ink-subtle);
+  padding-bottom: calc(4px * var(--sf));
+}
+
+.ss-tab {
+  padding: calc(6px * var(--sf)) calc(12px * var(--sf));
+  font-size: calc(13px * var(--sf));
+  font-family: var(--mono);
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  border-radius: calc(6px * var(--sf)) calc(6px * var(--sf)) 0 0;
+}
+
+.ss-tab.active {
+  color: var(--ink);
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.ss-seed-field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--sf));
+}
+
+.ss-seed-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--sf));
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: calc(0.5px * var(--sf));
+}
+
+.ss-seed-input {
+  width: 100%;
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  font-size: calc(14px * var(--sf));
+  font-family: var(--mono);
+  border: calc(1px * var(--sf)) solid var(--ink-subtle);
+  border-radius: calc(6px * var(--sf));
+  background: var(--surface);
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+.ss-pads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(10px * var(--sf));
+}
+
+.ss-pad {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: calc(12px * var(--sf));
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: calc(2px * var(--sf)) solid var(--ink-subtle);
+  background: var(--surface);
+  padding: 0;
+}
+
+.ss-pad.active {
+  border-color: var(--ink);
+  opacity: 1;
+  box-shadow: 0 0 calc(16px * var(--sf)) color-mix(in oklab, var(--accent) 50%, transparent);
+}
+
+.ss-pad.idle {
+  opacity: 0.8;
+}
+
+.ss-pad.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ss-status-detail {
+  margin-top: calc(8px * var(--sf));
+}
+
+.ss-score-row {
+  padding: calc(4px * var(--sf)) 0;
+}
+
+.ss-actions {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+.ss-best-row {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
