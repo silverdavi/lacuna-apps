@@ -1,0 +1,101 @@
+import { expect, test } from '@playwright/test'
+
+test('[A1] first load shows heading and empty saved trips tab', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('Trip Cost Calculator', { exact: true })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Saved Trips' })).toBeVisible()
+  await expect(page.getByText('No saved trips yet')).toBeVisible()
+})
+
+test('[A2] distance, mpg and fuel price produce the result summary', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  await expect(page.getByText('Total fuel cost: $45.00', { exact: true })).toBeVisible()
+  await expect(page.getByText('Gallons needed: 10.00', { exact: true })).toBeVisible()
+})
+
+test('[A3] breakdown table lists gallons and cost rows', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  const table = page.getByRole('table')
+  await expect(page.getByRole('cell', { name: 'Gallons', exact: true })).toBeVisible()
+  await expect(table.getByText('10.00', { exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'Cost', exact: true })).toBeVisible()
+  await expect(table.getByText('$45.00', { exact: true })).toBeVisible()
+})
+
+test('[A4] saving a trip adds it to the saved trips tab', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  await page.getByRole('button', { name: 'Save trip' }).click()
+  await page.getByRole('tab', { name: 'Saved Trips' }).click()
+  const item = page.getByRole('listitem').filter({ hasText: '300 miles' })
+  await expect(item).toBeVisible()
+  await expect(item.getByText('$45.00', { exact: true })).toBeVisible()
+})
+
+test('[A5] deleting a saved trip removes it and shows the empty message', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  await page.getByRole('button', { name: 'Save trip' }).click()
+  await page.getByRole('tab', { name: 'Saved Trips' }).click()
+  await expect(page.getByRole('button', { name: 'Delete 300 miles' })).toBeVisible()
+  await page.getByRole('button', { name: 'Delete 300 miles' }).click()
+  await expect(page.getByRole('listitem').filter({ hasText: '300 miles' })).toHaveCount(0)
+  await expect(page.getByText('No saved trips yet')).toBeVisible()
+})
+
+test('[A6] copying the result shows a toast', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  await page.getByRole('button', { name: 'Copy result' }).click()
+  await expect(page.getByText('Result copied to clipboard')).toBeVisible()
+})
+
+test('[A7] changing fuel price updates the total', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  await expect(page.getByText('Total fuel cost: $45.00', { exact: true })).toBeVisible()
+  await page.getByLabel('Fuel price ($/gal)').fill('5.00')
+  await expect(page.getByText('Total fuel cost: $50.00', { exact: true })).toBeVisible()
+})
+
+test('[A8] zero distance shows a validation message and zero cost', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('0')
+  await expect(page.getByText('Distance must be greater than 0')).toBeVisible()
+  await expect(page.getByText('Total fuel cost: $0.00', { exact: true })).toBeVisible()
+})
+
+test('[A9] saved trip survives a reload', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Calculator' }).click()
+  await page.getByLabel('Distance (miles)').fill('300')
+  await page.getByLabel('MPG').fill('30')
+  await page.getByLabel('Fuel price ($/gal)').fill('4.50')
+  await page.getByRole('button', { name: 'Save trip' }).click()
+  await page.reload()
+  await page.getByRole('tab', { name: 'Saved Trips' }).click()
+  const item = page.getByRole('listitem').filter({ hasText: '300 miles' })
+  await expect(item).toBeVisible()
+  await expect(item.getByText('$45.00', { exact: true })).toBeVisible()
+})

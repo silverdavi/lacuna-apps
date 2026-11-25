@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4d60c91f3fc14236c75aa721cdcda5bb87c7b2c527247308a19b955bafdc36a9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load, the page shows the heading \"Trip Cost Calculator\" and the text \"No saved trips yet\" in the Saved Trips tab."
+    },
+    {
+      "id": "A2",
+      "text": "In the tab labelled \"Calculator\", typing \"300\" in the field labelled \"Distance (miles)\", \"30\" in the field labelled \"MPG\", and \"4.50\" in the field labelled \"Fuel price ($/gal)\" updates the result summary to show \"Total fuel cost: $45.00\" and \"Gallons needed: 10.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the tab labelled \"Calculator\", with Distance \"300\", MPG \"30\", and Fuel price \"4.50\", the breakdown table shows a row with \"Gallons\" and \"10.00\" and a row with \"Cost\" and \"$45.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the tab labelled \"Calculator\", with Distance \"300\", MPG \"30\", and Fuel price \"4.50\", clicking the button \"Save trip\" adds a list item in the tab labelled \"Saved Trips\" that contains \"300 miles\" and \"$45.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the tab labelled \"Saved Trips\", with the saved trip from A4 present, clicking the button \"Delete 300 miles\" removes that list item and the text \"No saved trips yet\" reappears."
+    },
+    {
+      "id": "A6",
+      "text": "In the tab labelled \"Calculator\", with Distance \"300\", MPG \"30\", and Fuel price \"4.50\", clicking the button \"Copy result\" shows the toast text \"Result copied to clipboard\"."
+    },
+    {
+      "id": "A7",
+      "text": "In the tab labelled \"Calculator\", changing the field labelled \"Fuel price ($/gal)\" from \"4.50\" to \"5.00\" while Distance is \"300\" and MPG is \"30\" updates the result summary to show \"Total fuel cost: $50.00\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the tab labelled \"Calculator\", typing \"0\" in the field labelled \"Distance (miles)\" shows the message \"Distance must be greater than 0\" and the result summary shows \"Total fuel cost: $0.00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved trip: after saving a trip with Distance \"300\", MPG \"30\", and Fuel price \"4.50\" (showing \"$45.00\"), reloading the page still shows the list item in the tab labelled \"Saved Trips\" containing \"300 miles\" and \"$45.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f264e9b3c59ddff656e7c2456d2236bb852bc4a71c5d57a69e0d8023e09efff4"
+    }
+  ]
+}
