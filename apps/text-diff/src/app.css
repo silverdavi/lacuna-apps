@@ -1,0 +1,126 @@
+.td-panes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--td-pane-min, 18ch), 1fr));
+  gap: var(--space-3);
+}
+
+.td-field {
+  display: block;
+  min-width: 0;
+  margin-bottom: calc(14px * var(--sf));
+}
+
+.td-field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  margin-bottom: calc(5px * var(--sf));
+}
+
+.td-ta {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 0.0625em solid var(--ui-line2);
+  border-radius: 0.125em;
+  background: var(--ui-card);
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  line-height: var(--lh, 1.45);
+  color: var(--ink);
+}
+
+.td-ta::placeholder {
+  color: var(--ink-40);
+}
+
+.td-ta:focus {
+  border-color: var(--mid);
+}
+
+.td-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.td-card-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.td-diff {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  line-height: 1.5;
+  background: var(--ui-bg);
+  border-radius: 0.25em;
+  padding: var(--space-2);
+  overflow-x: auto;
+}
+
+.td-line {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-1, 0.125em);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.td-line-same .td-marker {
+  color: var(--ink-50);
+}
+
+.td-line-remove {
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+
+.td-line-remove .td-marker,
+.td-line-remove .td-text {
+  color: var(--danger);
+}
+
+.td-line-add {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.td-line-add .td-marker,
+.td-line-add .td-text {
+  color: var(--accent);
+}
+
+.td-marker {
+  width: 1ch;
+  flex: 0 0 1ch;
+  user-select: none;
+}
+
+.td-text {
+  min-width: 0;
+}
+
+.td-summary-text {
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-70);
+  margin-top: var(--space-3);
+}
+
+.td-toast {
+  position: fixed;
+  bottom: var(--space-4, 1em);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--surface);
+  padding: var(--space-2) var(--space-4);
+  border-radius: 0.375em;
+  font-size: calc(12px * var(--tf));
+  z-index: 100;
+}

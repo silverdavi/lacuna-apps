@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8c9d83d8e4fa676dc8e6888a18a28a44100ee68b1bd5275a562409affe2ab56c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Text Diff Checker\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the \"Original\" pane empty and the \"Revised\" pane empty, clicking the button \"Compare\" shows the message \"Enter text in both panes to compare\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"Hello\\nWorld\" into the \"Original\" pane and \"Hello\\nEarth\" into the \"Revised\" pane, then clicking \"Compare\", shows a diff result where the line \"World\" is marked as removed and the line \"Earth\" is marked as added."
+    },
+    {
+      "id": "A4",
+      "text": "With the \"Original\" pane containing \"Hello\" and the \"Revised\" pane containing \"hello\", clicking \"Compare\" shows the message \"No differences found\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the \"Original\" pane containing \"Hello\" and the \"Revised\" pane containing \"hello\", checking the checkbox labelled \"Case sensitive\" and clicking \"Compare\" shows a diff result where \"Hello\" is marked as removed and \"hello\" is marked as added."
+    },
+    {
+      "id": "A6",
+      "text": "With the \"Original\" pane containing \"Hello\\nWorld\" and the \"Revised\" pane containing \"Hello\\nEarth\", clicking the button \"Copy diff\" shows the toast \"Diff copied to clipboard\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the \"Original\" pane containing \"Hello\\nWorld\" and the \"Revised\" pane containing \"Hello\\nEarth\", clicking the button \"Download diff\" triggers a file download named \"diff.txt\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the \"Original\" pane containing \"Hello\\nWorld\" and the \"Revised\" pane containing \"Hello\\nEarth\", clicking the tab labelled \"Summary\" shows the text \"1 line removed, 1 line added\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last comparison: after typing \"Hello\\nWorld\" into \"Original\", \"Hello\\nEarth\" into \"Revised\", and clicking \"Compare\", reloading the page still shows the diff result with \"World\" marked as removed and \"Earth\" marked as added."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "e934344f774e627fa69b3dca8247d217bd86fa7a6812e17fe6bd58796cb65ab0"
+    }
+  ]
+}
