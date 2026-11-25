@@ -1,136 +1,118 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-// A2–A3: "pressing Tab" moves focus to the Average column, so the average cell
-// must be focusable and is read via document.activeElement (reading is allowed).
-// A7: the spec's CSV copy is verified against clipboard.readText(), which is a
-// read, not a user action.
+// Data rows start after the header row: row 0 is the header.
 
-test('[A1] empty grid with heading and column headers', async ({ page }) => {
+function row(page: Page, n: number) {
+  return page.getByRole('row').nth(n + 1)
+}
+
+async function enterRow(page: Page, n: number, student: string, math: string, science: string, english: string) {
+  await page.getByLabel('Student', { exact: true }).nth(n).fill(student)
+  await page.getByLabel('Math', { exact: true }).nth(n).fill(math)
+  await page.getByLabel('Science', { exact: true }).nth(n).fill(science)
+  await page.getByLabel('English', { exact: true }).nth(n).fill(english)
+}
+
+async function aliceAndBob(page: Page) {
+  await enterRow(page, 0, 'Alice', '95', '88', '92')
+  await page.getByRole('button', { name: 'Add Student' }).click()
+  await enterRow(page, 1, 'Bob', '70', '75', '80')
+}
+
+test('[A1] shows heading and the empty grid', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Gradebook Manager' })).toBeVisible()
-  for (const header of ['Student', 'Math', 'Science', 'English', 'Average']) {
-    await expect(page.getByRole('columnheader', { name: header })).toBeVisible()
-  }
+  const table = page.getByRole('table')
+  await expect(table).toBeVisible()
+  await expect(page.getByRole('row').nth(0)).toHaveText(['Student', 'Math', 'Science', 'English', 'Average'])
+  const emptyRow = row(page, 0)
+  await expect(emptyRow.getByLabel('Student', { exact: true })).toHaveValue('')
+  await expect(emptyRow.getByLabel('Math', { exact: true })).toHaveValue('')
+  await expect(emptyRow.getByLabel('Science', { exact: true })).toHaveValue('')
+  await expect(emptyRow.getByLabel('English', { exact: true })).toHaveValue('')
+  await expect(emptyRow.getByRole('cell').last()).toHaveText('')
+  await expect(page.getByRole('row')).toHaveCount(2)
 })
 
-test('[A2] Alice average shows 91.67 after Tab', async ({ page }) => {
+test('[A2] typing Alice scores shows 91.67 in her Average cell', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Alice')
-  await page.getByLabel('Math').first().fill('95')
-  await page.getByLabel('Science').first().fill('88')
-  await page.getByLabel('English').first().fill('92')
-  await page.getByLabel('English').first().press('Tab')
-  const active = await page.evaluate(() => document.activeElement?.textContent?.trim())
-  expect(active).toBe('91.67')
+  await enterRow(page, 0, 'Alice', '95', '88', '92')
+  await expect(row(page, 0).getByRole('cell').last()).toHaveText('91.67')
 })
 
-test('[A3] Bob average shows 75.00 after Tab', async ({ page }) => {
+test('[A3] Add Student adds a second row; typing Bob scores shows 75.00', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Bob')
-  await page.getByLabel('Math').first().fill('70')
-  await page.getByLabel('Science').first().fill('75')
-  await page.getByLabel('English').first().fill('80')
-  await page.getByLabel('English').first().press('Tab')
-  const active = await page.evaluate(() => document.activeElement?.textContent?.trim())
-  expect(active).toBe('75.00')
+  await enterRow(page, 0, 'Alice', '95', '88', '92')
+  await page.getByRole('button', { name: 'Add Student' }).click()
+  await expect(page.getByRole('row')).toHaveCount(3)
+  await expect(row(page, 1).getByLabel('Student', { exact: true })).toHaveValue('')
+  await enterRow(page, 1, 'Bob', '70', '75', '80')
+  await expect(row(page, 1).getByRole('cell').last()).toHaveText('75.00')
+  await expect(row(page, 0).getByRole('cell').last()).toHaveText('91.67')
 })
 
-test('[A4] Add Student button adds an empty row', async ({ page }) => {
+test('[A4] Add Student from the empty page adds an empty second row', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Add Student' }).click()
-  await expect(page.getByRole('button', { name: 'Add Student' })).toBeVisible()
-  const rows = page.getByRole('row').filter({ has: page.getByLabel('Student') })
-  await expect(rows).toHaveCount(1)
-  await expect(page.getByLabel('Student').first()).toHaveValue('')
-  await expect(page.getByLabel('Math').first()).toHaveValue('')
-  await expect(page.getByLabel('Science').first()).toHaveValue('')
-  await expect(page.getByLabel('English').first()).toHaveValue('')
+  const r = [0, 1]
+  for (const n of r) {
+    const dataRow = row(page, n)
+    await expect(dataRow.getByLabel('Student', { exact: true })).toHaveValue('')
+    await expect(dataRow.getByLabel('Math', { exact: true })).toHaveValue('')
+    await expect(dataRow.getByLabel('Science', { exact: true })).toHaveValue('')
+    await expect(dataRow.getByLabel('English', { exact: true })).toHaveValue('')
+    await expect(dataRow.getByRole('cell').last()).toHaveText('')
+  }
+  await expect(page.getByRole('row')).toHaveCount(3)
 })
 
-test('[A5] Delete Student removes the selected row', async ({ page }) => {
+test('[A5] Select Alice then Delete Student removes Alice, leaving Bob at 75.00', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Alice')
-  await page.getByLabel('Math').first().fill('95')
-  await page.getByLabel('Science').first().fill('88')
-  await page.getByLabel('English').first().fill('92')
-
-  const bobRow = page.getByRole('row', { name: /Bob/ })
-  await bobRow.locator('input').first().fill('Bob')
-  await bobRow.locator('input').nth(1).fill('70')
-  await bobRow.locator('input').nth(2).fill('75')
-  await bobRow.locator('input').nth(3).fill('80')
-
-  const aliceRow = page.getByRole('row', { name: /Alice/ })
-  await aliceRow.locator('input').first().press('Tab')
-  await aliceRow.click()
+  await aliceAndBob(page)
+  await row(page, 0).getByRole('button', { name: 'Select Alice' }).click()
   await page.getByRole('button', { name: 'Delete Student' }).click()
-
-  await expect(page.getByText('Alice')).toHaveCount(0)
-  await expect(bobRow.getByRole('cell').last()).toHaveText('75.00')
+  await expect(page.getByRole('row')).toHaveCount(2)
+  await expect(row(page, 0).getByLabel('Student', { exact: true })).toHaveValue('Bob')
+  await expect(row(page, 0).getByRole('cell').last()).toHaveText('75.00')
 })
 
-test('[A6] Statistics tab shows class statistics', async ({ page }) => {
+test('[A6] Statistics tab shows class average, highest, lowest and median', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Alice')
-  await page.getByLabel('Math').first().fill('95')
-  await page.getByLabel('Science').first().fill('88')
-  await page.getByLabel('English').first().fill('92')
-
-  const bobRow = page.getByRole('row', { name: /Bob/ })
-  await bobRow.locator('input').first().fill('Bob')
-  await bobRow.locator('input').nth(1).fill('70')
-  await bobRow.locator('input').nth(2).fill('75')
-  await bobRow.locator('input').nth(3).fill('80')
-
+  await aliceAndBob(page)
   await page.getByRole('tab', { name: 'Statistics' }).click()
-  await expect(page.getByText('Class Average: 83.34')).toBeVisible()
+  await expect(page.getByText('Class Average: 83.33')).toBeVisible()
   await expect(page.getByText('Highest: 95')).toBeVisible()
   await expect(page.getByText('Lowest: 70')).toBeVisible()
-  await expect(page.getByText('Median: 83.00')).toBeVisible()
+  await expect(page.getByText('Median: 84.00')).toBeVisible()
 })
 
-test('[A7] Export CSV copies the grid as CSV', async ({ page }) => {
-  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+test('[A7] Export CSV copies the header and Bob row without trailing rows', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Bob')
-  await page.getByLabel('Math').first().fill('70')
-  await page.getByLabel('Science').first().fill('75')
-  await page.getByLabel('English').first().fill('80')
-
+  await enterRow(page, 0, 'Bob', '70', '75', '80')
   await page.getByRole('tab', { name: 'Statistics' }).click()
   await page.getByRole('button', { name: 'Export CSV' }).click()
+  // read the clipboard after the user action; no page or storage mutation
   const text = await page.evaluate(() => navigator.clipboard.readText())
-  expect(text).toContain('Student,Math,Science,English,Average')
-  expect(text).toContain('Bob,70,75,80,75.00')
+  expect(text, 'clipboard holds the CSV export').toBe('Student,Math,Science,English,Average\nBob,70,75,80,75.00')
 })
 
-test('[A8] 105 in Math updates Bob to 78.33 and Statistics highest', async ({ page }) => {
+test('[A8] Math 105 shows 86.67 in Bob row and Highest 105 in Statistics', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Bob')
-  await page.getByLabel('Math').first().fill('70')
-  await page.getByLabel('Science').first().fill('75')
-  await page.getByLabel('English').first().fill('80')
-
-  await page.getByLabel('Math').first().fill('105')
-  await page.getByLabel('Math').first().press('Tab')
-  const active = await page.evaluate(() => document.activeElement?.textContent?.trim())
-  expect(active).toBe('78.33')
-
+  await enterRow(page, 0, 'Bob', '70', '75', '80')
+  await page.getByLabel('Math', { exact: true }).nth(0).fill('105')
+  await expect(row(page, 0).getByRole('cell').last()).toHaveText('86.67')
   await page.getByRole('tab', { name: 'Statistics' }).click()
   await expect(page.getByText('Highest: 105')).toBeVisible()
 })
 
-test('[A9] gradebook data survives reload', async ({ page }) => {
+test('[A9] reload keeps Bob row and its 75.00 average', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Student').first().fill('Bob')
-  await page.getByLabel('Math').first().fill('70')
-  await page.getByLabel('Science').first().fill('75')
-  await page.getByLabel('English').first().fill('80')
-
+  await enterRow(page, 0, 'Bob', '70', '75', '80')
   await page.reload()
-  await expect(page.getByLabel('Student').first()).toHaveValue('Bob')
-  await expect(page.getByLabel('Math').first()).toHaveValue('70')
-  await expect(page.getByLabel('Science').first()).toHaveValue('75')
-  await expect(page.getByLabel('English').first()).toHaveValue('80')
-  await expect(page.getByRole('row', { name: /Bob/ }).getByRole('cell').last()).toHaveText('78.33')
+  await expect(row(page, 0).getByLabel('Student', { exact: true })).toHaveValue('Bob')
+  await expect(row(page, 0).getByLabel('Math', { exact: true })).toHaveValue('70')
+  await expect(row(page, 0).getByLabel('Science', { exact: true })).toHaveValue('75')
+  await expect(row(page, 0).getByLabel('English', { exact: true })).toHaveValue('80')
+  await expect(row(page, 0).getByRole('cell').last()).toHaveText('75.00')
 })

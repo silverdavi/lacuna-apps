@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "40ad389a496bf86b920efd93f0c1cfe41d5965b47e4bd711673250f8b2a6aa16",
+  "spec_sha256": "5f9244129f5eed50a77a540e4b148a5a4785293231da554fb5003246f857ecb7",
   "checks": [
     {
       "id": "A1",
-      "text": "The page displays the heading \"Gradebook Manager\" and shows an empty grid with column headers \"Student\", \"Math\", \"Science\", \"English\" and \"Average\"."
+      "text": "The page displays the heading \"Gradebook Manager\" and a grid whose column headers are \"Student\", \"Math\", \"Science\", \"English\" and \"Average\", with one empty row."
     },
     {
       "id": "A2",
-      "text": "Typing \"Alice\" in the first cell of the Student column, \"95\" in the Math column, \"88\" in the Science column, and \"92\" in the English column, then pressing Tab to move to the Average column, displays \"91.67\" in the Average cell for Alice."
+      "text": "In the first row, typing \"Alice\" in the Student input, \"95\" in Math, \"88\" in Science and \"92\" in English displays \"91.67\" in the Average cell of that row immediately (no Tab needed)."
     },
     {
       "id": "A3",
-      "text": "Typing \"Bob\" in the Student column of the next row, \"70\" in Math, \"75\" in Science, and \"80\" in English, then pressing Tab, displays \"75.00\" in the Average cell for Bob."
+      "text": "After the Alice row of A2, clicking the button \"Add Student\" adds a second row; typing \"Bob\" in its Student input, \"70\" in Math, \"75\" in Science and \"80\" in English displays \"75.00\" in the Average cell of Bob's row."
     },
     {
       "id": "A4",
-      "text": "Clicking the button \"Add Student\" adds a new empty row below Bob with empty cells for Student, Math, Science, English and Average."
+      "text": "From the empty page, clicking the button \"Add Student\" adds a new empty row below the existing empty row: the grid then has two data rows, each with empty Student, Math, Science and English inputs and an empty Average cell."
     },
     {
       "id": "A5",
-      "text": "Selecting the row for Alice by clicking the row header, then clicking the button \"Delete Student\", removes the Alice row and the grid now shows only Bob's data with \"75.00\" in his Average cell."
+      "text": "With Alice (95, 88, 92) in row 1 and Bob (70, 75, 80) in row 2, clicking the button \"Select Alice\" in Alice's row header and then the button \"Delete Student\" removes Alice's row: the grid has one data row, Bob's, whose Average cell shows \"75.00\"."
     },
     {
       "id": "A6",
-      "text": "Clicking the tab \"Statistics\" displays a panel showing \"Class Average: 83.34\", \"Highest: 95\", \"Lowest: 70\", and \"Median: 83.00\" based on all numeric scores in the grid."
+      "text": "With Alice (95, 88, 92) and Bob (70, 75, 80) entered, clicking the tab \"Statistics\" shows \"Class Average: 83.33\", \"Highest: 95\", \"Lowest: 70\" and \"Median: 84.00\". (All six scores: sum 500, mean 500/6 = 83.33; sorted 70, 75, 80, 88, 92, 95, median (80+88)/2 = 84.00.)"
     },
     {
       "id": "A7",
-      "text": "In the Statistics tab, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"Student,Math,Science,English,Average\" and the row \"Bob,70,75,80,75.00\"."
+      "text": "With only Bob (70, 75, 80) entered, in the Statistics tab clicking the button \"Export CSV\" copies this text to the clipboard: \"Student,Math,Science,English,Average\\nBob,70,75,80,75.00\" (CSV rows never include empty trailing rows)."
     },
     {
       "id": "A8",
-      "text": "Typing \"105\" in the Math cell for Bob, then pressing Tab, displays \"78.33\" in the Average cell for Bob, and the Statistics tab updates to show \"Highest: 105\"."
+      "text": "With only Bob entered (70, 75, 80), changing Bob's Math value to \"105\" displays \"86.67\" in Bob's Average cell ((105+75+80)/3 = 260/3 = 86.67), and the Statistics tab shows \"Highest: 105\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the gradebook data: after reloading the page, the grid still shows Bob's row with \"70\" in Math, \"75\" in Science, \"80\" in English, and \"78.33\" in Average."
+      "text": "With only Bob entered (70, 75, 80), reloading the page keeps the data: Bob's row has Student \"Bob\", Math 70, Science 75, English 80 and Average \"75.00\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "55ad252ff4fe2c54c01d30fa700c3bbb2fffaa684cf9c0f0de18040157c56771"
+      "sha256": "37cc4b09736323d648fbb83c85fa207d4a68f3026a832a3acfc885fe6f6f894a"
     }
   ]
 }

@@ -1,342 +1,268 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useState } from 'react'
-import type { KeyboardEvent } from 'react'
-import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, PrimaryButton, Rail } from '@lacuna/ui'
+import { useEffect, useMemo, useState } from 'react'
+import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, Rail, TextInput } from '@lacuna/ui'
+import { toCsv } from '@lacuna/csv-parse'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { gradeRecord } from './host'
-import './gradebook.css'
+import { useLocalRecord } from '@lacuna/use-local-record'
+import { defaultRecord, type RecordData } from './host'
 
-const ASSIGNMENTS = ['Math', 'Science', 'English'] as const
-const TABS = ['Gradebook', 'Statistics', 'Export CSV'] as const
+const SUBJECTS = ['Math', 'Science', 'English'] as const
+type Subject = (typeof SUBJECTS)[number]
 
-export interface RecordData {
-  students: string[]
-  grades: Record<string, Record<string, number | null>>
-}
+const TAB_ITEMS = ['Gradebook', 'Statistics'] as const
 
-function mean(values: number[]): number | null {
-  if (values.length === 0) return null
-  return values.reduce((a, b) => a + b, 0) / values.length
-}
+const SUBJECT_ERROR = 'Score must be a number from 0 to 100'
 
-function fmt(n: number | null): string {
-  return n == null ? 'n/a' : n.toFixed(2)
-}
-
-function fmtStat(n: number | null): string {
-  return n == null ? 'n/a' : String(Math.round(n))
-}
-
-function median(values: number[]): number | null {
-  if (values.length === 0) return null
+function median(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b)
   const mid = Math.floor(sorted.length / 2)
-  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid]
+  return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
 }
 
-function parseGrade(text: string): number | null {
-  const t = text.trim()
-  if (t === '') return null
-  const v = Number(t)
-  if (Number.isNaN(v)) return null
-  return v
+function round2(n: number): string {
+  return (Math.round(n * 100) / 100).toFixed(2)
 }
 
-function toCSV(students: string[], grades: Record<string, Record<string, number | null>>): string {
-  const cell = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)
-  const header = ['Student', ...ASSIGNMENTS, 'Average'].map(cell).join(',')
-  const lines = students.map((s) => {
-    const values = ASSIGNMENTS.map((a) => grades[s]?.[a] ?? null)
-    const avg = mean(values.filter((v): v is number => v != null))
-    return [
-      s,
-      ...values.map((v) => (v == null ? '' : String(v))),
-      avg?.toFixed(2) ?? '',
-    ].map(cell).join(',')
-  })
-  return [header, ...lines].join('\n')
-}
-
-function normalize(raw: RecordData): RecordData {
-  const students = raw.students.length === 0 ? [''] : [...raw.students]
-  if (!students.includes('')) students.push('')
-  return { students, grades: { ...raw.grades } }
-}
-
-function TabBar({ active, onSelect }: { active: string; onSelect: (value: string) => void }) {
-  const [focused, setFocused] = useState(0)
-
-  function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    let next = -1
-    if (e.key === 'ArrowRight') next = (focused + 1) % TABS.length
-    else if (e.key === 'ArrowLeft') next = (focused - 1 + TABS.length) % TABS.length
-    else if (e.key === 'Home') next = 0
-    else if (e.key === 'End') next = TABS.length - 1
-    if (next === -1) return
-    e.preventDefault()
-    setFocused(next)
-    onSelect(TABS[next])
-    document.getElementById(`tab-${TABS[next]}`)?.focus()
+function rowGradesOf(grades: Record<string, number>, index: number): Record<string, number> {
+  const row = `${index + 1}::`
+  const out: Record<string, number> = {}
+  for (const s of SUBJECTS) {
+    const v = grades[`${row}${s}`]
+    if (typeof v === 'number' && Number.isFinite(v)) out[s] = v
   }
+  return out
+}
 
-  return (
-    <div
-      className="gb-tabs"
-      role="tablist"
-      aria-label="Gradebook views"
-      onKeyDown={onKeyDown}
-      tabIndex={-1}
-    >
-      {TABS.map((item, i) => (
-        <button
-          key={item}
-          type="button"
-          id={`tab-${item}`}
-          role="tab"
-          aria-selected={item === active}
-          aria-controls={`panel-${item}`}
-          tabIndex={item === active ? 0 : -1}
-          className={item === active ? 'gb-tab active' : 'gb-tab'}
-          onClick={() => {
-            setFocused(i)
-            onSelect(item)
-          }}
-        >
-          {item}
-        </button>
-      ))}
-    </div>
-  )
+function rawOf(grades: Record<string, number>, index: number, subject: string): string {
+  const v = grades[`${index + 1}::${subject}`]
+  return typeof v === 'number' ? String(v) : ''
+}
+
+function scoreError(raw: string): string | null {
+  if (raw.trim() === '') return null
+  const n = Number(raw)
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? null : SUBJECT_ERROR
+}
+
+/** Average of the row's entered scores, two decimals, or '' when none. */
+function rowAverage(grades: Record<string, number>): string {
+  const values = SUBJECTS.map((s) => grades[s]).filter((v): v is number => typeof v === 'number')
+  if (values.length === 0) return ''
+  return round2(values.reduce((a, b) => a + b, 0) / values.length)
 }
 
 export function App() {
-  const [data, setData] = useState<RecordData>(() => normalize(gradeRecord.get()))
-  const [tab, setTab] = useState('Gradebook')
-  const [selected, setSelected] = useState<number | null>(null)
-  const clipboard = useClipboard()
+  const record = useLocalRecord<RecordData>({
+    key: 'lacuna.gradebook.record',
+    version: 1,
+    defaultValue: defaultRecord(),
+  })
+  const [view, setView] = useState<'Gradebook' | 'Statistics'>('Gradebook')
+  const [selected, setSelected] = useState(0)
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
-  function update(next: RecordData) {
-    setData(next)
-    gradeRecord.set(next)
+  const students = record.value.students
+  const grades = record.value.grades
+
+  useEffect(() => {
+    if (selected >= students.length) setSelected(Math.max(0, students.length - 1))
+  }, [students.length, selected])
+
+  function patch(next: RecordData) {
+    record.set(next)
+  }
+
+  function setStudentName(index: number, value: string) {
+    if (value === students[index]) return
+    const row = `${index + 1}::`
+    const nextGrades: Record<string, number> = {}
+    for (const [key, v] of Object.entries(grades)) {
+      if (!key.startsWith(row)) continue
+      nextGrades[`${index + 1}::${key.slice(row.length)}`] = v
+    }
+    for (const [key, v] of Object.entries(grades)) {
+      if (!key.startsWith(row)) nextGrades[key] = v
+    }
+    patch({ students: students.map((n, i) => (i === index ? value : n)), grades: nextGrades })
+  }
+
+  function setGrade(index: number, subject: Subject, raw: string) {
+    const key = `${index + 1}::${subject}`
+    const nextGrades = { ...grades }
+    if (raw.trim() === '') delete nextGrades[key]
+    else nextGrades[key] = Number(raw)
+    patch({ students, grades: nextGrades })
   }
 
   function addStudent() {
-    const students = [...data.students]
-    if (students[students.length - 1] === '') {
-      setSelected(students.length - 1)
-      return
+    patch({ students: [...students, ''], grades })
+    setSelected(students.length)
+  }
+
+  function deleteStudent() {
+    if (selected < 0 || selected >= students.length) return
+    const gone = selected + 1
+    const nextGrades: Record<string, number> = {}
+    for (const [key, v] of Object.entries(grades)) {
+      const sep = key.indexOf('::')
+      if (sep < 0) continue
+      const rowNum = Number(key.slice(0, sep))
+      const subject = key.slice(sep + 2)
+      if (!Number.isInteger(rowNum) || !SUBJECTS.includes(subject as Subject)) continue
+      if (rowNum === gone) continue
+      nextGrades[`${rowNum > gone ? rowNum - 1 : rowNum}::${subject}`] = v
     }
-    students.push('')
-    setSelected(students.length - 1)
-    update({ ...data, students })
+    patch({
+      students: students.filter((_, i) => i !== selected),
+      grades: nextGrades,
+    })
+    setSelected(Math.min(selected, students.length - 2))
   }
 
-  function setStudentName(index: number, name: string) {
-    const oldName = data.students[index]
-    let students = data.students.map((s, i) => (i === index ? name : s))
-    const grades = { ...data.grades }
-    if (oldName !== name && oldName !== '' && grades[oldName]) {
-      grades[name] = { ...(grades[name] ?? {}), ...grades[oldName] }
-      delete grades[oldName]
-    }
-    if (index === students.length - 1 && name !== '' && students.length === 1) {
-      students = [...students, '']
-    }
-    update({ students, grades })
-  }
-
-  function gradeText(row: number, assignment: string): string {
-    const student = data.students[row]
-    if (student === '') return ''
-    const v = data.grades[student]?.[assignment]
-    return v == null ? '' : String(v)
-  }
-
-  function setGrade(row: number, assignment: string, text: string) {
-    const student = data.students[row]
-    if (student === '') return
-    const grades = { ...data.grades }
-    const studentGrades = { ...(grades[student] ?? {}) }
-    studentGrades[assignment] = parseGrade(text)
-    grades[student] = studentGrades
-    update({ ...data, grades })
-  }
-
-  function removeStudent() {
-    const students = [...data.students]
-    let idx = selected
-    if (idx == null || students[idx] === '') {
-      idx = students.findIndex((s) => s !== '')
-    }
-    if (idx === -1) return
-    const removed = students.splice(idx, 1)[0]
-    if (!students.includes('')) students.push('')
-    const grades = { ...data.grades }
-    delete grades[removed]
-    setSelected(null)
-    update({ students, grades })
-  }
-
-  const studentAverage = (row: number): number | null => {
-    const student = data.students[row]
-    if (student === '') return null
-    const s = data.grades[student]
-    if (!s) return null
-    return mean(
-      ASSIGNMENTS.map((a) => s[a] ?? null).filter((v): v is number => v != null),
+  function exportCsv() {
+    void copy(
+      toCsv([
+        ['Student', ...SUBJECTS, 'Average'],
+        ...students.map((name, i) => {
+          const row = rowGradesOf(grades, i)
+          return [
+            name,
+            ...SUBJECTS.map((s) => (row[s] != null ? String(row[s]) : '')),
+            rowAverage(row),
+          ]
+        }),
+      ]),
     )
   }
 
-  const namedStudents = data.students.filter((s) => s !== '')
-  const allGrades = namedStudents
-    .flatMap((s) => ASSIGNMENTS.map((a) => data.grades[s]?.[a] ?? null))
-    .filter((v): v is number => v != null)
+  const stats = useMemo(() => {
+    const values = Object.values(grades).filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
+    if (values.length === 0) return null
+    return {
+      count: values.length,
+      avg: values.reduce((a, b) => a + b, 0) / values.length,
+      highest: Math.max(...values),
+      lowest: Math.min(...values),
+      median: median(values),
+    }
+  }, [grades])
 
-  const classAverage = mean(allGrades)
-  const highest = allGrades.length ? Math.max(...allGrades) : null
-  const lowest = allGrades.length ? Math.min(...allGrades) : null
-  const med = median(allGrades)
-
-  const csv = toCSV(namedStudents, data.grades)
-
-  function exportCsv() {
-    void clipboard.copy(csv)
-  }
-
-  const railChips = [
-    `${namedStudents.length} student${namedStudents.length === 1 ? '' : 's'}`,
-    ...ASSIGNMENTS,
-    'Average',
-  ]
+  const filledStudents = students.filter((n) => n.trim() !== '').length
 
   return (
     <AppShell
       name="Gradebook Manager"
-      icon="docs"
+      icon="sheets"
       hue="green"
       category="Productivity"
-      meta={`${namedStudents.length} students`}
-      side={<Rail title="Gradebook" note="Local record" chips={railChips} />}
+      meta={`${filledStudents} of ${students.length} students`}
+
+      side={
+        <Rail
+          title="Gradebook"
+          note={`${stats ? stats.count : 0} scores entered`}
+          chips={['Three assignments', 'Averages per student', 'Class statistics', 'CSV export to clipboard']}
+        />
+      }
     >
-      <TabBar active={tab} onSelect={setTab} />
-      <div className="gb-gap" />
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-        {tab === 'Gradebook' && (
-          <Card title="Gradebook">
-            <table className="lc-table" aria-label="Grades">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  {ASSIGNMENTS.map((a) => (
-                    <th key={a} className="num">
-                      {a}
-                    </th>
-                  ))}
-                  <th className="num">Average</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.students.map((s, i) => (
-                  <tr key={`${i}-${s}`} aria-label={s || `Row ${i + 1}`} className={selected === i ? 'hot' : undefined}>
-                    <td>
-                      <input
-                        className="lc-input gc-name"
-                        aria-label="Student"
-                        value={s}
-                        onChange={(e) => setStudentName(i, e.target.value)}
-                        onFocus={() => setSelected(i)}
-                      />
+      <Card mono="Views" title="Gradebook" flush>
+        <div className="lc-tabs" role="tablist" aria-label="Views">
+          {TAB_ITEMS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={view === item}
+              className={`lc-tab${view === item ? ' active' : ''}`}
+              onClick={() => setView(item as 'Gradebook' | 'Statistics')}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      {view === 'Gradebook' ? (
+        <Card mono="Table" title="Grades" flush>
+          <table className="lc-table" aria-label="Gradebook">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th className="num">Math</th>
+                <th className="num">Science</th>
+                <th className="num">English</th>
+                <th className="num">Average</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((name, i) => {
+                const row = rowGradesOf(grades, i)
+                return (
+                  <tr key={i} className={selected === i ? 'hot' : undefined}>
+                    <td data-label="Student">
+                      <div className="gb-rowhead">
+                        <TextInput label="Student" value={name} onChange={(v) => setStudentName(i, v)} placeholder="Alice" />
+                        <Button kind={selected === i ? 'ink' : 'secondary'} aria-pressed={selected === i} onClick={() => setSelected(i)}>
+                          Select {name || `row ${i + 1}`}
+                        </Button>
+                      </div>
                     </td>
-                    {ASSIGNMENTS.map((a) => (
-                      <td key={a} className="num">
-                        <input
-                          className="lc-input gc-grade"
-                          aria-label={a}
+                    {SUBJECTS.map((s) => (
+                      <td key={s} className="num" data-label={s}>
+                        <TextInput
+                          label={s}
+                          value={row[s] != null ? String(row[s]) : ''}
+                          onChange={(v) => setGrade(i, s, v)}
                           inputMode="decimal"
-                          value={gradeText(i, a)}
-                          onChange={(e) => setGrade(i, a, e.target.value)}
-                          onFocus={() => setSelected(i)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === 'Tab') {
-                              e.preventDefault()
-                              const avg = (e.currentTarget.closest('tr')?.querySelector('.gc-avg') as HTMLElement | null) ?? null
-                              if (avg) avg.focus()
-                            }
-                          }}
+                          placeholder="0"
+                          error={scoreError(rawOf(grades, i, s))}
                         />
                       </td>
                     ))}
-                    <td className="num">
-                      <span
-                        className={`gc-avg${studentAverage(i) != null ? ' has' : ''}`}
-                        tabIndex={0}
-                        aria-label={`Average, ${s || `Row ${i + 1}`}`}
-                      >
-                        {fmt(studentAverage(i))}
-                      </span>
+                    <td className="num" data-label="Average">
+                      {rowAverage(row) || ' '}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="gb-gap" />
-            <div className="gb-actions">
-              <PrimaryButton onClick={addStudent}>Add Student</PrimaryButton>
-              <Button kind="danger" onClick={removeStudent}>
-                Delete Student
-              </Button>
-            </div>
-          </Card>
-        )}
-        {tab === 'Statistics' && (
-          <Card title="Statistics">
-            {allGrades.length === 0 ? (
-              <EmptyState
-                title="Nothing to summarize"
-                detail="Enter grades first."
-                actionLabel="Open Gradebook"
-                onAction={() => setTab('Gradebook')}
-              />
-            ) : (
-              <>
-                <KpiRow>
-                  <Kpi value={fmt(classAverage)} label="Class Average" />
-                  <Kpi value={fmtStat(highest)} label="Highest" />
-                  <Kpi value={fmtStat(lowest)} label="Lowest" />
-                  <Kpi value={fmt(med)} label="Median" />
-                </KpiRow>
-                <div className="gb-gap" />
-                <div className="gb-actions">
-                  <PrimaryButton onClick={exportCsv}>Export CSV</PrimaryButton>
-                  {clipboard.copied && <span className="gc-copied">Copied</span>}
-                </div>
-              </>
-            )}
-          </Card>
-        )}
-        {tab === 'Export CSV' && (
-          <Card title="Export CSV">
-            {namedStudents.length === 0 ? (
-              <EmptyState
-                title="Nothing to export"
-                detail="Enter grades first."
-                actionLabel="Open Gradebook"
-                onAction={() => setTab('Gradebook')}
-              />
-            ) : (
-              <>
-                <div className="gb-actions">
-                  <PrimaryButton onClick={exportCsv}>Export CSV</PrimaryButton>
-                  {clipboard.copied && <span className="gc-copied">Copied</span>}
-                </div>
-                <div className="gb-gap" />
-                <pre className="gc-csv">{csv}</pre>
-              </>
-            )}
-          </Card>
-        )}
-      </div>
+                )
+              })}
+            </tbody>
+          </table>
+          <div className="gb-actions">
+            <Button kind="primary" onClick={addStudent}>
+              Add Student
+            </Button>
+            <Button kind="danger" onClick={deleteStudent} disabled={students.length === 0}>
+              Delete Student
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <Card mono="Stats" title="Class statistics" flush>
+          {stats ? (
+            <>
+              <KpiRow>
+                <Kpi value={`Class Average: ${round2(stats.avg)}`} label="All scores" accent />
+                <Kpi value={`Highest: ${stats.highest}`} label="Top score" />
+                <Kpi value={`Lowest: ${stats.lowest}`} label="Bottom score" />
+                <Kpi value={`Median: ${round2(stats.median)}`} label="Middle score" />
+              </KpiRow>
+              <div className="gb-actions">
+                <Button kind="primary" onClick={exportCsv}>
+                  Export CSV
+                </Button>
+                {copied ? <span className="gc-copied" role="status">Copied to clipboard</span> : null}
+              </div>
+            </>
+          ) : (
+            <EmptyState
+              mono="Empty"
+              title="No scores yet"
+              detail="Record a score in the Gradebook tab to see the class figures."
+              actionLabel="Go to the Gradebook tab"
+              onAction={() => setView('Gradebook')}
+            />
+          )}
+        </Card>
+      )}
     </AppShell>
   )
 }

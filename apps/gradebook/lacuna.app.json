@@ -7,7 +7,7 @@
   "description": "Add students, record scores for each assignment, and read back averages per student, per assignment, and for the class. Statistics show class-level figures. Everything is stored locally in this device.",
   "category": "productivity",
   "tags": ["education", "grades", "csv"],
-  "icon": "docs",
+  "icon": "sheets",
   "relationship": {
     "kind": "standalone"
   },
@@ -39,12 +39,16 @@
       "@lacuna/money-input": "0.1.0",
       "@lacuna/money": "0.1.0",
       "@lacuna/chart": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
       "@lacuna/use-local-record": "0.1.0"
     }
   },
   "capabilities": [
-    "create:gradebook",
-    "export:gradebook"
+    "create:student",
+    "edit:grade",
+    "edit:student",
+    "view:average",
+    "export:csv"
   ],
   "permissions": {
     "records": [
@@ -53,7 +57,8 @@
         "access": [
           "read",
           "write",
-          "create"
+          "create",
+          "delete"
         ],
         "purpose": "Store the class roster and the grades entered for it"
       }

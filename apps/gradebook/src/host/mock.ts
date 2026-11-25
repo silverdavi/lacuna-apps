@@ -2,13 +2,20 @@
 // The built app has no Lacuna host, so the gradebook record lives in
 // localStorage through @lacuna/host-mock's single-value store.
 import { createMockValue } from '@lacuna/host-mock'
-import type { RecordData } from '../App'
+
+export type GradeMap = Record<string, number>
+
+export type RecordData = { students: string[]; grades: GradeMap }
 
 const KEY = 'lacuna.gradebook.record'
 
+export function defaultRecord(): RecordData {
+  return { students: [''], grades: {} }
+}
+
 export const gradeRecord = createMockValue<RecordData>({
   key: KEY,
-  fallback: { students: [], grades: {} },
+  fallback: defaultRecord(),
   validate: (v: unknown): v is RecordData => {
     const r = v as RecordData
     return (

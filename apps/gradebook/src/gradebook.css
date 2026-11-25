@@ -71,3 +71,4 @@
   font-size: calc(10px * var(--tf));
   color: var(--ink);
 }
+.lk-main .lc-tab:not(.active) { color: var(--ink-80); }

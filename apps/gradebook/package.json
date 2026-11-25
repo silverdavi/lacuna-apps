@@ -11,6 +11,7 @@
   "dependencies": {
     "@lacuna/calculator-kit": "workspace:0.2.0",
     "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/csv-parse": "workspace:0.1.0",
     "@lacuna/export-menu": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/money": "workspace:0.1.0",
