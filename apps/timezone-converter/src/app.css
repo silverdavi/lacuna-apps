@@ -2,43 +2,5 @@
 
 /* Custom tablist (kit Tabs lacks role="tab"); active uses --ink, inactive uses
    --ink-80 which meets the 4.5:1 contrast threshold in light and dark themes. */
-.tzc-tabs {
-  display: flex;
-  gap: calc(2px * var(--sf));
-  border-bottom: calc(1px * var(--sf)) solid var(--hairline);
-}
-
-.tzc-tab {
-  font-family: var(--sans);
-  font-size: calc(13px * var(--tf));
-  font-weight: 600;
-  color: var(--ink-80);
-  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
-  border: none;
-  background: none;
-  border-bottom: calc(2px * var(--sf)) solid transparent;
-  cursor: pointer;
-}
-
-.tzc-tab.active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
-}
-
-.tzc-actions {
-  display: flex;
-  gap: calc(8px * var(--sf));
-  margin-top: calc(12px * var(--sf));
-}
-
-.tzc-field {
-  display: flex;
-  flex-direction: column;
-}
-
-.tzc-field-label {
-  font-family: var(--mono);
-  font-size: calc(11px * var(--tf));
-  color: var(--ink-60);
-  margin-bottom: calc(4px * var(--sf));
-}
+.lk-main .lc-tab { color: var(--ink-80); }
+.lk-main .lc-tab.active { color: var(--ink); }
