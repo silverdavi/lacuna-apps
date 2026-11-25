@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "be5a156572f6fc0fe645600e69c5c00134539aaafc931c0a7f924dffff3f0a23",
+  "spec_sha256": "b381de237e245f69f66b9598634e61b34259f30d843e25c9da459752d77d4f91",
   "checks": [
     {
       "id": "A1",
-      "text": "The page shows the heading \"Hash Generator\" and the text \"Enter text to hash\" in the input area."
+      "text": "The page shows the heading \"Hash Generator\" and, with an empty input, the text \"Enter text to hash\"."
     },
     {
       "id": "A2",
-      "text": "Typing \"hello\" in the CodeArea labelled \"Input text\", selecting \"SHA-256\" in the select labelled \"Algorithm\", and selecting \"hex\" in the select labelled \"Encoding\" shows the text \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\" in the field labelled \"Result\"."
+      "text": "Typing \"hello\" in the code area labelled \"Input text\", selecting \"SHA-256\" in the select labelled \"Algorithm\" and \"hex\" in the select labelled \"Encoding\" shows the value \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\" in the field labelled \"Result\"."
     },
     {
       "id": "A3",
-      "text": "With \"hello\" in the Input text, selecting \"SHA-1\" in the Algorithm select and \"base64\" in the Encoding select shows the text \"gCqF1eIz9H3D9V2W8X4Y6Z0A1B2=\" in the Result field."
+      "text": "With \"hello\" as input, selecting \"SHA-1\" and \"base64\" shows the value \"qvTGHdzF6KLavt4PO0gs2a6pQ00=\" in \"Result\". (SHA-1(\"hello\") = aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d in hex.)"
     },
     {
       "id": "A4",
-      "text": "With \"hello\" in the Input text, selecting \"SHA-256\" in the Algorithm select and \"url\" in the Encoding select shows the text \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\" in the Result field, with no percent-encoding applied to the hex characters."
+      "text": "With \"hello\" as input, selecting \"SHA-256\" and \"url\" shows the value \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\" in \"Result\" (the \"url\" encoding percent-encodes the hex string, which has only unreserved characters, so it is unchanged)."
     },
     {
       "id": "A5",
-      "text": "Clicking the button \"Copy result\" with \"hello\" hashed as SHA-256 hex changes the button label to \"Copied\" for 2 seconds, and the clipboard contains \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\"."
+      "text": "With \"hello\" hashed as SHA-256 hex, clicking the button \"Copy result\" changes its label to \"Copied\" and the clipboard content is \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\"."
     },
     {
       "id": "A6",
-      "text": "After generating a hash of \"hello\" as SHA-256 hex, clicking the button \"Add to history\" adds a row to the table labelled \"History\" containing \"hello\", \"SHA-256\", \"hex\", and \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\"."
+      "text": "With \"hello\" hashed as SHA-256 hex, clicking the button \"Add to history\" adds a row to the table labelled \"History\" containing the cells \"hello\", \"SHA-256\", \"hex\" and \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\"."
     },
     {
       "id": "A7",
-      "text": "Clicking the button \"Clear history\" removes all rows from the History table and shows the text \"No history yet\"."
+      "text": "After adding that row to history, clicking the button \"Clear history\" removes all data rows and the table area shows the text \"No history yet\"."
     },
     {
       "id": "A8",
-      "text": "With \"hello\" in the Input text, selecting \"SHA-512\" in the Algorithm select and \"hex\" in the Encoding select shows the text \"9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef6627b3466cfc7\" in the Result field."
+      "text": "With \"hello\" as input, selecting \"SHA-512\" and \"hex\" shows the value \"9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043\" in \"Result\" (128 hex characters)."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the history entry: after adding \"hello\" SHA-256 hex to history and reloading the page, the History table still contains a row with \"hello\", \"SHA-256\", \"hex\", and \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\"."
+      "text": "After adding \"hello\" / SHA-256 / hex to history and reloading, the History table still contains a row with \"hello\", \"SHA-256\", \"hex\" and \"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "148f975bb4826c554d4a45b5b09b61a5325a6b9a31e1478d8732e2e1976e61f2"
+      "sha256": "adedbb0d42f2860aef2a159a7f1aa7dcc63d3507b44c5a092be007d4c6bbf7d0"
     }
   ]
 }

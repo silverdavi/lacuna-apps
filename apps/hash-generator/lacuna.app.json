@@ -6,7 +6,6 @@
   "summary": "Hash text with SHA-1, SHA-256, or SHA-512 and encode the result as hex, base64, or url.",
   "description": "Enter text, pick an algorithm and an encoding, and get the digest instantly. Copy the result or keep it in a local history table. Nothing leaves the browser.",
   "category": "productivity",
-  "tags": [],
   "icon": "security",
   "relationship": {
     "kind": "standalone"
@@ -15,6 +14,10 @@
     "type": "first-party",
     "name": "Lacuna",
     "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
   },
   "pricing": {
     "model": "free",
@@ -37,8 +40,8 @@
     }
   },
   "capabilities": [
-    "view:hash",
-    "create:hash"
+    "create:hash",
+    "view:hash"
   ],
   "permissions": {
     "records": [
@@ -80,9 +83,5 @@
     "keyboardOnly": true,
     "accessibilityScan": "axe",
     "worksWithoutNetwork": true
-  },
-  "source": {
-    "repository": "https://github.com/silverdavi/lacuna-apps",
-    "license": "MIT"
   }
 }

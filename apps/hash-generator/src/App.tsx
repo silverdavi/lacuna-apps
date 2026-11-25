@@ -7,13 +7,10 @@ import {
   Button,
   Card,
   EmptyState,
-  ErrorState,
   FormGrid,
-  PrimaryButton,
   Rail,
   Select,
   Table,
-  TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { ALGORITHM_OPTIONS, ENCODING_OPTIONS, hashInput } from './hash'
@@ -23,45 +20,17 @@ export function App() {
   const [input, setInput] = useState('')
   const [algorithm, setAlgorithm] = useState<HashAlgorithm>('SHA-256')
   const [encoding, setEncoding] = useState<HashEncoding>('hex')
-  const [result, setResult] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<HistoryEntry[]>(() => historyStore.list())
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
-  useEffect(() => {
-    setHistory(historyStore.list())
-  }, [])
-
-  const computed = useMemo(() => {
+  const result = useMemo(() => {
     if (!input) return null
-    return { algorithm, encoding, input }
+    try {
+      return hashInput(algorithm, encoding, input)
+    } catch {
+      return null
+    }
   }, [input, algorithm, encoding])
-
-  useEffect(() => {
-    if (!computed) {
-      setResult('')
-      setError(null)
-      return
-    }
-    let cancelled = false
-    void (async () => {
-      try {
-        const value = await hashInput(computed.algorithm, computed.encoding, computed.input)
-        if (!cancelled) {
-          setResult(value)
-          setError(null)
-        }
-      } catch {
-        if (!cancelled) {
-          setResult('')
-          setError('Could not compute the hash')
-        }
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [computed])
 
   const addHistory = () => {
     if (!result) return
@@ -86,7 +55,7 @@ export function App() {
     try {
       await copy(result)
     } catch {
-      setError('Copy failed')
+      // Clipboard unavailable: the button label simply does not flip.
     }
   }
 
@@ -97,29 +66,52 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={result ? 'Digest ready' : 'Ready'}
-      status={copied ? 'Copied to clipboard' : 'Local · no network'}
+      status={copied ? 'Copied' : 'Ready'}
       side={
         <Rail title="Hash Generator" note="SHA-1 · SHA-256 · SHA-512" chips={['hex', 'base64', 'url']}>
-          <Card mono="Output" title="Result">
-            {result ? (
-              <output aria-label="Result">{result}</output>
-            ) : (
-              <EmptyState mono="Waiting" title="No result yet" detail="Type text above to hash it." />
-            )}
+          <Card mono="Output" title="Digest">
+            <label className="lc-field">
+              <span className="lc-field-label">Result</span>
+              <input
+                className={`lc-input${result ? ' filled' : ''}`}
+                type="text"
+                readOnly
+                aria-readonly="true"
+                value={result ?? ''}
+                aria-label="Result"
+                tabIndex={-1}
+              />
+            </label>
             {result ? (
               <Actions>
-                <Button onClick={() => void copyResult()}>{copied ? 'Copied' : 'Copy result'}</Button>
-                <Button onClick={addHistory}>Add to history</Button>
+                <Button kind="primary" onClick={() => void copyResult()}>
+                  {copied ? 'Copied' : 'Copy result'}
+                </Button>
+                <Button kind="secondary" onClick={addHistory}>Add to history</Button>
               </Actions>
-            ) : undefined}
+            ) : (
+              <EmptyState mono="Waiting" title="No digest yet" detail="Type in the input field and the digest appears here." actionLabel="Type to hash" />
+            )}
           </Card>
         </Rail>
       }
     >
       <Card mono="Input" title="Hash settings">
-        <p style={{ margin: 0 }}>Enter text to hash</p>
+        {input ? null : (
+          <div className="lc-body-sm lc-faint" style={{ marginBottom: 'calc(10px * var(--sf))' }}>
+            Enter text to hash
+          </div>
+        )}
         <FormGrid>
-          <TextInput label="Input text" value={input} onChange={setInput} placeholder="hello" />
+          <label className="lc-field">
+            <span className="lc-field-label">Input text</span>
+            <textarea
+              className={`lc-input${input ? ' filled' : ''}`}
+              rows={4}
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+            />
+          </label>
           <Select label="Algorithm" value={algorithm} onChange={(v) => setAlgorithm(v as HashAlgorithm)} options={ALGORITHM_OPTIONS} />
           <Select label="Encoding" value={encoding} onChange={(v) => setEncoding(v as HashEncoding)} options={ENCODING_OPTIONS} />
         </FormGrid>
@@ -131,7 +123,7 @@ export function App() {
         actions={history.length > 0 ? <Button kind="ghost" onClick={clearHistory}>Clear history</Button> : undefined}
       >
         {history.length === 0 ? (
-          <EmptyState mono="Empty" title="No history yet" detail="Added hashes appear here and survive reloads." />
+          <EmptyState mono="Empty" title="No history yet" detail="Added hashes appear here and survive reloads." actionLabel="Add to history" />
         ) : (
           <Table
             label="History"
