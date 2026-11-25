@@ -2,7 +2,6 @@
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useState } from 'react'
 import {
-  Actions,
   AppShell,
   Button,
   Card,
@@ -10,7 +9,9 @@ import {
   EmptyState,
   FormGrid,
   PrimaryButton,
+  Rail,
   Table,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
@@ -144,12 +145,30 @@ export function App() {
   return (
     <AppShell
       name="Chore Chart"
-      icon="grid"
+      icon="tasks"
       hue="green"
       category="Productivity"
       meta={`${memberList.length} ${memberList.length === 1 ? 'member' : 'members'} · ${doneChores}/${totalChores} done`}
+      status={
+        copied ? 'CSV copied to clipboard' : `${doneChores} of ${totalChores} chores done`
+      }
+      side={
+        <Rail
+          title="Household"
+          chips={[
+            `${memberList.length} ${memberList.length === 1 ? 'member' : 'members'}`,
+            `${totalChores} ${totalChores === 1 ? 'chore' : 'chores'}`,
+            `${doneChores} done`,
+          ]}
+          note={`${memberList.length > 0 && doneChores === totalChores ? 'All chores done' : `${totalChores - doneChores} chores still open`}`}
+        />
+      }
     >
-      <div className="lc-tabs" role="tablist" aria-label="Chore chart sections">
+      <div
+        role="tablist"
+        aria-label="Chore chart sections"
+        className="lc-tabs"
+      >
         {(['Members', 'Chores'] as const).map((item) => (
           <button
             key={item}
@@ -158,7 +177,7 @@ export function App() {
             aria-selected={tab === item}
             tabIndex={tab === item ? 0 : -1}
             className={`lc-tab${tab === item ? ' active' : ''}`}
-            style={{ color: tab === item ? undefined : 'var(--ink-80)' }}
+            style={tab === item ? undefined : { color: 'var(--ink-60)' }}
             onClick={() => setTab(item)}
           >
             {item}
@@ -169,11 +188,15 @@ export function App() {
       {tab === 'Members' ? (
         <Card mono="New" title="Add a member">
           <FormGrid>
-            <TextInput label="Name" value={name} onChange={setName} placeholder="Who in the household?" error={nameError} />
+            <TextInput
+              label="Name"
+              value={name}
+              onChange={setName}
+              placeholder="Who in the household?"
+              error={nameError}
+            />
           </FormGrid>
-          <Actions>
-            <PrimaryButton onClick={onAddMember}>Add member</PrimaryButton>
-          </Actions>
+          <PrimaryButton onClick={onAddMember}>Add member</PrimaryButton>
         </Card>
       ) : null}
 
@@ -192,17 +215,17 @@ export function App() {
               {memberList.map((m) => {
                 const theirs = choresByMember(m.id)
                 const doneCount = theirs.filter((c) => c.data.done).length
-                const progress =
-                  theirs.length === 0
-                    ? '0 chores'
-                    : `${doneCount}/${theirs.length} of ${theirs.length} chores`
                 return (
                   <li key={m.id} className="lk-row" aria-label={m.data.name}>
                     <span className="lk-row-text">
                       <span className="lk-row-title">{m.data.name}</span>
                     </span>
-                    <span className="lk-row-value">{progress}</span>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <span className="lk-row-value">
+                      {theirs.length === 0
+                        ? '0 chores'
+                        : `${doneCount}/${theirs.length} · ${theirs.length} chores`}
+                    </span>
+                    <span className="lk-actions">
                       <Button kind="secondary" onClick={() => onOpenAssign(m.id)}>
                         Assign chore
                       </Button>
@@ -213,7 +236,7 @@ export function App() {
                       >
                         Remove {m.data.name}
                       </Button>
-                    </div>
+                    </span>
                   </li>
                 )
               })}
@@ -225,29 +248,33 @@ export function App() {
       {assigningId != null ? (
         <Card mono="New" title={`Assign a chore to ${assignTarget?.data.name ?? 'member'}`}>
           <FormGrid>
-            <TextInput label="Chore name" value={choreName} onChange={setChoreName} placeholder="Dishes, laundry, dishes..." error={choreError} />
+            <TextInput
+              label="Chore name"
+              value={choreName}
+              onChange={setChoreName}
+              placeholder="Dishes, laundry, dishes..."
+              error={choreError}
+            />
           </FormGrid>
-          <Actions>
+          <span className="lk-actions">
             <PrimaryButton onClick={onSaveChore}>Save</PrimaryButton>
             <Button kind="secondary" onClick={onCloseAssign}>
               Cancel
             </Button>
-          </Actions>
+          </span>
         </Card>
       ) : null}
 
       {tab === 'Chores' ? (
-        <Card mono={`${totalChores} ${totalChores === 1 ? 'chore' : 'chores'}`} title="Chores">
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+        <Card
+          mono={`${totalChores} ${totalChores === 1 ? 'chore' : 'chores'}`}
+          title="Chores"
+          actions={
             <Button kind="secondary" onClick={onExportCSV} disabled={totalChores === 0}>
               Export CSV
             </Button>
-            {copied ? (
-              <span role="status" style={{ marginLeft: '0.5rem', color: 'var(--ink-60)', alignSelf: 'center' }}>
-                CSV copied to clipboard
-              </span>
-            ) : null}
-          </div>
+          }
+        >
           {totalChores === 0 ? (
             <EmptyState
               mono="Empty"
