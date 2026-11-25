@@ -3,8 +3,8 @@
   "id": "lacuna.url-encoder",
   "name": "URL Encoder",
   "version": "0.1.0",
-  "summary": "Encode and decode text as a URL component, Base64, or hex.",
-  "description": "Type a value, pick a codec, and read the result live. Copy the result, and keep a history of past conversions that survives a reload.",
+  "summary": "Encode and decode text as a URL component, Base64, or hex. Copy or export the result, with conversion history that survives a reload.",
+  "description": "Type a value, pick a codec, and read the result live. Choose how spaces are encoded for URL output, copy the result, export it as a file, and keep a history of past conversions that survives a reload.",
   "category": "productivity",
   "tags": ["encoding", "url", "base64", "hex"],
   "icon": "search",
@@ -38,7 +38,8 @@
       "@lacuna/ui": "^0.1.0",
       "@lacuna/codecs": "0.1.0",
       "@lacuna/use-clipboard": "0.1.0",
-      "@lacuna/host-mock": "0.1.0"
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
     }
   },
   "capabilities": [
