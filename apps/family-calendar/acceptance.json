@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "d5736170c7f59b774ffb47cdeaa91969ba242411e2c962a1ed821411a99e1f02",
+  "spec_sha256": "31b15500efc2f000d63d34a9c0aa5a66023726447342891dd75b4d805212a3d4",
   "checks": [
     {
       "id": "A1",
-      "text": "The page heading is \"Family Calendar\" and the default view is the month grid for the current month, with the tab labelled \"Week\" visible and inactive."
+      "text": "The page heading is \"Family Calendar\" and the default view is the month grid for the current month, with the tab \"Week\" visible and not selected (`aria-selected=\"false\"`)."
     },
     {
       "id": "A2",
-      "text": "In the month view, clicking the button \"Add event\" opens a form; typing \"Dentist\" in the field labelled \"Title\", \"2025-06-10\" in the field labelled \"Date\", \"14:00\" in the field labelled \"Time\", and clicking \"Save\" adds a cell in the June 10 column that contains \"Dentist\" and \"14:00\"."
+      "text": "In the month view, clicking the button \"Add event\" opens a form; typing \"Dentist\" in the field labelled \"Title\", \"2025-06-10\" in \"Date\", \"14:00\" in \"Time\", and clicking \"Save\" closes the form, switches the month grid to June 2025 (heading \"June 2025\"), and the June 10 cell contains one event chip whose text contains both \"Dentist\" and \"14:00\"."
     },
     {
       "id": "A3",
-      "text": "Switching to the tab labelled \"Week\" shows the week containing June 10, 2025, and the day column for Tuesday June 10 contains the text \"Dentist\" and \"14:00\"."
+      "text": "After saving Dentist as in A2, clicking the tab \"Week\" shows the week of June 8-14, 2025 (the week, Sunday to Saturday, containing the most recently saved event's date); the cell for Tuesday June 10 contains an event chip whose text contains \"Dentist\" and \"14:00\"."
     },
     {
       "id": "A4",
-      "text": "In the event form, selecting \"Weekly\" in the select labelled \"Repeat\" and saving an event titled \"Yoga\" on \"2025-06-12\" at \"09:00\" creates events on June 12, June 19, and June 26, 2025, each showing \"Yoga\" and \"09:00\" in the month grid."
+      "text": "In the event form, typing \"Yoga\" in \"Title\", \"2025-06-12\" in \"Date\", \"09:00\" in \"Time\", selecting \"Weekly\" in the select labelled \"Repeat\" and clicking \"Save\" creates exactly three events, on June 12, June 19 and June 26, 2025; the month grid for June 2025 shows an event chip containing \"Yoga\" and \"09:00\" in each of those three cells."
     },
     {
       "id": "A5",
-      "text": "Clicking the button \"Export ICS\" produces a downloadable file whose content includes the line \"SUMMARY:Dentist\" and the line \"DTSTART:20250610T140000\"."
+      "text": "After saving Dentist (2025-06-10 14:00), clicking the button \"Export ICS\" downloads a file whose content includes the lines \"SUMMARY:Dentist\" and \"DTSTART:20250610T140000\"."
     },
     {
       "id": "A6",
-      "text": "In the tab labelled \"Tasks\", typing \"Buy milk\" in the field labelled \"New task\" and clicking \"Add\" adds a checklist item with the text \"Buy milk\" and an unchecked checkbox; the progress indicator shows \"0/1\"."
+      "text": "Clicking the tab \"Tasks\", typing \"Buy milk\" in the field labelled \"New task\" and clicking \"Add\" adds a checklist item with the text \"Buy milk\" and an unchecked checkbox; the progress indicator reads \"0/1\"."
     },
     {
       "id": "A7",
-      "text": "Checking the checkbox next to \"Buy milk\" changes the progress indicator to \"1/1\" and strikes through the text \"Buy milk\"."
+      "text": "After adding the task \"Buy milk\", ticking its checkbox changes the progress indicator to \"1/1\" and the text \"Buy milk\" gets a line-through text decoration."
     },
     {
       "id": "A8",
-      "text": "Clicking the button \"Delete Dentist\" on the event in the month grid removes the \"Dentist\" entry from June 10, and the week view for that week no longer contains \"Dentist\"."
+      "text": "After saving Dentist (2025-06-10 14:00), clicking the button \"Delete Dentist\" in the June 10 cell removes it: the June 10 cell has no \"Dentist\" chip, and after clicking the tab \"Week\" the week view contains no \"Dentist\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the event \"Dentist\" on June 10, 2025, and the task \"Buy milk\" with its checked state, visible in the month grid and the Tasks tab respectively."
+      "text": "After saving Dentist (2025-06-10 14:00) and adding and ticking the task \"Buy milk\", reloading the page keeps the event: the month grid (navigated to June 2025 with the \"Previous month\"/\"Next month\" buttons if needed) has a chip containing \"Dentist\" in the June 10 cell, and the Tasks tab shows \"Buy milk\" ticked with progress \"1/1\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "61edfac988b52af184ae5100756bb988cb67eaac7b88e876d5fe4d7ad913a19b"
+      "sha256": "73011f5aaf5433a5ef4bf59189226b41b189702b7113a39a5563509fedabd478"
     }
   ]
 }

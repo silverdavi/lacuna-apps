@@ -66,7 +66,7 @@ function occurrencesFor(events: EventRecord[], day: Date): EventRecord[] {
 // contains the time for toContainText('HH:MM').
 function EventChip({ ev, onDelete }: { ev: EventRecord; onDelete: () => void }) {
   return (
-    <div className="fcal-chip">
+    <div className="fcal-chip" role="listitem">
       <span className="fcal-chip-line">{ev.title}</span>
       <span className="fcal-chip-time">{ev.time}</span>
       <button type="button" className="fcal-delete" aria-label={`Delete ${ev.title}`} onClick={onDelete}>
@@ -214,22 +214,32 @@ export function App() {
                 </Stack>
               }>
               {showForm && <Card title="New event" mono="Form" flush>{eventForm}</Card>}
-              <div className="lc-cal" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-                  <div key={d} className="fcal-dow">{d}</div>
+              <h2 className="fcal-panel-title">{monthLabel}</h2>
+              <div className="lc-cal" role="grid" aria-label={monthLabel} style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+                <div role="row">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+                    <div key={d} role="columnheader" className="fcal-dow">{d}</div>
+                  ))}
+                </div>
+                {Array.from({ length: Math.ceil(monthDays.length / 7) }, (_, row) => (
+                  <div key={row} role="row">
+                    {monthDays.slice(row * 7, row * 7 + 7).map((day, i) => {
+                      if (!day) return <div key={i} role="gridcell" className="lc-cal-day" />
+                      const iso = toISODate(day)
+                      const name = day.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                      return (
+                        <div key={iso} role="gridcell" aria-label={name} className={`lc-cal-day${iso === todayISO ? ' today' : ''}`}>
+                          <div className="lc-cal-num">{day.getDate()}</div>
+                          <div className="fcal-day-events" role="list">
+                            {occurrencesFor(events, day).map((ev) => (
+                              <EventChip key={ev.id + iso} ev={ev} onDelete={() => deleteEvent(ev)} />
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
                 ))}
-                {monthDays.map((day, i) => {
-                  if (!day) return <div key={i} className="lc-cal-day" />
-                  const iso = toISODate(day)
-                  return (
-                    <div key={iso} className={`lc-cal-day${iso === todayISO ? ' today' : ''}`}>
-                      <div className="lc-cal-num">{day.getDate()}</div>
-                      {occurrencesFor(events, day).map((ev) => (
-                        <EventChip key={ev.id + iso} ev={ev} onDelete={() => deleteEvent(ev)} />
-                      ))}
-                    </div>
-                  )
-                })}
               </div>
             </Card>
           </div>
@@ -248,15 +258,30 @@ export function App() {
                 </Stack>
               }>
               {showForm && <Card title="New event" mono="Form" flush>{eventForm}</Card>}
-              <div className="lc-cal" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
-                {weekDays.map((day) => (
-                  <div key={toISODate(day)} className={`lc-cal-day${toISODate(day) === todayISO ? ' today' : ''}`}>
-                    <div className="fcal-week-day">{day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).replace(/,\s*/g, ' ')}</div>
-                    {occurrencesFor(events, day).map((ev) => (
-                      <EventChip key={ev.id + toISODate(day)} ev={ev} onDelete={() => deleteEvent(ev)} />
-                    ))}
-                  </div>
-                ))}
+              <h2 className="fcal-panel-title">{weekLabel}</h2>
+              <div className="lc-cal" role="grid" aria-label={weekLabel} style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+                <div role="row">
+                  {weekDays.map((day) => (
+                    <div key={toISODate(day)} role="columnheader" className="fcal-week-day">
+                      {day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </div>
+                  ))}
+                </div>
+                <div role="row">
+                  {weekDays.map((day) => {
+                    const iso = toISODate(day)
+                    const name = day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+                    return (
+                      <div key={iso} role="gridcell" aria-label={name} className={`lc-cal-day${iso === todayISO ? ' today' : ''}`}>
+                        <div className="fcal-day-events" role="list">
+                          {occurrencesFor(events, day).map((ev) => (
+                            <EventChip key={ev.id + iso} ev={ev} onDelete={() => deleteEvent(ev)} />
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </Card>
           </div>

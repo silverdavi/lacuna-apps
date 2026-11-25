@@ -1,120 +1,117 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-import { readFileSync } from 'node:fs'
-
-async function addEvent(page: Page, title: string, date: string, time: string, repeat = '') {
+const saveDentist = async (page: import('@playwright/test').Page) => {
   await page.getByRole('button', { name: 'Add event' }).click()
-  await page.getByLabel('Title').fill(title)
-  await page.getByLabel('Date').fill(date)
-  await page.getByLabel('Time').fill(time)
-  if (repeat) await page.getByLabel('Repeat').selectOption({ label: repeat })
+  await page.getByLabel('Title').fill('Dentist')
+  await page.getByLabel('Date').fill('2025-06-10')
+  await page.getByLabel('Time').fill('14:00')
   await page.getByRole('button', { name: 'Save' }).click()
 }
 
-// "the cell in the June 10 column" and "the day column for Tuesday June 10"
-// both denote the June 10 cell/column holding the event; scoping to the event's
-// own cell is how the check localises it.
-const cell = (page: Page, event: string) => page.getByText(event, { exact: true }).first()
-
-async function addTask(page: Page, text: string) {
-  await page.getByRole('tab', { name: 'Tasks' }).click()
-  await page.getByLabel('New task').fill(text)
-  await page.getByRole('button', { name: 'Add' }).click()
-}
-
-test('[A1] the heading is "Family Calendar" with the month grid by default and an inactive "Week" tab', async ({
-  page,
-}) => {
+test('[A1] heading and default view', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Family Calendar' })).toBeVisible()
-  await expect(page.getByRole('tab', { name: 'Week' })).toBeVisible()
-  await expect(page.getByRole('tab', { name: 'Tasks' })).toBeVisible()
-  // the month grid is the default view: June's day numbers are visible without
-  // clicking the Week tab.
-  await expect(page.getByText('10', { exact: true })).toBeVisible()
+  const week = page.getByRole('tab', { name: 'Week' })
+  await expect(week).toBeVisible()
+  await expect(week).toHaveAttribute('aria-selected', 'false')
 })
 
-test('[A2] adding Dentist on 2025-06-10 14:00 puts "Dentist" and "14:00" in the June 10 cell', async ({
-  page,
-}) => {
+test('[A2] adding Dentist shows it in June 2025 month grid', async ({ page }) => {
   await page.goto('/')
-  await addEvent(page, 'Dentist', '2025-06-10', '14:00')
-  const entry = cell(page, 'Dentist')
-  await expect(entry).toBeVisible()
-  await expect(entry).toContainText('14:00')
+  await saveDentist(page)
+  await expect(page.getByRole('heading', { name: 'June 2025' })).toBeVisible()
+  const cell = page.getByRole('gridcell', { name: 'June 10, 2025' })
+  const chip = cell.getByRole('listitem').filter({ hasText: 'Dentist' })
+  await expect(chip).toHaveCount(1)
+  await expect(chip).toContainText('14:00')
 })
 
-test('[A3] the Week tab for the week containing June 10, 2025 shows Dentist at 14:00 on Tuesday June 10', async ({
-  page,
-}) => {
+test('[A3] week view shows Dentist on Tuesday June 10', async ({ page }) => {
   await page.goto('/')
-  await addEvent(page, 'Dentist', '2025-06-10', '14:00')
+  await saveDentist(page)
   await page.getByRole('tab', { name: 'Week' }).click()
-  await expect(page.getByText('Tuesday June 10')).toBeVisible()
-  const entry = cell(page, 'Dentist')
-  await expect(entry).toBeVisible()
-  await expect(entry).toContainText('14:00')
+  const cell = page.getByRole('gridcell', { name: 'Tuesday, June 10, 2025' })
+  const chip = cell.getByRole('listitem').filter({ hasText: 'Dentist' })
+  await expect(chip).toHaveCount(1)
+  await expect(chip).toContainText('14:00')
 })
 
-test('[A4] saving weekly Yoga on 2025-06-12 09:00 creates events on June 12, 19 and 26', async ({ page }) => {
+test('[A4] weekly repeat creates three events', async ({ page }) => {
   await page.goto('/')
-  await addEvent(page, 'Yoga', '2025-06-12', '09:00', 'Weekly')
-  const yoga = page.getByText('Yoga', { exact: true })
-  await expect(yoga, 'three weekly Yoga cells').toHaveCount(3)
-  for (const day of ['12', '19', '26']) {
-    await expect(page.getByText(day, { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Add event' }).click()
+  await page.getByLabel('Title').fill('Yoga')
+  await page.getByLabel('Date').fill('2025-06-12')
+  await page.getByLabel('Time').fill('09:00')
+  await page.getByLabel('Repeat').selectOption('Weekly')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('heading', { name: 'June 2025' })).toBeVisible()
+  for (const name of ['June 12, 2025', 'June 19, 2025', 'June 26, 2025']) {
+    const chip = page.getByRole('gridcell', { name }).getByRole('listitem').filter({ hasText: 'Yoga' })
+    await expect(chip).toHaveCount(1)
+    await expect(chip).toContainText('09:00')
   }
-  await expect(yoga.first()).toContainText('09:00')
 })
 
-test('[A5] Export ICS downloads a file containing the Dentist event with DTSTART:20250610T140000', async ({
-  page,
-}) => {
+test('[A5] Export ICS contains the event', async ({ page }) => {
   await page.goto('/')
-  await addEvent(page, 'Dentist', '2025-06-10', '14:00')
+  await saveDentist(page)
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Export ICS' }).click(),
   ])
-  const content = readFileSync(await download.path(), 'utf8')
-  expect(content, 'ICS contains the event summary').toContain('SUMMARY:Dentist')
-  expect(content, 'ICS contains the event start').toContain('DTSTART:20250610T140000')
+  const path = await download.path()
+  const content = await (await import('node:fs/promises')).readFile(path, 'utf8')
+  await expect(content).toContain('SUMMARY:Dentist')
+  await expect(content).toContain('DTSTART:20250610T140000')
 })
 
-test('[A6] adding "Buy milk" to the Tasks tab shows an unchecked item and the progress "0/1"', async ({
-  page,
-}) => {
+test('[A6] adding a task shows 0/1', async ({ page }) => {
   await page.goto('/')
-  await addTask(page, 'Buy milk')
+  await page.getByRole('tab', { name: 'Tasks' }).click()
+  await page.getByLabel('New task').fill('Buy milk')
+  await page.getByRole('button', { name: 'Add' }).click()
+  await expect(page.getByRole('checkbox', { name: 'Buy milk' })).toBeVisible()
   await expect(page.getByRole('checkbox', { name: 'Buy milk' })).not.toBeChecked()
-  await expect(page.getByText('0/1')).toBeVisible()
+  await expect(page.getByText('0/1', { exact: true })).toBeVisible()
 })
 
-test('[A7] checking "Buy milk" strikes it through and changes the progress to "1/1"', async ({ page }) => {
+test('[A7] ticking a task shows 1/1 and line-through', async ({ page }) => {
   await page.goto('/')
-  await addTask(page, 'Buy milk')
+  await page.getByRole('tab', { name: 'Tasks' }).click()
+  await page.getByLabel('New task').fill('Buy milk')
+  await page.getByRole('button', { name: 'Add' }).click()
   await page.getByRole('checkbox', { name: 'Buy milk' }).click()
-  await expect(page.getByText('Buy milk')).toBeVisible()
-  await expect(page.getByText('1/1')).toBeVisible()
+  await expect(page.getByText('1/1', { exact: true })).toBeVisible()
+  await expect(page.getByText('Buy milk')).toHaveCSS('text-decoration-line', 'line-through')
 })
 
-test('[A8] Delete Dentist removes the June 10 entry from the month grid and the week view', async ({ page }) => {
+test('[A8] deleting Dentist removes it from month and week', async ({ page }) => {
   await page.goto('/')
-  await addEvent(page, 'Dentist', '2025-06-10', '14:00')
-  await expect(page.getByText('Dentist')).toBeVisible()
-  await page.getByRole('button', { name: 'Delete Dentist' }).click()
-  await expect(page.getByText('Dentist')).toHaveCount(0)
+  await saveDentist(page)
+  const cell = page.getByRole('gridcell', { name: 'June 10, 2025' })
+  await cell.getByRole('button', { name: 'Delete Dentist' }).click()
+  await expect(cell.getByText('Dentist')).toHaveCount(0)
   await page.getByRole('tab', { name: 'Week' }).click()
   await expect(page.getByText('Dentist')).toHaveCount(0)
 })
 
-test('[A9] reload keeps the Dentist event on June 10 and the checked "Buy milk" task', async ({ page }) => {
+test('[A9] reload keeps event and task', async ({ page }) => {
   await page.goto('/')
-  await addEvent(page, 'Dentist', '2025-06-10', '14:00')
-  await addTask(page, 'Buy milk')
+  await saveDentist(page)
+  await page.getByRole('tab', { name: 'Tasks' }).click()
+  await page.getByLabel('New task').fill('Buy milk')
+  await page.getByRole('button', { name: 'Add' }).click()
   await page.getByRole('checkbox', { name: 'Buy milk' }).click()
   await page.reload()
-  await expect(page.getByText('Dentist')).toBeVisible()
+  await page.getByRole('tab', { name: 'Month' }).click()
+  // saved event navigates the grid to June 2025; use the month buttons if it does not
+  const cell = page.getByRole('gridcell', { name: 'June 10, 2025' })
+  // saved event navigates the grid to June 2025; fall back to the month buttons otherwise
+  for (let i = 0; i < 24 && (await cell.count()) === 0; i++) {
+    await page.getByRole('button', { name: 'Next month' }).click()
+  }
+  await expect(cell.getByRole('listitem').filter({ hasText: 'Dentist' })).toHaveCount(1)
   await page.getByRole('tab', { name: 'Tasks' }).click()
   await expect(page.getByRole('checkbox', { name: 'Buy milk' })).toBeChecked()
+  await expect(page.getByText('1/1', { exact: true })).toBeVisible()
 })
