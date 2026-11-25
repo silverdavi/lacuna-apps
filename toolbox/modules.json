@@ -1629,6 +1629,48 @@
       }
     },
     {
+      "id": "@lacuna/money-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Currency amount input that formats with the money module and emits integer minor units.",
+      "today": [
+        "toolbox/modules/money-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/money"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "MoneyInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/money-input/0.1.0",
+      "bridge": {
+        "component": "MoneyInput",
+        "kind": "widget",
+        "exports": [
+          "MoneyInput"
+        ],
+        "types": [
+          "MoneyInputProps"
+        ],
+        "signature": "MoneyInput({ value, onChange, currency, locale = 'en-US', min, max, step = 1, placeholder, disab...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "3f460adba0c09a65",
+            "lines": 162,
+            "dependencies": {
+              "@lacuna/money": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/password-generate",
       "layer": 3,
       "status": "exists",
