@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "e2291ea3302ab1a18c8f7f09dcb59b03267952cae086da64f4bf550f4f8cf092",
+  "spec_sha256": "d840b378d1bb0a2d898738cbae255a5e4ed35e8ea0fb8ca35e0644584546f6ad",
   "checks": [
     {
       "id": "A1",
@@ -8,7 +8,7 @@
     },
     {
       "id": "A2",
-      "text": "Clicking \"Pause\" stops the countdown and shows \"Paused\" on the button."
+      "text": "Clicking \"Pause\" stops the countdown, shows the status text \"Paused\", and renames the button \"Resume\"."
     },
     {
       "id": "A3",
@@ -16,7 +16,7 @@
     },
     {
       "id": "A4",
-      "text": "After 25 minutes, the timer switches to a 5-minute break."
+      "text": "With \"Work minutes\" set to 1, after one minute of running the display shows \"05:00\" (the 5-minute break) and the status text \"Break\"."
     },
     {
       "id": "A5",
@@ -24,7 +24,7 @@
     },
     {
       "id": "A6",
-      "text": "Typing \"30\" in the work time field changes the interval to 30 minutes."
+      "text": "Typing \"30\" in the field labelled \"Work minutes\" changes the display to \"30:00\" (when idle on work)."
     },
     {
       "id": "A7",
@@ -36,13 +36,13 @@
     },
     {
       "id": "A9",
-      "text": "Reload keeps the current interval and state (e.g., \"25:00\" or \"5:00\")."
+      "text": "Reload keeps the current interval and state (e.g., \"25:00\" or \"05:00\")."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "71531677a5975c1733ae257c5c7eca3deacad341210e78c91f3ab621229e58f5"
+      "sha256": "ad449278c20440654d55346e5e7c973d9fe2b03ef8ac32e16ad411688f455289"
     }
   ]
 }

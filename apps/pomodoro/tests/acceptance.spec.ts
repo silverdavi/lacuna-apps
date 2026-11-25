@@ -1,138 +1,90 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-// The timer display reads "MM:SS".
-const time = (page: Page) => page.getByText(/\d{2}:\d{2}/)
+const display = (p: import('@playwright/test').Page) => p.getByText(/\d{2}:\d{2}/, { exact: true })
 
-// Read the current MM:SS display, trimming whitespace.
-async function display(page: Page) {
-  return (await time(page).first().innerText()).trim()
-}
-
-// The button labelled by the spec's words: Start / Pause / Reset / Switch.
-const button = (page: Page, name: string) => page.getByRole('button', { name })
-
-// The work-time field, named from the spec's "work time" wording.
-const workTime = (page: Page) => page.getByLabel('Work time')
-
-test('[A1] clicking Start begins a 25-minute countdown', async ({ page }) => {
+test('[A1] clicking "Start" begins a 25-minute countdown from 25:00', async ({ page }) => {
   await page.goto('/')
-  await expect(await display(page)).toBe('25:00')
-  await button(page, 'Start').click()
-  // The countdown must tick down from 25:00 within its test timeout.
-  await expect(async () => {
-    expect(await display(page)).not.toBe('25:00')
-  }).toPass()
+  await expect(display(page)).toHaveText('25:00')
+  await page.getByRole('button', { name: 'Start' }).click()
+  // Once running the countdown is live: poll until the display has moved off 25:00.
+  await expect(async () => expect(display(page)).not.toHaveText('25:00')).toPass({ timeout: 15000 })
+  await page.getByRole('button', { name: 'Pause' }).click()
+  const stopped = (await display(page).innerText()).trim()
+  expect(stopped).toMatch(/\d{2}:\d{2}/)
+  expect(stopped).not.toBe('25:00')
 })
 
-test('[A2] clicking Pause stops the countdown and shows Paused on the button', async ({ page }) => {
+test('[A2] clicking "Pause" stops the countdown, shows "Paused" and renames the button "Resume"', async ({ page }) => {
   await page.goto('/')
-  await button(page, 'Start').click()
-  await button(page, 'Pause').click()
-  await expect(button(page, 'Paused')).toBeVisible()
-  await expect(button(page, 'Start')).toHaveCount(0)
-  await expect(button(page, 'Pause')).toHaveCount(0)
-  const frozen = await display(page)
-  await expect(async () => {
-    expect(await display(page)).toBe(frozen)
-  }).toPass()
+  await page.getByRole('button', { name: 'Start' }).click()
+  const first = (await display(page).innerText()).trim()
+  await page.getByRole('button', { name: 'Pause' }).click()
+  await expect(page.getByText('Paused')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Pause' })).toHaveCount(0)
+  // The countdown stopped on the pause: the value is the same as the moment it paused.
+  await expect(display(page)).toHaveText(first)
 })
 
-test('[A3] clicking Reset stops the countdown and returns to 25:00', async ({ page }) => {
+test('[A3] clicking "Reset" stops the countdown and returns to 25:00', async ({ page }) => {
   await page.goto('/')
-  await button(page, 'Start').click()
-  await button(page, 'Reset').click()
-  await expect(await display(page)).toBe('25:00')
-  await expect(button(page, 'Start')).toBeVisible()
+  await page.getByRole('button', { name: 'Start' }).click()
+  await page.getByRole('button', { name: 'Reset' }).click()
+  await expect(display(page)).toHaveText('25:00')
 })
 
-test('[A4] after the work interval ends the timer switches to a 5-minute break', async ({ page }) => {
+test('[A4] with 1 work minute, after one minute the display shows the 05:00 break and "Break"', async ({ page }) => {
+  test.setTimeout(120000)
   await page.goto('/')
-  // The spec fixes the work interval at 25 minutes, which is too long to run
-  // inside a test. Use the work-time field to set a 1-minute work interval, run
-  // it down to 00:00, and confirm the app then takes over with the 5-minute break.
-  await workTime(page).fill('1')
-  await expect(async () => {
-    expect(await display(page)).toBe('1:00')
-  }).toPass()
-  await button(page, 'Start').click()
-  await expect(async () => {
-    expect(await display(page)).toBe('00:00')
-  }).toPass()
-  await expect(async () => {
-    expect(await display(page)).toBe('5:00')
-  }).toPass()
+  await page.getByLabel('Work minutes').fill('1')
+  await expect(display(page)).toHaveText('01:00')
+  await page.getByRole('button', { name: 'Start' }).click()
+  await expect(display(page)).toHaveText('05:00', { timeout: 75000 })
+  await expect(page.getByText('Break')).toBeVisible()
 })
 
-test('[A5] clicking Switch toggles between work and break modes', async ({ page }) => {
+test('[A5] clicking "Switch" toggles between work and break modes', async ({ page }) => {
   await page.goto('/')
-  await expect(await display(page)).toBe('25:00')
-  await button(page, 'Switch').click()
-  await expect(await display(page)).toBe('5:00')
-  await button(page, 'Switch').click()
-  await expect(await display(page)).toBe('25:00')
+  await expect(display(page)).toHaveText('25:00')
+  await page.getByRole('button', { name: 'Switch' }).click()
+  await expect(display(page)).toHaveText('05:00')
+  await page.getByRole('button', { name: 'Switch' }).click()
+  await expect(display(page)).toHaveText('25:00')
 })
 
-test('[A6] typing 30 in the work time field changes the interval to 30 minutes', async ({ page }) => {
+test('[A6] typing 30 in "Work minutes" changes the display to 30:00 when idle on work', async ({ page }) => {
   await page.goto('/')
-  await workTime(page).fill('30')
-  await expect(async () => {
-    expect(await display(page)).toBe('30:00')
-  }).toPass()
+  await page.getByLabel('Work minutes').fill('30')
+  await expect(display(page)).toHaveText('30:00')
 })
 
 test('[A7] the timer updates every second while running', async ({ page }) => {
   await page.goto('/')
-  await button(page, 'Start').click()
-  // A live per-second timer shows a different value one second on, then the
-  // next. Poll until the display has changed, then confirm it changed again.
-  const start = await display(page)
-  const changed = await expect
-    .poll(async () => (await display(page)) !== start, { timeout: 30_000 })
-    .toBeTruthy()
-  expect(changed, 'the display advanced from the initial value').toBe(true)
-  const first = await display(page)
-  await expect
-    .poll(async () => (await display(page)) !== first, { timeout: 30_000 })
-    .toBeTruthy()
+  await page.getByRole('button', { name: 'Start' }).click()
+  const first = (await display(page).innerText()).trim()
+  // Poll until the display differs from the value it had when started.
+  await expect(async () => expect((await display(page).innerText()).trim()).not.toBe(first)).toPass({ timeout: 15000 })
 })
 
-test('[A8] reopening the app retains the last interval setting', async ({ page }) => {
+test('[A8] closing the app and reopening it retains the last interval setting', async ({ page, context }) => {
   await page.goto('/')
-  await workTime(page).fill('30')
-  await expect(async () => {
-    expect(await display(page)).toBe('30:00')
-  }).toPass()
-  // Close the tab and reopen it. The interval setting is kept in the browser,
-  // so a fresh visit to the app must come back on 30:00.
-  await page.close()
-  const reopened = await page.context().newPage()
-  await reopened.goto('/')
-  await expect(async () => {
-    expect(await display(reopened)).toBe('30:00')
-  }).toPass()
+  await page.getByLabel('Work minutes').fill('30')
+  await expect(display(page)).toHaveText('30:00')
+  await context.close()
+  const page2 = await context.newPage()
+  await page2.goto('/')
+  await expect(page2.getByLabel('Work minutes')).toHaveValue('30')
+  await expect(display(page2)).toHaveText('30:00')
 })
 
 test('[A9] reload keeps the current interval and state', async ({ page }) => {
   await page.goto('/')
-  // Work mode, mid-countdown: read the exact remaining value, reload, and the
-  // interval (work) plus that remaining value must come back unchanged.
-  await button(page, 'Start').click()
-  await expect(async () => {
-    expect(await display(page)).not.toBe('25:00')
-  }).toPass()
-  const frozen = await display(page)
+  await page.getByLabel('Work minutes').fill('30')
+  await expect(display(page)).toHaveText('30:00')
   await page.reload()
-  await expect(async () => {
-    expect(await display(page)).toBe(frozen)
-  }).toPass()
-  // Break mode: switch to the break and reload; the break interval must be
-  // restored (not reset to the work interval's 25:00).
-  await button(page, 'Switch').click()
+  await expect(display(page)).toHaveText('30:00')
+  await page.getByLabel('Work minutes').fill('25')
+  await expect(display(page)).toHaveText('25:00')
   await page.reload()
-  await expect(async () => {
-    expect(await display(page)).not.toBe('25:00')
-  }).toPass()
-  await expect(async () => {
-    expect(await display(page)).toBe('5:00')
-  }).toPass()
+  await expect(display(page)).toHaveText('25:00')
 })

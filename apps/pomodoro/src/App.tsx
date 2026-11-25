@@ -1,220 +1,209 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Actions,
   AppShell,
+  Body,
   Button,
   Card,
   FormGrid,
   MonoLabel,
-  PrimaryButton,
   Stack,
   TextInput,
 } from '@lacuna/ui'
+import { BREAK_SECONDS, loadState, saveState } from './host/mock'
 
-const DEFAULT_WORK = 25 * 60
-const BREAK = 5 * 60
-const KEY = 'lacuna.pomodoro'
+const STORAGE_KEY = 'lacuna.pomodoro.work-minutes'
 
-type Mode = 'work' | 'break'
-type Phase = 'idle' | 'running' | 'paused'
-
-interface Persisted {
-  workSeconds: number
-  mode: Mode
-  phase: Phase
-  remainingSeconds: number
+function formatTime(totalSeconds: number): string {
+  const s = Math.max(0, totalSeconds)
+  const minutes = Math.floor(s / 60)
+  const seconds = s % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-function loadPersisted(): Persisted | null {
-  try {
-    const raw = localStorage.getItem(KEY)
-    if (!raw) return null
-    const p = JSON.parse(raw) as Partial<Persisted>
-    const workSeconds =
-      typeof p.workSeconds === 'number' && Number.isFinite(p.workSeconds) && p.workSeconds > 0
-        ? p.workSeconds
-        : DEFAULT_WORK
-    const mode: Mode = p.mode === 'break' ? 'break' : 'work'
-    const phase: Phase = p.phase === 'running' || p.phase === 'paused' ? p.phase : 'idle'
-    const intervalSeconds = mode === 'work' ? workSeconds : BREAK
-    const remainingSeconds =
-      typeof p.remainingSeconds === 'number' && Number.isFinite(p.remainingSeconds)
-        ? Math.max(0, Math.min(p.remainingSeconds, intervalSeconds))
-        : intervalSeconds
-    return { workSeconds, mode, phase, remainingSeconds }
-  } catch {
-    return null
+function loadWorkMinutes(): number {
+  const raw = window.localStorage.getItem(STORAGE_KEY)
+  const parsed = raw !== null ? Number(raw) : 25
+  if (Number.isFinite(parsed) && parsed >= 1 && parsed <= 120) {
+    return Math.floor(parsed)
   }
+  return 25
 }
 
-function persist(state: Persisted) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(state))
-  } catch {
-    // storage unavailable; the timer still works in memory
-  }
+function saveWorkMinutes(minutes: number): void {
+  window.localStorage.setItem(STORAGE_KEY, String(minutes))
 }
 
 export function App() {
-  const [initial] = useState(loadPersisted)
-  const [mode, setMode] = useState<Mode>(initial?.mode ?? 'work')
-  const [workSeconds, setWorkSeconds] = useState(initial?.workSeconds ?? DEFAULT_WORK)
-  const [workField, setWorkField] = useState(
-    String(Math.round((initial?.workSeconds ?? DEFAULT_WORK) / 60))
-  )
-  const [fieldError, setFieldError] = useState<string | null>(null)
-  const [phase, setPhase] = useState<Phase>(initial?.phase ?? 'idle')
-  const [left, setLeft] = useState(initial?.remainingSeconds ?? DEFAULT_WORK)
+  const [state, setState] = useState(() => loadState())
+  const [workMinutes, setWorkMinutes] = useState(() => loadWorkMinutes())
 
-  const phaseRef = useRef(phase)
-  const leftRef = useRef(left)
-  const modeRef = useRef(mode)
-  const workSecondsRef = useRef(workSeconds)
-  phaseRef.current = phase
-  leftRef.current = left
-  modeRef.current = mode
-  workSecondsRef.current = workSeconds
-
-  // Tick every second while running.
   useEffect(() => {
-    if (phase !== 'running') return
+    saveState(state.phase === 'running' ? { ...state, phase: 'idle' } : state)
+  }, [state])
+
+  useEffect(() => {
+    if (state.phase !== 'running') return
     const id = window.setInterval(() => {
-      const cur = leftRef.current
-      if (cur <= 1) {
-        setLeft(0)
-        setPhase('idle')
-        return
-      }
-      setLeft(cur - 1)
+      setState((prev) => {
+        if (prev.phase !== 'running') return prev
+        if (prev.remainingSeconds <= 0) return prev
+        return { ...prev, remainingSeconds: prev.remainingSeconds - 1 }
+      })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [phase])
+  }, [state.phase])
 
-  // When the countdown hits zero during work, switch to break.
   useEffect(() => {
-    if (left !== 0 || mode !== 'work') return
-    setMode('break')
-    setLeft(BREAK)
-    setPhase('idle')
-  }, [left, mode])
+    if (state.phase !== 'running' || state.remainingSeconds > 0) return
+    const nextMode = state.mode === 'work' ? 'break' : 'work'
+    const nextDuration = nextMode === 'work' ? workMinutes * 60 : BREAK_SECONDS
+    setState({ mode: nextMode, phase: 'idle', remainingSeconds: nextDuration })
+  }, [state.phase, state.remainingSeconds, workMinutes])
 
-  // Persist state.
-  useEffect(() => {
-    persist({ workSeconds, mode, phase, remainingSeconds: left })
-  }, [workSeconds, mode, phase, left])
-
-  const minutes = Math.floor(left / 60)
-  const seconds = left % 60
-  const displayValue = `${minutes}:${String(seconds).padStart(2, '0')}`
-
-  function toggle() {
-    if (phase === 'running') {
-      setPhase('paused')
-      return
-    }
-    if (left <= 0) {
-      const fresh = mode === 'work' ? workSeconds : BREAK
-      setLeft(fresh)
-      setPhase('running')
-      return
-    }
-    setPhase('running')
-  }
-
-  function reset() {
-    const fresh = mode === 'work' ? workSeconds : BREAK
-    setLeft(fresh)
-    setPhase('idle')
-  }
-
-  function switchMode() {
-    const next: Mode = mode === 'work' ? 'break' : 'work'
-    setMode(next)
-    setLeft(next === 'work' ? workSeconds : BREAK)
-    setPhase('idle')
-  }
-
-  function applyWorkTime(next: string) {
-    setWorkField(next)
-    const parsed = Number(next)
-    if (
-      next.trim() !== '' &&
-      (Number.isNaN(parsed) || parsed <= 0 || parsed > 180 || !Number.isInteger(parsed))
-    ) {
-      setFieldError('Enter a whole number of minutes between 1 and 180')
-      return
-    }
-    setFieldError(null)
-    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= 180) {
-      const secondsValue = parsed * 60
-      setWorkSeconds(secondsValue)
-      if (modeRef.current === 'work' && phaseRef.current !== 'running') {
-        setLeft(secondsValue)
-      }
+  const startPause = () => {
+    if (state.phase === 'running') {
+      setState((prev) => ({ ...prev, phase: 'paused' }))
+    } else if (state.phase === 'idle' && state.mode === 'work') {
+      setState((prev) => ({ ...prev, phase: 'running', remainingSeconds: workMinutes * 60 }))
+    } else {
+      setState((prev) => ({ ...prev, phase: 'running' }))
     }
   }
+
+  const reset = () => {
+    const duration = state.mode === 'work' ? workMinutes * 60 : BREAK_SECONDS
+    setState((prev) => ({ ...prev, phase: 'idle', remainingSeconds: duration }))
+  }
+
+  const switchMode = () => {
+    const nextMode = state.mode === 'work' ? 'break' : 'work'
+    const duration = nextMode === 'work' ? workMinutes * 60 : BREAK_SECONDS
+    setState({ mode: nextMode, phase: 'idle', remainingSeconds: duration })
+  }
+
+  const applyWorkMinutes = (raw: string) => {
+    const parsed = Number(raw)
+    if (!Number.isFinite(parsed) || parsed <= 0) return
+    const clamped = Math.min(120, Math.floor(parsed))
+    setWorkMinutes(clamped)
+    saveWorkMinutes(clamped)
+    setState((prev) => ({
+      ...prev,
+      remainingSeconds:
+        prev.mode === 'work' && prev.phase === 'idle' ? clamped * 60 : prev.remainingSeconds,
+    }))
+  }
+
+  const displayTime = formatTime(state.remainingSeconds)
+  const isRunning = state.phase === 'running'
+  const isPaused = state.phase === 'paused'
+  const isWork = state.mode === 'work'
+
+  const startLabel = isRunning ? 'Pause' : isPaused ? 'Resume' : 'Start'
+
+  const workDuration = workMinutes * 60
+  const progress = isWork
+    ? state.remainingSeconds / workDuration
+    : state.remainingSeconds / BREAK_SECONDS
+
+  const progressPct = Math.max(0, Math.min(1, 1 - progress)) * 100
 
   return (
     <AppShell
       name="Pomodoro"
-      icon="timesheets"
-      hue="green"
+      icon="tasks"
+      hue="rust"
       category="Productivity"
-      meta={`${workSeconds / 60} min work, 5 min break`}
+      meta={isRunning ? 'Running' : isPaused ? 'Paused' : 'Idle'}
     >
-      <style>{`.lk-field-hint { color: var(--ink-80); }`}</style>
-      <Card mono="Timer" title={mode === 'work' ? 'Work' : 'Break'}>
-        <Stack>
-          <MonoLabel style={{ color: 'var(--ink)', fontSize: 'calc(36px * var(--tf))' }}>
-            {minutes < 10 ? <span style={{ display: 'none' }}>0</span> : null}
-            {displayValue}
-          </MonoLabel>
-          <FormGrid>
-            <TextInput
-              label="Work time"
-              value={workField}
-              onChange={applyWorkTime}
-              inputMode="numeric"
-              placeholder="25"
-              hint="Minutes for the work interval"
-              error={fieldError}
-            />
-          </FormGrid>
-          <Actions>
-            {phase === 'running' ? (
-              <>
-                <PrimaryButton onClick={toggle}>Pause</PrimaryButton>
-                <Button kind="secondary" onClick={reset}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'calc(16px * var(--sf))', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gap: 'calc(16px * var(--sf))' }}>
+          <Card
+            title={isWork ? 'Work' : 'Break'}
+            mono={isRunning ? 'RUNNING' : 'IDLE'}
+            accent={isRunning}
+          >
+            <Stack>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'center',
+                  gap: 'calc(8px * var(--sf))',
+                  padding: 'calc(24px * var(--sf)) 0',
+                }}
+              >
+                <MonoLabel
+                  accent={isRunning}
+                  style={{ fontSize: 'calc(56px * var(--tf))', lineHeight: 1 }}
+                >
+                  {displayTime}
+                </MonoLabel>
+              </div>
+              <div
+                style={{
+                  height: 'calc(4px * var(--sf))',
+                  background: 'var(--hair)',
+                  borderRadius: 0,
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${progressPct}%`,
+                    height: '100%',
+                    background: isRunning ? 'var(--ui-accent)' : 'var(--ui-line2)',
+                    transition: 'width 1s linear',
+                  }}
+                />
+              </div>
+              <Actions>
+                <Button kind="primary" ariaLabel={startLabel} onClick={startPause}>
+                  {startLabel}
+                </Button>
+                <Button ariaLabel="Reset" onClick={reset}>
                   Reset
                 </Button>
-                <Button kind="secondary" onClick={switchMode}>
+                <Button ariaLabel="Switch" onClick={switchMode}>
                   Switch
                 </Button>
-              </>
-            ) : phase === 'paused' ? (
-              <>
-                <PrimaryButton onClick={toggle}>Paused</PrimaryButton>
-                <Button kind="secondary" onClick={reset}>
-                  Reset
-                </Button>
-                <Button kind="secondary" onClick={switchMode}>
-                  Switch
-                </Button>
-              </>
-            ) : (
-              <>
-                <PrimaryButton onClick={toggle}>Start</PrimaryButton>
-                <Button kind="secondary" onClick={reset}>
-                  Reset
-                </Button>
-                <Button kind="secondary" onClick={switchMode}>
-                  Switch
-                </Button>
-              </>
-            )}
-          </Actions>
-        </Stack>
-      </Card>
+              </Actions>
+            </Stack>
+          </Card>
+
+          <Card title="Work minutes" mono="INTERVAL">
+            <FormGrid>
+              <TextInput
+                label="Work minutes"
+                type="number"
+                value={String(workMinutes)}
+                onChange={applyWorkMinutes}
+              />
+            </FormGrid>
+          </Card>
+        </div>
+
+        <div style={{ display: 'grid', gap: 'calc(16px * var(--sf))' }}>
+          <Card title="How it works" mono="INFO">
+            <Stack>
+              <Body sm>
+                <h3 style={{ margin: 0 }}>Focus blocks</h3>
+                <Body sm>
+                  Start a work interval and stay on task. When it ends, the timer switches to a
+                  5-minute rest automatically.
+                </Body>
+              </Body>
+              <Body sm>
+                <h3 style={{ margin: 0 }}>Custom work length</h3>
+                <Body sm>
+                  Change the work minutes field to suit your rhythm. The rest stays at 5 minutes.
+                </Body>
+              </Body>
+            </Stack>
+          </Card>
+        </div>
+      </div>
     </AppShell>
   )
 }
