@@ -6,6 +6,22 @@
 }
 .sw-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: calc(8px * var(--sf));
   margin-top: calc(12px * var(--sf));
+}
+.sw-hint {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  margin-top: calc(8px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}
+.sw-total {
+  margin-top: calc(8px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
 }
