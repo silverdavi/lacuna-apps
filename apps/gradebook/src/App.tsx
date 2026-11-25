@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, Rail, TextInput } from '@lacuna/ui'
+import { Actions, AppShell, Button, Card, EmptyState, Kpi, KpiRow, Rail, TextInput } from '@lacuna/ui'
 import { toCsv } from '@lacuna/csv-parse'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useLocalRecord } from '@lacuna/use-local-record'
@@ -56,7 +56,7 @@ export function App() {
     version: 1,
     defaultValue: defaultRecord(),
   })
-  const [view, setView] = useState<'Gradebook' | 'Statistics'>('Gradebook')
+  const [view, setView] = useState<string>('Gradebook')
   const [selected, setSelected] = useState(0)
   const { copied, copy } = useClipboard({ timeoutMs: 1500 })
 
@@ -148,6 +148,74 @@ export function App() {
 
   const filledStudents = students.filter((n) => n.trim() !== '').length
 
+  type CellKey = 'student' | 'Math' | 'Science' | 'English' | 'Average'
+  const columns: { key: CellKey; label: string; num?: boolean }[] = [
+    { key: 'student', label: 'Student' },
+    { key: 'Math', label: 'Math', num: true },
+    { key: 'Science', label: 'Science', num: true },
+    { key: 'English', label: 'English', num: true },
+    { key: 'Average', label: 'Average', num: true },
+  ]
+
+  const tableRows = students.map((name, i) => {
+    const rowGrades = rowGradesOf(grades, i)
+    const avg = rowAverage(rowGrades)
+    return {
+      hot: selected === i,
+      cells: {
+        student: (
+          <span className="gb-cell">
+            <TextInput
+              label="Student"
+              value={name}
+              onChange={(v) => setStudentName(i, v)}
+              placeholder="Name"
+            />
+            <Button
+              kind={selected === i ? 'ink' : 'ghost'}
+              aria-pressed={selected === i}
+              ariaLabel={name ? `Select ${name}` : `Select row ${i + 1}`}
+              onClick={() => setSelected(i)}
+            >
+              {name ? `Select ${name}` : `Select row ${i + 1}`}
+            </Button>
+          </span>
+        ),
+        Math: (
+          <TextInput
+            label="Math"
+            value={rowGrades.Math != null ? String(rowGrades.Math) : ''}
+            onChange={(v) => setGrade(i, 'Math', v)}
+            inputMode="decimal"
+            placeholder="0"
+            error={scoreError(rawOf(grades, i, 'Math'))}
+          />
+        ),
+        Science: (
+          <TextInput
+            label="Science"
+            value={rowGrades.Science != null ? String(rowGrades.Science) : ''}
+            onChange={(v) => setGrade(i, 'Science', v)}
+            inputMode="decimal"
+            placeholder="0"
+            error={scoreError(rawOf(grades, i, 'Science'))}
+          />
+        ),
+        English: (
+          <TextInput
+            label="English"
+            value={rowGrades.English != null ? String(rowGrades.English) : ''}
+            onChange={(v) => setGrade(i, 'English', v)}
+            inputMode="decimal"
+            placeholder="0"
+            error={scoreError(rawOf(grades, i, 'English'))}
+          />
+        ),
+        Average: avg ? <span className="gc-avg has">{avg}</span> : <span className="gc-empty-cell" aria-hidden="true">&nbsp;</span>,
+      },
+    }
+  })
+
   return (
     <AppShell
       name="Gradebook Manager"
@@ -155,88 +223,67 @@ export function App() {
       hue="green"
       category="Productivity"
       meta={`${filledStudents} of ${students.length} students`}
-
+      status={stats ? `${stats.count} scores` : 'No scores yet'}
       side={
         <Rail
           title="Gradebook"
-          note={`${stats ? stats.count : 0} scores entered`}
-          chips={['Three assignments', 'Averages per student', 'Class statistics', 'CSV export to clipboard']}
+          note="Scores, averages and statistics"
+          chips={['Add students and scores', 'Averages per row', 'Class statistics', 'Export CSV to clipboard']}
         />
       }
     >
-      <Card mono="Views" title="Gradebook" flush>
-        <div className="lc-tabs" role="tablist" aria-label="Views">
-          {TAB_ITEMS.map((item) => (
-            <button
-              key={item}
-              type="button"
-              role="tab"
-              aria-selected={view === item}
-              className={`lc-tab${view === item ? ' active' : ''}`}
-              onClick={() => setView(item as 'Gradebook' | 'Statistics')}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </Card>
+      <div className="lc-tabs" role="tablist">
+        {TAB_ITEMS.map((item) => (
+          <button
+            key={item}
+            type="button"
+            role="tab"
+            aria-selected={view === item}
+            className={`lc-tab gc-tab${view === item ? ' active' : ''}`}
+            onClick={() => setView(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
 
       {view === 'Gradebook' ? (
-        <Card mono="Table" title="Grades" flush>
-          <table className="lc-table" aria-label="Gradebook">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th className="num">Math</th>
-                <th className="num">Science</th>
-                <th className="num">English</th>
-                <th className="num">Average</th>
-              </tr>
-            </thead>
+        <Card mono="Table" title="Grades">
+          <div className="gc-header-strip" role="presentation">
+            {columns.map((c) => (
+              <div
+                key={c.key}
+                role="row"
+                className={c.key === 'student' ? 'gc-header-cell gc-name' : 'gc-header-cell'}
+              >
+                {c.key === 'student' ? c.label : <span aria-hidden="true">{c.label}</span>}
+              </div>
+            ))}
+          </div>
+          <table className="lc-table gc-grades" aria-label="Grades">
             <tbody>
-              {students.map((name, i) => {
-                const row = rowGradesOf(grades, i)
-                return (
-                  <tr key={i} className={selected === i ? 'hot' : undefined}>
-                    <td data-label="Student">
-                      <div className="gb-rowhead">
-                        <TextInput label="Student" value={name} onChange={(v) => setStudentName(i, v)} placeholder="Alice" />
-                        <Button kind={selected === i ? 'ink' : 'secondary'} aria-pressed={selected === i} onClick={() => setSelected(i)}>
-                          Select {name || `row ${i + 1}`}
-                        </Button>
-                      </div>
+              {tableRows.map((r, i) => (
+                <tr key={i} className={r.hot ? 'hot' : undefined}>
+                  {columns.map((c) => (
+                    <td key={c.key} className={c.num ? 'num' : undefined} data-label={c.label}>
+                      {r.cells[c.key]}
                     </td>
-                    {SUBJECTS.map((s) => (
-                      <td key={s} className="num" data-label={s}>
-                        <TextInput
-                          label={s}
-                          value={row[s] != null ? String(row[s]) : ''}
-                          onChange={(v) => setGrade(i, s, v)}
-                          inputMode="decimal"
-                          placeholder="0"
-                          error={scoreError(rawOf(grades, i, s))}
-                        />
-                      </td>
-                    ))}
-                    <td className="num" data-label="Average">
-                      {rowAverage(row) || ' '}
-                    </td>
-                  </tr>
-                )
-              })}
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
-          <div className="gb-actions">
+          <Actions>
             <Button kind="primary" onClick={addStudent}>
               Add Student
             </Button>
             <Button kind="danger" onClick={deleteStudent} disabled={students.length === 0}>
               Delete Student
             </Button>
-          </div>
+          </Actions>
         </Card>
       ) : (
-        <Card mono="Stats" title="Class statistics" flush>
+        <Card mono="Stats" title="Class statistics">
           {stats ? (
             <>
               <KpiRow>
@@ -245,19 +292,19 @@ export function App() {
                 <Kpi value={`Lowest: ${stats.lowest}`} label="Bottom score" />
                 <Kpi value={`Median: ${round2(stats.median)}`} label="Middle score" />
               </KpiRow>
-              <div className="gb-actions">
+              <Actions>
                 <Button kind="primary" onClick={exportCsv}>
                   Export CSV
                 </Button>
                 {copied ? <span className="gc-copied" role="status">Copied to clipboard</span> : null}
-              </div>
+              </Actions>
             </>
           ) : (
             <EmptyState
               mono="Empty"
               title="No scores yet"
               detail="Record a score in the Gradebook tab to see the class figures."
-              actionLabel="Go to the Gradebook tab"
+              actionLabel="Open the Gradebook tab"
               onAction={() => setView('Gradebook')}
             />
           )}
