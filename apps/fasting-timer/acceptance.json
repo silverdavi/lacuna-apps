@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "af0d3c81402e6de763eabded4bec205236f5ad88149a9dc34e0ddab28959cf10",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load with no active timer, the page shows the heading \"Fasting Timer\", the text \"No active fast\", and the history section shows \"No fasts logged yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"New fast\" section, selecting \"16:8\" in the select labelled \"Preset\" sets the field labelled \"Duration\" to \"16h 0m\". Clicking the button \"Start fast\" changes the main display to show \"16:00:00\" in the large clock, shows the text \"Fasting\" as the phase, and the button labelled \"Start fast\" is replaced by a button labelled \"Pause\"."
+    },
+    {
+      "id": "A3",
+      "text": "With an active fast started from the \"16:8\" preset, clicking the button \"Pause\" changes the phase text to \"Paused\" and the button labelled \"Pause\" is replaced by a button labelled \"Resume\". The large clock still shows \"16:00:00\"."
+    },
+    {
+      "id": "A4",
+      "text": "With an active fast in the \"Paused\" state, clicking the button \"Resume\" changes the phase text back to \"Fasting\" and the button labelled \"Resume\" is replaced by a button labelled \"Pause\"."
+    },
+    {
+      "id": "A5",
+      "text": "With an active fast, clicking the button \"End fast\" removes the active timer display, shows the text \"No active fast\" again, and adds a new item to the history list containing the text \"16h 0m\". The history section no longer shows \"No fasts logged yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"New fast\" section, typing \"20h 30m\" in the field labelled \"Duration\" and clicking the button \"Start fast\" shows \"20:30:00\" in the large clock. Clicking \"End fast\" adds a history item containing \"20h 30m\"."
+    },
+    {
+      "id": "A7",
+      "text": "With two history items present, clicking the button \"Delete\" on the first history item removes that item from the list. If only one item remains, the list still shows that item. If no items remain, the text \"No fasts logged yet\" reappears."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Copy summary\" when there is at least one history item shows a toast with the text \"Summary copied to clipboard\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the active fast state: after starting a fast with the \"16:8\" preset and reloading the page, the large clock still shows \"16:00:00\", the phase text is \"Fasting\", and the button labelled \"Pause\" is present."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "fae22dd95865217448d27089f78ff525e371e27ff91e7dfa53bbed653dda48f1"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.fasting-timer",
+  "name": "Fasting Timer",
+  "version": "0.1.0",
+  "summary": "Count down a fast: pick a preset or a custom duration, pause and resume, then log it.",
+  "description": "A countdown for intermittent fasting. Start a fast from a preset (12:12, 14:10, 16:8) or any custom duration, pause it when you break the window, resume when you are ready, and end it to log the fast. The history, and any fast in progress, stay on this device.",
+  "category": "personal",
+  "tags": [
+    "fasting",
+    "timer",
+    "health"
+  ],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/fasting-timer",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-picker": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/format-duration": "0.1.0",
+      "@lacuna/use-timer": "0.1.0",
+      "@lacuna/big-clock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:fast",
+    "edit:fast",
+    "edit:fast-log"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "fast",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store logged fasting sessions and the fast currently in progress"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "fast"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
