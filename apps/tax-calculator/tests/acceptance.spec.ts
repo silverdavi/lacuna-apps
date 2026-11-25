@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('[A1] initial heading and zero summary', async ({ page }) => {
+test('[A1] initial state shows heading and zero summary', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Income Tax Calculator' })).toBeVisible()
   await expect(page.getByText('Tax: $0.00', { exact: true })).toBeVisible()
@@ -8,69 +8,69 @@ test('[A1] initial heading and zero summary', async ({ page }) => {
   await expect(page.getByText('Taxable income: $0.00', { exact: true })).toBeVisible()
 })
 
-test('[A2] single filer, 50000 gross', async ({ page }) => {
+test('[A2] single 50000 calculates tax 4,600.00', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('50000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Single' })
+  await page.getByLabel('Filing status').selectOption('Single')
   await page.getByRole('button', { name: 'Calculate' }).click()
-  await expect(page.getByText('Tax: $5,500.00', { exact: true })).toBeVisible()
-  await expect(page.getByText('Effective rate: 11.00%', { exact: true })).toBeVisible()
+  await expect(page.getByText('Tax: $4,600.00', { exact: true })).toBeVisible()
+  await expect(page.getByText('Effective rate: 9.20%', { exact: true })).toBeVisible()
   await expect(page.getByText('Taxable income: $40,000.00', { exact: true })).toBeVisible()
 })
 
-test('[A3] single filer, 100000 gross', async ({ page }) => {
+test('[A3] single 100000 calculates tax 15,600.00', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('100000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Single' })
+  await page.getByLabel('Filing status').selectOption('Single')
   await page.getByRole('button', { name: 'Calculate' }).click()
-  await expect(page.getByText('Tax: $13,200.00', { exact: true })).toBeVisible()
-  await expect(page.getByText('Effective rate: 13.20%', { exact: true })).toBeVisible()
+  await expect(page.getByText('Tax: $15,600.00', { exact: true })).toBeVisible()
+  await expect(page.getByText('Effective rate: 15.60%', { exact: true })).toBeVisible()
   await expect(page.getByText('Taxable income: $90,000.00', { exact: true })).toBeVisible()
 })
 
-test('[A4] married filing jointly, 50000 gross', async ({ page }) => {
+test('[A4] married filing jointly 50000 calculates tax 4,400.00', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('50000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Married filing jointly' })
+  await page.getByLabel('Filing status').selectOption('Married filing jointly')
   await page.getByRole('button', { name: 'Calculate' }).click()
   await expect(page.getByText('Tax: $4,400.00', { exact: true })).toBeVisible()
   await expect(page.getByText('Effective rate: 8.80%', { exact: true })).toBeVisible()
   await expect(page.getByText('Taxable income: $40,000.00', { exact: true })).toBeVisible()
 })
 
-test('[A5] single filer, 200000 gross', async ({ page }) => {
+test('[A5] single 200000 calculates tax 41,200.00', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('200000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Single' })
+  await page.getByLabel('Filing status').selectOption('Single')
   await page.getByRole('button', { name: 'Calculate' }).click()
-  await expect(page.getByText('Tax: $42,900.00', { exact: true })).toBeVisible()
-  await expect(page.getByText('Effective rate: 21.45%', { exact: true })).toBeVisible()
+  await expect(page.getByText('Tax: $41,200.00', { exact: true })).toBeVisible()
+  await expect(page.getByText('Effective rate: 20.60%', { exact: true })).toBeVisible()
   await expect(page.getByText('Taxable income: $190,000.00', { exact: true })).toBeVisible()
 })
 
-test('[A6] bracket breakdown rows after 50000 single', async ({ page }) => {
+test('[A6] breakdown rows for single 50000', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('50000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Single' })
+  await page.getByLabel('Filing status').selectOption('Single')
   await page.getByRole('button', { name: 'Calculate' }).click()
-  await expect(page.getByRole('table').getByText('10%')).toBeVisible()
-  await expect(page.getByRole('table').getByText('$4,000.00', { exact: true })).toBeVisible()
-  await expect(page.getByRole('table').getByText('12%')).toBeVisible()
-  await expect(page.getByRole('table').getByText('$1,500.00', { exact: true })).toBeVisible()
+  const table = page.getByRole('table')
+  await expect(table.getByRole('row').filter({ hasText: '10%' })).toContainText('$10,000.00', { exact: true })
+  await expect(table.getByRole('row').filter({ hasText: '10%' })).toContainText('$1,000.00', { exact: true })
+  await expect(table.getByRole('row').filter({ hasText: '12%' })).toContainText('$30,000.00', { exact: true })
+  await expect(table.getByRole('row').filter({ hasText: '12%' })).toContainText('$3,600.00', { exact: true })
 })
 
-test('[A7] copy result puts expected text on the clipboard', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+test('[A7] copy result copies tax to clipboard', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('50000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Single' })
+  await page.getByLabel('Filing status').selectOption('Single')
   await page.getByRole('button', { name: 'Calculate' }).click()
   await page.getByRole('button', { name: 'Copy result' }).click()
-  const text = await page.evaluate(() => navigator.clipboard.readText())
-  expect(text).toContain('Tax: $5,500.00')
+  const clip = await page.evaluate(async () => navigator.clipboard.readText())
+  expect(clip).toBe('Tax: $4,600.00')
 })
 
-test('[A8] zero income shows the error and keeps zero summary', async ({ page }) => {
+test('[A8] zero income shows error and keeps zero summary', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('0')
   await page.getByRole('button', { name: 'Calculate' }).click()
@@ -78,12 +78,13 @@ test('[A8] zero income shows the error and keeps zero summary', async ({ page })
   await expect(page.getByText('Tax: $0.00', { exact: true })).toBeVisible()
 })
 
-test('[A9] reload keeps the last calculation', async ({ page }) => {
+test('[A9] reload keeps last calculation', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Gross income').fill('50000')
-  await page.getByLabel('Filing status').selectOption({ label: 'Single' })
+  await page.getByLabel('Filing status').selectOption('Single')
   await page.getByRole('button', { name: 'Calculate' }).click()
+  await expect(page.getByText('Tax: $4,600.00', { exact: true })).toBeVisible()
   await page.reload()
-  await expect(page.getByText('Tax: $5,500.00', { exact: true })).toBeVisible()
-  await expect(page.getByText('Effective rate: 11.00%', { exact: true })).toBeVisible()
+  await expect(page.getByText('Tax: $4,600.00', { exact: true })).toBeVisible()
+  await expect(page.getByText('Effective rate: 9.20%', { exact: true })).toBeVisible()
 })

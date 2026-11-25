@@ -2443,9 +2443,6 @@ importers:
       '@lacuna/money':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/money/0.1.0
-      '@lacuna/number-input':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/number-input/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
