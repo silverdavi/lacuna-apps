@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { newCard, reviewCard, type Grade } from '@lacuna/spaced-repetition'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { toCsv } from '@lacuna/csv-parse'
-import { AppShell, Card, Body, Button, EmptyState, Stack, Title } from '@lacuna/ui'
+import { parseCsv, toCsv } from '@lacuna/csv-parse'
+import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, List, MonoLabel, Rail, Row, Stack, TextInput, Title } from '@lacuna/ui'
 import { wordStore, type Word } from './host'
 
 type Tab = 'deck' | 'study'
@@ -15,6 +15,10 @@ function today(): string {
   return `${year}-${month}-${day}`
 }
 
+function fmtDate(iso: string): string {
+  return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
 export function App() {
   const [tab, setTab] = useState<Tab>('deck')
   const [deck, setDeck] = useState<Word[]>(() => wordStore().list())
@@ -24,6 +28,7 @@ export function App() {
   const [flash, setFlash] = useState('')
   const [flashTimer, setFlashTimer] = useState(0)
   const [session, setSession] = useState<Word[]>(() => deck.filter((w) => w.dueDate <= today()))
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const notify = (message: string) => {
     setFlash(message)
@@ -37,7 +42,11 @@ export function App() {
     onError: () => notify('Could not copy the deck.'),
   })
 
-  const dueCount = session.length
+  const stats = useMemo(() => {
+    const due = deck.filter((w) => w.dueDate <= today()).length
+    return { total: deck.length, due, learning: Math.max(0, deck.length - due) }
+  }, [deck])
+
   const current = session[0] ?? null
 
   const save = (next: Word[]) => {
@@ -70,8 +79,6 @@ export function App() {
   const grade = (g: Grade) => {
     if (!current) return
     const result = reviewCard(current, g, today())
-    // "Again" keeps the word due today (stays in the session); "Good" moves it
-    // to a future date (leaves the session).
     save(deck.map((w): Word => (w.id === current.id ? { ...w, ...result.card } : w)))
     setSession((prev) => prev.filter((w) => w.id !== current.id))
     setFlipped(false)
@@ -82,9 +89,59 @@ export function App() {
     await clipboard.copy(toCsv(rows))
   }
 
+  const importCsv = (file: File) => {
+    file.text().then((text) => {
+      const { rows } = parseCsv(text, { header: true })
+      const seen = new Set(deck.map((w) => w.word.toLowerCase()))
+      const added: Word[] = []
+      for (const row of rows) {
+        const word = (row[0] ?? '').trim()
+        const definition = (row[1] ?? '').trim()
+        if (!word || !definition || seen.has(word.toLowerCase())) continue
+        seen.add(word.toLowerCase())
+        added.push({ ...newCard(word, today()), word, definition })
+      }
+      if (added.length > 0) {
+        save([...deck, ...added])
+        notify(`Imported ${added.length} word${added.length === 1 ? '' : 's'}.`)
+      } else {
+        notify('No new words found in that file.')
+      }
+    })
+  }
+
+  const onImportFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) importCsv(file)
+    event.target.value = ''
+  }
+
   return (
-    <AppShell name="Vocabulary Builder" icon="notes" hue="brown" category="Learning" meta={deck.length > 0 ? `${deck.length} words` : undefined}>
-      <main style={{ display: 'grid', gap: 16 }}>
+    <AppShell
+      name="Vocabulary Builder"
+      icon="notes"
+      hue="brown"
+      category="Learning"
+      meta={deck.length > 0 ? `${deck.length} words` : undefined}
+      status={flash || undefined}
+      side={
+        <Rail title="Deck" note={deck.length === 0 ? 'Empty' : `${stats.due} due today`} chips={deck.length === 0 ? [] : [`${stats.learning} learning`]}>
+          <Stack>
+            <KpiRow>
+              <Kpi value={stats.total} label="Words" />
+              <Kpi value={stats.due} label="Due" accent={stats.due > 0} />
+              <Kpi value={stats.learning} label="Learning" />
+            </KpiRow>
+            <Stack>
+              <Button kind="secondary" onClick={() => fileRef.current?.click()} disabled={deck.length === 0}>
+                Import CSV
+              </Button>
+            </Stack>
+          </Stack>
+        </Rail>
+      }
+    >
+      <div style={{ display: 'grid', gap: 16 }}>
         <div role="tablist" style={{ display: 'flex', gap: 8 }}>
           <button
             role="tab"
@@ -113,65 +170,62 @@ export function App() {
         </div>
 
         {tab === 'deck' && (
-          <>
-            <Card title="Add a word">
-              <Stack>
-                <div style={{ display: 'grid', gap: 8 }}>
-                  <input
-                    aria-label="Word"
-                    className="lc-input"
-                    placeholder="e.g. serendipity"
-                    value={newWord}
-                    onChange={(e) => setNewWord(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') addWord()
-                    }}
-                  />
-                  <input
-                    aria-label="Definition"
-                    className="lc-input"
-                    placeholder="e.g. a pleasant surprise"
-                    value={newDef}
-                    onChange={(e) => setNewDef(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') addWord()
-                    }}
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <Button kind="primary" onClick={addWord}>
-                    Add word
-                  </Button>
-                  <Button kind="ghost" onClick={exportCsv}>
-                    Export CSV
-                  </Button>
-                </div>
-                <div aria-live="polite">
-                  <Body sm>{flash}</Body>
-                </div>
-              </Stack>
-            </Card>
+          <Card title="Add a word">
+            <Stack>
+              <TextInput
+                label="Word"
+                placeholder="e.g. serendipity"
+                value={newWord}
+                onChange={setNewWord}
+                inputMode="text"
+              />
+              <TextInput
+                label="Definition"
+                placeholder="e.g. a pleasant surprise"
+                value={newDef}
+                onChange={setNewDef}
+              />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Button kind="primary" onClick={addWord}>
+                  Add word
+                </Button>
+                <Button kind="ghost" onClick={exportCsv} disabled={deck.length === 0}>
+                  Export CSV
+                </Button>
+              </div>
+              <div aria-live="polite">
+                {flash ? <MonoLabel accent>{flash}</MonoLabel> : null}
+              </div>
+            </Stack>
+          </Card>
+        )}
 
-            <Card title="Deck" mono={deck.length > 0 ? `${dueCount} due` : undefined}>
-              {deck.length === 0 ? (
-                <EmptyState title="Your deck is empty" detail="Add your first word to start building." actionLabel="Add a word above" />
-              ) : (
-                <ul className="lc-list" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 8 }}>
-                  {deck.map((w) => (
-                    <li key={w.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div>{w.word}</div>
-                        <div>{w.definition}</div>
-                      </div>
+        {tab === 'deck' && (
+          <Card title="Deck" mono={deck.length > 0 ? `${stats.due} due` : undefined}>
+            {deck.length === 0 ? (
+              <EmptyState
+                title="Your deck is empty"
+                detail="Add your first word to start building."
+                actionLabel="Add a word above"
+              />
+            ) : (
+              <List label="Deck">
+                {deck.map((w) => (
+                  <Row
+                    key={w.id}
+                    title={w.word}
+                    meta={w.definition}
+                    value={fmtDate(w.dueDate)}
+                    action={
                       <Button kind="ghost" onClick={() => removeWord(w.id)}>
                         Delete {w.word}
                       </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </>
+                    }
+                  />
+                ))}
+              </List>
+            )}
+          </Card>
         )}
 
         {tab === 'study' && current && (
@@ -179,7 +233,7 @@ export function App() {
             <Stack>
               <div aria-live="polite" style={{ display: 'grid', gap: 8 }}>
                 <Title size="md">{flipped ? current.definition : current.word}</Title>
-                {flipped && <Body sm>{current.word}</Body>}
+                {flipped ? <MonoLabel faint>{current.word}</MonoLabel> : null}
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 {!flipped ? (
@@ -214,12 +268,14 @@ export function App() {
 
         {tab === 'study' && (
           <div aria-live="polite">
-            <Body sm>
-              {dueCount === 0 ? 'No cards due' : `${dueCount} card${dueCount === 1 ? '' : 's'} due`}
-            </Body>
+            <MonoLabel faint>
+              {session.length === 0 ? 'No cards due' : `${session.length} card${session.length === 1 ? '' : 's'} due`}
+            </MonoLabel>
           </div>
         )}
-      </main>
+
+        <input ref={fileRef} type="file" accept=".csv,text/csv,text/plain" style={{ display: 'none' }} onChange={onImportFile} />
+      </div>
     </AppShell>
   )
 }
