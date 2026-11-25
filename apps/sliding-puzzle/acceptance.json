@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1052c4a669dd326af83bc481ea0a90ea7b3f77d5d36a1aa777e61ec7491c0488",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load with no saved state, the page shows the heading \"Sliding Tile Puzzle\", the text \"Moves: 0\", the text \"Best: 0\", and the board displays tiles 1 through 15 in order with an empty cell at the bottom right."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"42\" in the field labelled \"Seed\" and clicking the button \"New game\" shuffles the board; the tile labelled \"1\" is in the top-left cell and the empty cell is in the bottom-right cell."
+    },
+    {
+      "id": "A3",
+      "text": "With the board in the solved state (tiles 1-15 in order, empty bottom-right), pressing the \"ArrowUp\" key moves the tile labelled \"12\" into the empty space, the empty space moves to the bottom-middle, and the text \"Moves: 1\" is displayed."
+    },
+    {
+      "id": "A4",
+      "text": "With the board in the solved state, pressing the \"ArrowLeft\" key does not change the board state and the text \"Moves: 0\" remains displayed."
+    },
+    {
+      "id": "A5",
+      "text": "After making 5 moves from a shuffled board, clicking the button \"Reset\" returns the board to the solved state (tiles 1-15 in order, empty bottom-right) and the text \"Moves: 0\" is displayed."
+    },
+    {
+      "id": "A6",
+      "text": "After solving a puzzle with 10 moves, the text \"Best: 10\" is displayed; after solving a second puzzle with 8 moves, the text \"Best: 8\" is displayed."
+    },
+    {
+      "id": "A7",
+      "text": "After making 3 moves, clicking the button \"Copy state\" shows a toast with the text \"Board state copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the tab labelled \"Stats\" active, after solving a puzzle with 12 moves, the table shows a row with \"12\" in the \"Moves\" column and \"Solved\" in the \"Status\" column."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current board state: after making 2 moves from a shuffled board, reloading the page shows the same board configuration and the text \"Moves: 2\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1dd6b4bf1b71e009a2c37774fb7b0b6b0df7d2f2102ee02402b27838ab429999"
+    }
+  ]
+}
