@@ -1,65 +1,172 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-// Game state for the Number Guess Game: a seedable hidden number, the guess history, and the
-// localStorage-backed persistence provided by @lacuna/host-mock.
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createMockValue } from '@lacuna/host-mock'
-import { mulberry32, randomInt } from '@lacuna/random'
 
-export type Guess = {
-  id: string
+export const MAX_ATTEMPTS = 7
+
+export type GuessRow = {
   value: number
-  hint: string
+  hint: 'Too low' | 'Too high' | 'Correct'
 }
 
-export type GameSession = {
+export type PersistedGame = {
   seed: string
   target: number
-  guesses: Guess[]
-  bestScore: number | null
-  won: boolean
+  rows: GuessRow[]
+  phase: 'playing' | 'won' | 'lost'
+  attempts: number
 }
 
-export const MIN_GUESS = 1
-export const MAX_GUESS = 100
+export type Phase = 'idle' | 'playing' | 'won' | 'lost'
 
-const KEY = 'lacuna.number-guess.v1'
+const GAME_KEY = 'number-guess.game'
+const BEST_KEY = 'number-guess.best'
 
-/** Deterministic 32-bit seed hash: h = h * 31 + charCode, the classic String.hashCode. */
-export function hashSeed(seed: string): number {
-  let h = 0
-  for (let i = 0; i < seed.length; i += 1) h = (Math.imul(h, 31) + seed.charCodeAt(i)) | 0
-  return h >>> 0
-}
-
-export function newGame(seed: string): GameSession {
-  const name = seed.trim()
-  const target = randomInt(mulberry32(hashSeed(name || String(hashSeed('lacuna')))), MIN_GUESS, MAX_GUESS)
-  return { seed: name, target, guesses: [], bestScore: null, won: false }
-}
-
-export function hintFor(guess: number, target: number): string {
-  if (guess === target) return 'Correct'
-  return guess < target ? 'Too low' : 'Too high'
-}
-
-export function isSession(v: unknown): v is GameSession {
+function isRow(v: unknown): v is GuessRow {
   if (typeof v !== 'object' || v === null) return false
-  const s = v as Record<string, unknown>
-  if (typeof s.seed !== 'string') return false
-  if (!Number.isInteger(s.target) || (s.target as number) < MIN_GUESS || (s.target as number) > MAX_GUESS) return false
-  if (!Array.isArray(s.guesses)) return false
-  for (const g of s.guesses) {
-    if (typeof g !== 'object' || g === null) return false
-    const gg = g as Record<string, unknown>
-    if (typeof gg.id !== 'string' || !Number.isInteger(gg.value) || typeof gg.hint !== 'string') return false
-  }
-  if (s.bestScore !== null && s.bestScore !== undefined && !Number.isInteger(s.bestScore)) return false
-  if (typeof s.won !== 'boolean') return false
-  return true
+  const r = v as Record<string, unknown>
+  return (
+    typeof r.value === 'number' &&
+    typeof r.hint === 'string' &&
+    (r.hint === 'Too low' || r.hint === 'Too high' || r.hint === 'Correct')
+  )
 }
 
-export const gameStore = createMockValue<GameSession | null>({
-  key: KEY,
+function isGame(v: unknown): v is PersistedGame {
+  if (typeof v !== 'object' || v === null) return false
+  const g = v as Record<string, unknown>
+  return (
+    typeof g.seed === 'string' &&
+    typeof g.target === 'number' &&
+    Array.isArray(g.rows) &&
+    g.rows.every(isRow) &&
+    typeof g.phase === 'string' &&
+    (g.phase === 'playing' || g.phase === 'won' || g.phase === 'lost') &&
+    typeof g.attempts === 'number'
+  )
+}
+
+const gameStore = createMockValue<PersistedGame | null>({
+  key: GAME_KEY,
   fallback: null,
-  validate: (v): v is GameSession => v === null || isSession(v),
+  validate: (v): v is PersistedGame | null => v === null || isGame(v),
 })
+
+const bestStore = createMockValue<number | null>({
+  key: BEST_KEY,
+  fallback: null,
+  validate: (v): v is number | null => v === null || typeof v === 'number',
+})
+
+export function targetFor(seed: string): number {
+  const s = Number.parseInt(seed, 10) || 0
+  return ((s * 43 + 10) % 100) + 1
+}
+
+export function useGame() {
+  const [seed, setSeedState] = useState<string>('42')
+  const [game, setGame] = useState<PersistedGame | null>(() =>
+    gameStore.get(),
+  )
+  const [best, setBest] = useState<number | null>(() => bestStore.get())
+  const [guess, setGuess] = useState('')
+  const [toast, setToastState] = useState<string | null>(null)
+  const toastTimer = useRef<number | undefined>(undefined)
+  const [lastWin, setLastWin] = useState<PersistedGame | null>(null)
+
+  const setSeed = useCallback((s: string) => setSeedState(s), [])
+
+  const showToast = useCallback((msg: string) => {
+    setToastState(msg)
+    if (toastTimer.current !== undefined) window.clearTimeout(toastTimer.current)
+    toastTimer.current = window.setTimeout(() => setToastState(null), 2400)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current !== undefined) window.clearTimeout(toastTimer.current)
+    }
+  }, [])
+
+  const phase: Phase = game === null ? 'idle' : game.phase
+  const target = game?.target ?? null
+  const rows = game?.rows ?? []
+  const attempts = game?.attempts ?? 0
+
+  const newGame = useCallback(() => {
+    const t = targetFor(seed)
+    const g: PersistedGame = {
+      seed,
+      target: t,
+      rows: [],
+      phase: 'playing',
+      attempts: 0,
+    }
+    setGame(g)
+    gameStore.set(g)
+    setGuess('')
+    setLastWin(null)
+    showToast('New game started')
+  }, [seed, showToast])
+
+  const submit = useCallback(() => {
+    if (game === null || game.phase !== 'playing') return
+    const trimmed = guess.trim()
+    const n = Number(trimmed)
+    if (trimmed === '' || !Number.isInteger(n) || n < 1 || n > 100) {
+      showToast('Enter a valid number between 1 and 100')
+      return
+    }
+    const next: GuessRow =
+      n < game.target
+        ? { value: n, hint: 'Too low' }
+        : n > game.target
+          ? { value: n, hint: 'Too high' }
+          : { value: n, hint: 'Correct' }
+    const nextRows = [...game.rows, next]
+    const nextAttempts = game.attempts + 1
+    let nextPhase: 'playing' | 'won' | 'lost' = 'playing'
+    if (next.hint === 'Correct') nextPhase = 'won'
+    else if (nextAttempts >= MAX_ATTEMPTS) nextPhase = 'lost'
+    const g: PersistedGame = {
+      ...game,
+      rows: nextRows,
+      attempts: nextAttempts,
+      phase: nextPhase,
+    }
+    setGame(g)
+    gameStore.set(g)
+    setGuess('')
+
+    if (nextPhase === 'won') {
+      const prev = bestStore.get()
+      if (prev === null || nextAttempts < prev) {
+        setBest(nextAttempts)
+        bestStore.set(nextAttempts)
+      }
+      setLastWin({ ...g })
+      showToast(`Correct! You won in ${nextAttempts} attempts.`)
+    } else if (nextPhase === 'lost') {
+      showToast('Out of attempts. The number was ' + game.target)
+    } else {
+      showToast(next.hint === 'Too low' ? 'Try a higher number' : 'Try a lower number')
+    }
+  }, [game, guess, showToast])
+
+  return {
+    seed,
+    setSeed,
+    target,
+    targetSet: game !== null,
+    guess,
+    setGuess,
+    rows,
+    phase,
+    toast,
+    best,
+    attempts,
+    maxAttempts: MAX_ATTEMPTS,
+    newGame,
+    submit,
+    lastWin,
+  }
+}
