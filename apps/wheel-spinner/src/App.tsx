@@ -8,7 +8,10 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   List,
+  Rail,
   Row,
   Stack,
   Table,
@@ -36,6 +39,8 @@ export function App() {
 
   const entries = state.entries
   const spins = state.spins
+
+  const lastWinner = spins.length > 0 ? spins[spins.length - 1]?.winner ?? '' : ''
 
   function add() {
     const next = label.trim()
@@ -77,33 +82,50 @@ export function App() {
       winner: i === spins.length - 1 ? `Winner: ${s.winner}` : s.winner,
       at: timeLabel(s.at),
     },
+    hot: i === spins.length - 1,
   }))
 
   return (
     <AppShell
       name="Wheel Spinner"
-      icon="timesheets"
-      hue="gold"
+      icon="grid"
+      hue="teal"
       category="Productivity"
-      meta={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}
+      meta={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'} · ${spins.length} ${spins.length === 1 ? 'spin' : 'spins'}`}
+      side={
+        <Rail
+          title="Session"
+          note={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'} on the wheel`}
+        >
+          <KpiRow>
+            <Kpi value={String(entries.length)} label="Entries" />
+            <Kpi value={String(spins.length)} label="Spins" accent={spins.length > 0} />
+          </KpiRow>
+        </Rail>
+      }
     >
-      <div role="tablist" aria-label="Sections" style={{ display: 'flex', gap: 'calc(4px * var(--sf))', marginBottom: 'calc(16px * var(--sf))' }}>
+      <div
+        className="lc-tabs"
+        role="tablist"
+        aria-label="View"
+      >
         {TABS.map((t) => (
           <button
-            key={t}
             type="button"
+            key={t}
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
             style={{
               fontFamily: 'var(--sans)',
-              fontSize: 'calc(13px * var(--tf))',
-              color: tab === t ? 'var(--paper)' : 'var(--ink)',
-              background: tab === t ? 'var(--ink)' : 'transparent',
-              border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-              borderRadius: 'calc(7px * var(--sf))',
-              padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))',
+              fontSize: 'calc(12.5px * var(--tf))',
+              fontWeight: 600,
+              color: 'var(--ink)',
+              padding: 'calc(2px * var(--sf)) calc(12px * var(--sf)) calc(11px * var(--sf))',
               cursor: 'pointer',
+              border: 'none',
+              background: 'none',
+              borderBottom: `calc(2px * var(--sf)) solid ${tab === t ? 'var(--accent)' : 'transparent'}`,
             }}
           >
             {t}
@@ -115,7 +137,7 @@ export function App() {
         <Stack lg>
           <Card mono="New" title="Add an entry">
             <FormGrid>
-              <TextInput label="Entry name" value={label} onChange={setLabel} error={error} />
+              <TextInput label="Entry name" value={label} onChange={setLabel} error={error} placeholder="Alice" />
             </FormGrid>
             <Actions>
               <Button kind="primary" onClick={add}>Add entry</Button>
@@ -128,7 +150,15 @@ export function App() {
             ) : (
               <List label="Entries">
                 {entries.map((entry) => (
-                  <Row key={entry.id} title={entry.name} action={<Button kind="ghost" ariaLabel={`Delete ${entry.name}`} onClick={() => remove(entry.id)}>Delete</Button>} />
+                  <Row
+                    key={entry.id}
+                    title={entry.name}
+                    action={
+                      <Button kind="ghost" ariaLabel={`Delete ${entry.name}`} onClick={() => remove(entry.id)}>
+                        Delete
+                      </Button>
+                    }
+                  />
                 ))}
               </List>
             )}
@@ -136,32 +166,34 @@ export function App() {
 
           <Card mono="Spin" title="Pick a winner">
             <Actions>
-              <Button kind="primary" onClick={spin} disabled={entries.length === 0}>Spin</Button>
+              <Button kind="primary" onClick={spin} disabled={entries.length === 0}>
+                Spin
+              </Button>
               <Button kind="secondary" onClick={copyResult} disabled={result === null}>
                 {clipboard.copied ? 'Copied' : 'Copy result'}
               </Button>
-              <Button kind="ghost" onClick={resetAll} disabled={entries.length === 0 && spins.length === 0}>Reset all</Button>
+              <Button kind="ghost" onClick={resetAll} disabled={entries.length === 0 && spins.length === 0}>
+                Reset all
+              </Button>
             </Actions>
-            {result !== null && (
-              <div
-                role="status"
-                style={{
-                  marginTop: 'calc(14px * var(--sf))',
-                  padding: 'calc(12px * var(--sf))',
-                  border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                  borderRadius: 'calc(4px * var(--sf))',
-                  background: 'var(--ui-card)',
-                }}
-              >
-                <span style={{ fontSize: 'calc(16px * var(--tf))', fontWeight: 600 }}>Winner: {result.winner}</span>
+            {result !== null ? (
+              <div role="status" style={{ marginTop: 'calc(14px * var(--sf))', fontFamily: 'var(--serif)', fontSize: 'calc(20px * var(--tf))', color: 'var(--accent)' }}>
+                Winner: {result.winner}
               </div>
+            ) : (
+              <EmptyState
+                mono="Empty"
+                title="No result yet"
+                detail="Add entries, then press Spin."
+                actionLabel="Spin"
+              />
             )}
           </Card>
         </Stack>
       ) : (
         <Card mono={`${spins.length} ${spins.length === 1 ? 'spin' : 'spins'}`} title="Spin log">
           {spins.length === 0 ? (
-            <EmptyState mono="Empty" title="No spins yet" detail="Spin to start the log." actionLabel="Spin" />
+            <EmptyState mono="Empty" title="No spins yet" detail="Spin to start the log." actionLabel="Spin" onAction={spin} />
           ) : (
             <Table
               label="Spin log"
