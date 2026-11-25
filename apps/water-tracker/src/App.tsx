@@ -9,6 +9,8 @@ import {
   Button,
   Card,
   FormGrid,
+  Kpi,
+  KpiRow,
   List,
   MonoLabel,
   Rail,
@@ -210,7 +212,7 @@ export function App() {
         {todayEntries.length === 0 ? (
           <Body sm>No intakes logged yet today.</Body>
         ) : (
-          <List label="Intakes">
+          <List label="Entries">
             {todayEntries.map((e) => (
               <Row
                 key={e.id}
@@ -235,21 +237,19 @@ export function App() {
     ) : tab === 'Heatmap' ? (
       <Card mono="Activity" title="This year">
         <Heatmap data={heatmapCells} year={new Date().getFullYear()} max={goal} label={`Water logged · ${new Date().getFullYear()}`} />
-        {todayTotal > 0 ? (
-          <Body sm style={{ marginTop: 'calc(10px * var(--sf))' }}>
-            Today: {todayTotal} ml
-          </Body>
-        ) : null}
+        <KpiRow>
+          <Kpi value={todayTotal} label={`ml logged today`} accent />
+        </KpiRow>
       </Card>
     ) : (
       <Card mono="Trend" title="Last 14 days">
         <Chart type="line" data={trendData} title="Daily intake" ariaLabel="Daily water intake" />
-          <Body sm style={{ marginTop: 'calc(10px * var(--sf))' }}>
-            Today: {todayTotal} ml
-          </Body>
+        <KpiRow>
+          <Kpi value={todayTotal} label={`ml today`} accent />
+        </KpiRow>
         <List label="Daily totals">
           {trendData.map((d) => (
-            <Row key={d.label} title={d.label} value={d.label === t ? undefined : `${d.value} ml`} />
+            <Row key={d.label} title={d.label} value={d.value > 0 ? `${d.value} ml` : undefined} />
           ))}
         </List>
       </Card>
@@ -271,6 +271,7 @@ export function App() {
             <ProgressRing total={todayTotal} goal={goal} showLabel={tab === 'Log' && todayTotal > 0} />
             <div>
               <MonoLabel accent>Goal: {goal} ml</MonoLabel>
+              <MonoLabel>{goal} ml</MonoLabel>
               <div style={{ marginTop: 'calc(4px * var(--sf))', fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink-60)' }}>
                 Streak: {streak.current} {plural(streak.current)}
               </div>

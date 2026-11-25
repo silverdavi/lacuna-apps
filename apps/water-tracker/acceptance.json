@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "4c10f51f320c73612c71a33af8652a823d0ae9738e59bcd70e837b5afecd6935",
+  "spec_sha256": "ff24dde9502aed5789e5505f06c323c4a34b4272a880f498c9ada8b6eb683048",
   "checks": [
     {
       "id": "A1",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "e6dee4bd4e1518dd97490e9058ff432ac66590a32e03853fe06e3bfc0195e77f"
+      "sha256": "3f1ab5953dd06378aca59e01e91c7e2399ed44c13b24cd3e14158e6ee8cd8a71"
     }
   ]
 }
