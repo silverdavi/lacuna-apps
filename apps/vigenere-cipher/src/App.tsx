@@ -10,7 +10,6 @@ import {
   List,
   Rail,
   Row,
-  SectionLabel,
   Stack,
   TextInput,
 } from '@lacuna/ui'
@@ -19,12 +18,13 @@ import { addHistory, listHistory, removeHistory, type HistoryEntry } from './hos
 import { vigenere } from './cipher'
 
 type Mode = 'Encode' | 'Decode'
+type Tab = 'Work' | 'History'
 
 export function App() {
   const [message, setMessage] = useState('')
   const [key, setKey] = useState('')
   const [mode, setMode] = useState<Mode>('Encode')
-  const [tab, setTab] = useState<'Work' | 'History'>('Work')
+  const [tab, setTab] = useState<Tab>('Work')
   const [history, setHistory] = useState<HistoryEntry[]>(listHistory)
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
@@ -44,7 +44,7 @@ export function App() {
     setHistory(removeHistory(id))
   }
 
-  const status = copied ? 'Copied to clipboard' : ready ? `Result ${result}` : 'Local · nothing leaves the browser'
+  const status = copied ? 'Copied to clipboard' : ready ? 'Result ready' : 'Local · nothing leaves the browser'
 
   return (
     <AppShell
@@ -68,51 +68,6 @@ export function App() {
         </Rail>
       }
     >
-      <Card mono="01 · Inputs" title="Message and key">
-        <FormGrid>
-          <TextInput label="Message" value={message} onChange={setMessage} placeholder="HELLO WORLD" rows={3} />
-          <TextInput label="Key" value={key} onChange={setKey} placeholder="KEY" />
-        </FormGrid>
-        <SectionLabel>Direction</SectionLabel>
-        <Stack>
-          <label className="lk-check">
-            <input type="radio" name="mode" checked={mode === 'Encode'} onChange={() => setMode('Encode')} />
-            <span>Encode</span>
-          </label>
-          <label className="lk-check">
-            <input type="radio" name="mode" checked={mode === 'Decode'} onChange={() => setMode('Decode')} />
-            <span>Decode</span>
-          </label>
-        </Stack>
-      </Card>
-
-      <Card mono="02 · Result" title={mode === 'Encode' ? 'Encoded text' : 'Decoded text'}>
-        <Stack>
-          <label className="lc-field">
-            <span className="lc-field-label">Result</span>
-            <input
-              className={`lc-input${result ? ' filled' : ''}`}
-              type="text"
-              value={result}
-              readOnly
-              aria-readonly="true"
-            />
-          </label>
-          {result ? (
-            <Actions>
-              <Button kind="secondary" onClick={onCopy}>{copied ? 'Copied' : 'Copy'}</Button>
-              <Button kind="ghost" onClick={onAdd}>Add to history</Button>
-            </Actions>
-          ) : (
-            <EmptyState
-              mono="Empty"
-              title="Nothing to show yet"
-              detail="Type a message and a key, pick a direction, and the result appears here."
-            />
-          )}
-        </Stack>
-      </Card>
-
       <div role="tablist" aria-label="Sections">
         {(['Work', 'History'] as const).map((t) => (
           <button
@@ -120,6 +75,7 @@ export function App() {
             type="button"
             role="tab"
             aria-selected={tab === t}
+            tabIndex={tab === t ? 0 : -1}
             onClick={() => setTab(t)}
             style={{
               background: 'none',
@@ -137,6 +93,82 @@ export function App() {
         ))}
       </div>
 
+      {tab === 'Work' && (
+        <Stack>
+          <Card mono="01 · Inputs" title="Message and key">
+            <FormGrid>
+              <TextInput
+                label="Message"
+                value={message}
+                onChange={setMessage}
+                placeholder="HELLO WORLD"
+                rows={3}
+              />
+              <TextInput
+                label="Key"
+                value={key}
+                onChange={setKey}
+                placeholder="KEY"
+              />
+            </FormGrid>
+            <Stack>
+              <label className="lk-check">
+                <input
+                  type="radio"
+                  name="mode"
+                  checked={mode === 'Encode'}
+                  onChange={() => setMode('Encode')}
+                />
+                <span>Encode</span>
+              </label>
+              <label className="lk-check">
+                <input
+                  type="radio"
+                  name="mode"
+                  checked={mode === 'Decode'}
+                  onChange={() => setMode('Decode')}
+                />
+                <span>Decode</span>
+              </label>
+            </Stack>
+          </Card>
+
+          <Card
+            mono="02 · Result"
+            title={mode === 'Encode' ? 'Encoded text' : 'Decoded text'}
+          >
+            <Stack>
+              <label className="lc-field">
+                <span className="lc-field-label">Result</span>
+                <input
+                  className={`lc-input${result ? ' filled' : ''}`}
+                  type="text"
+                  value={result}
+                  readOnly
+                  aria-readonly="true"
+                />
+              </label>
+              {result ? (
+                <Actions>
+                  <Button kind="secondary" onClick={onCopy}>
+                    {copied ? 'Copied' : 'Copy'}
+                  </Button>
+                  <Button kind="ghost" onClick={onAdd}>
+                    Add to history
+                  </Button>
+                </Actions>
+              ) : (
+                <EmptyState
+                  mono="Empty"
+                  title="Nothing to show yet"
+                  detail="Type a message and a key, pick a direction, and the result appears here."
+                />
+              )}
+            </Stack>
+          </Card>
+        </Stack>
+      )}
+
       <Card mono={`${history.length} kept`} title="History">
         {history.length === 0 ? (
           <EmptyState
@@ -151,7 +183,11 @@ export function App() {
                 key={h.id}
                 title={`${h.message} → ${h.result}`}
                 meta={`${h.key} · ${h.mode}`}
-                action={<Button kind="ghost" onClick={() => onDelete(h.id)}>Delete</Button>}
+                action={
+                  <Button kind="ghost" onClick={() => onDelete(h.id)}>
+                    Delete
+                  </Button>
+                }
               />
             ))}
           </List>

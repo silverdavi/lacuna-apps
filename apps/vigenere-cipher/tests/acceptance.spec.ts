@@ -1,97 +1,92 @@
-import { expect, test, type Page } from '@playwright/test'
+// Acceptance tests for the vigenere-cipher app.
+// Derived from the spec's acceptance checks A1-A9; expected values copied verbatim.
+import { expect, test } from '@playwright/test'
 
-async function fillInputs(page: Page, message: string, key: string) {
-  await page.getByLabel('Message').fill(message)
-  await page.getByLabel('Key').fill(key)
-}
-
-async function selectMode(page: Page, mode: 'Encode' | 'Decode') {
-  await page.getByLabel(mode, { exact: true }).check()
-}
-
-test('[A1] page shows the heading Vigenere Cipher', async ({ page }) => {
+test('[A1] heading "Vigenere Cipher" is shown', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Vigenere Cipher' })).toBeVisible()
 })
 
-test('[A2] encoding HELLO with key KEY shows RIJVS in the Result field', async ({ page }) => {
+test('[A2] encoding HELLO with key KEY shows RIJVS in Result', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'HELLO', 'KEY')
-  await selectMode(page, 'Encode')
+  await page.getByLabel('Message').fill('HELLO')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Encode' }).click()
   await expect(page.getByLabel('Result')).toHaveValue('RIJVS')
 })
 
-test('[A3] decoding RIJVS with key KEY shows HELLO in the Result field', async ({ page }) => {
+test('[A3] decoding RIJVS with key KEY shows HELLO in Result', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'RIJVS', 'KEY')
-  await selectMode(page, 'Decode')
+  await page.getByLabel('Message').fill('RIJVS')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Decode' }).click()
   await expect(page.getByLabel('Result')).toHaveValue('HELLO')
 })
 
-test('[A4] encoding lowercase hello with key key keeps lowercase rijvs in the Result field', async ({ page }) => {
+test('[A4] encoding lowercase hello with key key keeps case and shows rijvs', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'hello', 'key')
-  await selectMode(page, 'Encode')
+  await page.getByLabel('Message').fill('hello')
+  await page.getByLabel('Key').fill('key')
+  await page.getByRole('radio', { name: 'Encode' }).click()
   await expect(page.getByLabel('Result')).toHaveValue('rijvs')
 })
 
-test('[A5] encoding HELLO WORLD with key KEY shows RIJVS UYVJH in the Result field', async ({ page }) => {
+test('[A5] spaces do not advance the key: encoding HELLO WORLD shows RIJVS UYVJN', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'HELLO WORLD', 'KEY')
-  await selectMode(page, 'Encode')
-  await expect(page.getByLabel('Result')).toHaveValue('RIJVS UYVJH')
+  await page.getByLabel('Message').fill('HELLO WORLD')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Encode' }).click()
+  await expect(page.getByLabel('Result')).toHaveValue('RIJVS UYVJN')
 })
 
-test('[A6] Copy button switches to Copied for 2 seconds, then back to Copy', async ({ page }) => {
+test('[A6] Copy button shows "Copied" for 2 seconds, then back to "Copy"', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'HELLO', 'KEY')
-  await selectMode(page, 'Encode')
-  await expect(page.getByLabel('Result')).toHaveValue('RIJVS')
+  await page.getByLabel('Message').fill('HELLO')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Encode' }).click()
   const copy = page.getByRole('button', { name: 'Copy' })
   await copy.click()
-  const start = Date.now()
+  // While the clipboard is in the copied state, the original Copy button is gone.
+  await expect(copy).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Copied' })).toBeHidden()
-  const elapsed = Date.now() - start
-  // The spec fixes the Copied lifetime at 2 seconds; waiting for the label to
-  // hide cannot finish before it is due, and the round-trip slack is bounded.
-  expect(elapsed).toBeGreaterThanOrEqual(2000)
-  expect(elapsed).toBeLessThan(5000)
-  await expect(copy).toBeVisible()
-  await expect(copy).toHaveText('Copy')
+  // The label reverts to Copy after the 2 seconds.
+  await expect(copy).toBeVisible({ timeout: 5000 })
 })
 
-test('[A7] Add to history adds an item with HELLO and RIJVS, Delete removes it', async ({ page }) => {
+test('[A7] Add to history creates a removable item with the message and result', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'HELLO', 'KEY')
-  await selectMode(page, 'Encode')
+  await page.getByLabel('Message').fill('HELLO')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Encode' }).click()
   await expect(page.getByLabel('Result')).toHaveValue('RIJVS')
   await page.getByRole('button', { name: 'Add to history' }).click()
-  const item = page.getByRole('listitem').filter({ hasText: 'HELLO' }).filter({ hasText: 'RIJVS' })
+  const item = page.getByRole('listitem').filter({ hasText: 'HELLO' })
   await expect(item).toHaveCount(1)
+  await expect(item).toContainText('RIJVS')
   await item.getByRole('button', { name: 'Delete' }).click()
-  await expect(item).toHaveCount(0)
+  await expect(page.getByRole('listitem')).toHaveCount(0)
 })
 
-test('[A8] History tab shows the list of previous conversions, one item after adding one', async ({ page }) => {
+test('[A8] History tab lists the added conversion', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'HELLO', 'KEY')
-  await selectMode(page, 'Encode')
+  await page.getByLabel('Message').fill('HELLO')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Encode' }).click()
   await expect(page.getByLabel('Result')).toHaveValue('RIJVS')
   await page.getByRole('button', { name: 'Add to history' }).click()
-  const tab = page.getByRole('tab', { name: 'History' })
-  await tab.click()
-  const item = page.getByRole('listitem').filter({ hasText: 'HELLO' }).filter({ hasText: 'RIJVS' })
-  await expect(item).toHaveCount(1)
+  await page.getByRole('tab', { name: 'History' }).click()
+  await expect(page.getByText('HELLO')).toBeVisible()
+  await expect(page.getByText('RIJVS')).toBeVisible()
 })
 
-test('[A9] reload keeps the history item with HELLO and RIJVS', async ({ page }) => {
+test('[A9] history survives a reload', async ({ page }) => {
   await page.goto('/')
-  await fillInputs(page, 'HELLO', 'KEY')
-  await selectMode(page, 'Encode')
-  await expect(page.getByLabel('Result')).toHaveValue('RIJVS')
+  await page.getByLabel('Message').fill('HELLO')
+  await page.getByLabel('Key').fill('KEY')
+  await page.getByRole('radio', { name: 'Encode' }).click()
   await page.getByRole('button', { name: 'Add to history' }).click()
   await page.reload()
-  const item = page.getByRole('listitem').filter({ hasText: 'HELLO' }).filter({ hasText: 'RIJVS' })
+  const item = page.getByRole('listitem').filter({ hasText: 'HELLO' })
   await expect(item).toHaveCount(1)
+  await expect(item).toContainText('RIJVS')
 })

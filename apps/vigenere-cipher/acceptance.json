@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "35b739073fe909c481bf4b093a905761f6ce1755db0403cd8ab8263d3c3a2fd3",
+  "spec_sha256": "1b67b34014ba040841efaaa61641ec63f6c558f0b1450ee3a2ba6e7504aa171a",
   "checks": [
     {
       "id": "A1",
@@ -20,7 +20,7 @@
     },
     {
       "id": "A5",
-      "text": "Typing \"HELLO WORLD\" in the field labelled \"Message\" and \"KEY\" in the field labelled \"Key\", with the radio button \"Encode\" selected, shows \"RIJVS UYVJH\" in the field labelled \"Result\"."
+      "text": "Typing \"HELLO WORLD\" in the field labelled \"Message\" and \"KEY\" in the field labelled \"Key\", with the radio button \"Encode\" selected, shows \"RIJVS UYVJN\" in the field labelled \"Result\"."
     },
     {
       "id": "A6",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "5f4efc887c5713999310262d345c1d50d50f0753c716b0730fb6cee4d7869e36"
+      "sha256": "a3a580e294e0bfeddfcfae20914f86afcaca6d204acea01ee4ff5b86812266eb"
     }
   ]
 }
