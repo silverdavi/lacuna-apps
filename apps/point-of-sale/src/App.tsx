@@ -33,11 +33,11 @@ function calcLine(line: SaleLine) {
   const discountAmount = extended * (line.discount / 100)
   const net = extended - discountAmount
   const tax = net * (line.taxRate / 100)
-  const subtotal = net - line.discount - (line.taxRate / 100) * discountAmount
   return {
     tax,
-    subtotal,
-    total: subtotal + tax,
+    discountAmount,
+    subtotal: net,
+    total: net + tax,
   }
 }
 
@@ -234,7 +234,7 @@ export function App() {
                       item: line.item,
                       qty: `${line.quantity}`,
                       price: money(line.unitPrice),
-                      discount: moneyNeg(line.discount),
+                      discount: moneyNeg(c.discountAmount),
                       tax: money(c.tax),
                     },
                   }
@@ -277,7 +277,7 @@ export function App() {
                           item: line.item,
                           qty: `${line.quantity}`,
                           price: money(line.unitPrice),
-                          discount: moneyNeg(line.discount),
+                          discount: moneyNeg(c.discountAmount),
                           tax: money(c.tax),
                         },
                       }

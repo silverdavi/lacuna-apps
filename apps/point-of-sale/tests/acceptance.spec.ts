@@ -1,8 +1,10 @@
+// Acceptance tests for the point-of-sale app, derived from the spec's checks A1-A9.
+// Expected values are copied verbatim from the spec.
 import { expect, test, type Page } from '@playwright/test'
 
-async function addLineItem(page: Page) {
-  await page.getByRole('button', { name: 'New sale' }).click()
-  await page.getByLabel('Item').selectOption('Widget')
+// Fill the new-sale form with the spec's A2 values and add the line.
+async function addSpecLine(page: Page) {
+  await page.getByLabel('Item').selectOption({ label: 'Widget' })
   await page.getByLabel('Quantity').fill('2')
   await page.getByLabel('Unit price').fill('10.00')
   await page.getByLabel('Discount').fill('5')
@@ -10,129 +12,149 @@ async function addLineItem(page: Page) {
   await page.getByRole('button', { name: 'Add line' }).click()
 }
 
-async function addWidgetStock(page: Page, stock: string) {
-  await page.getByRole('tab', { name: 'Inventory' }).click()
-  await page.getByRole('button', { name: 'Add item' }).click()
-  await page.getByLabel('Name').fill('Widget')
-  await page.getByLabel('Stock').fill(stock)
-  await page.getByLabel('Price').fill('10.00')
-  await page.getByRole('button', { name: 'Save' }).click()
-}
-
-test('[A1] shows Point of Sale heading, Sales and Inventory tabs, Sales table', async ({ page }) => {
+test('[A1] heading, tabs, and the active Sales table', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Point of Sale' })).toBeVisible()
   await expect(page.getByRole('tab', { name: 'Sales' })).toBeVisible()
   await expect(page.getByRole('tab', { name: 'Inventory' })).toBeVisible()
-  const salesTab = page.getByRole('tab', { name: 'Sales' })
-  expect(await salesTab.getAttribute('aria-selected')).toBe('true')
-  for (const column of ['ID', 'Date', 'Items', 'Total', 'Actions']) {
-    await expect(page.getByRole('columnheader', { name: column })).toBeVisible()
-  }
+  const table = page.getByRole('table', { name: 'Sales' })
+  await expect(table).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'ID' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Date' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Items' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Total' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Actions' })).toBeVisible()
 })
 
-test('[A2] new sale form computes line row, subtotal, and total', async ({ page }) => {
+test('[A2] add a Widget line shows the computed row, subtotal and total', async ({ page }) => {
   await page.goto('/')
-  await addLineItem(page)
-  const row = page.locator('tr', { has: page.getByRole('cell', { name: 'Widget' }) })
-  await expect(row.getByRole('cell', { name: '2' })).toBeVisible()
-  await expect(row.getByRole('cell', { name: '$10.00' })).toBeVisible()
-  await expect(row.getByRole('cell', { name: '-$5.00' })).toBeVisible()
-  await expect(row.getByRole('cell', { name: '$1.90' })).toBeVisible()
-  await expect(page.getByText('$13.90')).toBeVisible()
-  await expect(page.getByText('$15.80')).toBeVisible()
+  await page.getByRole('button', { name: 'New sale' }).click()
+  await addSpecLine(page)
+  const line = page.getByRole('row').filter({ hasText: 'Widget' })
+  await expect(line.getByRole('cell', { name: 'Widget', exact: true })).toBeVisible()
+  await expect(line.getByRole('cell', { name: '2', exact: true })).toBeVisible()
+  await expect(line.getByRole('cell', { name: '$10.00', exact: true })).toBeVisible()
+  await expect(line.getByRole('cell', { name: '-$1.00', exact: true })).toBeVisible()
+  await expect(line.getByRole('cell', { name: '$1.90', exact: true })).toBeVisible()
+  await expect(page.getByText('Subtotal', { exact: true })).toBeVisible()
+  await expect(page.getByText('$19.00')).toBeVisible()
+  await expect(page.getByText('Total', { exact: true })).toBeVisible()
+  await expect(page.getByText('$20.90')).toBeVisible()
 })
 
-test('[A3] saving a sale adds an S-001 row with a View button', async ({ page }) => {
+test('[A3] saving the sale adds S-001 to the sales table', async ({ page }) => {
   await page.goto('/')
-  await addLineItem(page)
+  await page.getByRole('button', { name: 'New sale' }).click()
+  await addSpecLine(page)
   await page.getByRole('button', { name: 'Save sale' }).click()
-  const row = page.locator('tr', { has: page.getByRole('cell', { name: 'S-001' }) })
-  await expect(row.getByRole('cell', { name: '2024-01-15' })).toBeVisible()
-  await expect(row.getByRole('cell', { name: '1' })).toBeVisible()
-  await expect(row.getByRole('cell', { name: '$15.80' })).toBeVisible()
-  await expect(row.getByRole('button', { name: 'View' })).toBeVisible()
   await expect(page.getByText('No sales yet')).toHaveCount(0)
+  const row = page.getByRole('row').filter({ hasText: 'S-001' })
+  await expect(row.getByRole('cell', { name: 'S-001', exact: true })).toBeVisible()
+  await expect(row.getByRole('cell', { name: '2024-01-15', exact: true })).toBeVisible()
+  await expect(row.getByRole('cell', { name: '1', exact: true })).toBeVisible()
+  await expect(row.getByRole('cell', { name: '$20.90', exact: true })).toBeVisible()
+  await expect(row.getByRole('button', { name: 'View' })).toBeVisible()
 })
 
-test('[A4] add item form saves a Widget row with stock and price', async ({ page }) => {
+test('[A4] add a Widget inventory item', async ({ page }) => {
   await page.goto('/')
-  await addWidgetStock(page, '100')
-  await expect(page.getByRole('columnheader', { name: 'Name' })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Stock' })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Price' })).toBeVisible()
-  await expect(page.getByRole('columnheader', { name: 'Actions' })).toBeVisible()
-  const row = page.locator('tr', { has: page.getByRole('cell', { name: 'Widget' }) })
-  await expect(row.getByRole('cell', { name: '100' })).toBeVisible()
-  await expect(row.getByRole('cell', { name: '$10.00' })).toBeVisible()
-})
-
-test('[A5] editing an item prefills the form and saves a new stock value', async ({ page }) => {
-  await page.goto('/')
-  await addWidgetStock(page, '100')
-  const row = page.locator('tr', { has: page.getByRole('cell', { name: 'Widget' }) })
-  await row.getByRole('button', { name: 'Edit' }).click()
-  await expect(page.getByLabel('Name')).toHaveValue('Widget')
-  await expect(page.getByLabel('Stock')).toHaveValue('100')
-  await expect(page.getByLabel('Price')).toHaveValue('10.00')
-  await page.getByLabel('Stock').fill('85')
+  await page.getByRole('tab', { name: 'Inventory' }).click()
+  const table = page.getByRole('table', { name: 'Inventory' })
+  await expect(table.getByRole('columnheader', { name: 'Name' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Stock' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Price' })).toBeVisible()
+  await expect(table.getByRole('columnheader', { name: 'Actions' })).toBeVisible()
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByLabel('Name').fill('Widget')
+  await page.getByLabel('Stock').fill('100')
+  await page.getByLabel('Price').fill('10.00')
   await page.getByRole('button', { name: 'Save' }).click()
-  await expect(page.locator('tr', { has: page.getByRole('cell', { name: 'Widget' }) }))
-    .getByRole('cell', { name: '85' })
-    .toBeVisible()
+  const row = page.getByRole('row').filter({ hasText: 'Widget' })
+  await expect(row.getByRole('cell', { name: 'Widget', exact: true })).toBeVisible()
+  await expect(row.getByRole('cell', { name: '100', exact: true })).toBeVisible()
+  await expect(row.getByRole('cell', { name: '$10.00', exact: true })).toBeVisible()
 })
 
-test('[A6] viewing sale S-001 shows the line item detail panel', async ({ page }) => {
+test('[A5] edit Widget stock down to 85', async ({ page }) => {
   await page.goto('/')
-  await addLineItem(page)
-  await page.getByRole('button', { name: 'Save sale' }).click()
-  await page.locator('tr', { has: page.getByRole('cell', { name: 'S-001' }) })
-    .getByRole('button', { name: 'View' })
-    .click()
-  for (const text of ['Widget', '$10.00', '-$5.00', '$1.90', '$13.90', '$15.80']) {
-    await expect(page.getByText(text)).toBeVisible()
-  }
-})
-
-test('[A7] search filters inventory rows and clearing restores them', async ({ page }) => {
-  await page.goto('/')
-  await addWidgetStock(page, '100')
   await page.getByRole('tab', { name: 'Inventory' }).click()
   await page.getByRole('button', { name: 'Add item' }).click()
-  await page.getByLabel('Name').fill('Gadget')
-  await page.getByLabel('Stock').fill('5')
-  await page.getByLabel('Price').fill('3.00')
+  await page.getByLabel('Name').fill('Widget')
+  await page.getByLabel('Stock').fill('100')
+  await page.getByLabel('Price').fill('10.00')
   await page.getByRole('button', { name: 'Save' }).click()
-  await expect(page.getByRole('cell', { name: 'Widget' })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'Gadget' })).toBeVisible()
-  await page.getByLabel('Search').fill('Wid')
-  await expect(page.getByRole('cell', { name: 'Widget' })).toBeVisible()
-  await expect(page.getByRole('cell', { name: 'Gadget' })).toHaveCount(0)
-  await page.getByLabel('Search').fill('')
-  await expect(page.getByRole('cell', { name: 'Gadget' })).toBeVisible()
+  const row = page.getByRole('row').filter({ hasText: 'Widget' })
+  await row.getByRole('button', { name: 'Edit' }).click()
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Widget')
+  await expect(page.getByLabel('Stock', { exact: true })).toHaveValue('100')
+  await expect(page.getByLabel('Price', { exact: true })).toHaveValue('10.00')
+  await page.getByLabel('Stock', { exact: true }).fill('85')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(row.getByRole('cell', { name: '85', exact: true })).toBeVisible()
 })
 
-test('[A8] export csv downloads sales with header and S-001 row', async ({ page }) => {
+test('[A6] the View button shows the sale detail panel', async ({ page }) => {
   await page.goto('/')
-  await addLineItem(page)
+  await page.getByRole('button', { name: 'New sale' }).click()
+  await addSpecLine(page)
+  await page.getByRole('button', { name: 'Save sale' }).click()
+  await page.getByRole('row').filter({ hasText: 'S-001' }).getByRole('button', { name: 'View' }).click()
+  await expect(page.getByRole('cell', { name: 'Widget', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '$10.00', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '-$1.00', exact: true })).toBeVisible()
+  await expect(page.getByRole('cell', { name: '$1.90', exact: true })).toBeVisible()
+  await expect(page.getByText('$19.00')).toBeVisible()
+  await expect(page.getByText('$20.90')).toBeVisible()
+})
+
+test('[A7] the Search field filters the inventory table', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Inventory' }).click()
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByLabel('Name').fill('Widget')
+  await page.getByLabel('Stock').fill('100')
+  await page.getByLabel('Price').fill('10.00')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByLabel('Name').fill('Gadget')
+  await page.getByLabel('Stock').fill('40')
+  await page.getByLabel('Price').fill('20.00')
+  await page.getByRole('button', { name: 'Save' }).click()
+  const search = page.getByLabel('Search')
+  await expect(search).toBeVisible()
+  await search.fill('Wid')
+  await expect(page.getByRole('row').filter({ hasText: 'Widget' })).toBeVisible()
+  await expect(page.getByRole('row').filter({ hasText: 'Gadget' })).toHaveCount(0)
+  await search.fill('')
+  await expect(page.getByRole('row').filter({ hasText: 'Widget' })).toBeVisible()
+  await expect(page.getByRole('row').filter({ hasText: 'Gadget' })).toBeVisible()
+})
+
+test('[A8] Export CSV downloads the sales table', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'New sale' }).click()
+  await addSpecLine(page)
   await page.getByRole('button', { name: 'Save sale' }).click()
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Export CSV' }).click(),
   ])
-  const path = await download.path()
-  const fs = await import('node:fs')
-  const content = fs.readFileSync(path, 'utf8')
-  expect(content).toContain('ID,Date,Items,Total')
-  expect(content).toContain('S-001,2024-01-15,1,15.80')
+  const stream = await download.createReadStream()
+  const chunks: Buffer[] = []
+  for await (const chunk of stream) chunks.push(chunk as Buffer)
+  const csv = Buffer.concat(chunks).toString('utf8')
+  expect(csv).toContain('ID,Date,Items,Total')
+  expect(csv).toContain('S-001,2024-01-15,1,20.90')
 })
 
-test('[A9] reload keeps the saved sale', async ({ page }) => {
+test('[A9] a reload keeps the saved sale', async ({ page }) => {
   await page.goto('/')
-  await addLineItem(page)
+  await page.getByRole('button', { name: 'New sale' }).click()
+  await addSpecLine(page)
   await page.getByRole('button', { name: 'Save sale' }).click()
-  await expect(page.getByRole('cell', { name: 'S-001' })).toBeVisible()
   await page.reload()
-  const row = page.locator('tr', { has: page.getByRole('cell', { name: 'S-001' }) })
-  await expect(row.getByRole('cell', { name: '$15.80' })).toBeVisible()
+  const row = page.getByRole('row').filter({ hasText: 'S-001' })
+  await expect(row.getByRole('cell', { name: 'S-001', exact: true })).toBeVisible()
+  await expect(row.getByRole('cell', { name: '$20.90', exact: true })).toBeVisible()
 })
