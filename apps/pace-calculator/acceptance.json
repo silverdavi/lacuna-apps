@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c97f65c6a34c022f1eac067f4b712a2b0a1718b3c0e40eae4b456b74f1dde738",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Running Pace Calculator\" and the three input fields with visible labels \"Distance (km)\", \"Time (min)\" and \"Pace (min/km)\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the select labelled \"Solve for\" set to \"Pace\", typing \"5\" in the field labelled \"Distance (km)\" and \"30\" in the field labelled \"Time (min)\" shows \"6.00\" in the result summary line labelled \"Pace\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the select labelled \"Solve for\" set to \"Time\", typing \"5\" in the field labelled \"Distance (km)\" and \"6\" in the field labelled \"Pace (min/km)\" shows \"30.00\" in the result summary line labelled \"Time\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the select labelled \"Solve for\" set to \"Distance\", typing \"30\" in the field labelled \"Time (min)\" and \"6\" in the field labelled \"Pace (min/km)\" shows \"5.00\" in the result summary line labelled \"Distance\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the select labelled \"Solve for\" set to \"Pace\", typing \"0\" in the field labelled \"Distance (km)\" and \"30\" in the field labelled \"Time (min)\" shows the message \"Distance must be greater than 0\" and the result summary is empty."
+    },
+    {
+      "id": "A6",
+      "text": "After a valid calculation (Distance 5, Time 30, Solve for Pace), the breakdown table contains a row with the text \"5 km\" and \"30 min\" and the chart tab labelled \"Chart\" shows a line with the data point at x=5, y=6."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Copy result\" shows the toast text \"Result copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the select labelled \"Solve for\" set to \"Pace\", typing \"10\" in the field labelled \"Distance (km)\" and \"30\" in the field labelled \"Time (min)\" shows \"3.00\" in the result summary line labelled \"Pace\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last calculation: after entering Distance 5, Time 30, Solve for Pace, reloading the page still shows \"6.00\" in the result summary line labelled \"Pace\" and the breakdown table row with \"5 km\" and \"30 min\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "18ee1adaa340a2a8a4e0fe92d61ae01e73bc032f18d27a59dcbb547eaf357b11"
+    }
+  ]
+}

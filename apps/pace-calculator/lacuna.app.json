@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.pace-calculator",
+  "name": "Running Pace Calculator",
+  "version": "0.1.0",
+  "summary": "Solve for pace, time, or distance from any two of the three running metrics.",
+  "description": "Enter distance, time, and pace in minutes per kilometer. Pick which value to solve for and the calculator fills it in. A breakdown table and a pace-vs-distance chart show the relationship. The last calculation persists across reloads. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["pace", "running", "calculator"],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/pace-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:pace-calculator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "pace-calculator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the last pace calculation"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "pace-calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
