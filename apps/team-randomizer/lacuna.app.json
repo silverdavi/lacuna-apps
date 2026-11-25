@@ -1,0 +1,93 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.team-randomizer",
+  "name": "Random Team Generator",
+  "version": "0.1.0",
+  "summary": "Add names and split them into random teams of near-equal size.",
+  "description": "Add a list of names, choose how many teams you need, and split them into balanced teams. The assignment is stable for the same names and team count, so generating again keeps the same split. The result can be copied as one line per team, and the current split is kept on this device.",
+  "category": "productivity",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/team-randomizer"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:team",
+    "create:team",
+    "edit:team"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "team",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the name list and the last generated split"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "team"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "tags": [
+    "random",
+    "teams",
+    "utility"
+  ]
+}

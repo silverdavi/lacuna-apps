@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8f59d77adffda0828c99b9fa32f719a70b6d03f65ac45a6c4d3d2a60bc484e21",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Random Team Generator\" and, with no names added, the text \"No names yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice\" in the field labelled \"Name\" and pressing Enter adds a tag \"Alice\" to the tag list; the text \"No names yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Alice\", \"Bob\", and \"Carol\", clicking the button \"Generate teams\" with the field labelled \"Number of teams\" set to \"2\" shows two team sections: \"Team 1\" and \"Team 2\", and every one of the three names appears in exactly one of those sections."
+    },
+    {
+      "id": "A4",
+      "text": "With \"Alice\", \"Bob\", \"Carol\", and \"Dave\" added and the field labelled \"Number of teams\" set to \"2\", clicking \"Generate teams\" shows \"Team 1\" containing exactly two names and \"Team 2\" containing exactly two names."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Alice\", \"Bob\", \"Carol\", and \"Dave\" added, setting the field labelled \"Number of teams\" to \"3\" and clicking \"Generate teams\" shows three team sections \"Team 1\", \"Team 2\", and \"Team 3\", with the four names distributed so that no team has more than one more member than another (sizes 2, 1, 1 in some order)."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Alice\", \"Bob\", \"Carol\", and \"Dave\" added and the field labelled \"Number of teams\" set to \"2\", clicking \"Generate teams\" twice in a row produces the same team assignments both times (the names under \"Team 1\" and \"Team 2\" are identical after the first and second click)."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy result\" after generating teams shows the toast text \"Copied to clipboard\" and the clipboard contains a line for each team, e.g. \"Team 1: Alice, Bob\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the \"x\" button on the tag \"Alice\" removes that tag; the tag list no longer contains \"Alice\" and the next \"Generate teams\" click distributes only the remaining names."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the generated teams: after adding \"Alice\", \"Bob\", \"Carol\", \"Dave\", setting \"Number of teams\" to \"2\", clicking \"Generate teams\", and reloading the page, the page still shows \"Team 1\" and \"Team 2\" with the same names under each as before the reload."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d33dc5569429ae3591e4dcba38807a5c16d17c321e961cf4185af48b8e49aa11"
+    }
+  ]
+}
