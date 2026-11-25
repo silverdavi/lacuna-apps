@@ -36,9 +36,9 @@ export const host = {
     return host.write(state)
   },
 
-  addSpin(winner: string): WheelState {
+  addSpin(winner: string, at?: number): WheelState {
     const state = loadState()
-    state.spins.push({ id: makeId(), winner, at: Date.now() })
+    state.spins.push({ id: makeId(), winner, at: at ?? Date.now() })
     return host.write(state)
   },
 

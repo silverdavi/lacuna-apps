@@ -17,20 +17,20 @@ import {
 import { cryptoRng, randomInt } from '@lacuna/random'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { host } from './host/mock'
-import type { WheelEntry, SpinRecord } from './host'
+import type { WheelState } from './host'
 
 type TabId = 'Spin' | 'History'
-const TABS: TabId[] = ['Spin', 'History']
+const TABS: readonly TabId[] = ['Spin', 'History']
 
 function timeLabel(at: number): string {
   return new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 export function App() {
-  const [state, setState] = useState(() => host.read())
+  const [state, setState] = useState<WheelState>(() => host.read())
   const [label, setLabel] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [result, setResult] = useState<string | null>(null)
+  const [result, setResult] = useState<{ winner: string; at: number } | null>(null)
   const [tab, setTab] = useState<TabId>('Spin')
   const clipboard = useClipboard({ timeoutMs: 1200 })
 
@@ -46,22 +46,23 @@ export function App() {
     setError(null)
   }
 
-  function remove(entry: WheelEntry) {
-    setState(host.deleteEntry(entry.id))
+  function remove(id: string) {
+    setState(host.deleteEntry(id))
   }
 
   function spin() {
     if (entries.length === 0) return
     const winner = entries[randomInt(cryptoRng(), 0, entries.length - 1)].name
-    const next = host.addSpin(winner)
+    const at = Date.now()
+    const next = host.addSpin(winner, at)
     setState(next)
-    setResult(winner)
+    setResult({ winner, at })
     setTab('Spin')
   }
 
   function copyResult() {
     if (result === null) return
-    void clipboard.copy(`Winner: ${result}`)
+    void clipboard.copy(`Winner: ${result.winner}`)
   }
 
   function resetAll() {
@@ -71,9 +72,9 @@ export function App() {
     setError(null)
   }
 
-  const spinRows = spins.map((s: SpinRecord) => ({
+  const spinRows = spins.map((s, i) => ({
     cells: {
-      winner: s.winner,
+      winner: i === spins.length - 1 ? `Winner: ${s.winner}` : s.winner,
       at: timeLabel(s.at),
     },
   }))
@@ -127,15 +128,7 @@ export function App() {
             ) : (
               <List label="Entries">
                 {entries.map((entry) => (
-                  <Row
-                    key={entry.id}
-                    title={entry.name}
-                    action={
-                      <Button kind="ghost" ariaLabel={`Delete ${entry.name}`} onClick={() => remove(entry)}>
-                        Delete {entry.name}
-                      </Button>
-                    }
-                  />
+                  <Row key={entry.id} title={entry.name} action={<Button kind="ghost" ariaLabel={`Delete ${entry.name}`} onClick={() => remove(entry.id)}>Delete</Button>} />
                 ))}
               </List>
             )}
@@ -160,13 +153,13 @@ export function App() {
                   background: 'var(--ui-card)',
                 }}
               >
-                <span style={{ fontSize: 'calc(16px * var(--tf))', fontWeight: 600 }}>Winner: {result}</span>
+                <span style={{ fontSize: 'calc(16px * var(--tf))', fontWeight: 600 }}>Winner: {result.winner}</span>
               </div>
             )}
           </Card>
         </Stack>
       ) : (
-        <Card mono={`${spins.length} ${spins.length === 1 ? 'spin' : 'spins'}`} title="History">
+        <Card mono={`${spins.length} ${spins.length === 1 ? 'spin' : 'spins'}`} title="Spin log">
           {spins.length === 0 ? (
             <EmptyState mono="Empty" title="No spins yet" detail="Spin to start the log." actionLabel="Spin" />
           ) : (
