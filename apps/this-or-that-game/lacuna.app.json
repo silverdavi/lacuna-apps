@@ -37,11 +37,14 @@
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "0.1.0",
       "@lacuna/quiz-engine": "0.1.0",
-      "@lacuna/host-mock": "0.1.0"
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/export-menu": "0.1.0"
     }
   },
   "capabilities": [
-    "create:quiz-session"
+    "create:quiz-session",
+    "view:quiz-results",
+    "export:results"
   ],
   "permissions": {
     "records": [

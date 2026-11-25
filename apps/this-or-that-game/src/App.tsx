@@ -1,200 +1,309 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import {
   Actions,
   AppShell,
+  Body,
   Button,
   Card,
-  EmptyState,
   Kpi,
   KpiRow,
-  MonoLabel,
   Rail,
   Stack,
   Table,
 } from '@lacuna/ui'
+import { ExportMenu } from '@lacuna/export-menu'
 import { loadGame, saveGame } from './host'
+import type { GameState } from './host/mock'
 
-type Question = { type: 'choice'; id: string; prompt: string; options: string[]; correctIndex: number }
-
-const BANK: Question[] = [
-  { type: 'choice', id: 'q1', prompt: 'Coffee or Tea?', options: ['Coffee', 'Tea'], correctIndex: 0 },
-  { type: 'choice', id: 'q2', prompt: 'Cats or Dogs?', options: ['Cats', 'Dogs'], correctIndex: 0 },
-  { type: 'choice', id: 'q3', prompt: 'Beach or Mountains?', options: ['Beach', 'Mountains'], correctIndex: 0 },
-  { type: 'choice', id: 'q4', prompt: 'Books or Movies?', options: ['Books', 'Movies'], correctIndex: 0 },
-  { type: 'choice', id: 'q5', prompt: 'Summer or Winter?', options: ['Summer', 'Winter'], correctIndex: 0 },
+const QUESTIONS: [string, string, string][] = [
+  ['Coffee or Tea?', 'Coffee', 'Tea'],
+  ['Cats or Dogs?', 'Cats', 'Dogs'],
+  ['Beach or Mountains?', 'Beach', 'Mountains'],
+  ['Books or Movies?', 'Books', 'Movies'],
+  ['Summer or Winter?', 'Summer', 'Winter'],
 ]
 
-const TOTAL = BANK.length
+function buildExport(state: GameState): string {
+  return [
+    'This Or That',
+    '',
+    `Score: ${state.score}`,
+    `Best score: ${state.best}`,
+    '',
+    ...state.answers.map((a, i) => `${i + 1}. ${a.prompt} → ${a.picked} (${a.points} pt)`),
+  ].join('\n')
+}
 
-type Game = { answers: { questionId: string; prompt: string; picked: string; points: number }[]; score: number; best: number }
+type Tab = 'Play' | 'Results'
 
 export function App() {
-  const [game, setGame] = useState<Game>(() => loadGame())
-  const [tab, setTab] = useState<'Play' | 'Results'>('Play')
-  const [started, setStarted] = useState(() => loadGame().answers.length > 0)
-  const [done, setDone] = useState(false)
-  const [picked, setPicked] = useState<string | null>(null)
+  const [game, setGame] = useState<GameState>(() => loadGame())
+  const [tab, setTab] = useState<Tab>('Play')
+  const [started, setStarted] = useState(false)
+  const [currentQ, setCurrentQ] = useState(0)
+  const [lastPick, setLastPick] = useState<string | null>(null)
 
-  const answers = game.answers
-  const score = game.score
-  const best = game.best
-  const finished = started && answers.length >= TOTAL && done
-  const playing = started && !finished
-  const index = playing ? (answers.length < TOTAL ? Math.min(answers.length, TOTAL) : 0) : 0
-  const question = playing ? BANK[index] : null
+  useLayoutEffect(() => {
+    saveGame(game)
+  }, [game])
 
-  function persist(next: Game) {
-    setGame(next)
-    saveGame(next)
-  }
-
-  function startGame() {
-    persist({ answers: [], score: 0, best })
+  const start = () => {
+    setGame((g) => ({ answers: [], score: 0, best: g.best }))
+    setCurrentQ(0)
+    setLastPick(null)
     setStarted(true)
-    setDone(false)
-    setPicked(null)
-    setTab('Play')
   }
 
-  function restart() {
-    persist({ answers, score: 0, best })
-    setDone(false)
-    setPicked(null)
-    setTab('Play')
-    window.setTimeout(() => {
-      persist({ answers: [], score: 0, best })
-    }, 0)
+  const pick = (index: number, side: 'left' | 'right') => {
+    const [, left, right] = QUESTIONS[index]
+    const picked = side === 'left' ? left : right
+    setGame((g) => {
+      const answers = [
+        ...g.answers,
+        { questionId: `q${index}`, prompt: QUESTIONS[index][0], picked, points: 1 },
+      ]
+      return { answers, score: answers.length, best: Math.max(g.best, answers.length) }
+    })
+    setLastPick(picked)
   }
 
-  function pick(option: string) {
-    if (!playing || !question || picked !== null) return
-    const nextAnswers = [
-      ...answers,
-      { questionId: question.id, prompt: question.prompt, picked: option, points: 1 },
-    ]
-    const nextScore = score + 1
-    const nextBest = nextAnswers.length === TOTAL ? Math.max(best, nextScore) : best
-    persist({ answers: nextAnswers, score: nextScore, best: nextBest })
-    setPicked(option)
+  const next = () => {
+    if (currentQ + 1 >= QUESTIONS.length) {
+      setLastPick(null)
+    } else {
+      setCurrentQ(currentQ + 1)
+      setLastPick(null)
+    }
   }
 
-  function next() {
-    setPicked(null)
-    if (answers.length >= TOTAL) setDone(true)
+  const restart = () => {
+    setGame((g) => ({ answers: [], score: 0, best: g.best }))
+    setCurrentQ(0)
+    setLastPick(null)
+    setStarted(true)
   }
 
-  const rows = answers.map((a) => ({
-    cells: { prompt: a.prompt, picked: a.picked, points: String(a.points) },
+  const answered = game.answers.length
+  const total = QUESTIONS.length
+  const finished = answered >= total
+
+  const resultsRows = game.answers.map((a) => ({
+    cells: {
+      question: a.prompt,
+      pick: a.picked,
+      points: String(a.points),
+    },
   }))
 
-  const playPanel = () => {
-    if (playing && picked === null && question) {
-      return (
-        <div role="region" aria-label="Question">
-          <MonoLabel>Question {index + 1} of {TOTAL}</MonoLabel>
-          <div className="ot-prompt">{question.prompt}</div>
-          <Stack>
-            {question.options.map((option: string) => (
-              <Button key={option} kind="secondary" style={{ width: '100%' }} onClick={() => pick(option)}>
-                {option}
-              </Button>
-            ))}
-          </Stack>
-        </div>
-      )
-    }
-    if (playing && picked !== null) {
-      const last = answers.length >= TOTAL
-      return (
-        <EmptyState title={`You picked ${picked}`} detail={`${score} of ${TOTAL} so far`}>
-          <Actions>
-            <Button kind="primary" onClick={next}>Next question</Button>
-          </Actions>
-        </EmptyState>
-      )
-    }
-    if (finished) {
-      return (
-        <EmptyState title="Round complete" detail="You finished all five questions.">
-          <Actions>
-            <Button kind="primary" onClick={restart}>Restart</Button>
-          </Actions>
-        </EmptyState>
-      )
-    }
-    return (
-      <EmptyState title="No answers yet" detail="Five quick questions, one pick each. Every pick scores a point.">
-        <Actions>
-          <Button kind="primary" onClick={startGame}>Start game</Button>
-        </Actions>
-      </EmptyState>
-    )
-  }
+  const exportOptions = [
+    {
+      id: 'txt',
+      label: 'Text summary',
+      mimeType: 'text/plain',
+      extension: 'txt',
+      getData: () => buildExport(game),
+    },
+  ]
 
   return (
     <AppShell
       name="This Or That"
       icon="tasks"
-      hue="cobalt"
-      category="Personal"
-      meta={`Score ${score} / ${TOTAL}`}
+      hue="gold"
+      category="Games"
+      meta={finished ? 'Completed' : `${answered}/${total}`}
       status="Saved on this device"
       side={
         <Rail
           title="This Or That"
-          note={`${answers.length} of ${TOTAL} answered`}
-          chips={['Five questions', 'One pick each', '1 point a pick', 'Best score kept']}
+          note="Five questions · local"
+          chips={['Score', 'Best', 'Export', 'Offline']}
         >
-          <KpiRow>
-            <Kpi label="Score" value={score} />
-            <Kpi label="Best" value={best} accent={best >= TOTAL} />
-          </KpiRow>
-          <MonoLabel style={{ color: 'var(--ink)' }}>{`Best score: ${best}`}</MonoLabel>
+          <Body sm>
+            Pick a side on each question. One point per answer. Your best score stays on this
+            device.
+          </Body>
         </Rail>
       }
     >
-      <div role="tablist" className="lc-tabs" aria-label="This Or That views">
-        {(['Play', 'Results'] as const).map((item) => (
-          <button
-            key={item}
-            type="button"
-            role="tab"
-            aria-selected={tab === item}
-            className={`lc-tab${tab === item ? ' active' : ''}`}
-            style={{ color: 'var(--ink-60)' }}
-            onClick={() => setTab(item)}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
-      {tab === 'Play' && started && <MonoLabel style={{ color: 'var(--ink)' }}>{`Score: ${score}`}</MonoLabel>}
-      {tab === 'Play' ? (
-        <Card
-          mono={finished ? 'Round done' : playing ? `Question ${Math.min(index + 1, TOTAL)} of ${TOTAL}` : 'Five quick picks'}
-          title={finished ? 'Round complete' : question ? question.prompt : 'Pick a side'}
-          accent={finished}
-        >
-          {playPanel()}
-        </Card>
-      ) : (
-        <Card mono={`${answers.length} answered`} title="Results" accent={answers.length > 0}>
-          {answers.length === 0 ? (
-            <EmptyState title="No answers yet" detail="Finish a round and your picks will be listed here." />
-          ) : (
-            <Table
-              label="Your answers"
-              columns={[
-                { key: 'prompt', label: 'Question' },
-                { key: 'picked', label: 'Picked' },
-                { key: 'points', label: 'Points', num: true },
-              ]}
-              rows={rows}
-              foot={{ prompt: `Score: ${score} / ${TOTAL}`, picked: '', points: String(score) }}
-            />
-          )}
-        </Card>
-      )}
+      <Stack lg>
+        <div role="tablist" className="lc-tabs">
+          {(['Play', 'Results'] as Tab[]).map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={tab === t}
+              className={'lc-tab' + (tab === t ? ' active' : '')}
+              style={tab !== t ? { color: 'var(--ink-60)' } : undefined}
+              onClick={() => setTab(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'Play' ? (
+          <Stack lg>
+            <KpiRow>
+              <Kpi value={game.score} label="Score" accent />
+              <Kpi value={game.best} label="Best" />
+              <Kpi value={`${answered}/${total}`} label="Answered" />
+            </KpiRow>
+            <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))', color: 'var(--ink)' }}>
+              <span>Score: {game.score}</span>
+              <span>Best score: {game.best}</span>
+            </div>
+
+            {!started ? (
+              <Card mono="Ready" title="This Or That">
+                <Stack>
+                  <Body>No answers yet</Body>
+                  <Body sm>Answer five quick two-choice questions to build your profile.</Body>
+                  <Stack style={{ marginTop: 'calc(10px * var(--sf))' }}>
+                    <Button kind="primary" onClick={start}>
+                      Start game
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Card>
+            ) : lastPick ? (
+              <div role="region" aria-label="Question">
+                <Card
+                  mono={`Question ${currentQ + 1} of ${total}`}
+                  title={QUESTIONS[currentQ][0]}
+                >
+                  <Stack>
+                    <Body>You picked {lastPick}</Body>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 'calc(12px * var(--sf))',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Button kind="primary" onClick={next}>
+                        Next question
+                      </Button>
+                      <Button kind="ghost" onClick={restart}>
+                        Restart
+                      </Button>
+                    </div>
+                  </Stack>
+                </Card>
+              </div>
+            ) : finished ? (
+              <Card mono="Done" title="All five answered">
+                <Stack>
+                  <Body>
+                    Score: {game.score} · Best score: {game.best}
+                  </Body>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 'calc(12px * var(--sf))',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <Button kind="primary" onClick={restart}>
+                      Restart
+                    </Button>
+                    <Button kind="secondary" onClick={() => setTab('Results')}>
+                      View results
+                    </Button>
+                  </div>
+                </Stack>
+              </Card>
+            ) : (
+              <div role="region" aria-label="Question">
+                <Card
+                  mono={`Question ${currentQ + 1} of ${total}`}
+                  title={QUESTIONS[currentQ][0]}
+                >
+                  <Stack>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 'calc(12px * var(--sf))',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <Button kind="secondary" onClick={() => pick(currentQ, 'left')}>
+                        {QUESTIONS[currentQ][1]}
+                      </Button>
+                      <Button kind="secondary" onClick={() => pick(currentQ, 'right')}>
+                        {QUESTIONS[currentQ][2]}
+                      </Button>
+                    </div>
+                    <Actions>
+                      <Button kind="ghost" onClick={restart}>
+                        Restart
+                      </Button>
+                    </Actions>
+                  </Stack>
+                </Card>
+              </div>
+            )}
+          </Stack>
+        ) : (
+          <Stack lg>
+            <KpiRow>
+              <Kpi value={game.score} label="Score" accent />
+              <Kpi value={game.best} label="Best" />
+              <Kpi value={`${answered}/${total}`} label="Answered" />
+            </KpiRow>
+            <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))', color: 'var(--ink)' }}>
+              <span>Score: {game.score}</span>
+              <span>Best score: {game.best}</span>
+            </div>
+
+            <Card
+              mono={`${answered} ${answered === 1 ? 'pick' : 'picks'}`}
+              title="Your picks"
+              actions={
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'calc(8px * var(--sf))',
+                    fontFamily: 'var(--mono)',
+                    fontSize: 'calc(11px * var(--tf))',
+                    color: 'var(--ink-60)',
+                  }}
+                >
+                  <span>EXPORT</span>
+                  <ExportMenu
+                    options={exportOptions}
+                    fileName="this-or-that"
+                    ariaLabel="Export results"
+                    disabled={answered === 0}
+                  />
+                </div>
+              }
+            >
+              {answered === 0 ? (
+                <Body>No answers yet</Body>
+              ) : (
+                <Table
+                  label="Your picks"
+                  columns={[
+                    { key: 'question', label: 'Question' },
+                    { key: 'pick', label: 'Picked' },
+                    { key: 'points', label: 'Points', num: true },
+                  ]}
+                  rows={resultsRows}
+                  foot={{
+                    question: '',
+                    pick: `Score: ${game.score}`,
+                    points: '',
+                  }}
+                />
+              )}
+            </Card>
+          </Stack>
+        )}
+      </Stack>
     </AppShell>
   )
 }

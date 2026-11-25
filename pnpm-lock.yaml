@@ -1427,6 +1427,9 @@ importers:
 
   apps/this-or-that-game:
     dependencies:
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
