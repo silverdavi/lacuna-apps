@@ -1762,6 +1762,52 @@
       }
     },
     {
+      "id": "@lacuna/editor-shell-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A document editing shell composing a toolbar, undo/redo, keyboard shortcuts, local persistence, autosave status, and export.",
+      "today": [
+        "toolbox/modules/editor-shell-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/export-menu",
+        "@lacuna/use-local-record",
+        "@lacuna/use-undo-stack"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "EditorShellKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/editor-shell-kit/0.1.0",
+      "bridge": {
+        "component": "EditorShellKit",
+        "kind": "kit",
+        "exports": [
+          "EditorShellKit"
+        ],
+        "types": [
+          "EditorShellKitProps"
+        ],
+        "signature": "EditorShellKit(props: EditorShellKitProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "b294bc982dbaf54e7d2d6ec83acf556e63cb91a8",
+            "source": "2ec527c75da842e3",
+            "lines": 304,
+            "dependencies": {
+              "@lacuna/export-menu": "0.1.0",
+              "@lacuna/use-local-record": "0.1.0",
+              "@lacuna/use-undo-stack": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/export-menu",
       "layer": 2,
       "status": "exists",

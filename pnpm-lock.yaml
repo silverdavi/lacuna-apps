@@ -6070,6 +6070,25 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/editor-shell-kit/0.1.0:
+    dependencies:
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../export-menu/0.1.0
+      '@lacuna/use-local-record':
+        specifier: workspace:0.1.0
+        version: link:../../use-local-record/0.1.0
+      '@lacuna/use-undo-stack':
+        specifier: workspace:0.1.0
+        version: link:../../use-undo-stack/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/export-menu/0.1.0:
     dependencies:
       '@lacuna/file-save-open':
