@@ -1025,6 +1025,48 @@
       }
     },
     {
+      "id": "@lacuna/date-picker",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Keyboard-navigable calendar grid for single-date and date-range selection.",
+      "today": [
+        "toolbox/modules/date-picker/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "DatePicker"
+      ],
+      "public": true,
+      "path": "toolbox/modules/date-picker/0.1.0",
+      "bridge": {
+        "component": "DatePicker",
+        "kind": "widget",
+        "exports": [
+          "DatePicker"
+        ],
+        "types": [
+          "DatePickerProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "5a26b102ad7ef82f",
+            "lines": 333,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/dialog",
       "layer": 2,
       "status": "exists",
@@ -1634,6 +1676,61 @@
       }
     },
     {
+      "id": "@lacuna/tracker-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.2.0",
+      "summary": "Value + date entry form, streak counter, heatmap, trend chart, and entry list for daily tracking apps.",
+      "today": [
+        "toolbox/modules/tracker-kit/0.2.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/chart",
+        "@lacuna/date-math",
+        "@lacuna/date-picker",
+        "@lacuna/heatmap",
+        "@lacuna/ui",
+        "@lacuna/use-collection",
+        "@lacuna/use-streak"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "TrackerKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/tracker-kit/0.2.0",
+      "bridge": {
+        "component": "TrackerKit",
+        "kind": "kit",
+        "exports": [
+          "TrackerKit"
+        ],
+        "types": [
+          "TrackerEntry",
+          "TrackerKitProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.2.0": {
+            "commit": "ecef1e347bbaf912046a57284a88d81fc05d54d7",
+            "source": "ad5d921c0191be05",
+            "lines": 316,
+            "dependencies": {
+              "@lacuna/chart": "0.1.0",
+              "@lacuna/date-math": "0.1.0",
+              "@lacuna/date-picker": "0.1.0",
+              "@lacuna/heatmap": "0.1.0",
+              "@lacuna/ui": "*",
+              "@lacuna/use-collection": "0.1.0",
+              "@lacuna/use-streak": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/use-clipboard",
       "layer": 3,
       "status": "exists",
@@ -1835,6 +1932,51 @@
             "source": "e1b260088ca68f80",
             "lines": 131,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-streak",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "React hook that manages daily check-ins with persisted state, computing current and longest streaks via streakCalc.",
+      "today": [
+        "toolbox/modules/use-streak/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/streak-calc",
+        "@lacuna/use-collection"
+      ],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useStreak"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-streak/0.1.0",
+      "bridge": {
+        "component": "useStreak",
+        "kind": "hook",
+        "exports": [
+          "useStreak"
+        ],
+        "types": [
+          "UseStreakOptions",
+          "UseStreakReturn"
+        ],
+        "signature": "useStreak(options: UseStreakOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "c8686688bd0ac65b",
+            "lines": 80,
+            "dependencies": {
+              "@lacuna/streak-calc": "0.1.0",
+              "@lacuna/use-collection": "0.1.0"
+            }
           }
         }
       }
