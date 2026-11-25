@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import type { CSSProperties, FormEvent } from 'react';
 import {
   AppShell,
   Card,
@@ -12,8 +11,9 @@ import {
 import { useCollection } from '@lacuna/use-collection';
 import { saveText } from '@lacuna/file-save-open';
 import { toCsv } from '@lacuna/csv-parse';
+import { fuzzySearch } from '@lacuna/fuzzy-search';
 
-type RsvpStatus = 'pending' | 'accepted' | 'declined';
+type RsvpStatus = 'Pending' | 'Accepted' | 'Declined';
 
 interface GuestData {
   name: string;
@@ -21,110 +21,38 @@ interface GuestData {
   rsvp: RsvpStatus;
 }
 
-interface GuestRow {
-  id: string;
-  name: string;
-  email: string;
-  rsvp: RsvpStatus;
-}
+const RsvpOptions: RsvpStatus[] = ['Pending', 'Accepted', 'Declined'];
 
-type SortField = 'name' | 'rsvp';
-type SortDirection = 'asc' | 'desc';
-
-interface SortState {
-  field: SortField;
-  direction: SortDirection;
-}
-
-const RsvpLabels: Record<RsvpStatus, string> = {
-  pending: 'Pending',
-  accepted: 'Accepted',
-  declined: 'Declined',
-};
-
-const RsvpOptions: { value: RsvpStatus; label: string }[] = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'declined', label: 'Declined' },
-];
-
-const inputStyle: CSSProperties = {
+const inputStyle: React.CSSProperties = {
   boxSizing: 'border-box',
   width: '100%',
-  fontFamily: 'var(--sans)',
-  fontSize: 'calc(14px * var(--tf))',
-  color: 'var(--ink)',
+  padding: 'calc(8px * var(--sf))',
+  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
+  borderRadius: 'calc(4px * var(--sf))',
   background: 'var(--paper)',
-  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-  borderRadius: 'calc(4px * var(--sf))',
-  padding: 'calc(8px * var(--sf))',
+  color: 'var(--ink)',
+  fontFamily: 'var(--sans)',
+  fontSize: 'calc(14px * var(--tf))',
 };
 
-const labelStyle: CSSProperties = {
+const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--sans)',
   fontSize: 'calc(14px * var(--tf))',
   fontWeight: 600,
   color: 'var(--ink)',
 };
 
-const rowStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'calc(8px * var(--sf))',
-};
-
-const primaryBtnStyle: CSSProperties = {
-  fontFamily: 'var(--sans)',
-  fontSize: 'calc(14px * var(--tf))',
-  color: 'var(--paper)',
-  background: 'var(--ink)',
-  border: 'none',
-  borderRadius: 'calc(4px * var(--sf))',
+const cellStyle: React.CSSProperties = {
   padding: 'calc(8px * var(--sf))',
-  cursor: 'pointer',
 };
 
-const cancelBtnStyle: CSSProperties = {
-  ...primaryBtnStyle,
-  color: 'var(--ink)',
-  background: 'var(--paper-deep)',
-  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-};
-
-const tableStyle: CSSProperties = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  fontFamily: 'var(--sans)',
-  fontSize: 'calc(14px * var(--tf))',
-};
-
-const thStyle: CSSProperties = {
+const headerCellStyle: React.CSSProperties = {
   textAlign: 'left',
   padding: 'calc(8px * var(--sf))',
-  borderBottom: 'calc(1px * var(--sf)) solid var(--hair-strong)',
+  fontFamily: 'var(--sans)',
+  fontSize: 'calc(13px * var(--tf))',
   fontWeight: 600,
   color: 'var(--ink)',
-  cursor: 'pointer',
-  userSelect: 'none',
-};
-
-const thPlainStyle: CSSProperties = {
-  textAlign: 'left',
-  padding: 'calc(8px * var(--sf))',
-  borderBottom: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-  fontWeight: 600,
-  color: 'var(--ink)',
-};
-
-const tdStyle: CSSProperties = {
-  padding: 'calc(8px * var(--sf))',
-  borderBottom: 'calc(1px * var(--sf)) solid var(--hair)',
-  color: 'var(--ink)',
-};
-
-const sortIndicatorStyle: CSSProperties = {
-  marginLeft: 'calc(4px * var(--sf))',
-  fontSize: 'calc(10px * var(--tf))',
 };
 
 export function App() {
@@ -133,15 +61,14 @@ export function App() {
   });
 
   const [query, setQuery] = useState('');
-  const [editing, setEditing] = useState<string | null>(null);
-  const [sort, setSort] = useState<SortState | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [sortKeys, setSortKeys] = useState<string[]>([]);
   const [toast, setToast] = useState<string | null>(null);
-
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
-  const [formRsvp, setFormRsvp] = useState<RsvpStatus>('pending');
+  const [formRsvp, setFormRsvp] = useState<RsvpStatus>('Pending');
 
-  const guests: GuestRow[] = useMemo(
+  const guests = useMemo(
     () =>
       state.activeItems.map((item) => ({
         id: item.id,
@@ -152,31 +79,27 @@ export function App() {
     [state.activeItems],
   );
 
-  const acceptedCount = guests.filter((g) => g.rsvp === 'accepted').length;
-  const pendingCount = guests.filter((g) => g.rsvp === 'pending').length;
-  const declinedCount = guests.filter((g) => g.rsvp === 'declined').length;
+  const acceptedCount = guests.filter((g) => g.rsvp === 'Accepted').length;
+  const pendingCount = guests.filter((g) => g.rsvp === 'Pending').length;
+  const declinedCount = guests.filter((g) => g.rsvp === 'Declined').length;
 
   const filtered = useMemo(() => {
     if (query.trim() === '') return guests;
-    const q = query.trim().toLowerCase();
-    return guests.filter(
-      (g) =>
-        g.name.toLowerCase().includes(q) ||
-        g.email.toLowerCase().includes(q),
-    );
+    const matches = fuzzySearch(guests, query, { fields: ['name', 'email'] });
+    return matches
+      .map((m) => guests[m.index])
+      .filter((g): g is typeof guests[number] => g !== undefined);
   }, [guests, query]);
 
   const sorted = useMemo(() => {
-    if (!sort) return filtered;
-    const dir = sort.direction === 'asc' ? 1 : -1;
-    return [...filtered].sort((a, b) => {
-      const av = sort.field === 'name' ? a.name : a.rsvp;
-      const bv = sort.field === 'name' ? b.name : b.rsvp;
-      if (av < bv) return -1 * dir;
-      if (av > bv) return 1 * dir;
-      return 0;
+    if (sortKeys[0] !== 'name') return filtered;
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      const cmp = a.name.localeCompare(b.name);
+      return sortKeys[1] === 'desc' ? -cmp : cmp;
     });
-  }, [filtered, sort]);
+    return arr;
+  }, [filtered, sortKeys]);
 
   function showToast(message: string) {
     setToast(message);
@@ -186,77 +109,50 @@ export function App() {
   function resetForm() {
     setFormName('');
     setFormEmail('');
-    setFormRsvp('pending');
+    setFormRsvp('Pending');
+    setEditingId(null);
   }
 
-  function handleAdd(e: FormEvent) {
+  function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
     const name = formName.trim();
     if (!name) return;
     const email = formEmail.trim();
-    actions.add({ name, email, rsvp: formRsvp });
+    if (editingId !== null) {
+      actions.update(editingId, { name, email, rsvp: formRsvp });
+    } else {
+      actions.add({ name, email, rsvp: formRsvp });
+    }
     resetForm();
   }
 
   function startEdit(id: string) {
-    const guest = guests.find((g) => g.id === id);
-    if (!guest) return;
-    setEditing(id);
-    setFormName(guest.name);
-    setFormEmail(guest.email);
-    setFormRsvp(guest.rsvp);
-  }
-
-  function handleEdit(e: FormEvent) {
-    e.preventDefault();
-    if (!editing) return;
-    const name = formName.trim();
-    if (!name) return;
-    const email = formEmail.trim();
-    actions.update(editing, { name, email, rsvp: formRsvp });
-    setEditing(null);
-    resetForm();
+    const g = guests.find((x) => x.id === id);
+    if (!g) return;
+    setFormName(g.name);
+    setFormEmail(g.email);
+    setFormRsvp(g.rsvp);
+    setEditingId(id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function handleDelete(id: string) {
     actions.remove(id);
-    if (editing === id) {
-      setEditing(null);
+    if (editingId === id) {
       resetForm();
     }
   }
 
-  function handleCancelEdit() {
-    setEditing(null);
-    resetForm();
-  }
-
   function handleExportCsv() {
     const rows: string[][] = [['Name', 'Email', 'RSVP']];
-    for (const g of sorted) {
-      rows.push([g.name, g.email, RsvpLabels[g.rsvp]]);
+    for (const g of filtered) {
+      rows.push([g.name, g.email, g.rsvp]);
     }
     saveText(toCsv(rows), { filename: 'guest-list.csv', mimeType: 'text/csv' });
     showToast('CSV exported');
   }
 
-  function toggleSort(field: SortField) {
-    if (sort?.field === field) {
-      setSort({
-        field,
-        direction: sort.direction === 'asc' ? 'desc' : 'asc',
-      });
-    } else {
-      setSort({ field, direction: 'asc' });
-    }
-  }
-
-  function sortIndicator(field: SortField) {
-    if (sort?.field !== field) return '';
-    return sort.direction === 'asc' ? ' ▲' : ' ▼';
-  }
-
-  const isEditing = editing !== null;
+  const isEditing = editingId !== null;
 
   return (
     <AppShell
@@ -265,11 +161,7 @@ export function App() {
       hue="rust"
       category="Personal"
       meta={`${guests.length} ${guests.length === 1 ? 'guest' : 'guests'}`}
-      actions={
-        <Button kind="secondary" ariaLabel="Export CSV" onClick={handleExportCsv}>
-          Export CSV
-        </Button>
-      }
+      status={`${guests.length} guests · ${acceptedCount} accepted · ${pendingCount} pending · ${declinedCount} declined`}
       side={
         <Rail title="RSVP Summary">
           <SectionLabel>By status</SectionLabel>
@@ -295,7 +187,7 @@ export function App() {
             >
               <span>Pending</span>
               <span style={{ fontFamily: 'var(--mono)' }}>
-                Pending: {pendingCount}
+                {pendingCount}
               </span>
             </div>
             <div
@@ -307,7 +199,7 @@ export function App() {
             >
               <span>Declined</span>
               <span style={{ fontFamily: 'var(--mono)' }}>
-                Declined: {declinedCount}
+                {declinedCount}
               </span>
             </div>
           </Stack>
@@ -320,15 +212,20 @@ export function App() {
           title={isEditing ? 'Edit guest' : 'Add a guest'}
         >
           <form
-            noValidate
-            onSubmit={isEditing ? handleEdit : handleAdd}
+            onSubmit={handleFormSubmit}
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 'calc(16px * var(--sf))',
+              gap: 'calc(12px * var(--sf))',
             }}
           >
-            <div style={rowStyle}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'calc(6px * var(--sf))',
+              }}
+            >
               <label htmlFor="guest-name" style={labelStyle}>
                 Name
               </label>
@@ -341,7 +238,13 @@ export function App() {
                 style={inputStyle}
               />
             </div>
-            <div style={rowStyle}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'calc(6px * var(--sf))',
+              }}
+            >
               <label htmlFor="guest-email" style={labelStyle}>
                 Email
               </label>
@@ -353,7 +256,13 @@ export function App() {
                 style={inputStyle}
               />
             </div>
-            <div style={rowStyle}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'calc(6px * var(--sf))',
+              }}
+            >
               <label htmlFor="guest-rsvp" style={labelStyle}>
                 RSVP
               </label>
@@ -364,41 +273,62 @@ export function App() {
                 style={inputStyle}
               >
                 {RsvpOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                  <option key={opt} value={opt}>
+                    {opt}
                   </option>
                 ))}
               </select>
             </div>
-            <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
-              <button type="submit" style={primaryBtnStyle}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 'calc(8px * var(--sf))',
+              }}
+            >
+              <Button kind="primary" type="submit">
                 {isEditing ? 'Save' : 'Add guest'}
-              </button>
+              </Button>
               {isEditing && (
-                <button
-                  type="button"
-                  style={cancelBtnStyle}
-                  onClick={handleCancelEdit}
-                >
+                <Button kind="ghost" onClick={resetForm}>
                   Cancel
-                </button>
+                </Button>
               )}
             </div>
           </form>
         </Card>
 
         <Card
-          mono={`${sorted.length} of ${guests.length}`}
+          mono={`${filtered.length} of ${guests.length}`}
           title="Guests"
           actions={
-            <input
-              type="text"
-              aria-label="Search"
-              placeholder="Search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              style={inputStyle}
-            />
+            <div
+              style={{
+                display: 'flex',
+                gap: 'calc(8px * var(--sf))',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+              }}
+            >
+              <input
+                type="text"
+                aria-label="Search"
+                placeholder="Search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                style={{
+                  ...inputStyle,
+                  width: 'auto',
+                  minWidth: 'calc(120px * var(--sf))',
+                }}
+              />
+              <Button
+                kind="secondary"
+                ariaLabel="Export CSV"
+                onClick={handleExportCsv}
+              >
+                Export CSV
+              </Button>
+            </div>
           }
         >
           {guests.length === 0 ? (
@@ -407,9 +337,8 @@ export function App() {
               title="No guests yet"
               detail="Add your first guest to get started."
               actionLabel="Add your first guest"
-              onAction={() => document.getElementById('guest-name')?.focus()}
             />
-          ) : sorted.length === 0 ? (
+          ) : filtered.length === 0 ? (
             <EmptyState
               mono="No match"
               title="No guests match"
@@ -418,54 +347,108 @@ export function App() {
               onAction={() => setQuery('')}
             />
           ) : (
-            <table style={tableStyle} aria-label="Guest list">
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontFamily: 'var(--sans)',
+                fontSize: 'calc(14px * var(--tf))',
+                color: 'var(--ink)',
+              }}
+            >
               <thead>
-                <tr>
+                <tr
+                  style={{
+                    borderBottom:
+                      'calc(1px * var(--sf)) solid var(--hair-strong)',
+                  }}
+                >
                   <th
-                    scope="col"
-                    style={thStyle}
-                    onClick={() => toggleSort('name')}
+                    aria-sort={
+                      sortKeys[0] === 'name'
+                        ? sortKeys.length === 1
+                          ? 'ascending'
+                          : 'descending'
+                        : 'none'
+                    }
+                    onClick={() => {
+                      if (sortKeys[0] === 'name') {
+                        setSortKeys(
+                          sortKeys.length === 1 ? [] : ['name', 'desc'],
+                        );
+                      } else {
+                        setSortKeys(['name']);
+                      }
+                    }}
+                    style={{
+                      ...headerCellStyle,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
                   >
-                    Name{sortIndicator('name')}
+                    Name
                   </th>
-                  <th scope="col" style={thPlainStyle}>
-                    Email
-                  </th>
-                  <th
-                    scope="col"
-                    style={thStyle}
-                    onClick={() => toggleSort('rsvp')}
-                  >
-                    RSVP{sortIndicator('rsvp')}
-                  </th>
-                  <th scope="col" style={thPlainStyle}>
-                    Actions
-                  </th>
+                  <th style={headerCellStyle}>Email</th>
+                  <th style={headerCellStyle}>RSVP</th>
+                  <th style={cellStyle} />
                 </tr>
               </thead>
               <tbody>
                 {sorted.map((g) => (
-                  <tr key={g.id}>
-                    <td style={tdStyle}>{g.name}</td>
-                    <td style={tdStyle}>{g.email}</td>
-                    <td style={tdStyle}>{RsvpLabels[g.rsvp]}</td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
-                        <Button
-                          kind="ghost"
-                          ariaLabel={`Edit ${g.name}`}
-                          onClick={() => startEdit(g.id)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          kind="ghost"
-                          ariaLabel={`Delete ${g.name}`}
-                          onClick={() => handleDelete(g.id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                  <tr
+                    key={g.id}
+                    style={{
+                      borderBottom:
+                        'calc(1px * var(--sf)) solid var(--hair)',
+                    }}
+                  >
+                    <td style={{ ...cellStyle, fontWeight: 500 }}>
+                      {g.name}
+                    </td>
+                    <td style={cellStyle}>{g.email}</td>
+                    <td style={cellStyle}>{g.rsvp}</td>
+                    <td
+                      style={{
+                        ...cellStyle,
+                        textAlign: 'right',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Edit ${g.name}`}
+                        onClick={() => startEdit(g.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--sans)',
+                          fontSize: 'calc(13px * var(--tf))',
+                          color: 'var(--ink)',
+                          textDecoration: 'underline',
+                          padding: 0,
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Delete ${g.name}`}
+                        onClick={() => handleDelete(g.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--sans)',
+                          fontSize: 'calc(13px * var(--tf))',
+                          color: 'var(--ink)',
+                          textDecoration: 'underline',
+                          padding: 0,
+                          marginLeft: 'calc(8px * var(--sf))',
+                        }}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
