@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "6875f1cdcb14c14214bac262b7ce15bff1058734082e173f7e4488c5a59ce047",
+  "spec_sha256": "54bb88eb89d4c561f2debe5ee16eaa5be5c4878d237394a4f9fb150d7fe5e876",
   "checks": [
     {
       "id": "A1",
@@ -8,37 +8,37 @@
     },
     {
       "id": "A2",
-      "text": "With the default 2x2 matrices A = [[1,2],[3,4]] and B = [[5,6],[7,8]] and the operation select set to \"Add\", the result table shows the values 6, 8, 10, 12 in the cells at row 1 col 1, row 1 col 2, row 2 col 1, and row 2 col 2 respectively."
+      "text": "With the default 2x2 matrices A = [[1,2],[3,4]] and B = [[5,6],[7,8]] and the operation select set to \"Add\", the result table shows 6, 8, 10, 12 in the cells at (row 1, col 1), (1, 2), (2, 1), (2, 2)."
     },
     {
       "id": "A3",
-      "text": "Changing the operation select to \"Multiply\" with the same default matrices updates the result table to show 19, 22, 43, 50 in the cells at row 1 col 1, row 1 col 2, row 2 col 1, and row 2 col 2 respectively."
+      "text": "Changing the operation select to \"Multiply\" with the same default matrices shows 19, 22, 43, 50 in the result cells (1,1), (1,2), (2,1), (2,2). (1*5+2*7 = 19, 1*6+2*8 = 22, 3*5+4*7 = 43, 3*6+4*8 = 50.)"
     },
     {
       "id": "A4",
-      "text": "Clicking the button \"Copy result\" copies the text \"6 8 10 12\" to the clipboard when the operation is \"Add\" and the default matrices are in use."
+      "text": "With the operation \"Add\" and default matrices, clicking the button \"Copy result\" puts exactly the text \"6 8 10 12\" on the clipboard."
     },
     {
       "id": "A5",
-      "text": "Changing the dimension select from \"2x2\" to \"3x3\" adds a third row and column to both matrix input grids, and the result table displays a 3x3 grid of zeros."
+      "text": "Selecting \"3x3\" in the select labelled \"Both sizes\" (it starts at \"2x2\") shows three rows and three columns of inputs in both matrices (inputs \"A11\"..\"A33\" and \"B11\"..\"B33\") and resets every matrix cell to 0, so the result table (operation \"Add\") is a 3x3 grid in which every cell is 0."
     },
     {
       "id": "A6",
-      "text": "With the operation set to \"Add\" and matrices A = [[1,2],[3,4]] and B = [[5,6],[7,8]], clicking the button \"Undo\" reverts the last edit to a matrix cell, restoring the previous value in that cell."
+      "text": "With operation \"Add\" and the default matrices, changing cell \"A11\" from 1 to 9 changes result cell (1,1) from 6 to 14; clicking the button \"Undo\" restores \"A11\" to 1 and result cell (1,1) to 6."
     },
     {
       "id": "A7",
-      "text": "Reload keeps the matrices and operation: after setting the operation to \"Multiply\" and editing cell A11 to \"10\", reloading the page shows the operation select set to \"Multiply\" and cell A11 containing \"10\"."
+      "text": "After selecting \"Multiply\" and changing \"A11\" to 10, reloading the page shows the operation select set to \"Multiply\" and the input \"A11\" with the value 10."
     },
     {
       "id": "A8",
-      "text": "With the operation set to \"Multiply\" and matrices of incompatible dimensions (e.g., A is 2x2 and B is 2x3 after manual dimension change), the result area shows the message \"Dimensions do not match for multiplication\"."
+      "text": "With operation \"Multiply\", leaving A at 2x2 and selecting \"3x3\" in the select labelled \"Size B\" (A stays 2x2) makes the result area show the message \"Dimensions do not match for multiplication\" (columns of A = 2, rows of B = 3)."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "beb5988351561510e6c5e15b37a4b13ea5345195691d6056a698b9acce18ec5e"
+      "sha256": "2797e4d12b3a0bfc6f761170cbc99c720286670895150c18d8e9a7f16e07d2a7"
     }
   ]
 }

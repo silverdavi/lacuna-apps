@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Matrix calculator: two matrices up to 5x5, Add or Multiply, an undoable cell editor,
 // and a result table. The session persists on this device via the host adapter.
-import { useEffect, useMemo, useRef } from 'react'
-import type { ReactNode } from 'react'
-import { AppShell, Board, Button, Card, ErrorState, Kpi, KpiRow, Rail, Select, Stack } from '@lacuna/ui'
+import { useEffect, useMemo } from 'react'
+import { AppShell, Board, Button, Card, ErrorState, FormGrid, Kpi, KpiRow, Rail, Select, Stack, TextInput } from '@lacuna/ui'
 import { useUndoStack } from '@lacuna/use-undo-stack'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { ExportMenu } from '@lacuna/export-menu'
@@ -17,22 +16,14 @@ const OPERATION_OPTIONS: { value: Operation; label: string }[] = [
   { value: 'multiply', label: 'Multiply' },
 ]
 
-const DIMENSION_OPTIONS: { value: string; label: string }[] = []
-for (let r = 2; r <= 5; r += 1) {
-  for (let c = 2; c <= 5; c += 1) {
-    DIMENSION_OPTIONS.push({ value: `${r}x${c}`, label: `${r}x${c}` })
-  }
+const SIZE_OPTIONS: { value: string; label: string }[] = []
+for (let n = 2; n <= 5; n += 1) {
+  SIZE_OPTIONS.push({ value: `${n}x${n}`, label: `${n}x${n}` })
 }
 
 function parseSize(value: string): { rows: number; cols: number } {
   const [rows, cols] = value.split('x').map(Number)
   return { rows, cols }
-}
-
-function cellNames(rows: number, cols: number): string[] {
-  const names: string[] = []
-  for (let i = 0; i < rows * cols; i += 1) names.push(cellName(rows, cols, i))
-  return names
 }
 
 export function App() {
@@ -50,14 +41,14 @@ export function App() {
 
   const clipboard = useClipboard()
 
-  function setCell(target: 'a' | 'b', name: string, value: string): void {
+  function setCell(target: 'a' | 'b', name: string, raw: string): void {
     set((prev) => {
-      const rows = target === 'a' ? prev.a.rows : prev.b.rows
-      const cols = target === 'a' ? prev.a.cols : prev.b.cols
-      const index = cellIndex(rows, cols, name)
+      const letter = target === 'a' ? 'A' : 'B'
       const source = target === 'a' ? prev.a : prev.b
+      const index = cellIndex(letter, source.rows, source.cols, name)
+      if (index < 0) return prev
       const values = source.values.slice()
-      if (index >= 0 && index < values.length) values[index] = value
+      values[index] = raw
       const next = { ...prev }
       if (target === 'a') next.a = { ...prev.a, values }
       else next.b = { ...prev.b, values }
@@ -65,18 +56,19 @@ export function App() {
     })
   }
 
-  function setDimension(target: 'a' | 'b', value: string): void {
+  function setBothSizes(value: string): void {
     const { rows, cols } = parseSize(value)
     set((prev) => {
-      const out = { ...prev }
-      if (target === 'a') {
-        out.a = resize(prev.a, rows, cols)
-        out.b = resize(prev.b, rows, cols)
-      } else {
-        out.b = resize(prev.b, rows, cols)
-      }
-      return out
+      const next = { ...prev }
+      next.a = resize(prev.a, rows, cols)
+      next.b = resize(prev.b, rows, cols)
+      return next
     })
+  }
+
+  function setSizeB(value: string): void {
+    const { rows, cols } = parseSize(value)
+    set((prev) => ({ ...prev, b: resize(prev.b, rows, cols) }))
   }
 
   function setOperation(value: string): void {
@@ -109,54 +101,45 @@ export function App() {
     },
   ]
 
-  const dimsOk =
-    record.operation === 'add'
-      ? a.rows === b.rows && a.cols === b.cols
-      : a.rows === b.cols && b.rows === a.cols
-
-  function gridPanel(target: 'a' | 'b'): ReactNode {
+  function gridPanel(target: 'a' | 'b'): React.ReactNode {
     const g = target === 'a' ? a : b
-    const names = cellNames(g.rows, g.cols)
-    const showDimSelect = target === 'a' || record.operation === 'multiply'
+    const letter = target === 'a' ? 'A' : 'B'
+    const cells: React.ReactNode[] = []
+    for (let r = 0; r < g.rows; r += 1) {
+      for (let c = 0; c < g.cols; c += 1) {
+        const name = cellName(letter, r * g.cols + c, g.cols)
+        const value = g.values[r * g.cols + c] ?? '0'
+        cells.push(
+          <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <TextInput
+              label={name}
+              value={value}
+              inputMode="decimal"
+              onChange={(raw) => setCell(target, name, raw)}
+            />
+          </div>,
+        )
+      }
+    }
     return (
       <Card mono={`Matrix ${target.toUpperCase()}`} title={`Matrix ${target.toUpperCase()}`}>
-        {showDimSelect ? (
-          <label className="lc-field">
-            <span className="lc-field-label">{target === 'a' ? 'Dimensions' : 'B dimensions'}</span>
-            <select
-              className="lc-input"
-              aria-label={target === 'a' ? 'Dimensions' : 'B dimensions'}
-              value={`${g.rows}x${g.cols}`}
-              onChange={(event) => setDimension(target, event.target.value)}
-            >
-              {DIMENSION_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-        <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
-              <Board cols={g.cols} rows={g.rows} cell={56} label={`Matrix ${target.toUpperCase()} cells`}>
-                {names.map((name, i) => {
-                  const value = g.values[i] ?? '0'
-                  return (
-                    <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <input
-                        className="lc-input"
-                        style={{ width: 'calc(40px * var(--sf))', textAlign: 'center' }}
-                        aria-label={target === 'a' ? name : `Matrix B cell ${i + 1}`}
-                        inputMode="decimal"
-                        value={value}
-                        onChange={(event) => setCell(target, name, event.target.value)}
-                      />
-                    </div>
-                  )
-                })}
-              </Board>
-        </div>
+        <Board cols={g.cols} rows={g.rows} cell={64} label={`Matrix ${target.toUpperCase()} cells`}>
+          {cells}
+        </Board>
       </Card>
     )
   }
+
+  const resultBody =
+    result.kind === 'ok'
+      ? Array.from({ length: a.rows }, (_, r) => (
+          <tr key={r}>
+            {Array.from({ length: a.cols }, (_, c) => (
+              <td key={c} className="num">{result.values[r * a.cols + c]}</td>
+            ))}
+          </tr>
+        ))
+      : []
 
   return (
     <AppShell
@@ -189,18 +172,18 @@ export function App() {
     >
       <Stack>
         <Card mono="Setup" title="Matrices">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(12px * var(--sf))' }}>
-            <div>
-              <Select label="Operation" value={record.operation} onChange={setOperation} options={OPERATION_OPTIONS} />
-            </div>
-          </div>
+          <FormGrid>
+            <Select label="Operation" value={record.operation} onChange={setOperation} options={OPERATION_OPTIONS} />
+            <Select label="Both sizes" value={`${a.rows}x${a.cols}`} onChange={setBothSizes} options={SIZE_OPTIONS} />
+            <Select label="Size B" value={`${b.rows}x${b.cols}`} onChange={setSizeB} options={SIZE_OPTIONS} />
+          </FormGrid>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(12px * var(--sf))', marginTop: 'calc(12px * var(--sf))' }}>
             {gridPanel('a')}
             {gridPanel('b')}
           </div>
         </Card>
 
-        <Card mono={dimsOk ? 'Result' : 'Blocked'} title="Result">
+        <Card mono={result.kind === 'ok' ? 'Result' : 'Blocked'} title="Result">
           {result.kind === 'error' ? (
             <ErrorState mono="Blocked" title={result.message} detail="Resize the matrices so the dimensions match, then the result will appear here." />
           ) : (
@@ -212,13 +195,9 @@ export function App() {
                 <Kpi value={`${b.rows}x${b.cols}`} label="B" />
               </KpiRow>
               <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
-                <Board cols={a.cols} rows={a.rows} cell={52} label="Result grid">
-                  {result.values.map((v, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="lc-kpi-value">{v}</span>
-                    </div>
-                  ))}
-                </Board>
+                <table className="lc-table" aria-label="Result">
+                  <tbody>{resultBody}</tbody>
+                </table>
               </div>
             </>
           )}

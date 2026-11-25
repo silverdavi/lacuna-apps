@@ -1,78 +1,89 @@
 // Acceptance tests for the matrix-calculator app.
-// Derived from the spec's acceptance checks A1-A8; expected values copied verbatim.
-// The spec does not name the table's cells or the clipboard text format; cell
-// contents are asserted wherever they appear and the copied text is read back
-// from the clipboard after a real click on "Copy result".
+// Derived from the spec's acceptance checks A1–A8; expected values copied verbatim.
 import { expect, test, type Page } from '@playwright/test'
 
-async function selectDimension(page: Page, label: string) {
-  await page.getByLabel('Dimensions').selectOption({ label })
-}
+const resultCell = (page: Page, r: number, c: number) =>
+  page
+    .getByRole('table', { name: 'Result' })
+    .getByRole('row')
+    .nth(r - 1)
+    .getByRole('cell')
+    .nth(c - 1)
 
-async function selectOperation(page: Page, label: string) {
-  await page.getByLabel('Operation').selectOption({ label })
-}
-
-test('[A1] heading is "Matrix Calculator"', async ({ page }) => {
+test('[A1] page heading is Matrix Calculator', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Matrix Calculator' })).toBeVisible()
 })
 
-test('[A2] default 2x2 matrices with Add give 6, 8, 10, 12', async ({ page }) => {
+test('[A2] default matrices with Add show 6, 8, 10, 12 in the result table', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('6', { exact: true })).toBeVisible()
-  await expect(page.getByText('8', { exact: true })).toBeVisible()
-  await expect(page.getByText('10', { exact: true })).toBeVisible()
-  await expect(page.getByText('12', { exact: true })).toBeVisible()
+  await expect(page.getByRole('select', { name: 'Operation' })).toHaveValue('Add')
+  await expect(page.getByRole('select', { name: 'Both sizes' })).toHaveValue('2x2')
+  await expect(resultCell(page, 1, 1)).toHaveText('6')
+  await expect(resultCell(page, 1, 2)).toHaveText('8')
+  await expect(resultCell(page, 2, 1)).toHaveText('10')
+  await expect(resultCell(page, 2, 2)).toHaveText('12')
 })
 
-test('[A3] Multiply with default matrices gives 19, 22, 43, 50', async ({ page }) => {
+test('[A3] default matrices with Multiply show 19, 22, 43, 50 in the result table', async ({ page }) => {
   await page.goto('/')
-  await selectOperation(page, 'Multiply')
-  await expect(page.getByText('19', { exact: true })).toBeVisible()
-  await expect(page.getByText('22', { exact: true })).toBeVisible()
-  await expect(page.getByText('43', { exact: true })).toBeVisible()
-  await expect(page.getByText('50', { exact: true })).toBeVisible()
+  await page.getByRole('select', { name: 'Operation' }).selectOption({ label: 'Multiply' })
+  await expect(resultCell(page, 1, 1)).toHaveText('19')
+  await expect(resultCell(page, 1, 2)).toHaveText('22')
+  await expect(resultCell(page, 2, 1)).toHaveText('43')
+  await expect(resultCell(page, 2, 2)).toHaveText('50')
 })
 
-test('[A4] Copy result copies "6 8 10 12" to the clipboard', async ({ page }) => {
+test('[A4] Copy result puts exactly "6 8 10 12" on the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
   await page.getByRole('button', { name: 'Copy result' }).click()
   const text = await page.evaluate(() => navigator.clipboard.readText())
   expect(text).toBe('6 8 10 12')
 })
 
-test('[A5] switching to 3x3 adds a row and column and shows a 3x3 of zeros', async ({ page }) => {
+test('[A5] 3x3 in "Both sizes" gives three rows and columns of zero inputs and an all-zero 3x3 result', async ({ page }) => {
   await page.goto('/')
-  await selectDimension(page, '3x3')
-  const zeros = page.getByText('0', { exact: true })
-  await expect(zeros).toHaveCount(9)
+  await page.getByRole('select', { name: 'Both sizes' }).selectOption({ label: '3x3' })
+  for (const m of ['A', 'B']) {
+    for (let r = 1; r <= 3; r++) {
+      for (let c = 1; c <= 3; c++) {
+        await expect(page.getByLabel(`${m}${r}${c}`, { exact: true })).toHaveValue('0')
+      }
+    }
+  }
+  await expect(page.getByRole('table', { name: 'Result' }).getByRole('row')).toHaveCount(3)
+  for (let r = 1; r <= 3; r++) {
+    const row = page.getByRole('table', { name: 'Result' }).getByRole('row').nth(r - 1)
+    await expect(row.getByRole('cell')).toHaveCount(3)
+    for (let c = 1; c <= 3; c++) {
+      await expect(row.getByRole('cell').nth(c - 1)).toHaveText('0')
+    }
+  }
 })
 
-test('[A6] Undo reverts the last matrix cell edit', async ({ page }) => {
+test('[A6] changing A11 from 1 to 9 moves result (1,1) to 14; Undo restores both', async ({ page }) => {
   await page.goto('/')
-  const cell = page.getByLabel('A11')
-  await expect(cell).toHaveValue('1')
-  await cell.fill('5')
-  await expect(cell).toHaveValue('5')
+  await page.getByLabel('A11', { exact: true }).fill('9')
+  await expect(resultCell(page, 1, 1)).toHaveText('14')
   await page.getByRole('button', { name: 'Undo' }).click()
-  await expect(cell).toHaveValue('1')
+  await expect(page.getByLabel('A11', { exact: true })).toHaveValue('1')
+  await expect(resultCell(page, 1, 1)).toHaveText('6')
 })
 
-test('[A7] reload restores the edited cell and the operation', async ({ page }) => {
+test('[A7] reload keeps the Multiply operation and the edited A11 value', async ({ page }) => {
   await page.goto('/')
-  await selectOperation(page, 'Multiply')
-  await page.getByLabel('A11').fill('10')
+  await page.getByRole('select', { name: 'Operation' }).selectOption({ label: 'Multiply' })
+  await page.getByLabel('A11', { exact: true }).fill('10')
   await page.reload()
-  await expect(page.getByLabel('Operation')).toHaveValue('multiply')
-  await expect(page.getByLabel('A11')).toHaveValue('10')
+  await expect(page.getByRole('select', { name: 'Operation' })).toHaveValue('Multiply')
+  await expect(page.getByLabel('A11', { exact: true })).toHaveValue('10')
 })
 
-test('[A8] incompatible dimensions show the multiplication message', async ({ page }) => {
-  // [A8] The spec does not spell out how to make A 2x2 and B 2x3; the test assumes
-  // the app exposes a per-matrix dimension control that accepts "2x3" for B.
+test('[A8] A 2x2 with B 3x3 under Multiply shows the dimension mismatch message', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Operation').selectOption({ label: 'Multiply' })
-  await page.getByLabel('B dimensions').selectOption({ label: '2x3' })
+  await page.getByRole('select', { name: 'Operation' }).selectOption({ label: 'Multiply' })
+  await page.getByRole('select', { name: 'Size B' }).selectOption({ label: '3x3' })
   await expect(page.getByText('Dimensions do not match for multiplication')).toBeVisible()
+  await expect(page.getByRole('table', { name: 'Result' })).toHaveCount(0)
 })

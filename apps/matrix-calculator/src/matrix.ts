@@ -7,18 +7,19 @@ import type { MatrixRecord, Operation } from './host'
 export const DEFAULT_A: MatrixRecord = { rows: 2, cols: 2, values: ['1', '2', '3', '4'] }
 export const DEFAULT_B: MatrixRecord = { rows: 2, cols: 2, values: ['5', '6', '7', '8'] }
 
-export function cellName(rows: number, cols: number, index: number): string {
+// A cell's accessible name is `<matrixLetter><rowNumber><colNumber>`, e.g. A11, A22, B13.
+// The letter identifies which matrix (A or B) the cell belongs to, so a cell's name is
+// unique across both matrices and can be addressed directly by label.
+export function cellName(letter: 'A' | 'B', index: number, cols: number): string {
   const row = Math.floor(index / cols)
   const col = index % cols
-  return `${String.fromCharCode(65 + row)}${row + 1}${col + 1}`
+  return `${letter}${row + 1}${col + 1}`
 }
 
-export function cellIndex(rows: number, cols: number, name: string): number {
-  const row = name.charCodeAt(0) - 65
+export function cellIndex(letter: 'A' | 'B', rows: number, cols: number, name: string): number {
+  if (!name.startsWith(letter)) return -1
   const digits = name.slice(1)
-  // The name is `<rowLetter><rowNumber><colNumber>` where rowNumber and colNumber are
-  // each at least one digit. Find the unique split of `digits` into rowNumber and
-  // colNumber that are both within the matrix's dimensions.
+  // Split `digits` into rowNumber and colNumber, each at least one digit, both in range.
   for (let i = 1; i < digits.length; i += 1) {
     const rowNumber = Number(digits.slice(0, i)) - 1
     const colNumber = Number(digits.slice(i)) - 1
