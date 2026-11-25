@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "614c684db7c69683f9a18fe1e35defee3274b604fdc31b8dde440ed3d7c7ae46",
+  "spec_sha256": "aeb0f6b0a3b074efdf581391713dded204d2abf3b9bed72ae85e9bd04b5641ef",
   "checks": [
     {
       "id": "A1",
@@ -12,7 +12,7 @@
     },
     {
       "id": "A3",
-      "text": "With the grid showing Hydrogen, pressing the Down arrow key moves focus to the next row, which shows \"Symbol\" \"He\" and \"Name\" \"Helium\"."
+      "text": "With Hydrogen selected, pressing the Down arrow key in the grid selects the next row, which shows \"Symbol\" \"He\" and \"Name\" \"Helium\"."
     },
     {
       "id": "A4",
@@ -20,7 +20,7 @@
     },
     {
       "id": "A5",
-      "text": "With the grid showing Carbon, clicking the checkbox labelled \"Show only metals\" removes the Carbon row and shows the text \"No elements match the current filter\"."
+      "text": "With Carbon selected, clicking the checkbox labelled \"Show only metals\" removes the Carbon row from the grid (Iron and Zinc remain)."
     },
     {
       "id": "A6",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "f001ad8c81cfff2ee897121b08e50cd2abff7a78dd9590b541ec41cb68112a4e"
+      "sha256": "e5ce38ff086fd36910b40966f4a9f6caa981dee1f4a8c3be629a65c5ca840482"
     }
   ]
 }

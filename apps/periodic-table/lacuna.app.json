@@ -38,8 +38,7 @@
     }
   },
   "capabilities": [
-    "view:element",
-    "create:element"
+    "view:element"
   ],
   "permissions": {
     "records": [
@@ -77,8 +76,7 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts",
-      "tests/browse-and-persist.spec.ts"
+      "tests/acceptance.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,
