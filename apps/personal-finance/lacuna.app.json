@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.personal-finance",
+  "name": "Personal Finance Ledger",
+  "version": "0.1.0",
+  "summary": "A ledger, budgets, and a spending chart for one household's money.",
+  "description": "Add income and expense transactions with an account and a category. See net worth, compare category budgets against actuals, and look at the spending mix in a donut chart. Transactions and budgets survive reload. Nothing leaves the browser.",
+  "category": "personal",
+  "tags": [],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/personal-finance"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:transaction"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "transaction",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the income and expense transactions of the ledger"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "transaction"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
