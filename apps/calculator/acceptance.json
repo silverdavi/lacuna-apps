@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "814a5e6123c1778418f503c8e4bd4100544dcc73b13543a2246b079ea48163e1",
+  "spec_sha256": "2b59d44bfd04fe9b045db634e943f831cfdcf11209a72e16a2c3e323ea08efac",
   "checks": [
     {
       "id": "A1",
@@ -24,7 +24,7 @@
     },
     {
       "id": "A6",
-      "text": "After evaluating \"sin(x)\" with the setting \"Degrees\" selected in the select labelled \"Angle mode\", the chart tab shows a point at x=30 with y=0.5; switching to \"Radians\" and re-evaluating shows a point at x=30 with y=-0.988."
+      "text": "After evaluating \"sin(x)\" with \"Degrees\" selected in the select labelled \"Angle mode\", the chart tab has a point `x=30, y=0.5`; after selecting \"Radians\" and evaluating again it has a point `x=30, y=-0.988`."
     },
     {
       "id": "A7",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "d624484b8f500773719b393e54fc62f32eff95ec05d291eced31b2939ead8994"
+      "sha256": "9b7c8d1699028d320abfb4d59acdd4af98aa0e5a041043dae1d113a57f963d70"
     }
   ]
 }

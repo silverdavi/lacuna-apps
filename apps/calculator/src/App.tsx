@@ -14,7 +14,6 @@ import {
   Row,
   Select,
   Stack,
-  TextInput,
 } from '@lacuna/ui'
 import { Chart } from '@lacuna/chart'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -50,15 +49,6 @@ export function App() {
   useEffect(() => {
     setState({ expression, angleMode: mode })
   }, [expression, mode, setState])
-
-  // Playwright 1.65+ reports <select> as role "combobox" in the a11y tree when
-  // appearance is custom-styled. The acceptance test uses getByRole('select'),
-  // so we patch the element to explicitly declare role="select".
-  const formRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const sel = formRef.current?.querySelector('select')
-    if (sel) sel.setAttribute('role', 'select')
-  }, [])
 
   const run = (expr: string, angleMode: AngleMode = mode) => {
     setExpression(expr)
@@ -178,15 +168,25 @@ export function App() {
       }
     >
       <Card title="Expression" mono="Input">
-        <div ref={formRef}>
+        <p className="lc-body-sm" style={{ margin: 0 }}>
+          Enter an expression
+        </p>
         <FormGrid>
-          <TextInput
-            label="Expression"
-            value={expression}
-            onChange={setExpression}
-            placeholder="sin(x) + 1"
-            error={error}
-          />
+          <div className="lc-field">
+            <label className="lc-field-label" htmlFor="calc-expression">Expression</label>
+            <input
+              id="calc-expression"
+              className="lc-input"
+              type="text"
+              value={expression}
+              placeholder="sin(x) + 1"
+              aria-invalid={error ? true : undefined}
+              onChange={(e) => setExpression(e.target.value)}
+            />
+            {error && (
+              <span className="lk-field-error" role="alert">{error}</span>
+            )}
+          </div>
           <Select
             label="Angle mode"
             value={mode}
@@ -194,7 +194,6 @@ export function App() {
             options={['Degrees', 'Radians']}
           />
         </FormGrid>
-        </div>
         <Stack style={{ gap: 'calc(12px * var(--sf))' }}>
           <PrimaryButton onClick={() => run(expression)}>Evaluate</PrimaryButton>
         </Stack>
@@ -273,7 +272,10 @@ export function App() {
                 ariaLabel={`Chart of ${expression}`}
               />
               {atX && (
-                <span className="calc-f30">
+                <span
+                  className="calc-f30"
+                  aria-label={`x=30, y=${formatValue(atX.y)}`}
+                >
                   f(30) = {formatValue(atX.y)}
                 </span>
               )}
