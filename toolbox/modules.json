@@ -1104,6 +1104,45 @@
       }
     },
     {
+      "id": "@lacuna/category-picker",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Dropdown picker of categories with color swatches and icons, inline keyboard navigation, and inline creation of a new category.",
+      "today": [
+        "toolbox/modules/category-picker/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "CategoryPicker"
+      ],
+      "public": true,
+      "path": "toolbox/modules/category-picker/0.1.0",
+      "bridge": {
+        "component": "CategoryPicker",
+        "kind": "widget",
+        "exports": [
+          "CategoryPicker"
+        ],
+        "types": [
+          "CategoryOption",
+          "CategoryPickerProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "27329c567b38ee51f94c3eee413b237ebb05a433",
+            "source": "0501f463da0e6141",
+            "lines": 353,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/chart",
       "layer": 2,
       "status": "exists",
@@ -2623,6 +2662,56 @@
       }
     },
     {
+      "id": "@lacuna/ledger",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure double-entry ledger with accounts, categories, running balances, net worth, and budget-versus-actuals comparisons.",
+      "today": [
+        "toolbox/modules/ledger/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "ledger"
+      ],
+      "public": true,
+      "path": "toolbox/modules/ledger/0.1.0",
+      "bridge": {
+        "component": "ledger",
+        "kind": "logic",
+        "exports": [
+          "createLedger",
+          "addTransaction",
+          "removeTransaction",
+          "getBalance",
+          "getRunningBalance",
+          "getNetWorth",
+          "getBudgetActuals",
+          "getTransactionsByCategory"
+        ],
+        "types": [
+          "Account",
+          "Category",
+          "Transaction",
+          "BalanceEntry",
+          "BudgetActual",
+          "Ledger"
+        ],
+        "signature": "createLedger(accounts: Account[], categories: Category[]); addTransaction(ledger: Ledger, tx: Omit<Transaction, 'id'>); removeTransaction(ledger: Ledger, txId: string); getBalance(ledger: Ledger, accountId: string, asOf?: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "27329c567b38ee51f94c3eee413b237ebb05a433",
+            "source": "127c34e8f3bb0604",
+            "lines": 149,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/ledger-kit",
       "layer": 2,
       "status": "exists",
@@ -3221,6 +3310,44 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "09542eb0e6765652",
             "lines": 64,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/question-card",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Shows one quiz question as choice buttons or a text/number input, with submit, correct/incorrect feedback, and a next button.",
+      "today": [
+        "toolbox/modules/question-card/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "QuestionCard"
+      ],
+      "public": true,
+      "path": "toolbox/modules/question-card/0.1.0",
+      "bridge": {
+        "component": "QuestionCard",
+        "kind": "widget",
+        "exports": [
+          "QuestionCard"
+        ],
+        "types": [
+          "QuestionCardProps"
+        ],
+        "signature": "QuestionCard({ prompt, type, options, correctAnswer, correctValue, tolerance, caseSensitive, onNex...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "27329c567b38ee51f94c3eee413b237ebb05a433",
+            "source": "001ffc757c40f1e5",
+            "lines": 191,
             "dependencies": {}
           }
         }
