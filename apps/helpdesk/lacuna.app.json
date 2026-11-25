@@ -3,8 +3,8 @@
   "id": "lacuna.helpdesk",
   "name": "Helpdesk",
   "version": "0.1.0",
-  "summary": "Track support tickets: subject, customer, priority, and status.",
-  "description": "List support tickets, each with a subject, customer, priority, and status. Add, edit, and delete tickets, search by customer, filter by status, sort by priority, and export the list to CSV. The list survives reload. Nothing leaves the browser.",
+  "summary": "Track support tickets with search, filters, sorting, and CSV export.",
+  "description": "A full ticket workbench: add, edit, and delete support tickets with subject, customer, priority, and status. Search by text, filter by status, sort by any column, see open and high-priority counts, and export the filtered list to CSV. Tickets survive reload. Nothing leaves the browser.",
   "category": "productivity",
   "icon": "inbox",
   "relationship": {

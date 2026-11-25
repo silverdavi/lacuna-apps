@@ -1,10 +1,24 @@
-import { useState } from 'react'
-import type { CSSProperties } from 'react'
-import { AppShell, Select } from '@lacuna/ui'
-import { Actions, Button, Card, EmptyState, FormGrid, TextInput } from '@lacuna/ui'
+import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { saveText } from '@lacuna/file-save-open'
 import { toCsv } from '@lacuna/csv-parse'
+import {
+  Actions,
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  Rail,
+  Select,
+  Stack,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
 import { host, type Priority, type Status, type Ticket } from './host'
+import './app.css'
 
 const PRIORITIES: Priority[] = ['High', 'Medium', 'Low']
 const STATUSES: Status[] = ['Open', 'Closed']
@@ -17,57 +31,6 @@ type SortKey = 'subject' | 'customer' | 'priority' | 'status'
 interface SortState {
   key: SortKey
   dir: 'asc' | 'desc'
-}
-
-const gridStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
-  gap: 'calc(12px * var(--sf))',
-}
-
-const rowStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 'calc(12px * var(--sf))',
-}
-
-const tableStyle: CSSProperties = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  fontFamily: 'var(--sans)',
-  fontSize: 'calc(14px * var(--tf))',
-  color: 'var(--ink)',
-  background: 'var(--paper)',
-}
-
-const headerStyle: CSSProperties = {
-  textAlign: 'left',
-  padding: 'calc(8px * var(--sf))',
-  borderBottom: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-  background: 'var(--paper-deep)',
-  color: 'var(--ink)',
-}
-
-const headerBtnStyle: CSSProperties = {
-  appearance: 'none',
-  background: 'none',
-  border: 'none',
-  padding: 0,
-  margin: 0,
-  font: 'inherit',
-  color: 'inherit',
-  cursor: 'pointer',
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 'calc(4px * var(--sf))',
-}
-
-const cellStyle: CSSProperties = {
-  padding: 'calc(8px * var(--sf))',
-  borderBottom: 'calc(1px * var(--sf)) solid var(--hair)',
-  color: 'var(--ink)',
-  background: 'var(--paper)',
-  textAlign: 'left',
 }
 
 function priorityRank(value: unknown): number {
@@ -110,12 +73,10 @@ function matchesStatus(ticket: Ticket, status: 'All' | Status): boolean {
   return ticket.status === status
 }
 
-const COLUMNS: { key: SortKey; header: string }[] = [
-  { key: 'subject', header: 'Subject' },
-  { key: 'customer', header: 'Customer' },
-  { key: 'priority', header: 'Priority' },
-  { key: 'status', header: 'Status' },
-]
+function sortButtonLabel(header: string, active: boolean, dir: 'asc' | 'desc'): ReactNode {
+  const arrow = active ? (dir === 'asc' ? ' \u2191' : ' \u2193') : ''
+  return header + arrow
+}
 
 export function App() {
   const [tickets, setTickets] = useState<Ticket[]>(() => host.loadTickets())
@@ -123,16 +84,29 @@ export function App() {
   const [subject, setSubject] = useState('')
   const [customer, setCustomer] = useState('')
   const [priority, setPriority] = useState<Priority>('High')
+  const [formError, setFormError] = useState('')
 
   const [editing, setEditing] = useState<Ticket | null>(null)
   const [editStatus, setEditStatus] = useState<Status>('Open')
 
   const [query, setQuery] = useState('')
-  const [status, setStatus] = useState<'All' | Status>('All')
+  const [statusFilter, setStatusFilter] = useState<'All' | Status>('All')
   const [sort, setSort] = useState<SortState | null>(null)
 
+  const openCount = tickets.filter((t) => t.status === 'Open').length
+  const highCount = tickets.filter((t) => t.priority === 'High' && t.status === 'Open').length
+
+  const visible = sortTickets(
+    tickets.filter((t) => matchesQuery(t, query) && matchesStatus(t, statusFilter)),
+    sort,
+  )
+
   const addTicket = () => {
-    if (!subject.trim() || !customer.trim()) return
+    if (!subject.trim() || !customer.trim()) {
+      setFormError('Enter a subject and a customer')
+      return
+    }
+    setFormError('')
     setTickets(host.addTicket(subject.trim(), customer.trim(), priority))
     setSubject('')
     setCustomer('')
@@ -162,16 +136,28 @@ export function App() {
     })
   }
 
-  const visible = sortTickets(
-    tickets.filter((t) => matchesQuery(t, query) && matchesStatus(t, status)),
-    sort,
-  )
-
   const exportCsv = () => {
     const header = ['Subject', 'Customer', 'Priority', 'Status']
     const rows = visible.map((t) => [t.subject, t.customer, t.priority, t.status])
-    return toCsv([header, ...rows])
+    saveText(toCsv([header, ...rows]), { filename: 'helpdesk.csv', mimeType: 'text/csv' })
   }
+
+  const sortLabel = (key: SortKey, header: string) => {
+    const active = sort?.key === key
+    return active && sort ? sortButtonLabel(header, true, sort.dir) : header
+  }
+
+  const columnDefs = (
+    key: SortKey,
+    header: string,
+  ): { key: string; label: ReactNode } => ({
+    key,
+    label: (
+      <button type="button" className="help-sort" onClick={() => toggleSort(key)}>
+        {sortLabel(key, header)}
+      </button>
+    ),
+  })
 
   return (
     <AppShell
@@ -180,121 +166,155 @@ export function App() {
       hue="gold"
       category="Productivity"
       meta={`${tickets.length} ticket${tickets.length === 1 ? '' : 's'}`}
+      status={`${openCount} open`}
+      side={
+        <Rail
+          title="Helpdesk"
+          note={`${openCount} open · ${highCount} high priority`}
+          chips={['Add', 'Search', 'Sort']}
+        />
+      }
     >
-      <Card title="New ticket">
-        <FormGrid>
-          <div style={gridStyle}>
-            <TextInput label="Subject" value={subject} onChange={setSubject} placeholder="What needs help?" />
-            <TextInput label="Customer" value={customer} onChange={setCustomer} placeholder="Who is it from?" />
+      <Stack lg>
+        <Card
+          mono={editing ? 'Edit' : 'New'}
+          title={editing ? `Edit ticket: ${editing.subject}` : 'New ticket'}
+        >
+          <FormGrid>
+            <TextInput
+              label="Subject"
+              value={subject}
+              onChange={setSubject}
+              placeholder="What needs help?"
+              error={formError || null}
+            />
+            <TextInput
+              label="Customer"
+              value={customer}
+              onChange={setCustomer}
+              placeholder="Who is it from?"
+            />
             <Select
               label="Priority"
               value={priority}
               onChange={(value) => setPriority(value as Priority)}
               options={PRIORITIES}
             />
-            <Actions>
+            {editing && (
+              <Select
+                label="Status"
+                value={editStatus}
+                onChange={(value) => setEditStatus(value as Status)}
+                options={STATUSES}
+              />
+            )}
+          </FormGrid>
+          <Actions>
+            {editing ? (
+              <>
+                <Button kind="primary" onClick={saveEdit}>
+                  Save
+                </Button>
+                <Button kind="ghost" onClick={() => setEditing(null)}>
+                  Cancel
+                </Button>
+              </>
+            ) : (
               <Button kind="primary" onClick={addTicket}>
                 Add ticket
               </Button>
+            )}
+          </Actions>
+        </Card>
+
+        <KpiRow>
+          <Kpi value={String(tickets.length)} label="Total" />
+          <Kpi value={String(openCount)} label="Open" accent={openCount > 0} />
+          <Kpi value={String(highCount)} label="High priority" accent={highCount > 0} />
+        </KpiRow>
+
+        <Card
+          mono={`${visible.length} of ${tickets.length} shown`}
+          title="Tickets"
+        >
+          <div className="help-controls">
+            <div className="help-search">
+              <TextInput
+                label="Search"
+                type="search"
+                value={query}
+                onChange={setQuery}
+                placeholder="Search tickets"
+              />
+            </div>
+            <div className="help-chips">
+              {(['All', 'Open', 'Closed'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={statusFilter === s ? 'help-chip on' : 'help-chip'}
+                  onClick={() => setStatusFilter(s)}
+                  aria-pressed={statusFilter === s}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <Actions>
+              <Button kind="secondary" onClick={exportCsv}>
+                Export CSV
+              </Button>
             </Actions>
           </div>
-        </FormGrid>
-      </Card>
 
-      <Card title="Tickets">
-        <div style={rowStyle}>
-          <TextInput label="Search" value={query} onChange={setQuery} type="search" placeholder="Search tickets" />
-          <Button kind={status === 'All' ? 'primary' : 'secondary'} onClick={() => setStatus('All')}>
-            All
-          </Button>
-          <Button kind={status === 'Open' ? 'primary' : 'secondary'} onClick={() => setStatus('Open')}>
-            Open
-          </Button>
-          <Button kind={status === 'Closed' ? 'primary' : 'secondary'} onClick={() => setStatus('Closed')}>
-            Closed
-          </Button>
-          <Button kind="secondary" onClick={() => saveText(exportCsv(), { filename: 'helpdesk.csv', mimeType: 'text/csv' })}>
-            Export CSV
-          </Button>
-        </div>
-        {tickets.length === 0 ? (
-          <EmptyState
-            title="No tickets yet"
-            detail="Add your first ticket above and it will appear here."
-            actionLabel="Add ticket"
-          />
-        ) : visible.length === 0 ? (
-          <EmptyState
-            title="No matching tickets"
-            detail="Try a different search or filter."
-            actionLabel="Clear filters"
-            onAction={() => {
-              setQuery('')
-              setStatus('All')
-            }}
-          />
-        ) : (
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                {COLUMNS.map((col) => {
-                  const active = sort?.key === col.key
-                  const arrow = active && sort ? (sort.dir === 'asc' ? '↑' : '↓') : ''
-                  return (
-                    <th key={col.key} scope="col" style={headerStyle}>
-                      <button type="button" style={headerBtnStyle} onClick={() => toggleSort(col.key)}>
-                        {col.header}
-                        {arrow ? <span aria-hidden>{arrow}</span> : null}
-                      </button>
-                    </th>
-                  )
-                })}
-                <th scope="col" style={headerStyle}>
-                  <span aria-hidden />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((ticket) => (
-                <tr key={ticket.id}>
-                  <td style={cellStyle}>{ticket.subject}</td>
-                  <td style={cellStyle}>{ticket.customer}</td>
-                  <td style={cellStyle}>{ticket.priority}</td>
-                  <td style={cellStyle}>{ticket.status}</td>
-                  <td style={cellStyle}>
-                    <span style={{ display: 'inline-flex', gap: 'calc(8px * var(--sf))' }}>
-                      <Button onClick={() => startEdit(ticket)}>Edit</Button>
-                      <Button kind="danger" onClick={() => deleteTicket(ticket.id)}>
+          {tickets.length === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No tickets yet"
+              detail="Add your first ticket above and it will appear here."
+              actionLabel="Add ticket"
+            />
+          ) : (
+            <Table
+              label="Tickets"
+              columns={[
+                columnDefs('subject', 'Subject'),
+                columnDefs('customer', 'Customer'),
+                columnDefs('priority', 'Priority'),
+                columnDefs('status', 'Status'),
+                { key: 'actions', label: '' },
+              ]}
+              rows={visible.map((ticket) => ({
+                cells: {
+                  subject: ticket.subject,
+                  customer: ticket.customer,
+                  priority: ticket.priority,
+                  status: ticket.status,
+                  actions: (
+                    <>
+                      <Button
+                        kind="ghost"
+                        ariaLabel={`Edit ${ticket.subject}`}
+                        onClick={() => startEdit(ticket)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        kind="ghost"
+                        ariaLabel={`Delete ${ticket.subject}`}
+                        onClick={() => deleteTicket(ticket.id)}
+                      >
                         Delete
                       </Button>
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {editing ? (
-          <Card title="Edit ticket" mono={editing.subject} style={{ marginTop: 'calc(12px * var(--sf))' }}>
-            <FormGrid>
-              <div style={gridStyle}>
-                <Select
-                  label="Status"
-                  value={editStatus}
-                  onChange={(value) => setEditStatus(value as Status)}
-                  options={STATUSES}
-                />
-                <Actions>
-                  <Button kind="primary" onClick={saveEdit}>
-                    Save
-                  </Button>
-                  <Button onClick={() => setEditing(null)}>Cancel</Button>
-                </Actions>
-              </div>
-            </FormGrid>
-          </Card>
-        ) : null}
-      </Card>
+                    </>
+                  ),
+                },
+              }))}
+              empty="No matching tickets"
+            />
+          )}
+        </Card>
+      </Stack>
     </AppShell>
   )
 }
