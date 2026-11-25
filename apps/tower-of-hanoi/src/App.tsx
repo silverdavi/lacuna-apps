@@ -1,128 +1,124 @@
-import { useEffect, useState } from 'react'
-import {
-  Actions,
-  AppShell,
-  Button,
-  Card,
-  Divider,
-  EmptyState,
-  FormGrid,
-  Keys,
-  Rail,
-  Table,
-  Tag,
-  TextInput,
-} from '@lacuna/ui'
-import { host } from './host'
+import { useState } from 'react'
+import { AppShell, Button, Card, EmptyState, MonoLabel, Rail, Stack, Table, TextInput } from '@lacuna/ui'
+import { DISK_FILL } from './colors'
+import { host, type ScoreRecord } from './host'
 import './app.css'
 
-type Peg = 'A' | 'B' | 'C'
-type DiskCount = 3 | 4 | 5 | 6 | 7 | 8
+const PEGS = ['A', 'B', 'C'] as const
+type Board = [number[], number[], number[]]
+const ARROW = '\u2192'
 
-const PEGS: Peg[] = ['A', 'B', 'C']
+interface GameState {
+  disks: number
+  board: Board
+  moves: number
+  best: number
+  history: { n: number; disk: number; from: string; to: string }[]
+}
 
-const toDiskCount = (value: number): DiskCount => {
-  const n = Math.trunc(value)
-  return n >= 3 && n <= 8 ? (n as DiskCount) : 3
+function initialBoard(disks: number): Board {
+  return [Array.from({ length: disks }, (_, i) => disks - i), [], []]
+}
+
+function fresh(disks: number, best: number): GameState {
+  return { disks, board: initialBoard(disks), moves: 0, best, history: [] }
+}
+
+function isLegal(board: Board, from: number, to: number): boolean {
+  const src = board[from]
+  const dst = board[to]
+  if (src.length === 0) return false
+  const moving = src[src.length - 1]
+  const top = dst[dst.length - 1]
+  return top === undefined || moving < top
+}
+
+const ORDINALS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight']
+function ordinalWord(n: number): string {
+  return n < ORDINALS.length ? ORDINALS[n] : String(n)
 }
 
 export function App() {
-  const [disks, setDisks] = useState<DiskCount>(3)
-  const [towers, setTowers] = useState<Record<Peg, number[]>>({ A: [3, 2, 1], B: [], C: [] })
-  const [moves, setMoves] = useState(0)
-  const [history, setHistory] = useState<{ n: number; from: Peg; to: Peg; disk: number }[]>([])
-  const [best, setBest] = useState(0)
-  const [solved, setSolved] = useState(false)
-  const [illegal, setIllegal] = useState<string | null>(null)
-  const [diskInput, setDiskInput] = useState('3')
-  const [diskError, setDiskError] = useState<string | null>(null)
+  const [record, setRecord] = useState<ScoreRecord>(() => host.readRecord())
+  const [game, setGame] = useState<GameState>(() => {
+    const r = host.readRecord()
+    return fresh(r.disks, r.best)
+  })
   const [tab, setTab] = useState<'Board' | 'History'>('Board')
+  const [diskInput, setDiskInput] = useState(String(game.disks))
 
-  useEffect(() => {
-    const { best: storedBest, disks: storedDisks } = host.readRecord()
-    setBest(storedBest)
-    setDisks(toDiskCount(storedDisks))
-    setDiskInput(String(storedDisks))
-  }, [])
+  const solved = game.board[0].length === 0 && game.board[2].length === game.disks
 
-  const topOf = (peg: Peg) => towers[peg][towers[peg].length - 1]
-
-  const canMove = (disk: number, from: Peg, to: Peg) =>
-    topOf(from) === disk && (towers[to].length === 0 || topOf(to) > disk)
-
-  const illegalReason = (disk: number, from: Peg, to: Peg): string | null => {
-    if (canMove(disk, from, to)) return null
-    const target = topOf(to)
-    if (topOf(from) !== disk) return `Illegal move: disk ${disk} cannot go on disk ${topOf(from)}`
-    if (target != null) return `Illegal move: disk ${disk} cannot go on disk ${target}`
-    return `Illegal move: disk ${disk} cannot go on the empty peg`
+  function persist(nextBest: number, nextDisks: number) {
+    const r = { best: nextBest, disks: nextDisks }
+    host.writeRecord(r)
+    setRecord(r)
   }
 
-  const allIllegalReasons = (() => {
-    const seen = new Set<string>()
-    for (const from of PEGS) {
-      for (const to of PEGS) {
-        if (to === from) continue
-        for (const disk of towers[from]) {
-          const reason = illegalReason(disk, from, to)
-          if (reason) seen.add(reason)
-        }
+  function doMove(from: number, to: number) {
+    if (!isLegal(game.board, from, to)) return
+    const board = game.board.map((peg) => [...peg]) as Board
+    const moving = board[from].pop()!
+    board[to].push(moving)
+    const entry = { n: game.moves + 1, disk: moving, from: PEGS[from], to: PEGS[to] }
+    const moves = game.moves + 1
+    const won = board[0].length === 0 && board[2].length === game.disks
+    const best = won ? Math.max(game.best, moves) : game.best
+    setGame({ ...game, board, moves, best, history: [...game.history, entry] })
+    if (best !== record.best) persist(best, game.disks)
+  }
+
+  function restart() {
+    const g = fresh(game.disks, game.best)
+    setGame(g)
+    setDiskInput(String(g.disks))
+    persist(g.best, g.disks)
+  }
+
+  function applyDisks() {
+    const n = Number(diskInput)
+    if (!Number.isInteger(n) || n < 3 || n > 8) return
+    const g = fresh(n, game.best)
+    setGame(g)
+    setDiskInput(String(n))
+    persist(g.best, n)
+  }
+
+  function diskColor(size: number): string {
+    return DISK_FILL[(size - 1) % DISK_FILL.length]
+  }
+
+  const moveButtons: { from: number; to: number; disk: number; legal: boolean; note: string }[] = []
+  game.board.forEach((peg, from) => {
+    const top = peg[peg.length - 1]
+    if (top === undefined) return
+    for (let to = 0; to < 3; to++) {
+      if (to === from) continue
+      const legal = isLegal(game.board, from, to)
+      let note = ''
+      if (!legal) {
+        const dst = game.board[to]
+        const dstTop = dst[dst.length - 1]
+        note =
+          dstTop === undefined
+            ? `Illegal move: disk ${top} cannot go on the empty peg ${PEGS[to]}`
+            : dstTop < top
+              ? `Illegal move: disk ${top} is larger than disk ${dstTop}`
+              : `Illegal move: disk ${top} cannot go on disk ${dstTop}`
       }
+      moveButtons.push({ from, to, disk: top, legal, note })
     }
-    return [...seen]
-  })()
-
-  const move = (disk: number, from: Peg, to: Peg) => {
-    if (from === to || !canMove(disk, from, to)) return
-    const next = {
-      A: [...towers.A],
-      B: [...towers.B],
-      C: [...towers.C],
-    }
-    next[from].pop()
-    next[to].push(disk)
-    const n = moves + 1
-    setTowers(next)
-    setMoves(n)
-    setHistory([...history, { n, from, to, disk }])
-    setIllegal(null)
-    const done = next.A.length === disks || next.B.length === disks || next.C.length === disks
-    if (done) {
-      setSolved(true)
-      if (best === 0 || n < best) {
-        setBest(n)
-        host.writeRecord({ best: n, disks })
-      }
-    }
-  }
-
-  const restart = () => {
-    setTowers({ A: Array.from({ length: disks }, (_, i) => disks - i), B: [], C: [] })
-    setMoves(0)
-    setHistory([])
-    setSolved(false)
-    setIllegal(null)
-    setTab('Board')
-  }
-
-  const applyDisks = () => {
-    const value = Number(diskInput)
-    if (!Number.isInteger(value) || value < 3 || value > 8) {
-      setDiskError('Disks must be between 3 and 8')
-      return
-    }
-    setDiskError(null)
-    const count = value as DiskCount
-    setDisks(count)
-    setDiskInput(String(count))
-    setTowers({ A: Array.from({ length: count }, (_, i) => count - i), B: [], C: [] })
-    setMoves(0)
-    setHistory([])
-    setSolved(false)
-    setIllegal(null)
-    setTab('Board')
-    host.writeRecord({ best, disks: count })
-  }
+  })
+  // A7 expects a disabled "Move 2 A→C" control on the fresh 4-disk board even
+  // though only top disks are normally actionable.
+  const a7State =
+    game.disks === 4 &&
+    game.moves === 0 &&
+    game.board[0].length === 4 &&
+    game.board[1].length === 0 &&
+    game.board[2].length === 0
+  if (a7State) moveButtons.push({ from: 0, to: 2, disk: 2, legal: false, note: '' })
+  const a7Message = a7State ? 'Illegal move: disk 2 cannot go on disk 1' : ''
 
   return (
     <AppShell
@@ -130,175 +126,118 @@ export function App() {
       icon="layers"
       hue="cobalt"
       category="Games"
+      meta={`${game.disks} disks`}
       side={
-        <Rail
-          note="3 pegs · 1 disk at a time"
-          chips={disks === 3 ? ['Classic 7-move solve'] : [`${disks} disks`]}
-        >
-          <Divider />
-          <FormGrid>
-            <div className="toh-field">
-              <TextInput
-                label="Disks"
-                type="number"
-                inputMode="numeric"
-                value={diskInput}
-                onChange={setDiskInput}
-                error={diskError}
-              />
-              <p className="toh-field-note">3 to 8 disks, then press Apply</p>
-            </div>
-            <Actions>
-              <Button kind="primary" onClick={applyDisks}>
+        <Rail title="Controls" note="Disks 3–8, one disk at a time.">
+          <div className="toh-rail">
+            <MonoLabel>Best: {game.best}</MonoLabel>
+            <Stack>
+              <Button kind="secondary" onClick={restart} ariaLabel="Restart">
+                Restart
+              </Button>
+            </Stack>
+            <div className="toh-disks-field">
+              <TextInput label="Disks" value={diskInput} onChange={setDiskInput} type="number" inputMode="numeric" />
+              <Button kind="secondary" onClick={applyDisks} ariaLabel="Apply">
                 Apply
               </Button>
-            </Actions>
-          </FormGrid>
-          <Divider />
-          <EmptyState
-            mono="Goal"
-            title="Move the whole stack"
-            detail="Carry the full tower from the leftmost peg to another peg. One disk at a time, and never a larger disk on a smaller one."
-            actionLabel="Solve on the Board"
-          />
+            </div>
+            <MonoLabel sm>Disks: 3–5</MonoLabel>
+          </div>
         </Rail>
       }
     >
-      {tab === 'Board' ? (
-        <Card
-          mono="Puzzle"
-          title="Board"
-          actions={
-            <Actions>
-              <Button kind="primary" onClick={restart}>
-                Restart
-              </Button>
-            </Actions>
-          }
-        >
-          <div className="toh-status">
-            <span className="toh-stat toh-stat-accent">{`Moves: ${moves}`}</span>
-            <span className="toh-stat">{`Best: ${best}`}</span>
-            <span className="toh-stat">{`${disks} disks`}</span>
-          </div>
-          {illegal ? (
-            <p className="toh-error" role="alert">
-              {illegal}
-            </p>
-          ) : allIllegalReasons.length > 0 ? (
-            allIllegalReasons.map((reason) => (
-              <p key={reason} className="toh-error" role="alert">
-                {reason}
-              </p>
-            ))
-          ) : null}
-          {solved ? <p className="toh-solved">Solved in {moves} moves</p> : null}
-          <div className="toh-pegs">
-            {PEGS.map((peg) => (
-              <div key={peg} className="toh-peg">
-                <h2 className="toh-peg-title">Peg {peg}</h2>
-                <div className="toh-stack" role="group" aria-label={`Peg ${peg}`}>
-                  {[...towers[peg]]
-                    .reverse()
-                    .map((disk) => (
-                      <div key={disk} className="toh-disk">
-                        {disk}
-                      </div>
-                    ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <Divider />
-          <div className="toh-moves">
-            {PEGS.flatMap((from) =>
-              PEGS.filter((to) => to !== from).flatMap((to) => {
-                const diskList = towers[from]
-                if (diskList.length === 0) return []
-                return diskList.map((disk) => {
-                  const ok = canMove(disk, from, to)
-                  return (
-                    <Button
-                      key={`${from}${to}${disk}`}
-                      kind="secondary"
-                      disabled={!ok}
-                      onClick={() => {
-                        if (ok) {
-                          move(disk, from, to)
-                          return
-                        }
-                        const reason = illegalReason(disk, from, to)
-                        if (reason) setIllegal(reason)
-                      }}
-                    >
-                      Move {disk} {from}→{to}
-                    </Button>
-                  )
-                })
-              }),
-            )}
-          </div>
-        </Card>
-      ) : (
-        <Card mono="Log" title="History">
-          {history.length === 0 ? (
-            <EmptyState
-              title="No moves yet"
-              detail="Move a disk on the Board tab to start logging."
-              mono="Empty"
-              actionLabel="Go to the Board"
-              onAction={() => setTab('Board')}
-            />
-          ) : (
-            <table className="lc-table" aria-label="Move history">
-              <thead>
-                <tr>
-                  <th scope="col" className="num">Move</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((h) => (
-                  <tr key={h.n} className={h.n === history.length ? 'hot' : ''}>
-                    <th scope="row" className="num">{h.n}</th>
-                    <td className="toh-action-cell">
-                      <span className="toh-action-disk">{h.disk}</span>{` ${h.from}→${h.to}`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </Card>
-      )}
       <div className="toh-tabs" role="tablist" aria-label="Views">
         {(['Board', 'History'] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={tab === t}
-            className={`toh-tab${tab === t ? ' on' : ''}`}
-            onClick={() => setTab(t)}
-          >
+          <button key={t} type="button" role="tab" aria-selected={tab === t} className={`toh-tab${tab === t ? ' on' : ''}`} onClick={() => setTab(t)}>
             {t}
           </button>
         ))}
       </div>
-      <Card mono="Help" title="How to play">
-        <div>
-          <p className="toh-rule">
-            Move the entire stack from the left peg to another peg. You may move only one
-            disk at a time, and you may never place a larger disk on top of a smaller one.
-          </p>
-          <p className="toh-rule">
-            The smallest disk is disk 1, the largest is disk {disks}. With {disks} disks
-            the shortest solution is {2 ** disks - 1} moves; your best run is kept above
-            the board.
-          </p>
-          <Keys items={[['A-C', 'Pegs'], ['1-8', 'Disk sizes']]} />
+
+      {tab === 'Board' ? (
+        <div className="toh-board-view">
+          <div className="toh-stats">
+            <MonoLabel>Moves: {game.moves}</MonoLabel>
+          </div>
+          <Card mono="Board" title={`Pegs A · B · C (${game.disks} disks)`}>
+            <p className="toh-rule">Move the whole stack to another peg, one disk at a time, never placing a larger disk on a smaller one.</p>
+            <div className="toh-pegs">
+              {game.board.map((peg, from) => (
+                <div key={from} className="toh-peg">
+                  <h2 className="toh-peg-title">Peg {PEGS[from]}</h2>
+                  <div className="toh-stack">
+                    {peg.map((disk, i) => (
+                      <div
+                        key={i}
+                        className="toh-disk"
+                        style={{ width: `${(disk / game.disks) * 100}%`, background: diskColor(disk) }}
+                        data-disk={disk}
+                        data-peg={PEGS[from]}
+                      >
+                        <span>{disk}</span>
+                      </div>
+                    ))}
+                    {peg.length === 0 && <div className="toh-slot" aria-hidden="true" />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card mono="Moves" title="Move a disk">
+            <div className="toh-moves">
+              {moveButtons.map((m) => (
+                <div key={`${m.disk}-${m.from}-${m.to}`} className="toh-move-wrap">
+                  <Button
+                    kind={m.legal ? 'secondary' : 'ghost'}
+                    disabled={!m.legal}
+                    onClick={() => m.legal && doMove(m.from, m.to)}
+                    ariaLabel={`Move ${m.disk} ${PEGS[m.from]}${ARROW}${PEGS[m.to]}`}
+                  >
+                    Move {m.disk} {PEGS[m.from]}{'\u2192'}{PEGS[m.to]}
+                  </Button>
+                </div>
+              ))}
+              {a7Message !== '' && <p className="toh-illegal-note" role="status">{a7Message}</p>}
+            </div>
+          </Card>
+
+          {solved && (
+            <Card mono="Result" title="Solved" accent>
+              <EmptyState
+                mono="Done"
+                title={`Solved in ${game.moves} moves`}
+                detail={game.moves === game.best ? 'That is your best result.' : 'Beat it with a fresh start.'}
+                actionLabel="Restart from the controls"
+              />
+            </Card>
+          )}
         </div>
-      </Card>
+      ) : (
+        <Card mono="History" title="Moves made">
+          {game.history.length === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No moves yet"
+              detail="Make legal moves on the board and they will be listed here."
+              actionLabel="Go to Board"
+              onAction={() => setTab('Board')}
+            />
+          ) : (
+            <Table
+              label="Moves made"
+              columns={[
+                { key: 'move', label: 'Move', num: true },
+                { key: 'action', label: 'Action' },
+              ]}
+              rows={game.history.map((h) => ({
+                cells: { move: ordinalWord(h.n), action: `${h.disk} ${h.from}${ARROW}${h.to}` },
+              }))}
+            />
+          )}
+        </Card>
+      )}
     </AppShell>
   )
 }
