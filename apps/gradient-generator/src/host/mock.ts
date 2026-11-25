@@ -15,17 +15,19 @@ export interface SavedGradient {
   stops: GradientStop[]
 }
 
-export interface GradientState {
+export interface WorkState {
   name: string
   kind: GradientKind
   angle: number
+  angleDraft: string
   stops: GradientStop[]
 }
 
-export const DEFAULT_STATE: GradientState = {
+export const DEFAULT_WORK: WorkState = {
   name: '',
   kind: 'linear',
   angle: 90,
+  angleDraft: '90',
   stops: [],
 }
 
@@ -43,10 +45,17 @@ function isKind(v: unknown): v is GradientKind {
   return v === 'linear' || v === 'radial'
 }
 
-function isState(v: unknown): v is GradientState {
+function isWork(v: unknown): v is WorkState {
   const o = v as Record<string, unknown> | null
   if (!o || typeof o !== 'object') return false
-  return typeof o.name === 'string' && isKind(o.kind) && typeof o.angle === 'number' && Array.isArray(o.stops) && o.stops.every(isStop)
+  return (
+    typeof o.name === 'string' &&
+    isKind(o.kind) &&
+    typeof o.angle === 'number' &&
+    typeof o.angleDraft === 'string' &&
+    Array.isArray(o.stops) &&
+    o.stops.every(isStop)
+  )
 }
 
 function isSaved(v: unknown): v is SavedGradient {
@@ -62,10 +71,10 @@ function isSaved(v: unknown): v is SavedGradient {
   )
 }
 
-const stateStore = createMockValue<GradientState>({
-  key: 'lacuna.gradient-generator.state',
-  fallback: DEFAULT_STATE,
-  validate: isState,
+const workStore = createMockValue<WorkState>({
+  key: 'lacuna.gradient-generator.work',
+  fallback: DEFAULT_WORK,
+  validate: isWork,
 })
 
 const libraryStore = createMockRecordStore<SavedGradient>({
@@ -74,12 +83,12 @@ const libraryStore = createMockRecordStore<SavedGradient>({
   idPrefix: 'g',
 })
 
-export function loadState(): GradientState {
-  return stateStore.get()
+export function loadWork(): WorkState {
+  return workStore.get()
 }
 
-export function saveState(state: GradientState): void {
-  stateStore.set(state)
+export function saveWork(state: WorkState): void {
+  workStore.set(state)
 }
 
 export function listGradients(): SavedGradient[] {

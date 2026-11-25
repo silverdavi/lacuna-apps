@@ -1,9 +1,9 @@
 export {
-  DEFAULT_STATE,
+  DEFAULT_WORK,
   deleteGradient,
   listGradients,
-  loadState,
+  loadWork,
   saveGradient,
-  saveState,
+  saveWork,
 } from './mock'
-export type { GradientKind, GradientState, GradientStop, SavedGradient } from './mock'
+export type { GradientKind, GradientStop, SavedGradient, WorkState } from './mock'

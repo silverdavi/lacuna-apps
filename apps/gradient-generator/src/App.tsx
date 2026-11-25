@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
+import type { KeyboardEvent } from 'react'
 import {
   Actions,
   AppShell,
@@ -12,73 +13,19 @@ import {
   Rail,
   Row,
   Select,
+  Stack,
   Tag,
-  TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useLocalRecord } from '@lacuna/use-local-record'
-import { useCollection } from '@lacuna/use-collection'
-import { swatchCss, swatchDisplay } from './colors'
-import type { GradientKind, GradientStop, SavedGradient } from './host'
-
-interface WorkState {
-  name: string
-  kind: GradientKind
-  angle: number
-  stops: GradientStop[]
-}
-
-const DEFAULT_WORK: WorkState = {
-  name: '',
-  kind: 'linear',
-  angle: 90,
-  stops: [],
-}
+import { SAMPLES, swatchDisplay } from './colors'
+import { DEFAULT_WORK, deleteGradient, listGradients, saveGradient as persistGradient } from './host'
+import type { GradientKind, GradientStop, SavedGradient, WorkState } from './host'
 
 const TYPE_OPTIONS = [
   { value: 'linear', label: 'Linear' },
   { value: 'radial', label: 'Radial' },
 ]
-
-function isWorkState(v: unknown): v is WorkState {
-  const o = v as Record<string, unknown> | null
-  if (!o || typeof o !== 'object') return false
-  const kind = o.kind
-  if (kind !== 'linear' && kind !== 'radial') return false
-  if (typeof o.name !== 'string') return false
-  if (typeof o.angle !== 'number' || !Number.isFinite(o.angle)) return false
-  if (!Array.isArray(o.stops)) return false
-  return o.stops.every((s) => {
-    const stop = s as Record<string, unknown> | null
-    return (
-      stop &&
-      typeof stop.color === 'string' &&
-      typeof stop.position === 'number' &&
-      stop.position >= 0 &&
-      stop.position <= 100
-    )
-  })
-}
-
-function isSavedGradient(v: unknown): v is Omit<SavedGradient, 'id'> {
-  const o = v as Record<string, unknown> | null
-  if (!o || typeof o !== 'object') return false
-  const kind = o.kind
-  if (kind !== 'linear' && kind !== 'radial') return false
-  if (typeof o.name !== 'string' || o.name.length === 0) return false
-  if (typeof o.angle !== 'number' || !Number.isFinite(o.angle)) return false
-  if (!Array.isArray(o.stops)) return false
-  return o.stops.every((s) => {
-    const stop = s as Record<string, unknown> | null
-    return (
-      stop &&
-      typeof stop.color === 'string' &&
-      typeof stop.position === 'number' &&
-      stop.position >= 0 &&
-      stop.position <= 100
-    )
-  })
-}
 
 function buildCss(kind: GradientKind, angle: number, stops: GradientStop[]): string {
   const sorted = [...stops].sort((a, b) => a.position - b.position)
@@ -92,6 +39,82 @@ function nextPosition(index: number, count: number): number {
   return Math.round((index / (count - 1)) * 100)
 }
 
+function AngleInput({
+  value,
+  error,
+  onChange,
+  onCommit,
+}: {
+  value: string
+  error: string | null
+  onChange: (v: string) => void
+  onCommit: () => void
+}) {
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') onCommit()
+  }
+  return (
+    <label className="lc-field">
+      <span className="lc-field-label">Angle (deg)</span>
+      <input
+        className="lc-input"
+        type="number"
+        inputMode="decimal"
+        value={value}
+        placeholder="90"
+        aria-invalid={error ? true : undefined}
+        onChange={(event) => onChange(event.target.value)}
+        onBlur={onCommit}
+        onKeyDown={onKeyDown}
+      />
+      {error ? <span className="lk-field-error" role="alert">{error}</span> : null}
+    </label>
+  )
+}
+
+function PositionInput({
+  value,
+  error,
+  onChange,
+}: {
+  value: number
+  error: string | null
+  onChange: (v: number) => void
+}) {
+  return (
+    <label className="lc-field">
+      <span className="lc-field-label">Position</span>
+      <input
+        className="lc-input"
+        type="number"
+        inputMode="decimal"
+        value={String(value)}
+        aria-invalid={error ? true : undefined}
+        onChange={(event) => {
+          const n = Number(event.target.value)
+          if (Number.isFinite(n)) onChange(n)
+        }}
+      />
+      {error ? <span className="lk-field-error" role="alert">{error}</span> : null}
+    </label>
+  )
+}
+
+function NameInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <label className="lc-field">
+      <span className="lc-field-label">Name</span>
+      <input
+        className="lc-input"
+        type="text"
+        value={value}
+        placeholder="e.g. Sunset"
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  )
+}
+
 export function App() {
   const { value: work, set: setWork } = useLocalRecord<WorkState>({
     key: 'lacuna.gradient-generator.work',
@@ -99,29 +122,19 @@ export function App() {
     defaultValue: DEFAULT_WORK,
   })
 
-  const collection = useCollection<Omit<SavedGradient, 'id'>>({
-    storageKey: 'lacuna.gradient-generator.library',
-  })
-
-  const [toast, setToast] = useState<string | null>(null)
-  const toastTimer = useRef<number | undefined>(undefined)
+  const [library, setLibrary] = useState<SavedGradient[]>(() => listGradients())
+  const [notice, setNotice] = useState<string | null>(null)
 
   const clipboard = useClipboard({
     timeoutMs: 2000,
+    onSuccess: () => setNotice('CSS copied'),
+    onError: () => setNotice('Copy failed — select the CSS and copy it'),
   })
 
-  useEffect(() => () => window.clearTimeout(toastTimer.current), [])
-
-  const flash = (message: string) => {
-    setToast(message)
-    window.clearTimeout(toastTimer.current)
-    toastTimer.current = window.setTimeout(() => setToast(null), 6000)
-  }
+  const setWorkState = (next: WorkState) => setWork(() => next)
 
   const stops = work.stops
   const css = stops.length > 0 ? buildCss(work.kind, work.angle, stops) : ''
-
-  const setWorkState = (next: WorkState) => setWork(() => next)
 
   const addStop = () => {
     const index = stops.length
@@ -141,38 +154,71 @@ export function App() {
     setWorkState({ ...work, stops: stops.filter((_, i) => i !== index) })
   }
 
-  const positionError = (index: number) => {
-    const stop = stops[index]
-    if (stop == null) return null
-    if (stop.position < 0 || stop.position > 100) {
-      return 'Keep the position between 0 and 100'
-    }
+  const angleError = (() => {
+    const draft = work.angleDraft.trim()
+    if (draft === '') return 'Enter the angle in degrees'
+    const n = Number(draft)
+    if (!Number.isFinite(n)) return 'Enter a number between 0 and 360'
+    if (n < 0 || n > 360) return 'Keep the angle between 0 and 360'
+    return null
+  })()
+
+  const commitAngle = () => {
+    if (angleError != null) return
+    setWorkState({ ...work, angle: Number(work.angleDraft.trim()) })
+  }
+
+  const positionError = (position: number): string | null => {
+    if (position < 0 || position > 100) return 'Keep the position between 0 and 100'
     return null
   }
 
+  const loadSample = (sample: (typeof SAMPLES)[number]) => {
+    setWorkState({
+      name: sample.name,
+      kind: sample.kind,
+      angle: sample.angle,
+      angleDraft: String(sample.angle),
+      stops: sample.stops.map((s) => ({ ...s })),
+    })
+    setNotice(`Loaded ${sample.name}`)
+  }
+
+  const loadSaved = (record: SavedGradient) => {
+    setWorkState({
+      name: record.name,
+      kind: record.kind,
+      angle: record.angle,
+      angleDraft: String(record.angle),
+      stops: record.stops.map((s) => ({ ...s })),
+    })
+    setNotice(`Loaded ${record.name}`)
+  }
+
   const copyCss = () => {
-    flash('CSS copied')
-    void clipboard.copy(css).catch(() => undefined)
+    void clipboard.copy(css)
   }
 
   const saveGradient = () => {
     const name = work.name.trim()
     if (!name) {
-      flash('Name the gradient first')
+      setNotice('Name the gradient first')
       return
     }
-    collection.actions.add({
+    persistGradient({
       name,
       kind: work.kind,
       angle: work.angle,
-      stops,
+      stops: stops.map((s) => ({ ...s })),
     })
-    flash(`Saved ${name}`)
+    setLibrary(listGradients())
+    setNotice(`Saved ${name}`)
   }
 
   const deleteSaved = (id: string, name: string) => {
-    collection.actions.remove(id)
-    flash(`Deleted ${name}`)
+    deleteGradient(id)
+    setLibrary(listGradients())
+    setNotice(`Deleted ${name}`)
   }
 
   return (
@@ -182,15 +228,35 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={stops.length > 0 ? `${stops.length} stop${stops.length === 1 ? '' : 's'}` : 'Ready'}
-      status={work.kind}
+      status={notice ?? (clipboard.copied ? 'CSS copied' : 'Local · no network')}
       side={
         <Rail
           title="Gradient Generator"
           note="CSS gradient · local library"
           chips={['Linear or radial', 'Live CSS preview', 'Copy to clipboard', 'Save to library']}
         >
+          <Card mono="Samples" title="Starting points" flush>
+            <List label="Samples">
+              {SAMPLES.map((sample) => (
+                <Row
+                  key={sample.name}
+                  title={sample.name}
+                  meta={
+                    <Tag>
+                      {sample.kind} · {sample.stops.length} stop{sample.stops.length === 1 ? '' : 's'}
+                    </Tag>
+                  }
+                  action={
+                    <Button kind="ghost" ariaLabel={`Load ${sample.name}`} onClick={() => loadSample(sample)}>
+                      Load
+                    </Button>
+                  }
+                />
+              ))}
+            </List>
+          </Card>
           <Card mono="Library" title="Saved gradients" flush>
-            {collection.state.isLoading ? null : collection.state.activeItems.length === 0 ? (
+            {library.length === 0 ? (
               <EmptyState
                 mono="Library"
                 title="No gradients saved"
@@ -199,18 +265,23 @@ export function App() {
               />
             ) : (
               <List label="Saved gradients">
-                {collection.state.activeItems.map((item) => (
+                {library.map((record) => (
                   <Row
-                    key={item.id}
-                    title={item.data.name}
+                    key={record.id}
+                    title={record.name}
                     meta={
                       <Tag>
-                        {item.data.kind} · {item.data.stops.length} stop{item.data.stops.length === 1 ? '' : 's'}
+                        {record.kind} · {record.stops.length} stop{record.stops.length === 1 ? '' : 's'}
                       </Tag>
                     }
+                    value={
+                      <Button kind="ghost" ariaLabel={`Load ${record.name}`} onClick={() => loadSaved(record)}>
+                        Load
+                      </Button>
+                    }
                     action={
-                      <Button kind="ghost" ariaLabel={`Delete ${item.data.name}`} onClick={() => deleteSaved(item.id, item.data.name)}>
-                        Delete {item.data.name}
+                      <Button kind="ghost" ariaLabel={`Delete ${record.name}`} onClick={() => deleteSaved(record.id, record.name)}>
+                        Delete {record.name}
                       </Button>
                     }
                   />
@@ -221,9 +292,6 @@ export function App() {
         </Rail>
       }
     >
-      <div role="status" aria-label={toast ?? undefined}>
-        {toast ?? ''}
-      </div>
       <Card mono="Mix" title="Stops">
         <FormGrid>
           <Select
@@ -232,12 +300,11 @@ export function App() {
             onChange={(v) => setWorkState({ ...work, kind: v as GradientKind })}
             options={TYPE_OPTIONS}
           />
-          <TextInput
-            label="Angle (deg)"
-            type="number"
-            value={String(work.angle)}
-            onChange={(v) => setWorkState({ ...work, angle: Number(v) || 0 })}
-            placeholder="90"
+          <AngleInput
+            value={work.angleDraft}
+            error={angleError}
+            onChange={(v) => setWorkState({ ...work, angleDraft: v })}
+            onCommit={commitAngle}
           />
         </FormGrid>
 
@@ -253,35 +320,12 @@ export function App() {
             {stops.map((stop, index) => (
               <Row
                 key={index}
-                title={
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'calc(6px * var(--sf))' }}>
-                    <input
-                      type="color"
-                      aria-label={`Stop ${index + 1} color`}
-                      value={swatchCss(index)}
-                      onChange={(event) => updateStop(index, { color: event.target.value })}
-                      style={{
-                        width: 'calc(28px * var(--sf))',
-                        height: 'calc(24px * var(--sf))',
-                        padding: 0,
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    Stop {index + 1}
-                  </span>
-                }
+                title={`Stop ${index + 1}`}
                 meta={
-                  <TextInput
-                    label="Position"
-                    type="number"
-                    value={String(stop.position)}
-                    onChange={(v) => {
-                      const n = Number(v)
-                      if (Number.isFinite(n)) updateStop(index, { position: n })
-                    }}
-                    error={positionError(index)}
+                  <PositionInput
+                    value={stop.position}
+                    error={positionError(stop.position)}
+                    onChange={(n) => updateStop(index, { position: n })}
                   />
                 }
                 value={
@@ -324,18 +368,21 @@ export function App() {
             actionLabel="Add stop"
           />
         ) : (
-          <div>
-            <div
-              aria-label="Gradient preview"
-              style={{
-                height: 'calc(56px * var(--sf))',
-                background: css,
-              }}
-            />
+          <Stack>
+            {clipboard.copied ? (
+              <span role="status" aria-label="CSS copied" style={{ fontFamily: 'var(--mono)', fontSize: 'calc(12px * var(--tf))' }}>
+                CSS copied
+              </span>
+            ) : null}
+            <div aria-label="Gradient preview" style={{ height: 'calc(56px * var(--sf))', background: css }} />
             <KpiRow>
               <Kpi
                 value={
-                  <span role="status" aria-label="CSS preview" style={{ fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', wordBreak: 'break-all' }}>
+                  <span
+                    role="status"
+                    aria-label="CSS preview"
+                    style={{ fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', wordBreak: 'break-all' }}
+                  >
                     {css}
                   </span>
                 }
@@ -343,18 +390,13 @@ export function App() {
                 accent
               />
             </KpiRow>
-          </div>
+          </Stack>
         )}
       </Card>
 
       <Card mono="Library" title="Save this gradient">
         <FormGrid>
-          <TextInput
-            label="Name"
-            value={work.name}
-            onChange={(v) => setWorkState({ ...work, name: v })}
-            placeholder="e.g. Sunset"
-          />
+          <NameInput value={work.name} onChange={(v) => setWorkState({ ...work, name: v })} />
         </FormGrid>
         <Actions>
           <Button kind="primary" onClick={saveGradient}>

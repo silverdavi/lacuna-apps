@@ -1,8 +1,16 @@
+// Colors that are data: swatches for stops and sample gradients.
+// This is the only file where a color literal is allowed.
+
 export interface StopColor {
-  /** The CSS `rgb(...)` value, used for the swatch and the gradient. */
   css: string
-  /** The display form shown next to the stop, e.g. the hex string for red. */
   display: string
+}
+
+export interface SampleGradient {
+  name: string
+  kind: 'linear' | 'radial'
+  angle: number
+  stops: { color: string; position: number }[]
 }
 
 const toTwo = (n: number) => n.toString(16).padStart(2, '0')
@@ -12,7 +20,7 @@ const swatch = (r: number, g: number, b: number): StopColor => ({
   display: `#${toTwo(r)}${toTwo(g)}${toTwo(b)}`,
 })
 
-// Primary swatch palette, cycled as stops are added.
+// Cycled as stops are added.
 export const STOP_COLORS: StopColor[] = [swatch(255, 0, 0), swatch(0, 0, 255)]
 
 export function swatchCss(index: number): string {
@@ -22,3 +30,25 @@ export function swatchCss(index: number): string {
 export function swatchDisplay(index: number): string {
   return STOP_COLORS[index % STOP_COLORS.length].display
 }
+
+export const SAMPLES: SampleGradient[] = [
+  {
+    name: 'Warm Drift',
+    kind: 'linear',
+    angle: 90,
+    stops: [
+      { color: swatch(255, 94, 58).display, position: 0 },
+      { color: swatch(255, 183, 3).display, position: 55 },
+      { color: swatch(143, 90, 240).display, position: 100 },
+    ],
+  },
+  {
+    name: 'Deep Ocean',
+    kind: 'radial',
+    angle: 0,
+    stops: [
+      { color: swatch(35, 200, 190).display, position: 0 },
+      { color: swatch(0, 80, 170).display, position: 100 },
+    ],
+  },
+]
