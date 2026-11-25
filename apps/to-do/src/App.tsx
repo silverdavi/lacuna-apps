@@ -8,6 +8,8 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  ICONS,
+  Keys,
   Kpi,
   KpiRow,
   List,
@@ -23,7 +25,6 @@ import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
 import { exportBackup, importBackup } from '@lacuna/json-backup'
 
 type TaskData = { text: string; done: boolean }
-
 const STORAGE_KEY = 'lacuna.to-do.tasks'
 const APP_ID = 'lacuna.to-do'
 
@@ -40,7 +41,7 @@ function Progress({ total, done }: { total: number; done: number }) {
         width: '100%',
         height: 8,
         borderRadius: 4,
-        background: 'var(--ink-10)',
+        background: 'var(--ui-line2)',
         overflow: 'hidden',
       }}
     >
@@ -55,6 +56,7 @@ export function App() {
 
   const [text, setText] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
   const [toast, setToast] = useState<string | null>(null)
@@ -65,7 +67,11 @@ export function App() {
 
   const total = tasks.length
   const done = tasks.filter((task) => task.done).length
+  const open = total - done
   const percent = total === 0 ? 0 : Math.round((done / total) * 100)
+
+  let visible = tasks
+  if (query.trim()) visible = visible.filter((task) => task.text.toLowerCase().includes(query.trim().toLowerCase()))
 
   function addTask() {
     const next = text.trim()
@@ -103,7 +109,6 @@ export function App() {
   function undoDelete() {
     if (lastDeleted === null) return
     const { index, data } = lastDeleted
-    // The restored task lands at the end (tasks.length); move it back to its original slot.
     actions.add(data)
     if (index < tasks.length) actions.reorder(tasks.length, index)
     setLastDeleted(null)
@@ -180,18 +185,51 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={`${total} ${total === 1 ? 'task' : 'tasks'}`}
-      status="Saved on this device"
+      status={`${done}/${total} done · ${percent}% · ${open} open`}
+      actions={
+        <>
+          <span className="to-do-search">
+            <ICONS.search size={14} />
+            <input
+              className="to-do-filter"
+              value={query}
+              placeholder="Search tasks"
+              aria-label="Search tasks"
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </span>
+          {total > 0 ? (
+            <ExportMenu
+              options={exportOptions}
+              fileName="to-do"
+              ariaLabel="Export tasks"
+              onExport={(id) => setExported(`Exported ${id === 'csv' ? 'CSV' : 'backup'}.`)}
+            />
+          ) : null}
+        </>
+      }
       side={
-        <Rail title="Task List" note="Personal · local" chips={['Check off', 'Reorder', 'Works offline']}>
+        <Rail
+          chips={[`${done} done`, `${open} open`, `${percent}% complete`]}
+          note="All tasks"
+        >
           <MonoLabel faint>
-            Add tasks, check them off, and keep the list in the order you need. It stays on this device.
+            Check tasks off, reorder with Alt+↑↓, and keep the list in the order you need.
           </MonoLabel>
+          <div style={{ marginTop: 12 }}>
+            <Keys
+              items={[
+                ['Enter', 'Add or save'],
+                ['Alt+↑↓', 'Reorder task'],
+              ]}
+            />
+          </div>
         </Rail>
       }
     >
       <Title size="xl">Task List</Title>
 
-      <Card mono="New" title="Add a task">
+      <Card mono="New" title="New task">
         <FormGrid>
           <label className="lc-field">
             <span className="lc-field-label">New task</span>
@@ -222,63 +260,61 @@ export function App() {
 
       <Card mono="Progress" title="Progress">
         <KpiRow>
-          <Kpi label="Done" value={`Done: ${done}`} />
-          <Kpi label="Open" value={`Open: ${total - done}`} />
-          <Kpi label="Percent" value={`Percent: ${percent}%`} accent />
+          <Kpi label="Done" value={String(done)} />
+          <Kpi label="Open" value={String(open)} />
+          <Kpi label="Percent" value={`${percent}%`} accent />
         </KpiRow>
         <div style={{ marginTop: 12 }}>
           <Progress total={total} done={done} />
         </div>
       </Card>
 
-      <Card mono={`${total} saved`} title="Tasks">
+      <Card
+        mono={query ? `${visible.length} of ${total}` : total}
+        title="All tasks"
+      >
         {total === 0 ? (
-          <EmptyState mono="Empty" title="No tasks yet" detail="Add the first task above." />
+          <EmptyState
+            mono="Empty"
+            title="No tasks yet"
+            detail="Add the first task above."
+            actionLabel="Add a task"
+          />
+        ) : visible.length === 0 ? (
+          <EmptyState
+            mono="Filtered"
+            title="No matching tasks"
+            detail="No task matches the search."
+            actionLabel="Clear the search"
+            onAction={() => setQuery('')}
+          />
         ) : (
-          <List label="Tasks">
-            {tasks.map((task, index) => (
+          <List label="All tasks">
+            {visible.map((task, index) => (
               <Row
                 key={task.id}
                 title={
-                  editingId === task.id ? (
-                    <label
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-                      onKeyUp={(event) => {
-                        if (!event.altKey) return
-                        if (event.key === 'ArrowUp') reorderTask(task.id, -1)
-                        else if (event.key === 'ArrowDown') reorderTask(task.id, 1)
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        aria-label={task.text}
-                        checked={task.done}
-                        onChange={(event) => actions.update(task.id, { done: event.target.checked })}
-                      />
-                    </label>
-                  ) : (
-                    <label
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-                      onKeyUp={(event) => {
-                        if (!event.altKey) return
-                        if (event.key === 'ArrowUp') reorderTask(task.id, -1)
-                        else if (event.key === 'ArrowDown') reorderTask(task.id, 1)
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        aria-label={task.text}
-                        checked={task.done}
-                        onChange={(event) => actions.update(task.id, { done: event.target.checked })}
-                      />
-                      <span style={task.done ? { textDecorationLine: 'line-through' } : undefined}>
-                        {task.text}
-                      </span>
-                    </label>
-                  )
+                  <label
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    onKeyUp={(event) => {
+                      if (!event.altKey) return
+                      if (event.key === 'ArrowUp') reorderTask(task.id, -1)
+                      else if (event.key === 'ArrowDown') reorderTask(task.id, 1)
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      aria-label={task.text}
+                      checked={task.done}
+                      onChange={(event) => actions.update(task.id, { done: event.target.checked })}
+                    />
+                    <span style={task.done ? { textDecorationLine: 'line-through' } : undefined}>
+                      {task.text}
+                    </span>
+                  </label>
                 }
                 action={
-                  <span style={{ display: 'inline-flex', gap: 4 }}>
+                  <span style={{ display: 'inline-flex', gap: 4, maxWidth: 240, minWidth: 0 }}>
                     <Button
                       kind="ghost"
                       ariaLabel={`Move ${task.text} up`}
@@ -310,11 +346,7 @@ export function App() {
                             }}
                           />
                         </label>
-                        <Button
-                          kind="primary"
-                          ariaLabel={`Save ${task.text}`}
-                          onClick={commitEdit}
-                        >
+                        <Button kind="primary" ariaLabel={`Save ${task.text}`} onClick={commitEdit}>
                           Save
                         </Button>
                       </>
@@ -330,11 +362,7 @@ export function App() {
                         Edit {task.text}
                       </Button>
                     )}
-                    <Button
-                      kind="ghost"
-                      ariaLabel={`Delete ${task.text}`}
-                      onClick={() => removeTask(task.id)}
-                    >
+                    <Button kind="ghost" ariaLabel={`Delete ${task.text}`} onClick={() => removeTask(task.id)}>
                       Delete {task.text}
                     </Button>
                   </span>
@@ -345,11 +373,15 @@ export function App() {
         )}
       </Card>
 
-      <Card mono="Backup" title="Export and import">
+      <Card mono="Backup" title="Import backup">
         {importResult ? <p role="status">{importResult}</p> : null}
         {exported ? <p role="status">{exported}</p> : null}
         {total === 0 ? (
-          <EmptyState title="Nothing to export yet" detail="Add a task, then export it here." />
+          <EmptyState
+            title="Nothing to export yet"
+            detail="Add a task, then export it here."
+            actionLabel="Add a task"
+          />
         ) : (
           <ExportMenu
             options={exportOptions}
@@ -385,7 +417,7 @@ export function App() {
             padding: '0.5rem 0.75rem',
             borderRadius: 8,
             background: 'var(--ink)',
-            color: 'var(--ink-100)',
+            color: 'var(--paper)',
           }}
         >
           <span>{toast}</span>
