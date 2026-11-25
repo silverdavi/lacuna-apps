@@ -1,261 +1,225 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useCallback, useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, PrimaryButton, Stack, Table, TextInput } from '@lacuna/ui'
+import { useEffect, useState } from 'react'
+import {
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  PrimaryButton,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { shuffle } from '@lacuna/random'
-import './app.css'
+import { cryptoRng, shuffle } from '@lacuna/random'
 
-type Participant = { name: string }
-type Pairing = { giver: string; receiver: string }
-type Tab = 'participants' | 'settings'
-type PairingMode = 'standard' | 'no-self'
+type PairingMode = 'No self-pairing' | 'Allow self-pairing'
+
+interface Pairing {
+  giver: string
+  receiver: string
+}
+
+const TABS = ['Participants', 'Settings', 'Pairings'] as const
+type Tab = (typeof TABS)[number]
 
 function generatePairings(names: string[], mode: PairingMode): Pairing[] {
   const n = names.length
   if (n < 2) return []
-
-  const pool = [...names]
-  if (mode === 'no-self') {
-    // Derangement: each person gives to a different person, no self-pairing.
-    for (let attempt = 0; attempt < 500; attempt++) {
-      const givers = shuffle(Math.random, pool)
-      const receivers = shuffle(Math.random, pool)
-      let valid = true
-      for (let i = 0; i < n; i++) {
-        if (givers[i] === receivers[i]) {
-          valid = false
-          break
-        }
-      }
-      if (valid) {
-        return givers.map((giver, i) => ({ giver, receiver: receivers[i] }))
+  const rng = cryptoRng()
+  if (mode === 'No self-pairing') {
+    // Derangement: every participant gives to exactly one different participant.
+    for (;;) {
+      const receivers = shuffle(rng, [...names])
+      if (receivers.every((r, i) => r !== names[i])) {
+        return names.map((giver, i) => ({ giver, receiver: receivers[i] }))
       }
     }
-  } else {
-    // Standard: each person gives to a random other person (self-pairing allowed).
-    const givers = shuffle(Math.random, pool)
-    return givers.map((giver) => {
-      const others = pool.filter((p) => p !== giver)
-      const receiver = others.length > 0
-        ? others[Math.floor(Math.random() * others.length)]
-        : giver
-      return { giver, receiver }
-    })
   }
-
-  // Fallback
-  const order = shuffle(Math.random, pool)
-  const pairings: Pairing[] = []
-  for (let i = 0; i < n; i++) {
-    pairings.push({ giver: order[i], receiver: order[(i + 1) % n] })
-  }
-  return pairings
+  const receivers = shuffle(rng, [...names])
+  return names.map((giver, i) => ({ giver, receiver: receivers[i] }))
 }
 
 export function App() {
-  const { state, actions } = useCollection<Participant>({
-    storageKey: 'secret-santa-participants',
-  })
-
-  const [name, setName] = useState('')
+  const [tab, setTab] = useState<Tab>('Participants')
+  const [mode, setMode] = useState<PairingMode>('No self-pairing')
+  const [draft, setDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<Tab>('participants')
-  const [mode, setMode] = useState<PairingMode>('standard')
   const [pairings, setPairings] = useState<Pairing[] | null>(null)
-  const [pairingsError, setPairingsError] = useState<string | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
-
-  const participants = state.activeItems.map((item) => item.data.name)
-  const { copy, copied } = useClipboard({
-    timeoutMs: 2500,
-    onSuccess: () => {
-      setToast('Pairings copied to clipboard')
-      window.setTimeout(() => setToast(null), 3000)
-    },
+  const { state, actions } = useCollection<{ name: string }>({
+    storageKey: 'secret-santa.participants',
   })
+  const clipboard = useClipboard({ timeoutMs: 2000 })
 
-  const addParticipant = useCallback(() => {
-    const next = name.trim()
-    if (!next) {
-      setError('Type a name first')
+  const names = state.activeItems.map((i) => i.data.name)
+  const nameKey = names.join('\u0000')
+
+  useEffect(() => {
+    setPairings(null)
+  }, [nameKey])
+
+  function add() {
+    const name = draft.trim()
+    if (name === '') return
+    if (names.some((n) => n.toLowerCase() === name.toLowerCase())) {
+      setError(`${name} is already in the list.`)
       return
     }
-    if (participants.includes(next)) {
-      setError('That participant is already in the list')
-      return
-    }
-    actions.add({ name: next })
-    setName('')
+    actions.add({ name })
+    setDraft('')
     setError(null)
-  }, [name, participants, actions])
+  }
 
-  const deleteParticipant = useCallback(
-    (id: string) => {
-      actions.remove(id)
-      setPairings(null)
-      setPairingsError(null)
-    },
-    [actions],
-  )
+  function remove(name: string) {
+    const item = state.items.find((it) => it.data.name === name)
+    if (item) actions.remove(item.id)
+    setPairings(null)
+  }
 
-  const generate = useCallback(() => {
-    if (participants.length < 2) {
-      setPairingsError('Need at least 2 participants')
-      setPairings(null)
+  function generate() {
+    if (names.length < 2) {
+      setError('Need at least 2 participants')
       return
     }
-    setPairings(generatePairings(participants, mode))
-    setPairingsError(null)
-  }, [participants, mode])
+    setPairings(generatePairings(names, mode))
+    setError(null)
+    setTab('Pairings')
+  }
 
-  const copyPairings = useCallback(async () => {
-    if (!pairings) return
-    const text = pairings.map((p) => `${p.giver} → ${p.receiver}`).join('\n')
-    try {
-      await copy(text)
-    } catch {
-      setToast('Copy failed')
-      window.setTimeout(() => setToast(null), 3000)
-    }
-  }, [pairings, copy])
+  function copyPairings() {
+    if (!pairings || pairings.length === 0) return
+    const lines = pairings.map((p) => `${p.giver} → ${p.receiver}`)
+    void clipboard.copy(lines.join('\n'))
+  }
 
-  const count = participants.length
+  const participantRows = names.map((name) => ({
+    cells: {
+      name,
+      action: (
+        <Button kind="ghost" ariaLabel={`Delete ${name}`} onClick={() => remove(name)}>
+          Delete
+        </Button>
+      ),
+    },
+  }))
+
+  const pairingRows = (pairings ?? []).map((p) => ({
+    cells: { giver: p.giver, receiver: p.receiver },
+  }))
 
   return (
     <AppShell
       name="Secret Santa"
       icon="people"
-      hue="gold"
-      category="Apps"
-      meta={count === 0 ? '' : `${count} participant${count === 1 ? '' : 's'}`}
+      hue="rust"
+      category="Personal"
+      meta={names.length === 1 ? '1 participant' : `${names.length} participants`}
+      status={pairings && pairings.length > 0 ? `${pairings.length} pairs generated` : 'No pairings yet'}
     >
-      <div role="tablist" aria-label="App sections" className="ss-tabs">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'participants'}
-          className={`ss-tab${tab === 'participants' ? ' active' : ''}`}
-          onClick={() => setTab('participants')}
-        >
-          Participants
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'settings'}
-          className={`ss-tab${tab === 'settings' ? ' active' : ''}`}
-          onClick={() => setTab('settings')}
-        >
-          Settings
-        </button>
+      <div role="tablist" aria-label="Secret Santa views" className="ss-tabs">
+        {TABS.map((t) => (
+          <button
+            key={t}
+            type="button"
+            role="tab"
+            id={`tab-${t}`}
+            aria-selected={tab === t}
+            aria-controls={`panel-${t}`}
+            tabIndex={tab === t ? 0 : -1}
+            className="ss-tab"
+            onClick={() => setTab(t)}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
-      {tab === 'participants' && (
-        <Stack lg>
-          <Card mono="New" title="Add a participant">
-            <FormGrid>
-              <TextInput label="Name" value={name} onChange={setName} error={error} placeholder="Alice" />
-            </FormGrid>
-            <Actions>
-              <PrimaryButton onClick={addParticipant}>Add participant</PrimaryButton>
-            </Actions>
+      {tab === 'Participants' ? (
+        <div role="tabpanel" id="panel-Participants" aria-labelledby="tab-Participants">
+          <Card title="Add a participant">
+            <TextInput
+              label="Name"
+              value={draft}
+              onChange={(v) => {
+                setDraft(v)
+                setError(null)
+              }}
+              placeholder="e.g. Priya"
+            />
+            {error ? <p role="alert">{error}</p> : null}
+            <PrimaryButton onClick={add}>Add participant</PrimaryButton>
           </Card>
 
-          <Card mono={`${count} saved`} title="Participants">
-            {count === 0 ? (
-              <EmptyState
-                mono="Empty"
-                title="No participants yet"
-                detail="Add the first one above."
-                actionLabel="Add a participant"
-                onAction={addParticipant}
-              />
-            ) : (
-              <Table
-                label="Participants"
-                columns={[
-                  { key: 'name', label: 'Name' },
-                  { key: 'actions', label: '' },
-                ]}
-                rows={state.activeItems.map((item) => ({
-                  cells: {
-                    name: item.data.name,
-                    actions: (
-                      <Button
-                        kind="ghost"
-                        ariaLabel={`Delete ${item.data.name}`}
-                        onClick={() => deleteParticipant(item.id)}
-                      >
-                        Delete
-                      </Button>
-                    ),
-                  },
-                }))}
-              />
-            )}
+          <Card title="Participants">
+            <Table
+              label="Participants"
+              columns={[
+                { key: 'name', label: 'Name' },
+                { key: 'action', label: '' },
+              ]}
+              rows={participantRows}
+              empty="No participants yet"
+            />
           </Card>
 
-          <Card mono="Draw" title="Pairings">
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-              <Button kind="secondary" onClick={generate}>Generate pairings</Button>
-            </div>
-            {pairingsError ? (
-              <div role="alert">{pairingsError}</div>
-            ) : pairings ? (
-              <Stack>
-                <Table
-                  label="Pairings"
-                  columns={[
-                    { key: 'giver', label: 'Giver' },
-                    { key: 'receiver', label: 'Receiver' },
-                  ]}
-                  rows={pairings.map((p) => ({
-                    cells: { giver: p.giver, receiver: p.receiver },
-                  }))}
-                />
-                <Actions>
-                  <Button kind="secondary" onClick={() => void copyPairings()}>
-                    {copied ? 'Copied' : 'Copy pairings'}
-                  </Button>
-                </Actions>
-              </Stack>
-            ) : (
-              <div className="lc-body-sm" style={{ color: 'var(--ink-60)' }}>
-                No pairings yet. Generate a draw to see who gives to whom.
-              </div>
-            )}
-          </Card>
-        </Stack>
-      )}
+          <PrimaryButton onClick={generate}>Generate pairings</PrimaryButton>
+        </div>
+      ) : null}
 
-      {tab === 'settings' && (
-        <Stack lg>
-          <Card mono="Options" title="Pairing settings">
-            <FormGrid>
-              <label className="lc-field">
-                <span className="lc-field-label">Pairing mode</span>
-                <select
-                  className="lc-input"
-                  aria-label="Pairing mode"
-                  value={mode}
-                  onChange={(e) => setMode(e.target.value as PairingMode)}
-                >
-                  <option value="standard">Standard (allow self-pairing)</option>
-                  <option value="no-self">No self-pairing</option>
-                </select>
+      {tab === 'Settings' ? (
+        <div role="tabpanel" id="panel-Settings" aria-labelledby="tab-Settings">
+          <Card title="Pairing settings">
+            <div className="lc-field">
+              <label className="lc-field-label" htmlFor="pairing-mode">
+                Pairing mode
               </label>
-            </FormGrid>
-            <p className="lc-body-sm">
-              {mode === 'no-self'
-                ? 'No participant is paired with themselves.'
-                : 'A participant may be paired with themselves by chance.'}
-            </p>
+              <select
+                id="pairing-mode"
+                className="lc-input"
+                value={mode}
+                onChange={(e) => setMode(e.target.value as PairingMode)}
+              >
+                <option value="No self-pairing">No self-pairing</option>
+                <option value="Allow self-pairing">Allow self-pairing</option>
+              </select>
+            </div>
           </Card>
-        </Stack>
-      )}
+        </div>
+      ) : null}
 
-      {toast && <div role="status">{toast}</div>}
+      {tab === 'Pairings' ? (
+        <div role="tabpanel" id="panel-Pairings" aria-labelledby="tab-Pairings">
+          {pairings && pairings.length > 0 ? (
+            <Card mono={`${pairings.length} pairs`} title="Pairings">
+              <Table
+                label="Pairings"
+                columns={[
+                  { key: 'giver', label: 'Giver' },
+                  { key: 'receiver', label: 'Receiver' },
+                ]}
+                rows={pairingRows}
+              />
+              <div className="ss-actions">
+                <Button kind="secondary" onClick={copyPairings}>Copy pairings</Button>
+              </div>
+            </Card>
+          ) : (
+            <Card title="Pairings">
+              <EmptyState
+                title="No pairings yet"
+                detail="Add at least two participants, then generate a pairing."
+                actionLabel="Generate pairings"
+                onAction={generate}
+              />
+            </Card>
+          )}
+        </div>
+      ) : null}
+
+      {clipboard.copied ? (
+        <div role="status" aria-live="polite">
+          Pairings copied to clipboard
+        </div>
+      ) : null}
     </AppShell>
   )
 }
