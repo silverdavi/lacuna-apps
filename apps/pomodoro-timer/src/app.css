@@ -1,5 +1,4 @@
-/* Inactive tabs: the kit's .lc-tab defaults to --ink-40 (2.49:1) which
-   fails WCAG AA; --ink-60 (4.79:1) passes. */
-.pt-tab {
-  color: var(--ink-60);
-}
+/* The kit's inactive .lc-tab sits at --ink-40, which does not reach the
+   4.5:1 contrast floor on the shell background; lift it to --ink-80.
+   Colors are Lacuna tokens only. */
+.lk-main .lc-tab[aria-selected='false'] { color: var(--ink-80); }

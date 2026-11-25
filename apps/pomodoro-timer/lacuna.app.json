@@ -7,7 +7,7 @@
   "description": "A focus timer with 25-minute focus phases and 5-minute breaks. Start, pause, and skip phases. Completed focus sessions are listed in history with a daily streak.",
   "category": "productivity",
   "tags": [],
-  "icon": "calendar",
+  "icon": "timesheets",
   "relationship": {
     "kind": "standalone"
   },
@@ -34,8 +34,7 @@
       "@lacuna/ui": "^0.1.0",
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/streak-calc": "0.1.0",
-      "@lacuna/use-clipboard": "0.1.0",
-      "@lacuna/use-timer": "0.1.0"
+      "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [

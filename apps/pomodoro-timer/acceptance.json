@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "9a282af06d4b49047aa058592d7745bc9de28737d55a81b13e503157b3ec78cd",
+  "spec_sha256": "609e5c5c01c9ae7582a623cdf9b18d10d0fa839ce16f0ce9ce00fdef170b6071",
   "checks": [
     {
       "id": "A1",
@@ -20,29 +20,29 @@
     },
     {
       "id": "A5",
-      "text": "After a Focus phase completes naturally (time reaches \"00:00\"), the phase label changes to \"Break\", the time display resets to \"05:00\", and a toast message \"Focus session completed\" appears."
+      "text": "With `/?focus=2`, after clicking \"Start\" and waiting for the Focus phase to complete naturally (the display reaches \"00:00\"), the phase label changes to \"Break\", the time display shows \"05:00\", and a toast message \"Focus session completed\" appears."
     },
     {
       "id": "A6",
-      "text": "Clicking the tab \"History\" shows a list of completed sessions; after completing one Focus session, the list contains an item with the text \"Focus\" and a duration of \"25:00\"."
+      "text": "With `/?focus=2`, after one Focus session completes naturally, clicking the tab \"History\" shows a list containing an item with the text \"Focus\" and the duration \"00:02\"."
     },
     {
       "id": "A7",
-      "text": "Clicking the button \"Copy summary\" on the History tab copies the text \"Sessions: 1, Total focus: 25:00\" to the clipboard and shows a toast \"Copied to clipboard\"."
+      "text": "With `/?focus=2`, after one Focus session completes naturally, clicking the button \"Copy summary\" on the History tab copies the text \"Sessions: 1, Total focus: 00:02\" to the clipboard and shows a toast \"Copied to clipboard\"."
     },
     {
       "id": "A8",
-      "text": "The streak display shows \"Streak: 0\" initially; after completing one Focus session, it shows \"Streak: 1\"."
+      "text": "The streak display shows \"Streak: 0\" initially; with `/?focus=2`, after one Focus session completes naturally, it shows \"Streak: 1\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the completed session: after completing one Focus session and reloading, the History tab shows an item with \"Focus\" and \"25:00\", and the streak display shows \"Streak: 1\"."
+      "text": "With `/?focus=2`, after one Focus session completes naturally and a reload, the History tab shows an item with \"Focus\" and \"00:02\", and the streak display shows \"Streak: 1\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "44750769d378a36ffd292d9689f40f0054caf6b221d1b7019f524213f6516458"
+      "sha256": "f126339fd06779f8ba076806d807d046e08473eeb85dc59b66a3c781556df4ea"
     }
   ]
 }
