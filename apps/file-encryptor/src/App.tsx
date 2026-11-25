@@ -5,14 +5,11 @@ import {
   Button,
   Card,
   EmptyState,
-  ErrorState,
   FormGrid,
   List,
-  Rail,
   Row,
   Select,
   Stack,
-  TextInput,
 } from '@lacuna/ui'
 import { decrypt, encrypt } from '@lacuna/passphrase-crypto'
 import type { EncryptedPayload } from '@lacuna/passphrase-crypto'
@@ -134,11 +131,14 @@ export function App() {
   }
 
   function addOperation(filename: string, opMode: string) {
+    const d = new Date()
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const timestamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
     const op: Operation = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       filename,
       mode: opMode,
-      timestamp: new Date().toLocaleString(),
+      timestamp,
     }
     setSession((prev) => ({
       ...prev,
@@ -169,20 +169,8 @@ export function App() {
         setMessage({ kind: 'error', text: 'Encryption failed' })
       }
     } else {
-      const trimmed = loaded.text.trim()
-      let payload: EncryptedPayload
-      if (looksLikePayload(trimmed)) {
-        try {
-          payload = payloadFromJSON(trimmed)
-        } catch {
-          setMessage({ kind: 'error', text: 'Decryption failed: corrupted file' })
-          return
-        }
-      } else {
-        setMessage({ kind: 'error', text: 'Decryption failed: not an encrypted file' })
-        return
-      }
       try {
+        const payload = payloadFromJSON(loaded.text)
         const out = await decrypt(payload, pass)
         const base = loaded.name.endsWith('.enc') ? loaded.name.slice(0, -4) : loaded.name
         setResult({ text: out, filename: base })
@@ -219,14 +207,7 @@ export function App() {
       hue="rust"
       category="Productivity"
       meta={loaded ? 'ready' : 'no file'}
-      status="Local · no network"
-      side={
-        <Rail
-          title="File Encryptor"
-          note={loaded ? 'File loaded' : 'No file loaded'}
-          chips={['Encrypt', 'Decrypt', 'Download', 'Copy']}
-        />
-      }
+      status={message ? message.text : 'Local · no network'}
     >
       <input
         ref={fileRef}
@@ -326,16 +307,20 @@ export function App() {
           </FormGrid>
         </Card>
 
-        {message ? (
-          message.kind === 'error' ? (
-            <ErrorState title={message.text} detail="Check the file and passphrase, then try again." />
-          ) : (
-            <Card mono="STATUS" title="Result of last run">
-              <div role="status" style={{ fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', color: 'var(--ink)' }}>
-                {message.text}
-              </div>
-            </Card>
-          )
+        {message && message.kind === 'error' ? (
+          <div
+            role="alert"
+            style={{
+              padding: 'calc(10px * var(--sf))',
+              border: 'calc(1px * var(--sf)) solid var(--rust)',
+              background: 'var(--paper-deep)',
+              fontFamily: 'var(--mono)',
+              fontSize: 'calc(13px * var(--tf))',
+              color: 'var(--ink)',
+            }}
+          >
+            {message.text}
+          </div>
         ) : null}
 
         {result ? (
@@ -365,10 +350,10 @@ export function App() {
                 alignItems: 'center',
               }}
             >
-              <Button kind="primary" onClick={downloadResult}>
+              <Button kind="primary" onClick={downloadResult} disabled={!result}>
                 Download result
               </Button>
-              <Button kind="secondary" onClick={copyResult}>
+              <Button kind="secondary" onClick={copyResult} disabled={!result}>
                 Copy to clipboard
               </Button>
               {clipboard.copied ? (
@@ -391,6 +376,22 @@ export function App() {
               title="No result yet"
               detail="Load a file and run Transform."
             />
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 'calc(10px * var(--sf))',
+                marginTop: 'calc(10px * var(--sf))',
+                alignItems: 'center',
+              }}
+            >
+              <Button kind="primary" onClick={downloadResult} disabled>
+                Download result
+              </Button>
+              <Button kind="secondary" onClick={copyResult} disabled>
+                Copy to clipboard
+              </Button>
+            </div>
           </Card>
         )}
 
@@ -426,13 +427,13 @@ export function App() {
         <Card mono="DEFAULTS" title="Default passphrase">
           <FormGrid>
             <label className="lc-field">
-              <span className="lc-field-label">Default</span>
+              <span className="lc-field-label">Default passphrase</span>
               <input
                 className="lc-input"
                 type="text"
                 value={session.defaultPassphrase}
                 placeholder="Saved and pre-filled on load"
-                aria-label="Default"
+                aria-label="Default passphrase"
                 onChange={(event) => setSession((prev) => ({ ...prev, defaultPassphrase: event.target.value }))}
               />
             </label>
