@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2f9e4a6fc33f0b80df3e685e9251218aa0e2897f56cd0adcad62317d9ee5cc75",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Epoch Converter\" and the input pane shows a field labelled \"Unix timestamp\" with the value \"1700000000\" and a field labelled \"Date\" with the value \"2023-11-14T22:13:20Z\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"1609459200\" into the field labelled \"Unix timestamp\" updates the field labelled \"Date\" to \"2021-01-01T00:00:00Z\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"2024-02-29T12:00:00Z\" into the field labelled \"Date\" updates the field labelled \"Unix timestamp\" to \"1709217600\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button labelled \"Copy timestamp\" shows the toast text \"Copied 1700000000\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Copy date\" shows the toast text \"Copied 2023-11-14T22:13:20Z\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Now\" sets the field labelled \"Unix timestamp\" to a value that, when converted, shows a date within the last 60 seconds of the test run; the field labelled \"Date\" updates accordingly."
+    },
+    {
+      "id": "A7",
+      "text": "After converting \"1609459200\" to \"2021-01-01T00:00:00Z\", the history list contains an item with the text \"1609459200 \u2192 2021-01-01T00:00:00Z\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labelled \"Clear history\" removes all items from the history list, and the list shows the text \"No history\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history item \"1609459200 \u2192 2021-01-01T00:00:00Z\" visible in the history list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "cb89b4a27272f05295fb117146101cfe59943e9db92be41ef1f231146f987405"
+    }
+  ]
+}
