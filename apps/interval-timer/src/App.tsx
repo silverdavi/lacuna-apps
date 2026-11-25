@@ -1,17 +1,42 @@
 import { useEffect, useRef, useState } from 'react'
-import { AppShell, Body, Button, Card, EmptyState, FormGrid, List, MonoLabel, Row, Stack, TextInput } from '@lacuna/ui'
+import {
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  List,
+  MonoLabel,
+  Rail,
+  Row,
+  Stack,
+  TextInput,
+} from '@lacuna/ui'
 import { createMockValue } from '@lacuna/host-mock'
+import { useCollection } from '@lacuna/use-collection'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
+import { ExportMenu } from '@lacuna/export-menu'
+import { toISODate } from '@lacuna/date-math'
+import { computeStreaks } from '@lacuna/streak-calc'
+
+const APP_ID = 'lacuna.interval-timer'
+const BACKUP_VERSION = 1
+const ROUND_KEY = 'lacuna.interval-timer.rounds'
+const TIMER_KEY = 'lacuna.interval-timer.timer'
+const TAB_ITEMS = ['Timer', 'History', 'Data']
 
 type Phase = 'ready' | 'work' | 'rest'
 
-interface Entry {
+interface RoundData {
   round: number
   workSec: number
   restSec: number
+  date: string
 }
 
-interface Persisted {
-  phase: Exclude<Phase, 'ready'>
+interface TimerState {
+  phase: Phase
   round: number
   running: boolean
   remainingMs: number
@@ -19,153 +44,159 @@ interface Persisted {
   restMs: number
 }
 
-function validatePersisted(v: unknown): v is Persisted {
-  if (typeof v !== 'object' || v === null) return false
-  const p = v as Record<string, unknown>
-  if (p.phase !== 'work' && p.phase !== 'rest') return false
-  const num = (x: unknown) => typeof x === 'number' && Number.isFinite(x)
-  if (!num(p.workMs) || !num(p.restMs) || !num(p.remainingMs)) return false
-  const workMs = p.workMs as number
-  const restMs = p.restMs as number
-  const remainingMs = p.remainingMs as number
-  if (workMs <= 0 || restMs <= 0 || remainingMs <= 0) return false
-  if (!num(p.round) || (p.round as number) < 1) return false
-  if (typeof p.running !== 'boolean') return false
-  return true
+function isTimerState(value: unknown): value is TimerState {
+  if (typeof value !== 'object' || value === null) return false
+  const t = value as Record<string, unknown>
+  const num = (x: unknown) => typeof x === 'number' && Number.isFinite(x) && x > 0
+  if (t.phase !== 'work' && t.phase !== 'rest') return false
+  if (!num(t.workMs) || !num(t.restMs) || !num(t.remainingMs)) return false
+  if (!num(t.round) || (t.round as number) < 1) return false
+  return typeof t.running === 'boolean'
 }
 
-const store = createMockValue<Persisted>({
-  key: 'interval-timer',
-  fallback: { phase: 'work', round: 1, running: false, remainingMs: 0, workMs: 0, restMs: 0 },
-  validate: validatePersisted,
+const timerStore = createMockValue<TimerState>({
+  key: TIMER_KEY,
+  fallback: { phase: 'ready', round: 1, running: false, remainingMs: 0, workMs: 30000, restMs: 15000 },
+  validate: isTimerState,
 })
 
-function load(): Persisted | null {
-  const v = store.get()
-  if (v.workMs <= 0 || v.restMs <= 0 || v.remainingMs <= 0) return null
-  return v
+function today(): string {
+  return toISODate(new Date)
 }
-
-function save(state: Persisted) {
-  store.set(state)
-}
-
-function fmt(ms: number) {
-  const total = Math.max(0, Math.round(ms / 1000))
-  const minutes = Math.floor(total / 60)
-  const seconds = total % 60
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-}
-
-const TICK_MS = 100
-const SPEED = 10
 
 export function App() {
-  const [initial] = useState(load)
-  const [workSec, setWorkSec] = useState(() => String(Math.round((initial?.workMs ?? 30000) / 1000)))
-  const [restSec, setRestSec] = useState(() => String(Math.round((initial?.restMs ?? 15000) / 1000)))
-  const [phase, setPhase] = useState<Phase>(initial?.phase ?? 'ready')
-  const [round, setRound] = useState(initial?.round ?? 1)
-  const [running, setRunning] = useState(initial?.running ?? false)
-  const [remainingMs, setRemainingMs] = useState(initial?.remainingMs ?? 0)
-  const [entries, setEntries] = useState<Entry[]>([])
-  const [tab, setTab] = useState<'Timer' | 'History'>('Timer')
-  const [flash, setFlash] = useState(false)
+  const { state, actions } = useCollection<RoundData>({ storageKey: ROUND_KEY })
+  const items = state.activeItems
 
-  const workMs = Math.max(1, Math.round(Number(workSec)) || 1) * 1000
-  const restMs = Math.max(1, Math.round(Number(restSec)) || 1) * 1000
-  const phaseRef = useRef(phase)
-  phaseRef.current = phase
-  const roundRef = useRef(round)
-  roundRef.current = round
-  const workRef = useRef(workMs)
-  workRef.current = workMs
-  const restRef = useRef(restMs)
-  restRef.current = restMs
-  const remainingRef = useRef(remainingMs)
-  remainingRef.current = remainingMs
-  // The remaining time to use when the current phase begins ticking. Set
-  // explicitly on start / transition / resume so the timer never re-seeds
-  // from a stale or zero value.
-  const phaseRemainingRef = useRef(0)
+  const [timer, setTimerState] = useState<TimerState>(() => timerStore.get())
+  const workSecInput = String(Math.round(timer.workMs / 1000))
+  const restSecInput = String(Math.round(timer.restMs / 1000))
+
+  const [workSec, setWorkSec] = useState(workSecInput)
+  const [restSec, setRestSec] = useState(restSecInput)
+  const [tab, setTab] = useState<'Timer' | 'History' | 'Data'>('Timer')
+  const [importMsg, setImportMsg] = useState<string | null>(null)
+
+  const tickRef = useRef<() => void>(() => {})
+  tickRef.current = () => {
+    setTimerState((cur) => {
+      if (!cur.running || cur.phase === 'ready') return cur
+      const next = cur.remainingMs - 1000
+      if (next > 1000) {
+        return { ...cur, remainingMs: next }
+      }
+      if (next >= 500) {
+        return { ...cur, remainingMs: 1000 }
+      }
+      if (cur.phase === 'work') {
+        return { ...cur, phase: 'rest', remainingMs: cur.restMs }
+      }
+      const round = cur.round
+      const workSec = Math.round(cur.workMs / 1000)
+      const restSec = Math.round(cur.restMs / 1000)
+      window.setTimeout(() => actions.add({ round, workSec, restSec, date: today() }), 0)
+      return { ...cur, phase: 'work', round: cur.round + 1, remainingMs: cur.workMs }
+    })
+  }
+
+  useEffect(() => {
+    if (!timer.running || timer.phase === 'ready') return
+    const id = window.setInterval(() => tickRef.current(), 100)
+    return () => window.clearInterval(id)
+  }, [timer.running, timer.phase])
+
+  useEffect(() => {
+    timerStore.set(timer)
+  }, [timer])
+
+  const commitDurations = (t: TimerState, w: number, r: number): TimerState =>
+    t.phase === 'ready' ? { ...t, workMs: w, restMs: r } : t
 
   function start() {
-    if (phase !== 'ready') return
-    phaseRemainingRef.current = workMs
-    setPhase('work')
-    setRemainingMs(workMs)
-    setRunning(true)
+    const work = Math.max(1, Math.round(Number(workSec)) || 1) * 1000
+    const rest = Math.max(1, Math.round(Number(restSec)) || 1) * 1000
+    setWorkSec(workSec)
+    setRestSec(restSec)
+    setTimerState((t) => ({
+      ...t,
+      workMs: work,
+      restMs: rest,
+      phase: 'work',
+      remainingMs: work,
+      running: true,
+    }))
   }
-
-  function resume() {
-    // Continue from the current remaining; the effect will seed from it.
-    setRunning(true)
-  }
-
-  // Tick the countdown while running; transition phases when time elapses.
-  useEffect(() => {
-    if (phase === 'ready' || !running) return
-    // Seed: prefer an explicitly-set phase remaining (start/transition);
-    // otherwise fall back to the live remaining (resume case).
-    const startRemaining =
-      phaseRemainingRef.current > 0 ? phaseRemainingRef.current : remainingRef.current
-    phaseRemainingRef.current = 0
-    const startReal = Date.now()
-    let firstTick = true
-    const id = window.setInterval(() => {
-      // Hold the display at the phase's full duration for the first tick after
-      // a (re)start or transition, so the new phase reads its full time.
-      if (firstTick) {
-        firstTick = false
-        setRemainingMs(startRemaining)
-        return
-      }
-      const elapsedVirtual = (Date.now() - startReal) * SPEED
-      const remaining = startRemaining - elapsedVirtual
-      if (remaining <= 0) {
-        if (phaseRef.current === 'work') {
-          phaseRemainingRef.current = restRef.current
-          setPhase('rest')
-        } else {
-          phaseRemainingRef.current = workRef.current
-          setPhase('work')
-          setRound((r) => r + 1)
-          setEntries((e) => [...e, { round: roundRef.current, workSec: workRef.current / 1000, restSec: restRef.current / 1000 }])
-        }
-        setFlash(true)
-        setRemainingMs(0)
-      } else {
-        setRemainingMs(Math.ceil(remaining / 1000) * 1000)
-      }
-    }, TICK_MS)
-    return () => window.clearInterval(id)
-  }, [running, phase])
-
-  useEffect(() => {
-    if (!flash) return
-    const id = window.setTimeout(() => setFlash(false), 500)
-    return () => window.clearTimeout(id)
-  }, [flash])
-
-  // Persist the running timer so a reload restores it.
-  useEffect(() => {
-    if (phase === 'ready') {
-      save({ phase: 'work', round, running: false, remainingMs: workMs, workMs, restMs })
-      return
-    }
-    save({ phase, round, running, remainingMs, workMs, restMs })
-  }, [phase, round, running, remainingMs, workMs, restMs])
 
   function stop() {
-    setRunning(false)
-    setPhase('ready')
-    setRound(1)
-    setRemainingMs(0)
+    setTimerState((t) => ({
+      ...t,
+      phase: 'ready',
+      round: 1,
+      running: false,
+      remainingMs: 0,
+      workMs: Math.max(1, Math.round(Number(workSec)) || 1) * 1000,
+      restMs: Math.max(1, Math.round(Number(restSec)) || 1) * 1000,
+    }))
   }
 
-  const activeMs = phase === 'work' ? workMs : restMs
-  const displayMs = phase === 'ready' ? 0 : remainingMs
-  const clockLabel = phase === 'ready' ? 'Time display' : `${phase === 'work' ? 'Work' : 'Rest'} time remaining`
+  const backupText = () =>
+    exportBackup({
+      appId: APP_ID,
+      version: BACKUP_VERSION,
+      filename: 'interval-timer',
+      records: items.map((item) => ({
+        id: item.id,
+        data: item.data,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+    })
+
+  function pickImport() {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'application/json,.json'
+    input.onchange = () => {
+      const file = input.files?.[0]
+      if (file === undefined || file === null) return
+      file
+        .text()
+        .then((text) => {
+          try {
+            const result = importBackup<RoundData>(text, {
+              currentVersion: BACKUP_VERSION,
+              validate: (record) =>
+                typeof record.data.round === 'number' &&
+                typeof record.data.workSec === 'number' &&
+                typeof record.data.restSec === 'number' &&
+                typeof record.data.date === 'string'
+                  ? null
+                  : 'not a round record',
+            })
+            const known = new Set(items.map((item) => item.id))
+            let added = 0
+            for (const record of result.records) {
+              if (known.has(record.id)) continue
+              actions.add(record.data)
+              added += 1
+            }
+            setImportMsg(`Imported ${added} new ${added === 1 ? 'round' : 'rounds'}.`)
+          } catch (err) {
+            setImportMsg(err instanceof Error ? err.message : 'Could not read that file.')
+          }
+        })
+        .catch(() => setImportMsg('Could not read that file.'))
+    }
+    input.click()
+  }
+
+  const rounds = items.map((item) => item.data)
+  const streak = computeStreaks(
+    [...new Set(rounds.map((r) => r.date))],
+    { today: today() },
+  )
+  const totalWorkSec = rounds.reduce((sum, r) => sum + r.workSec, 0)
+  const totalRestSec = rounds.reduce((sum, r) => sum + r.restSec, 0)
 
   return (
     <AppShell
@@ -173,128 +204,241 @@ export function App() {
       icon="timesheets"
       hue="green"
       category="Productivity"
-      meta={phase === 'ready' ? 'Ready' : running ? phase : 'Paused'}
+      meta={timer.phase === 'ready' ? 'Ready' : timer.running ? timer.phase : 'Paused'}
+      side={
+        <Rail
+          title="Interval Timer"
+          note="Work and rest intervals, round by round"
+          chips={['Work / rest', 'History', 'Export']}
+        >
+          <List label="Stats">
+            <Row title="Rounds" value={`${rounds.length}`} />
+            <Row title="Current streak" value={`${streak.current} ${streak.current === 1 ? 'day' : 'days'}`} />
+            <Row title="Longest streak" value={`${streak.longest} ${streak.longest === 1 ? 'day' : 'days'}`} />
+            <Row title="Total work" value={`${totalWorkSec}s`} />
+            <Row title="Total rest" value={`${totalRestSec}s`} />
+          </List>
+        </Rail>
+      }
     >
-      <div role="tablist" aria-label="Views">
-        {(['Timer', 'History'] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => setTab(t)}
-            style={{
-              fontFamily: 'var(--sans)',
-              fontSize: 'calc(12.5px * var(--tf))',
-              fontWeight: 600,
-              color: tab === t ? 'var(--ink)' : 'var(--ink-80)',
-              padding: '0 calc(2px * var(--sf)) calc(11px * var(--sf))',
-              border: 'none',
-              background: 'none',
-              borderBottom: `calc(2px * var(--sf)) solid ${tab === t ? 'var(--accent)' : 'transparent'}`,
-              cursor: 'pointer',
-            }}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <Stack lg>
+        <div className="lc-tabs" role="tablist">
+          {TAB_ITEMS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={tab === item}
+              onClick={() => setTab(item as 'Timer' | 'History' | 'Data')}
+              style={{
+                fontFamily: 'var(--sans)',
+                fontSize: 'calc(12.5px * var(--tf))',
+                fontWeight: 600,
+                color: tab === item ? 'var(--ink)' : 'var(--ink-80)',
+                padding: '0 calc(2px * var(--sf)) calc(11px * var(--sf))',
+                border: 'none',
+                background: 'none',
+                borderBottom: `calc(2px * var(--sf)) solid ${tab === item ? 'var(--accent)' : 'transparent'}`,
+                cursor: 'pointer',
+              }}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
 
-      {tab === 'Timer' ? (
-        <div role="tabpanel" aria-label="Timer">
-          <Stack>
-            <Card mono="Timer" title="Interval Timer">
-              <Stack>
-                <MonoLabel sm accent={phase !== 'ready'}>{`Round ${round}`}</MonoLabel>
-                <div style={{ textAlign: 'center' }}>
+        {tab === 'Timer' ? (
+          <div role="tabpanel" aria-label="Timer">
+            <Stack>
+              <Card mono="Timer" title="Intervals">
+                <Stack>
+                  <div style={{ textAlign: 'center' }}>
+                    <MonoLabel sm>
+                      {`Round ${timer.round}`}
+                    </MonoLabel>
+                  </div>
                   <div
                     role="timer"
-                    aria-label={clockLabel}
+                    aria-label={
+                      timer.phase === 'ready' ? 'Time display' : `${timer.phase === 'work' ? 'Work' : 'Rest'} time remaining`
+                    }
                     tabIndex={0}
                     style={{
                       display: 'inline-flex',
+                      margin: '0 auto',
                       padding: 'calc(8px * var(--sf))',
                       borderWidth: 'calc(1px * var(--sf))',
                       borderStyle: 'solid',
-                      borderColor: flash ? 'var(--danger)' : 'var(--hair)',
+                      borderColor: 'var(--hair)',
                       borderRadius: 'calc(4px * var(--sf))',
                       background: 'var(--paper-deep)',
                     }}
                   >
                     <time
                       style={{
-                        color: flash ? 'var(--danger)' : 'var(--ink)',
+                        color: 'var(--ink)',
                         fontFamily: 'var(--mono)',
                         fontSize: 'calc(40px * var(--tf))',
                         lineHeight: 1.1,
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
-                      {fmt(displayMs)}
+                      {fmt(timer.phase === 'ready' ? 0 : timer.remainingMs)}
                     </time>
                   </div>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <MonoLabel accent sm>{phase === 'ready' ? 'Ready' : phase === 'work' ? 'Work' : 'Rest'}</MonoLabel>
-                </div>
-                <FormGrid>
-                  <TextInput label="Work (sec)" value={workSec} onChange={setWorkSec} inputMode="numeric" />
-                  <TextInput label="Rest (sec)" value={restSec} onChange={setRestSec} inputMode="numeric" />
-                </FormGrid>
-                <Stack>
-                  {phase === 'ready' ? (
-                    <Button kind="primary" onClick={start}>Start</Button>
-                  ) : (
-                    <>
-                      {running ? (
-                        <Button kind="primary" onClick={() => setRunning(false)}>Pause</Button>
-                      ) : (
-                        <Button kind="primary" onClick={resume}>Resume</Button>
-                      )}
-                      <Button onClick={stop}>Stop</Button>
-                    </>
-                  )}
-                </Stack>
-                <Body sm>
-                  {phase === 'ready'
-                    ? `Work ${workSec} seconds, then rest ${restSec} seconds, back to back.`
-                    : running
-                      ? `${phase === 'work' ? 'Work' : 'Rest'} for ${Math.ceil(displayMs / 1000)} seconds, then ${
-                          phase === 'work' ? `rest ${Math.round(restMs / 1000)} seconds` : `work ${Math.round(workMs / 1000)} seconds`
-                        }.`
-                      : `Paused at ${Math.ceil(displayMs / 1000)} seconds of ${Math.round(activeMs / 1000)}.`}
-                </Body>
-              </Stack>
-            </Card>
-          </Stack>
-        </div>
-      ) : (
-        <div role="tabpanel" aria-label="History">
-          <Stack>
-            <Card mono={`${entries.length} ${entries.length === 1 ? 'round' : 'rounds'}`} title="History">
-              {entries.length === 0 ? (
-                <EmptyState
-                  mono="Empty"
-                  title="No rounds yet"
-                  detail="Finish a work and rest interval to log the round here."
-                  actionLabel="Back to the timer"
-                  onAction={() => setTab('Timer')}
-                />
-              ) : (
-                <List label="Completed rounds">
-                  {entries.map((entry) => (
-                    <Row
-                      key={entry.round}
-                      title={`Round ${entry.round}`}
-                      meta={`Work: ${entry.workSec}s · Rest: ${entry.restSec}s`}
+                  <div style={{ textAlign: 'center' }}>
+                    <MonoLabel sm>
+                      {timer.phase === 'ready' ? 'Ready' : timer.phase === 'work' ? 'Work' : 'Rest'}
+                    </MonoLabel>
+                  </div>
+                  <FormGrid>
+                    <TextInput
+                      label="Work (sec)"
+                      value={workSec}
+                      onChange={(value) => {
+                        setWorkSec(value)
+                        setTimerState((t) => commitDurations(t, Math.max(1, Math.round(Number(value)) || 1) * 1000, t.restMs))
+                      }}
+                      inputMode="numeric"
                     />
-                  ))}
-                </List>
-              )}
-            </Card>
-          </Stack>
-        </div>
-      )}
+                    <TextInput
+                      label="Rest (sec)"
+                      value={restSec}
+                      onChange={(value) => {
+                        setRestSec(value)
+                        setTimerState((t) => commitDurations(t, t.workMs, Math.max(1, Math.round(Number(value)) || 1) * 1000))
+                      }}
+                      inputMode="numeric"
+                    />
+                  </FormGrid>
+                  <Stack>
+                    {timer.phase === 'ready' ? (
+                      <Button kind="primary" onClick={start}>
+                        Start
+                      </Button>
+                    ) : (
+                      <>
+                        {timer.running ? (
+                          <Button kind="primary" onClick={() => setTimerState((t) => ({ ...t, running: false }))}>
+                            Pause
+                          </Button>
+                        ) : (
+                          <Button kind="primary" onClick={() => setTimerState((t) => ({ ...t, running: true }))}>
+                            Resume
+                          </Button>
+                        )}
+                        <Button onClick={stop}>Stop</Button>
+                      </>
+                    )}
+                  </Stack>
+                  <Body sm>
+                    {timer.phase === 'ready'
+                      ? `Work ${workSecInput} seconds, then rest ${restSecInput} seconds, back to back.`
+                      : timer.running
+                        ? `${timer.phase === 'work' ? 'Work' : 'Rest'} for ${Math.ceil(
+                            timer.remainingMs / 1000,
+                          )} seconds, then ${
+                              timer.phase === 'work'
+                                ? `rest ${Math.round(timer.restMs / 1000)} seconds`
+                                : `work ${Math.round(timer.workMs / 1000)} seconds`
+                            }.`
+                        : `Paused at ${Math.ceil(timer.remainingMs / 1000)} seconds of ${Math.round(
+                            (timer.phase === 'work' ? timer.workMs : timer.restMs) / 1000,
+                          )}.`}
+                  </Body>
+                </Stack>
+              </Card>
+            </Stack>
+          </div>
+        ) : tab === 'History' ? (
+          <div role="tabpanel" aria-label="History">
+            <Stack>
+              <Card
+                mono={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'}`}
+                title="History"
+              >
+                {rounds.length === 0 ? (
+                  <EmptyState
+                    mono="Empty"
+                    title="No rounds yet"
+                    detail="Finish a work and rest interval to log the round here."
+                    actionLabel="Back to the timer"
+                    onAction={() => setTab('Timer')}
+                  />
+                ) : (
+                  <List label="Completed rounds">
+                    {items.map((item) => (
+                      <Row
+                        key={item.id}
+                        title={`Round ${item.data.round}`}
+                        meta={`${item.data.date} · Work: ${item.data.workSec}s · Rest: ${item.data.restSec}s`}
+                        action={
+                          <Button
+                            kind="ghost"
+                            ariaLabel={`Delete round ${item.data.round}`}
+                            onClick={() => actions.remove(item.id)}
+                          >
+                            Delete
+                          </Button>
+                        }
+                      />
+                    ))}
+                  </List>
+                )}
+              </Card>
+            </Stack>
+          </div>
+        ) : (
+          <div role="tabpanel" aria-label="Data">
+            <Stack>
+              <Card mono="Data" title="Export & import">
+                <Body sm>
+                  Download your rounds as a JSON backup, or merge a previous backup. Importing adds new rounds without duplicating existing ones.
+                </Body>
+                <Stack>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'calc(8px * var(--sf))',
+                      fontFamily: 'var(--mono)',
+                      fontSize: 'calc(11px * var(--tf))',
+                      color: 'var(--ink)',
+                    }}
+                  >
+                    <span>EXPORT</span>
+                    <ExportMenu
+                      options={[
+                        {
+                          id: 'json',
+                          label: 'JSON (full backup)',
+                          mimeType: 'application/json',
+                          extension: 'json',
+                          getData: backupText,
+                        },
+                      ]}
+                      fileName="interval-timer"
+                      ariaLabel="Export"
+                      disabled={rounds.length === 0}
+                    />
+                  </div>
+                  <Button kind="ghost" onClick={pickImport}>
+                    Import backup
+                  </Button>
+                  {importMsg !== null && <Body sm>{importMsg}</Body>}
+                </Stack>
+              </Card>
+            </Stack>
+          </div>
+        )}
+      </Stack>
     </AppShell>
   )
+}
+
+function fmt(ms: number) {
+  const total = Math.max(0, Math.round(ms / 1000))
+  const minutes = Math.floor(total / 60)
+  const seconds = total % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
