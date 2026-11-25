@@ -1980,6 +1980,58 @@
       }
     },
     {
+      "id": "@lacuna/quiz-engine",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for building question banks, creating shuffled quiz sessions, checking answers, and computing scores.",
+      "today": [
+        "toolbox/modules/quiz-engine/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/random"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "quizEngine"
+      ],
+      "public": true,
+      "path": "toolbox/modules/quiz-engine/0.1.0",
+      "bridge": {
+        "component": "quizEngine",
+        "kind": "logic",
+        "exports": [
+          "createSession",
+          "checkAnswer",
+          "scoreSession",
+          "validateQuestionBank"
+        ],
+        "types": [
+          "QuestionType",
+          "ChoiceQuestion",
+          "TextQuestion",
+          "NumberQuestion",
+          "Question",
+          "QuizSession",
+          "AnswerResult",
+          "Score"
+        ],
+        "signature": "createSession(questions: Question[], seed: number); checkAnswer(question: Question, given: string | number); scoreSession( session: QuizSession, answers: AnswerResult[], ); validateQuestionBank(questions: Question[])",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "729e3ff2dfa35eac",
+            "lines": 110,
+            "dependencies": {
+              "@lacuna/random": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/random",
       "layer": 3,
       "status": "exists",
