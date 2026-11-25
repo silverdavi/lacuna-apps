@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "025302de8850c9069897ab78ea82881de881eaa40d1f50fa13684e77607cf49c",
+  "spec_sha256": "155cc2d34a5b5b70cd6bc55924bc93f23bd7d794160f061289e235d6989c3ce2",
   "checks": [
     {
       "id": "A1",
@@ -8,41 +8,41 @@
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"Add item\" adds a new item with the text \"New item\" to the tree."
+      "text": "Clicking the button \"Add item\" adds one tree item named \"New item\"."
     },
     {
       "id": "A3",
-      "text": "With one item \"New item\", clicking the button \"Indent\" on that item changes its indent level to 1."
+      "text": "With one item \"New item\", clicking the button \"Indent\" changes its level to 1 (`aria-level=\"2\"`; a top-level item has `aria-level=\"1\"`)."
     },
     {
       "id": "A4",
-      "text": "With one item at indent level 1, clicking the button \"Outdent\" changes its indent level to 0."
+      "text": "With one item that has been indented to level 1 (aria-level \"2\"), clicking the button \"Outdent\" changes its level back to 0 (`aria-level=\"1\"`)."
     },
     {
       "id": "A5",
-      "text": "With two items \"A\" and \"B\" at indent level 0, dragging item \"A\" below item \"B\" using the drag handle reorders the list so \"B\" appears before \"A\"."
+      "text": "With two items \"A\" then \"B\" at level 0 (add two items, then type \"A\" and \"B\" into their text inputs), dragging the handle of \"A\" (button \"Drag A\") below item \"B\" reorders the list so that the tree items in DOM order are \"B\", then \"A\"."
     },
     {
       "id": "A6",
-      "text": "Clicking the button \"Export Markdown\" copies the text \"- A\\n- B\" to the clipboard when the outline contains items \"A\" and \"B\" at indent level 0."
+      "text": "With items \"A\" and \"B\" at level 0, clicking the button \"Export Markdown\" puts exactly the text \"- A\\n- B\" on the clipboard."
     },
     {
       "id": "A7",
-      "text": "With an item \"A\" at indent level 0 and an item \"B\" at indent level 1, clicking the collapse toggle on \"A\" hides \"B\" from view."
+      "text": "With \"A\" at level 0 and \"B\" at level 1 (B added second, selected, then Indent), clicking the toggle \"Collapse A\" removes \"B\" from view: no tree item named \"B\" remains while \"A\" stays visible."
     },
     {
       "id": "A8",
-      "text": "Typing \"Hello\" in the text input of the first item and pressing Enter updates the item text to \"Hello\"."
+      "text": "Typing \"Hello\" into the text input of the first item (`fill`) and pressing Enter makes that item's tree item named \"Hello\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the outline structure: after adding an item \"Test\" and reloading, the tree still contains the item \"Test\"."
+      "text": "After clicking \"Add item\" and renaming the item to \"Test\", reloading the page still shows a tree item named \"Test\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "44a6a4988084d75076305715f3324b52d2479573a6bb3192e82e2fd44ff5c5f7"
+      "sha256": "0ed749d1b3e503664ce48b98f124f7e3986152edc7361bcacae6169be0599a07"
     }
   ]
 }

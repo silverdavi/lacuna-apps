@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { useDragReorder } from '@lacuna/use-drag-reorder'
 import {
   Actions,
   AppShell,
@@ -29,13 +28,20 @@ export function App() {
   const [focusKey, setFocusKey] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [selected, setSelected] = useState<string | null>(null)
+  const [dragFrom, setDragFrom] = useState<number | null>(null)
+  const [dragOver, setDragOver] = useState<number | null>(null)
   const itemRefs = useRef(new Map<string, HTMLInputElement>())
   const touched = useRef(new Set<string>())
+  const treeRef = useRef<HTMLDivElement>(null)
 
   const sorted = useMemo(
     () => [...items].sort((a, b) => a.order - b.order),
     [items],
   )
+
+  function item(key: string): OutlineItem | undefined {
+    return items.find((i) => i.id === key)
+  }
 
   function hasChildrenOf(key: string): boolean {
     const cur = item(key)
@@ -52,29 +58,20 @@ export function App() {
     const out: Row[] = []
     let hiddenLevel = -1
     for (const it of sorted) {
-      if (hiddenLevel !== -1 && it.level > hiddenLevel) {
-        continue
-      }
+      if (hiddenLevel !== -1 && it.level > hiddenLevel) continue
       hiddenLevel = -1
       const isCollapsed = collapsed.has(it.id)
-      const hasKids = hasChildrenOf(it.id)
       out.push({
         id: it.id,
         text: it.text,
         level: it.level,
         collapsed: isCollapsed,
-        hasChildren: hasKids,
+        hasChildren: hasChildrenOf(it.id),
       })
-      if (isCollapsed) {
-        hiddenLevel = it.level
-      }
+      if (isCollapsed) hiddenLevel = it.level
     }
     return out
   }, [sorted, collapsed])
-
-  function item(key: string): OutlineItem | undefined {
-    return items.find((i) => i.id === key)
-  }
 
   function commit(next: OutlineItem[]) {
     setItems(next)
@@ -137,29 +134,91 @@ export function App() {
     commit(items.map((i) => (i.id === key ? { ...i, level: i.level - 1 } : i)))
   }
 
-  function isDescendant(ancestorKey: string, key: string): boolean {
-    const ancestor = item(ancestorKey)
-    if (!ancestor) return false
-    const aIdx = sorted.findIndex((i) => i.id === ancestorKey)
-    const tIdx = sorted.findIndex((i) => i.id === key)
-    if (tIdx < aIdx + 1) return false
-    for (let i = aIdx + 1; i <= tIdx; i++) {
-      if (sorted[i].level <= ancestor.level) return false
-    }
-    return true
-  }
-
-  const { itemProps, listProps, isDragging, draggingItem } = useDragReorder({
-    onReorder: (fromList, fromIndex, toList, toIndex) => {
-      if (fromList !== toList) return
-      const sortedCopy = [...sorted]
-      const fromIdx = sortedCopy.findIndex((i) => i.order === fromIndex)
-      if (fromIdx < 0) return
-      const [moved] = sortedCopy.splice(fromIdx, 1)
-      sortedCopy.splice(toIndex, 0, moved)
-      commit(sortedCopy.map((i, idx) => ({ ...i, order: idx })))
+  const handleDragStart = useCallback(
+    (e: React.PointerEvent, index: number) => {
+      e.preventDefault()
+      setDragFrom(index)
+      setDragOver(index)
     },
-  })
+    [],
+  )
+
+  const handleDragOver = useCallback(
+    (e: React.PointerEvent, index: number) => {
+      if (dragFrom === null) return
+      e.preventDefault()
+      setDragOver(index)
+    },
+    [dragFrom],
+  )
+
+  const handleDragEnd = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault()
+      if (dragFrom === null || dragOver === null) {
+        setDragFrom(null)
+        setDragOver(null)
+        return
+      }
+      const from = dragFrom
+      const to = dragOver
+      setDragFrom(null)
+      setDragOver(null)
+      if (from === to) return
+      const all = [...items]
+      const fromPos = all.findIndex((i) => i.order === from)
+      if (fromPos < 0) return
+      const [moved] = all.splice(fromPos, 1)
+      all.splice(to, 0, moved)
+      commit(all.map((i, idx) => ({ ...i, order: idx })))
+    },
+    [dragFrom, dragOver, items],
+  )
+
+  useEffect(() => {
+    if (dragFrom === null) return
+    function onMove(e: PointerEvent) {
+      if (!treeRef.current) return
+      const els = Array.from(treeRef.current.querySelectorAll('[data-drag-over]'))
+      for (const el of els) {
+        const rect = el.getBoundingClientRect()
+        if (
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom &&
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right
+        ) {
+          const idx = parseInt((el as HTMLElement).dataset.dragOver ?? '0', 10)
+          setDragOver(idx)
+          return
+        }
+      }
+    }
+    function onUp() {
+      if (dragFrom === null || dragOver === null) {
+        setDragFrom(null)
+        setDragOver(null)
+        return
+      }
+      const from = dragFrom
+      const to = dragOver
+      setDragFrom(null)
+      setDragOver(null)
+      if (from === to) return
+      const all = [...items]
+      const fromPos = all.findIndex((i) => i.order === from)
+      if (fromPos < 0) return
+      const [moved] = all.splice(fromPos, 1)
+      all.splice(to, 0, moved)
+      commit(all.map((i, idx) => ({ ...i, order: idx })))
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+  }, [dragFrom, dragOver, items])
 
   function toggleCollapse(key: string) {
     setCollapsed((prev) => {
@@ -207,30 +266,44 @@ export function App() {
             actionLabel="Add item"
           />
         ) : (
-          <ul className="ol-tree" aria-label="Outline" {...listProps(0)}>
+          <div
+            ref={treeRef}
+            className="ol-tree"
+            role="tree"
+            aria-label="Outline"
+          >
             {rows.map((row, idx) => {
               const isEditing = editing === row.id
-              const isDraggingThis =
-                isDragging && draggingItem?.itemIndex === idx
+              const isDraggingThis = dragFrom === idx
+              const isDragOver = dragOver === idx && dragFrom !== null && dragFrom !== idx
               return (
-                <li
+                <div
                   key={row.id}
+                  data-drag-over={idx}
                   className={[
                     'ol-row',
                     isEditing && 'editing',
                     isDraggingThis && 'dragging',
+                    isDragOver && 'drag-over',
                     selected === row.id && 'selected',
                   ]
                     .filter(Boolean)
                     .join(' ')}
-                  style={{ paddingLeft: `${row.level * 1.25}em` }}
-                  {...itemProps(0, idx)}
+                  style={{ marginLeft: `${row.level * 1.25}em` }}
+                  role="treeitem"
+                  aria-level={row.level + 1}
+                  aria-label={row.text}
+                  aria-expanded={row.hasChildren ? !row.collapsed : undefined}
+                  aria-grabbed={isDraggingThis || undefined}
+                  onPointerMove={(e) => handleDragOver(e, idx)}
+                  onPointerUp={(e) => handleDragEnd(e)}
                 >
                   <button
                     type="button"
                     className="ol-drag"
-                    aria-label="Drag handle"
+                    aria-label={`Drag ${row.text}`}
                     title="Drag to reorder"
+                    onPointerDown={(e) => handleDragStart(e, idx)}
                   >
                     ::
                   </button>
@@ -267,7 +340,7 @@ export function App() {
                         else itemRefs.current.delete(row.id)
                       }}
                       className="ol-input"
-                      aria-label="New item"
+                      aria-label="Item text"
                       value={isEditing ? editValue : row.text}
                       disabled={!isEditing}
                       onClick={() => {
@@ -318,10 +391,10 @@ export function App() {
                       )}
                     </div>
                   )}
-                </li>
+                </div>
               )
             })}
-          </ul>
+          </div>
         )}
       </Card>
 
