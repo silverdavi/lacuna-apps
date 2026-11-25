@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   Actions,
   AppShell,
-  Board,
   Button,
   Card,
   EmptyState,
@@ -10,6 +9,7 @@ import {
   Keys,
   Kpi,
   KpiRow,
+  List,
   Rail,
   Stack,
   Table,
@@ -192,19 +192,28 @@ export function App() {
                   actionLabel="Then press Generate"
                 />
               ) : (
-                <Board cols={record.size} rows={record.size} label="Word search board">
-                  {record.grid.map((line, row) => (
-                    <div key={row} role="row" className="ws-row">
-                      {line.map((letter, col) => {
+                <>
+                  <div
+                    className="lk-board"
+                    role="grid"
+                    aria-label="Puzzle"
+                    style={{
+                      ['--cols' as string]: record.size,
+                      ['--rows' as string]: record.size,
+                      ['--cell' as string]: 'calc(28px * var(--sf))',
+                    }}
+                  >
+                    {record.grid.flatMap((line, row) =>
+                      line.map((letter, col) => {
                         const active =
                           foundCells.has(`${row}:${col}`) ||
                           (start !== null && start[0] === row && start[1] === col)
                         return (
                           <button
                             type="button"
-                            key={col}
+                            key={`${row}:${col}`}
                             role="gridcell"
-                            aria-label={`Row ${row + 1}, column ${col + 1}, ${letter}`}
+                            aria-label={`Row ${row + 1}, column ${col + 1}: ${letter}`}
                             className={active ? 'ws-cell on' : 'ws-cell'}
                             onClick={() => onCellClick(row, col)}
                             style={{ background: active ? 'var(--accent-soft)' : 'var(--ui-bg)' }}
@@ -212,10 +221,21 @@ export function App() {
                             {letter}
                           </button>
                         )
-                      })}
-                    </div>
-                  ))}
-                </Board>
+                      }),
+                    )}
+                  </div>
+                  <div className="ws-found">
+                    <List label="Found words">
+                      {record.found.length === 0 ? (
+                        <li style={{ color: 'var(--ink-60)' }}>No words found yet</li>
+                      ) : (
+                        record.found.map((word) => (
+                          <li key={word}>{word}</li>
+                        ))
+                      )}
+                    </List>
+                  </div>
+                </>
               )}
             </Card>
           </Stack>

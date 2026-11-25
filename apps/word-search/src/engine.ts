@@ -116,5 +116,5 @@ export function scoreFor(word: string): number {
 }
 
 export function puzzleText(grid: string[][]): string {
-  return grid.map((row) => row.join('')).join('\n')
+  return grid.map((row) => row.join('')).join('')
 }
