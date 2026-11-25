@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "87bf8eacaded7cbfe8e8905e1f80e2c26236549a5f9520aea171e504ff38bfa5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Number to Words\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 42 in the field labelled \"Number\" shows \"forty-two\" in the output pane."
+    },
+    {
+      "id": "A3",
+      "text": "Typing 1000 in the field labelled \"Number\" shows \"one thousand\" in the output pane."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 1234567 in the field labelled \"Number\" shows \"one million two hundred thirty-four thousand five hundred sixty-seven\" in the output pane."
+    },
+    {
+      "id": "A5",
+      "text": "Typing 0 in the field labelled \"Number\" shows \"zero\" in the output pane."
+    },
+    {
+      "id": "A6",
+      "text": "Typing 99 in the field labelled \"Number\" and selecting \"UPPER\" in the select labelled \"Case\" shows \"NINETY-NINE\" in the output pane."
+    },
+    {
+      "id": "A7",
+      "text": "Typing 500 in the field labelled \"Number\" and clicking the button \"Copy\" shows the toast \"Copied to clipboard\" and the output pane still shows \"five hundred\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing 77 in the field labelled \"Number\" and clicking the button \"Save to history\" adds a row to the history table containing \"77\" and \"seventy-seven\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history row with \"77\" and \"seventy-seven\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2cd0289ea7470ea74c00bd6b3b709e8675b9def67defd070bf460332d80eb4cb"
+    }
+  ]
+}
