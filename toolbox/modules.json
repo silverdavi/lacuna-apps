@@ -891,6 +891,56 @@
       }
     },
     {
+      "id": "@lacuna/color-math",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure functions for hex, RGB, HSL, and OKLCH color conversion, WCAG contrast, palettes, and gradients.",
+      "today": [
+        "toolbox/modules/color-math/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "colorMath"
+      ],
+      "public": true,
+      "path": "toolbox/modules/color-math/0.1.0",
+      "bridge": {
+        "component": "colorMath",
+        "kind": "logic",
+        "exports": [
+          "hexToRgb",
+          "rgbToHex",
+          "rgbToHsl",
+          "hslToRgb",
+          "rgbToOklch",
+          "oklchToRgb",
+          "relativeLuminance",
+          "contrastRatio",
+          "meetsWcagAA",
+          "generatePalette",
+          "generateGradient"
+        ],
+        "types": [
+          "RGB",
+          "HSL",
+          "OKLCH"
+        ],
+        "signature": "hexToRgb(hex: string); rgbToHex(rgb: RGB); rgbToHsl(rgb: RGB); hslToRgb(hsl: HSL)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "a3e8e28e15e20f1a",
+            "lines": 164,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/combobox",
       "layer": 2,
       "status": "exists",
@@ -2056,6 +2106,44 @@
               "@lacuna/streak-calc": "0.1.0",
               "@lacuna/use-collection": "0.1.0"
             }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-undo-stack",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Undo and redo for any editor state: present value plus past and future stacks.",
+      "today": [
+        "toolbox/modules/use-undo-stack/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useUndoStack"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-undo-stack/0.1.0",
+      "bridge": {
+        "component": "useUndoStack",
+        "kind": "hook",
+        "exports": [
+          "useUndoStack"
+        ],
+        "types": [
+          "UndoStack"
+        ],
+        "signature": "useUndoStack( initial: T, options?: { limit?: number } )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "dddfa1a242548120",
+            "lines": 62,
+            "dependencies": {}
           }
         }
       }
