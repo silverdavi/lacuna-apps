@@ -1,0 +1,6 @@
+/* App-level overrides for timezone-converter. */
+
+/* Custom tablist (kit Tabs lacks role="tab"); active uses --ink, inactive uses
+   --ink-80 which meets the 4.5:1 contrast threshold in light and dark themes. */
+.lk-main .lc-tab { color: var(--ink-80); }
+.lk-main .lc-tab.active { color: var(--ink); }
