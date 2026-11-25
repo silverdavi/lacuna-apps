@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "node ../../scripts/check-app.mjs"
+    "check": "node ../../scripts/check-app.mjs",
+    "test": "APP=purchase-order pnpm exec playwright test --config=../../playwright.config.ts --project=app"
   },
   "dependencies": {
     "@lacuna/host-mock": "workspace:0.1.0",
+    "@lacuna/json-backup": "workspace:0.1.0",
     "@lacuna/line-items": "workspace:0.1.0",
     "@lacuna/csv-parse": "workspace:0.1.0",
     "@lacuna/money": "workspace:0.1.0",

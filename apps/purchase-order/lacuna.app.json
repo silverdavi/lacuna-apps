@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "com.lacuna.purchase-order",
+  "id": "lacuna.purchase-order",
   "name": "Purchase Order",
   "version": "0.1.0",
   "summary": "Create, track, and export purchase orders with line-item totals.",
@@ -12,9 +12,9 @@
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",
@@ -31,15 +31,18 @@
     "hostApi": "^1.0.0",
     "modules": {
       "@lacuna/ui": "0.1.0",
-      "@lacuna/host-mock": "0.1.0",
-      "@lacuna/line-items": "0.1.0",
+    "@lacuna/host-mock": "0.1.0",
+    "@lacuna/json-backup": "0.1.0",
+    "@lacuna/line-items": "0.1.0",
       "@lacuna/csv-parse": "0.1.0",
       "@lacuna/money": "0.1.0",
       "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
-    "edit:purchase-order"
+    "create:purchase-order",
+    "edit:purchase-order",
+    "export:csv"
   ],
   "permissions": {
     "records": [

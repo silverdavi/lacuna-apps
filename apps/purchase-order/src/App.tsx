@@ -1,417 +1,564 @@
-import { useMemo, useState } from 'react'
+// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AppShell,
+  Actions,
+  Body,
   Button,
   Card,
   Divider,
-  EmptyState,
   FormGrid,
   Kpi,
   KpiRow,
-  Rail,
-  Spread,
+  MonoLabel,
   Stack,
   Table,
   TextInput,
 } from '@lacuna/ui'
 import { toCsv } from '@lacuna/csv-parse'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { add, sub, toMinorUnits, type MinorUnits } from '@lacuna/money'
-import { orderStore, type OrderRecord } from './host'
+import { computeLineItem, computeOrderTotals, formatMinorUnits } from '@lacuna/line-items'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
+import { orderStore, type OrderRecord, type LineItemRecord } from './host'
 
-type FormLine = {
-  key: number
+const CURRENCY = 'USD'
+const BACKUP_VERSION = 1
+
+interface DraftLine {
   description: string
   quantity: string
   unitPrice: string
-  discountPct: string
-  taxPct: string
+  discount: string
+  taxRate: string
 }
 
-type SortDir = 'none' | 'asc' | 'desc'
+const EMPTY_DRAFT: DraftLine = { description: '', quantity: '', unitPrice: '', discount: '', taxRate: '' }
 
-function formatUsd(minorUnits: number): string {
-  return `$${(minorUnits / 100).toFixed(2)}`
+function today(): string {
+  return new Date().toISOString().slice(0, 10)
 }
 
-function formatPlain(minorUnits: number): string {
-  return (minorUnits / 100).toFixed(2)
+function orderTotals(order: OrderRecord): number {
+  return computeOrderTotals(
+    order.lineItems.map((l) => ({
+      description: l.description,
+      quantity: l.quantity,
+      unitPrice: l.unitPrice,
+      discount: l.discountPct / 100,
+      taxRate: l.taxPct / 100,
+    })),
+  ).grandTotal
 }
 
-function parseMajor(raw: string): number {
-  const n = Number(raw)
-  return Number.isFinite(n) ? n : 0
+function parsePct(raw: string): number {
+  const value = parseFloat(raw)
+  return Number.isFinite(value) && value >= 0 ? value : 0
 }
 
-function lineTotalMinor(li: OrderRecord['lineItems'][number]): MinorUnits {
-  const extended = li.unitPrice * li.quantity
-  const net = extended * (1 - li.discountPct / 100)
-  return Math.round(net * (1 + li.taxPct / 100))
-}
-
-function orderTotalMinor(order: OrderRecord): number {
-  return order.lineItems.reduce((sum, li) => sum + lineTotalMinor(li), 0)
+function draftToLine(draft: DraftLine, index: number): LineItemRecord | null {
+  const quantity = Math.max(1, Math.round(Number(draft.quantity) || 0))
+  const unitPrice = Math.round((parseFloat(draft.unitPrice) || 0) * 100)
+  if (!draft.description.trim() || unitPrice <= 0) return null
+  return {
+    id: `li-${index}-${Math.random().toString(36).slice(2, 8)}`,
+    description: draft.description.trim(),
+    quantity,
+    unitPrice,
+    discountPct: parsePct(draft.discount),
+    taxPct: parsePct(draft.taxRate),
+  }
 }
 
 export function App() {
+  const { copy } = useClipboard()
   const [orders, setOrders] = useState<OrderRecord[]>(() => orderStore.list())
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setOrders(orderStore.list())
+  }, [])
   const [vendor, setVendor] = useState('')
-  const [orderDate, setOrderDate] = useState('')
-  const [lines, setLines] = useState<FormLine[]>([])
-  const [nextKey, setNextKey] = useState(1)
-  const [search, setSearch] = useState('')
-  const [sortDir, setSortDir] = useState<SortDir>('none')
-  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+  const [orderDate, setOrderDate] = useState(today())
+  const [lines, setLines] = useState<DraftLine[]>([])
+  const [formError, setFormError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [sort, setSort] = useState<{ key: 'date' | 'total'; dir: 'asc' | 'desc' } | null>(null)
+  const [importText, setImportText] = useState('')
+  const [importMsg, setImportMsg] = useState<string | null>(null)
+  const importFileRef = useRef<HTMLInputElement | null>(null)
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    let rows = q ? orders.filter((o) => o.vendor.toLowerCase().includes(q)) : [...orders]
-    if (sortDir !== 'none') {
-      rows.sort((a, b) => {
-        const d = orderTotalMinor(a) - orderTotalMinor(b)
-        if (d !== 0) return sortDir === 'asc' ? d : -d
-        // Tie: later-created orders first when descending, first-created when ascending.
-        const idCmp = Number(a.id.replace(/\D/g, '')) - Number(b.id.replace(/\D/g, ''))
-        return sortDir === 'asc' ? idCmp : -idCmp
-      })
-    }
-    return rows
-  }, [orders, search, sortDir])
+  const selected = useMemo(() => orders.find((o) => o.id === selectedId) ?? null, [orders, selectedId])
 
-  const visibleRows = filtered.flatMap((o) => {
-    if (o.lineItems.length === 0) {
-      return [
-        {
-          key: `${o.id}-summary`,
-          vendor: o.vendor,
-          date: o.orderDate,
-          line: '—',
-          qty: String(o.lineItems.length),
-          price: '—',
-          total: formatUsd(orderTotalMinor(o)),
-        },
-      ]
-    }
-    return o.lineItems.map((li, idx) => ({
-      key: `${o.id}-${idx}`,
-      vendor: o.vendor,
-      date: o.orderDate,
-      line: li.description,
-      qty: String(li.quantity),
-      price: formatUsd(li.unitPrice),
-      total: formatUsd(lineTotalMinor(li)),
-    }))
-  })
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const list = q ? orders.filter((o) => o.vendor.toLowerCase().includes(q)) : [...orders]
+    if (!sort) return list
+    return list.sort((a, b) => {
+      const dir = sort.dir === 'asc' ? 1 : -1
+      if (sort.key === 'total') {
+        const cmp = orderTotals(a) - orderTotals(b)
+        if (cmp !== 0) return cmp * dir
+        return a.id.localeCompare(b.id) * dir
+      }
+      const cmp = a.orderDate.localeCompare(b.orderDate)
+      if (cmp !== 0) return cmp * dir
+      return a.id.localeCompare(b.id) * dir
+    })
+  }, [orders, query, sort])
 
-  const formResults = useMemo(
+  const totals = useMemo(
     () =>
-      lines.map((l) => {
-        const line: OrderRecord['lineItems'][number] = {
-          id: `form-${l.key}`,
-          description: l.description,
-          quantity: parseMajor(l.quantity),
-          unitPrice: toMinorUnits(parseMajor(l.unitPrice)),
-          discountPct: parseMajor(l.discountPct),
-          taxPct: parseMajor(l.taxPct),
-        }
-        return { total: lineTotalMinor(line) }
-      }),
-    [lines],
+      computeOrderTotals(
+        visible.flatMap((o) =>
+          o.lineItems.map((l) => ({
+            description: l.description,
+            quantity: l.quantity,
+            unitPrice: l.unitPrice,
+            discount: l.discountPct / 100,
+            taxRate: l.taxPct / 100,
+          })),
+        ),
+      ),
+    [visible],
   )
 
-  function addLine() {
-    setLines((prev) => [
-      ...prev,
-      { key: nextKey, description: '', quantity: '1', unitPrice: '', discountPct: '', taxPct: '' },
-    ])
-    setNextKey((k) => k + 1)
-  }
-
-  function updateLine(key: number, patch: Partial<FormLine>) {
-    setLines((prev) => prev.map((l) => (l.key === key ? { ...l, ...patch } : l)))
-  }
-
-  function saveOrder() {
-    const lineItems = lines.map((l, idx) => ({
-      id: `${Date.now()}-${idx}`,
-      description: l.description,
-      quantity: parseMajor(l.quantity),
-      unitPrice: toMinorUnits(parseMajor(l.unitPrice)),
-      discountPct: parseMajor(l.discountPct),
-      taxPct: parseMajor(l.taxPct),
-    }))
-    orderStore.add({
-      vendor: vendor.trim() || 'Unnamed vendor',
-      orderDate: orderDate || new Date().toISOString().slice(0, 10),
-      lineItems,
-    })
-    setOrders(orderStore.list())
+  function openForm() {
     setVendor('')
-    setOrderDate('')
+    setOrderDate(today())
     setLines([])
+    setFormError(null)
   }
 
-  function deleteOrder(id: string) {
-    orderStore.remove(id)
+  function closeForm() {
+    setFormError(null)
+  }
+
+  function addLine() {
+    setLines((prev) => [...prev, { ...EMPTY_DRAFT }])
+  }
+
+  function setLine(i: number, patch: Partial<DraftLine>) {
+    setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)))
+  }
+
+  function removeLine(i: number) {
+    setLines((prev) => prev.filter((_, idx) => idx !== i))
+  }
+
+  function save() {
+    const v = vendor.trim()
+    if (!v) {
+      setFormError('Vendor is required')
+      return
+    }
+    const parsed = lines.map((l, i) => draftToLine(l, i)).filter((l): l is LineItemRecord => l !== null)
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(orderDate) ? orderDate : today()
+    orderStore.add({ vendor: v, orderDate: date, lineItems: parsed })
     setOrders(orderStore.list())
+    setSelectedId(null)
+    setVendor('')
+    setOrderDate(today())
+    setLines([])
+    setFormError(null)
+  }
+
+  function toggleSort(key: 'date' | 'total') {
+    const active = sort?.key === key
+    setSort(active ? { key, dir: sort.dir === 'desc' ? 'asc' : 'desc' } : { key, dir: 'desc' })
+  }
+
+  function openOrder(id: string) {
+    setSelectedId(id)
   }
 
   function exportCsv() {
-    const rows: string[][] = [
-      ['vendor', 'order_date', 'description', 'quantity', 'unit_price', 'discount_pct', 'tax_pct', 'total'],
-    ]
-    for (const o of orders) {
-      for (const li of o.lineItems) {
-        rows.push([
-          o.vendor,
-          o.orderDate,
-          li.description,
-          String(li.quantity),
-          formatPlain(li.unitPrice),
-          String(li.discountPct),
-          String(li.taxPct),
-          formatPlain(lineTotalMinor(li)),
-        ])
+    const rows: string[][] = visible.flatMap((o) =>
+      o.lineItems.map((l) => [
+        o.vendor,
+        o.orderDate,
+        l.description,
+        String(l.quantity),
+        (l.unitPrice / 100).toFixed(2),
+        String(l.discountPct),
+        String(l.taxPct),
+        (computeLineItem({
+          description: l.description,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+          discount: l.discountPct / 100,
+          taxRate: l.taxPct / 100,
+        }).total / 100).toFixed(2),
+      ]),
+    )
+    void copy(toCsv([['vendor', 'order_date', 'description', 'quantity', 'unit_price', 'discount_pct', 'tax_pct', 'total'], ...rows]))
+  }
+
+  interface BackupOrder {
+    vendor: string
+    orderDate: string
+    lineItems: Array<{
+      description: string
+      quantity: number
+      unitPrice: number
+      discountPct: number
+      taxPct: number
+    }>
+  }
+
+  function backupText(): string {
+    return exportBackup({
+      appId: 'purchase-order',
+      version: BACKUP_VERSION,
+      filename: 'purchase-order',
+      records: orders.map((o) => ({
+        id: o.id,
+        data: {
+          vendor: o.vendor,
+          orderDate: o.orderDate,
+          lineItems: o.lineItems.map((l) => ({
+            description: l.description,
+            quantity: l.quantity,
+            unitPrice: l.unitPrice,
+            discountPct: l.discountPct,
+            taxPct: l.taxPct,
+          })),
+        },
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })),
+    })
+  }
+
+  function applyMerged(list: OrderRecord[]) {
+    const byId = new Map(list.map((record) => [record.id, record]))
+    for (const existing of orders) {
+      const incoming = byId.get(existing.id)
+      if (!incoming) orderStore.remove(existing.id)
+      else if (incoming.lineItems.length === 0) orderStore.remove(existing.id)
+      else orderStore.update(existing.id, incoming)
+    }
+    const existingIds = new Set(orders.map((o) => o.id))
+    for (const record of list) {
+      if (!existingIds.has(record.id) && record.lineItems.length > 0) {
+        orderStore.add({ id: record.id, vendor: record.vendor, orderDate: record.orderDate, lineItems: record.lineItems })
       }
     }
-    void copy(toCsv(rows))
+    setOrders(orderStore.list())
   }
 
-  function toggleSort() {
-    setSortDir((d) => (d === 'none' ? 'desc' : d === 'desc' ? 'asc' : 'none'))
+  async function exportBackupFile() {
+    const json = backupText()
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'purchase-order-backup.json'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
-  const canSave = vendor.trim().length > 0
+  async function onPickImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImportText(await file.text())
+  }
 
-  const grandTotal = orders.reduce((sum, o) => sum + orderTotalMinor(o), 0)
+  function applyImport() {
+    setImportMsg(null)
+    if (!importText.trim()) {
+      setImportMsg('Paste a backup, or choose a .json file first.')
+      return
+    }
+    try {
+      const result = importBackup<BackupOrder>(importText, {
+        currentVersion: BACKUP_VERSION,
+        validate: (record) => {
+          const d = record.data
+          if (typeof d?.vendor !== 'string' || !d.vendor.trim()) return 'missing vendor'
+          if (typeof d?.orderDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.orderDate)) return 'missing valid date'
+          if (!Array.isArray(d?.lineItems) || d.lineItems.length === 0) return 'no lines'
+          for (const l of d.lineItems) {
+            if (typeof l?.description !== 'string' || !l.description.trim()) return 'line missing description'
+            if (typeof l?.quantity !== 'number' || l.quantity < 1) return 'line with bad quantity'
+            if (typeof l?.unitPrice !== 'number' || l.unitPrice < 0) return 'line with bad unit price'
+          }
+          return null
+        },
+      })
+      const seen = new Set(orders.map((o) => o.id))
+      let added = 0
+      let updated = 0
+      const next = [...orders]
+      for (const record of result.records) {
+        const lineItems = record.data.lineItems.map((l) => ({
+          id: '',
+          description: l.description,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+          discountPct: typeof l.discountPct === 'number' ? l.discountPct : 0,
+          taxPct: typeof l.taxPct === 'number' ? l.taxPct : 0,
+        }))
+        const incoming: OrderRecord = { id: record.id, vendor: record.data.vendor, orderDate: record.data.orderDate, lineItems }
+        if (seen.has(record.id)) {
+          const idx = next.findIndex((o) => o.id === record.id)
+          if (idx >= 0) next[idx] = incoming
+          updated += 1
+        } else {
+          next.push(incoming)
+          seen.add(record.id)
+          added += 1
+        }
+      }
+      applyMerged(next)
+      setImportText('')
+      setImportMsg(
+        result.droppedCount > 0
+          ? `Imported ${added} new, updated ${updated}; ${result.droppedCount} invalid ${result.droppedCount === 1 ? 'record was' : 'records were'} dropped.`
+          : `Imported ${added} new, updated ${updated}.`,
+      )
+    } catch (err) {
+      setImportMsg(err instanceof Error ? `Could not import: ${err.message}` : 'Could not import that text.')
+    }
+  }
 
-  const columns = [
-    { key: 'vendor', label: 'Vendor' },
-    { key: 'date', label: 'Order date' },
-    { key: 'line', label: 'Line' },
-    { key: 'qty', label: 'Qty', num: true },
-    { key: 'price', label: 'Unit', num: true },
-    {
-      key: 'total',
-      label: (
-        <button
-          type="button"
-          aria-label="Sort by total"
-          onClick={toggleSort}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            margin: 0,
-            display: 'block',
-            width: '100%',
-            textAlign: 'inherit',
-            cursor: 'pointer',
-            color: 'inherit',
-            font: 'inherit',
-            textTransform: 'inherit',
-            letterSpacing: 'inherit',
-          }}
-        >
-          Total <span aria-hidden={sortDir !== 'none'}>{sortDir === 'desc' ? '↓' : sortDir === 'asc' ? '↑' : ''}</span>
-        </button>
-      ),
-      num: true,
-    },
-  ]
+  const draftTotal = lines.reduce((sum, l, i) => {
+    const line = draftToLine(l, i)
+    if (!line) return sum
+    return sum + computeLineItem({
+      description: line.description,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      discount: line.discountPct / 100,
+      taxRate: line.taxPct / 100,
+    }).total
+  }, 0)
+
+  const draftLines = lines.map((l, i) => draftToLine(l, i)).filter((l): l is LineItemRecord => l !== null)
+
+  const detailTotals = selected
+    ? computeOrderTotals(
+        selected.lineItems.map((l) => ({
+          description: l.description,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+          discount: l.discountPct / 100,
+          taxRate: l.taxPct / 100,
+        })),
+      )
+    : null
 
   return (
     <AppShell
       name="Purchase Order"
       icon="procurement"
       hue="green"
-      category="Business"
-      meta={`${orders.length} order${orders.length === 1 ? '' : 's'}`}
-      status={copied ? 'CSV copied' : undefined}
-      side={
-        <Rail
-          title="Totals"
-          note={orders.length > 0 ? `${orders.length} order${orders.length === 1 ? '' : 's'} on file` : 'Nothing on file yet'}
-          chips={[
-            `${visibleRows.length} line${visibleRows.length === 1 ? '' : 's'}`,
-            `Booked ${formatUsd(grandTotal)}`,
-            'Sort by total',
-            'CSV export',
-          ]}
-        />
+      category="Procurement"
+      meta={`${orders.length} ${orders.length === 1 ? 'order' : 'orders'}`}
+      status={
+        orders.length > 0
+          ? `${visible.length} ${visible.length === 1 ? 'order' : 'orders'} · ${formatMinorUnits(totals.grandTotal, CURRENCY)} total`
+          : 'No orders yet'
       }
     >
-      <Stack lg>
-        <Card
-          title="Orders"
-          mono={`${orders.length} saved`}
-          actions={
-            <Spread style={{ gap: 8, maxWidth: 420, width: '100%' }}>
-              <TextInput
-                label="Search"
-                value={search}
-                onChange={setSearch}
-                type="search"
-                placeholder="Filter by vendor"
-              />
-              <Button kind="secondary" onClick={exportCsv} disabled={orders.length === 0}>
-                Export CSV
-              </Button>
-              <Button
-                kind="primary"
-                onClick={() => {
-                  setVendor('')
-                  setOrderDate('')
-                  setLines([])
-                }}
-              >
-                New order
-              </Button>
-            </Spread>
-          }
-        >
-          {orders.length > 0 && (
-            <KpiRow>
-              <Kpi value={formatUsd(grandTotal)} label="Booked total" accent />
-              <Kpi value={String(orders.length)} label="Orders" />
-            </KpiRow>
-          )}
-          <Table
-            label="Purchase orders"
-            columns={columns}
-            rows={visibleRows.map((r) => ({ cells: r as Record<string, string> }))}
-            empty="No purchase orders yet"
-          />
-        </Card>
+      <Stack>
+        <KpiRow>
+          <Kpi value={visible.length} label="Orders" />
+          <Kpi value={visible.flatMap((o) => o.lineItems).length} label="Line items" />
+          <Kpi value={formatMinorUnits(totals.grandTotal, CURRENCY)} label="Grand total" accent />
+        </KpiRow>
 
-        <Card title="New purchase order" mono="Vendor and line items">
-            <Stack>
+        {selected && detailTotals ? (
+          <Card mono="Order detail"             actions={<Button kind="ghost" onClick={() => setSelectedId(null)}>Back to orders</Button>} title={selected.vendor}>
+            <MonoLabel>Date</MonoLabel>
+            <Body>{selected.orderDate}</Body>
+            <Divider />
+            <Table
+              label="Lines"
+              columns={[
+                { key: 'description', label: 'Description' },
+                { key: 'quantity', label: 'Quantity', num: true },
+                { key: 'unitPrice', label: 'Unit price', num: true },
+                { key: 'discount', label: 'Discount %', num: true },
+                { key: 'taxRate', label: 'Tax %', num: true },
+                { key: 'total', label: 'Amount', num: true },
+              ]}
+              rows={selected.lineItems.map((l) => {
+                const r = computeLineItem({
+                  description: l.description,
+                  quantity: l.quantity,
+                  unitPrice: l.unitPrice,
+                  discount: l.discountPct / 100,
+                  taxRate: l.taxPct / 100,
+                })
+                return {
+                  cells: {
+                    description: l.description,
+                    quantity: String(l.quantity),
+                    unitPrice: formatMinorUnits(l.unitPrice, CURRENCY),
+                    discount: String(l.discountPct),
+                    taxRate: String(l.taxPct),
+                    total: <div data-label="Amount">{formatMinorUnits(r.total, CURRENCY)}</div>,
+                  },
+                }
+              })}
+              foot={{
+                description: 'Totals',
+                quantity: '',
+                unitPrice: '',
+                discount: `Subtotal ${formatMinorUnits(detailTotals.subtotal, CURRENCY)}`,
+                taxRate: `Tax ${formatMinorUnits(detailTotals.totalTax, CURRENCY)}`,
+                total: formatMinorUnits(detailTotals.grandTotal, CURRENCY),
+              }}
+            />
+            <KpiRow>
+              <Kpi value={formatMinorUnits(detailTotals.subtotal, CURRENCY)} label="Subtotal" />
+              <Kpi value={formatMinorUnits(detailTotals.totalDiscount, CURRENCY)} label="Discounts" />
+              <Kpi value={formatMinorUnits(detailTotals.totalTax, CURRENCY)} label="Tax" />
+              <Kpi value={formatMinorUnits(detailTotals.grandTotal, CURRENCY)} label="Grand total" accent />
+            </KpiRow>
+          </Card>
+        ) : null}
+
+          <Card mono="New order" title="New purchase order">
+              {formError ? <MonoLabel style={{ color: 'var(--danger)' }}>{formError}</MonoLabel> : null}
               <FormGrid>
-                <TextInput label="Vendor" value={vendor} onChange={setVendor} placeholder="Acme Corp" />
+                <TextInput label="Vendor" value={vendor} onChange={setVendor} />
                 <TextInput label="Order date" value={orderDate} onChange={setOrderDate} type="date" />
               </FormGrid>
-
-              <Divider />
-
-              <Stack>
-                <Spread>
-                  <strong>Line items</strong>
-                  <Button kind="secondary" onClick={addLine}>
-                    Add line item
-                  </Button>
-                </Spread>
-
-                {lines.length === 0 ? (
-                  <EmptyState
-                    title="No line items yet"
-                    detail="Add a line item with a description, quantity, and unit price."
-                    actionLabel="Add first line item"
-                    onAction={addLine}
-                  />
-                ) : (
-                  <Stack>
-                    {lines.map((line, idx) => (
-                      <Card key={line.key} flush>
-                        <FormGrid>
-                          <TextInput
-                            label="Description"
-                            value={line.description}
-                            onChange={(v) => updateLine(line.key, { description: v })}
-                            placeholder="Widget"
-                          />
-                          <TextInput
-                            label="Quantity"
-                            value={line.quantity}
-                            onChange={(v) => updateLine(line.key, { quantity: v })}
-                            type="number"
-                            inputMode="numeric"
-                            placeholder="10"
-                          />
-                          <TextInput
-                            label="Unit price"
-                            value={line.unitPrice}
-                            onChange={(v) => updateLine(line.key, { unitPrice: v })}
-                            type="number"
-                            inputMode="decimal"
-                            placeholder="25.00"
-                          />
-                          <TextInput
-                            label="Discount %"
-                            value={line.discountPct}
-                            onChange={(v) => updateLine(line.key, { discountPct: v })}
-                            type="number"
-                            inputMode="decimal"
-                            placeholder="0"
-                          />
-                          <TextInput
-                            label="Tax %"
-                            value={line.taxPct}
-                            onChange={(v) => updateLine(line.key, { taxPct: v })}
-                            type="number"
-                            inputMode="decimal"
-                            placeholder="0"
-                          />
-                        </FormGrid>
-                        {formResults[idx] && (
-                          <KpiRow>
-                            <Kpi value={formatUsd(formResults[idx].total)} label="Line total" accent />
-                          </KpiRow>
-                        )}
-                      </Card>
-                    ))}
-                  </Stack>
-                )}
-              </Stack>
-
-              <Divider />
-
-              <Spread style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <KpiRow>
-                  <Kpi
-                    value={formatUsd(formResults.reduce((sum, r) => sum + r.total, 0))}
-                    label="Order total"
-                    accent
-                  />
-                </KpiRow>
-                <Spread style={{ gap: 8 }}>
-                  <Button
-                    kind="secondary"
-                    onClick={() => {
-                      setVendor('')
-                      setOrderDate('')
-                      setLines([])
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button kind="primary" onClick={saveOrder} disabled={!canSave}>
-                    Save
-                  </Button>
-                </Spread>
-              </Spread>
-            </Stack>
+              <MonoLabel faint={lines.length === 0}>Line items</MonoLabel>
+              {lines.length === 0 && <Body sm>Add at least one line item to save this order.</Body>}
+              <Table
+                label="Line items"
+                columns={[
+                  { key: 'description', label: 'Description' },
+                  { key: 'quantity', label: 'Quantity', num: true },
+                  { key: 'unitPrice', label: 'Unit price', num: true },
+                  { key: 'discount', label: 'Discount %', num: true },
+                  { key: 'taxRate', label: 'Tax %', num: true },
+                   { key: 'total', label: 'Amount', num: true },
+                  { key: 'actions', label: '' },
+                ]}
+                rows={lines.map((l, i) => {
+                  const parsed = draftToLine(l, i)
+                    const total = parsed
+                    ? computeLineItem({
+                        description: parsed.description,
+                        quantity: parsed.quantity,
+                        unitPrice: parsed.unitPrice,
+                        discount: parsed.discountPct / 100,
+                        taxRate: parsed.taxPct / 100,
+                      }).total
+                    : 0
+                  return {
+                    cells: {
+                      description: (
+                        <TextInput label="Description" value={l.description} onChange={(v) => setLine(i, { description: v })} />
+                      ),
+                      quantity: <TextInput label="Quantity" value={l.quantity} onChange={(v) => setLine(i, { quantity: v })} inputMode="numeric" />,
+                      unitPrice: <TextInput label="Unit price" value={l.unitPrice} onChange={(v) => setLine(i, { unitPrice: v })} inputMode="decimal" />,
+                      discount: <TextInput label="Discount %" value={l.discount} onChange={(v) => setLine(i, { discount: v })} inputMode="decimal" />,
+                      taxRate: <TextInput label="Tax %" value={l.taxRate} onChange={(v) => setLine(i, { taxRate: v })} inputMode="decimal" />,
+                      total: <div data-label="Amount">{formatMinorUnits(total, CURRENCY)}</div>,
+                      actions: (
+                        <Button kind="ghost" ariaLabel={`Remove line ${i + 1}`} onClick={() => removeLine(i)}>Remove</Button>
+                      ),
+                    },
+                  }
+                })}
+                foot={draftLines.length > 0 ? {
+                  description: 'Amount',
+                  quantity: String(draftLines.length),
+                  unitPrice: '',
+                  discount: '',
+                  taxRate: '',
+                  total: formatMinorUnits(draftTotal, CURRENCY),
+                  actions: '',
+                } : undefined}
+              />
+              <Actions>
+                <Button onClick={addLine}>Add line item</Button>
+                <Button kind="primary" onClick={save}>Save</Button>
+                <Button kind="ghost" onClick={closeForm}>Cancel</Button>
+              </Actions>
           </Card>
 
-        {orders.length > 0 && (
-          <Card title="Manage" mono="Delete orders">
-            <Stack>
-              {filtered.map((o) => (
-                <Spread key={o.id} style={{ alignItems: 'center', gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div>{o.vendor}</div>
-                    <div style={{ color: 'var(--ink-60)', fontSize: 13 }}>
-                      {o.orderDate} · {o.lineItems.length} item{o.lineItems.length === 1 ? '' : 's'} ·{' '}
-                      {formatUsd(orderTotalMinor(o))}
-                    </div>
-                  </div>
-                  <Button kind="danger" onClick={() => deleteOrder(o.id)}>
-                    Delete {o.vendor}
-                  </Button>
-                </Spread>
-              ))}
-            </Stack>
+          <Card mono="Search" actions={<Button kind="ghost" onClick={openForm}>New order</Button>} title="Orders">
+              <TextInput label="Search" value={query} onChange={setQuery} placeholder="Filter by vendor…" />
+              <Table
+                label="Purchase orders"
+                columns={[
+                  { key: 'vendor', label: 'Vendor' },
+                   {
+                     key: 'date',
+                     label: (
+                       <button type="button" aria-label="Sort by date" onClick={() => toggleSort('date')} style={{ width: '100%', justifyContent: 'inherit', background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', color: 'inherit', letterSpacing: 'inherit' }}>Date {sort?.key === 'date' ? (sort.dir === 'desc' ? '↓' : '↑') : ''}</button>
+                     ),
+                   },
+                  { key: 'lines', label: 'Lines' },
+                   {
+                     key: 'total',
+                     label: (
+                       <button type="button" aria-label="Sort by total" onClick={() => toggleSort('total')} style={{ width: '100%', justifyContent: 'inherit', background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', color: 'inherit', letterSpacing: 'inherit' }}>Total {sort?.key === 'total' ? (sort.dir === 'desc' ? '↓' : '↑') : ''}</button>
+                     ),
+                     num: true,
+                   },
+                  { key: 'actions', label: '' },
+                ]}
+                rows={visible.map((o) => ({
+                  cells: {
+                    vendor: (
+                      <>
+                        <b>{o.vendor}</b>
+                        {o.lineItems.map((l) => (
+                          <div key={l.id} data-line={l.id}>
+                            {l.description} · {l.quantity} @ {formatMinorUnits(l.unitPrice, CURRENCY)} · {l.discountPct}% off · {l.taxPct}% tax
+                          </div>
+                        ))}
+                      </>
+                    ),
+                    date: o.orderDate,
+                    lines: String(o.lineItems.length),
+                    total: <div data-label="Total">{formatMinorUnits(orderTotals(o), CURRENCY)}</div>,
+                    actions: (
+                      <>
+                        <Button kind="ghost" ariaLabel={`View ${o.vendor}`} onClick={() => openOrder(o.id)}>View</Button>
+                        <Button kind="ghost" ariaLabel={`Delete ${o.vendor}`} onClick={() => { orderStore.remove(o.id); setOrders(orderStore.list()) }}>Delete {o.vendor}</Button>
+                      </>
+                    ),
+                  },
+                }))}
+                empty="No purchase orders yet"
+              />
           </Card>
-        )}
+
+          <Card mono="Data" title="Export & import">
+            <Body sm>Export the whole book as CSV to the clipboard, or back up and restore as JSON. Importing adds new orders without duplicating existing ones.</Body>
+            <Actions>
+              <Button kind="ghost" onClick={exportCsv} disabled={visible.length === 0}>Export CSV</Button>
+              <Button kind="ghost" onClick={exportBackupFile} disabled={orders.length === 0}>Backup JSON</Button>
+              <Button kind="ghost" onClick={() => importFileRef.current?.click()}>Import backup…</Button>
+            </Actions>
+            <input
+              ref={importFileRef}
+              type="file"
+              accept="application/json,.json"
+              style={{ display: 'none' }}
+              aria-hidden
+              tabIndex={-1}
+              onChange={onPickImportFile}
+            />
+            <TextInput label="Paste a JSON backup" value={importText} onChange={setImportText} rows={3} placeholder='{"version":1,"appId":"purchase-order",…}' />
+            <Actions>
+              <Button kind="ghost" onClick={applyImport} disabled={!importText.trim()}>Import</Button>
+            </Actions>
+            {importMsg && (
+              <Body sm style={{ marginTop: 'calc(8px * var(--sf))', color: 'var(--mid)' }}>
+                {importMsg}
+              </Body>
+            )}
+          </Card>
       </Stack>
     </AppShell>
   )
