@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/use-camera",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Manages a live camera stream: start, stop, device selection, and single-frame capture to a canvas.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useCamera",
+    "kind": "hook",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "bdae24e3ff2ba347",
+    "lines": 146,
+    "exports": [
+      "useCamera"
+    ],
+    "types": [
+      "UseCameraOptions",
+      "UseCameraReturn"
+    ],
+    "signature": "useCamera(options?: UseCameraOptions)"
+  }
+}

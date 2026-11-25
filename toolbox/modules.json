@@ -1292,6 +1292,47 @@
       }
     },
     {
+      "id": "@lacuna/format-duration",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Formats millisecond durations as h:mm:ss or human phrases, and parses phrases back.",
+      "today": [
+        "toolbox/modules/format-duration/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "formatDuration"
+      ],
+      "public": true,
+      "path": "toolbox/modules/format-duration/0.1.0",
+      "bridge": {
+        "component": "formatDuration",
+        "kind": "logic",
+        "exports": [
+          "toParts",
+          "formatDuration",
+          "humanizeDuration",
+          "parseDuration"
+        ],
+        "types": [
+          "DurationParts"
+        ],
+        "signature": "toParts(ms: number); formatDuration(ms: number); humanizeDuration(ms: number); parseDuration(input: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "fa8fbfda613bc75e",
+            "lines": 50,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/fuzzy-search",
       "layer": 3,
       "status": "exists",
@@ -2352,6 +2393,45 @@
       }
     },
     {
+      "id": "@lacuna/use-camera",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Manages a live camera stream: start, stop, device selection, and single-frame capture to a canvas.",
+      "today": [
+        "toolbox/modules/use-camera/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useCamera"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-camera/0.1.0",
+      "bridge": {
+        "component": "useCamera",
+        "kind": "hook",
+        "exports": [
+          "useCamera"
+        ],
+        "types": [
+          "UseCameraOptions",
+          "UseCameraReturn"
+        ],
+        "signature": "useCamera(options?: UseCameraOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "bdae24e3ff2ba347",
+            "lines": 146,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/use-clipboard",
       "layer": 3,
       "status": "exists",
@@ -2552,6 +2632,47 @@
             "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
             "source": "e1b260088ca68f80",
             "lines": 131,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-media-recorder",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Records microphone, camera, or screen media into a Blob with state, elapsed time, and pause/resume/stop controls.",
+      "today": [
+        "toolbox/modules/use-media-recorder/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useMediaRecorder"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-media-recorder/0.1.0",
+      "bridge": {
+        "component": "useMediaRecorder",
+        "kind": "hook",
+        "exports": [
+          "useMediaRecorder"
+        ],
+        "types": [
+          "MediaSource",
+          "UseMediaRecorderOptions",
+          "UseMediaRecorderReturn",
+          "UseMediaRecorderStatus"
+        ],
+        "signature": "useMediaRecorder(options?: UseMediaRecorderOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+            "source": "b40b837a3a3f192f",
+            "lines": 184,
             "dependencies": {}
           }
         }
