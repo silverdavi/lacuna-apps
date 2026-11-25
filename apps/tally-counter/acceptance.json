@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8cb6716a76078b7ee1df7315b625fa93dac90a6837a73e74860fd7d83a285a89",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Tally Counter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button labeled \"Add\" increments the counter display from \"0\" to \"1\"."
+    },
+    {
+      "id": "A3",
+      "text": "Entering \"10\" in the field labeled \"Daily Goal\" and clicking \"Save\" updates the progress indicator to show \"1/10\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button labeled \"Reset\" changes the counter display from \"1\" to \"0\" and updates the progress indicator to \"0/10\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab labeled \"History\" displays a list containing the text \"Today: 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"History\" tab, clicking the button labeled \"Clear History\" removes the entry \"Today: 1\" and displays the text \"No history yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"History\" tab, the heatmap component displays a cell with the title attribute \"Today: 1\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"History\" tab, the trend chart displays a data point with the value \"1\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the counter value \"1\" and the daily goal \"10\" visible in the main view."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "25c7148353e7976b7feed45d30226c8a846db75f536e55a0fcfae93baeafa970"
+    }
+  ]
+}
