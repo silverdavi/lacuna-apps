@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "df7f06cf0f3cd97f805e23aef9d892cc49aab07306ce331280c0c96fef94299f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Nonogram Puzzle\" and, on first load with no seed entered, displays the text \"Enter a seed to start\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"1\" in the field labelled \"Seed\" and clicking the button \"New puzzle\" loads a 5x5 grid; the row clue for row 1 shows \"3\" and the column clue for column 1 shows \"3\"."
+    },
+    {
+      "id": "A3",
+      "text": "After loading seed \"1\", clicking the cell at row 1, column 1 toggles it to filled; the cell displays the text \"X\" and the score display shows \"Score: 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "After loading seed \"1\" and filling the cell at row 1, column 1, clicking the cell at row 1, column 2 toggles it to filled; the cell displays \"X\" and the score display shows \"Score: 2\"."
+    },
+    {
+      "id": "A5",
+      "text": "After loading seed \"1\" and filling the cell at row 1, column 1, clicking the cell at row 1, column 1 again toggles it to empty; the cell displays \"-\" and the score display shows \"Score: 0\"."
+    },
+    {
+      "id": "A6",
+      "text": "After loading seed \"1\" and filling the cell at row 1, column 1, clicking the button \"Check\" shows the toast text \"Incorrect: 1 cell(s) wrong\" because the puzzle is not solved."
+    },
+    {
+      "id": "A7",
+      "text": "After loading seed \"1\", filling all cells in the solution pattern for that seed, clicking the button \"Check\" shows the toast text \"Solved!\" and the best score display shows \"Best: 25\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"History\" shows a list of past puzzles; after solving seed \"1\", the list contains an item with the text \"Seed 1 - Solved\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current puzzle state: after loading seed \"1\" and filling the cell at row 1, column 1, reloading the page still shows the cell at row 1, column 1 displaying \"X\" and the score display showing \"Score: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b82900c6162f65b3e2500cd809edbf895ff26e03b50a99436d8c0b70f7c6c168"
+    }
+  ]
+}

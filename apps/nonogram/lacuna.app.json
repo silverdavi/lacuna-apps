@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.nonogram",
+  "name": "Nonogram Puzzle",
+  "version": "0.1.0",
+  "summary": "A pixel-logic puzzle that fills the grid to match row and column clues.",
+  "description": "Solve pixel-logic puzzles: read the row and column clues, then paint the grid until it matches. New puzzles are seeded, scores persist on this device, and a check reports how many cells are wrong.",
+  "category": "personal",
+  "tags": ["puzzle", "logic", "grid"],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/nonogram",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/grid-utils": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0",
+      "@lacuna/use-timer": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:nonogram"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "nonogram",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Nonogram records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "nonogram"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

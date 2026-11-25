@@ -1,0 +1,170 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16px * var(--sf));
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  color: var(--ink);
+}
+
+.stats {
+  display: flex;
+  gap: calc(16px * var(--sf));
+}
+
+.score {
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.cells {
+  font-size: 0.9rem;
+  color: var(--mid);
+}
+
+.tablist {
+  display: flex;
+  gap: calc(4px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.tab {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: calc(6px * var(--sf)) calc(14px * var(--sf));
+  color: var(--mid);
+  cursor: pointer;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.tabActive {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16px * var(--sf));
+}
+
+.panelHidden {
+  display: none;
+}
+
+.enterSeed {
+  margin: 0;
+  color: var(--mid);
+}
+
+.grid {
+  display: grid;
+  gap: calc(3px * var(--sf));
+  width: max-content;
+}
+
+.corner {
+  background: none;
+}
+
+.rowEl {
+  display: contents;
+}
+
+.clue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  min-height: 1.4rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--mid);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--ui-bright);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.cellOn {
+  background: var(--ink);
+  color: var(--on-accent);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(12px * var(--sf));
+}
+
+.seedField {
+  font-size: 0.85rem;
+  color: var(--mid);
+}
+
+.seedInput {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--ui-bright);
+  color: var(--ink);
+  min-width: 5rem;
+}
+
+.bestLine {
+  margin: 0;
+  color: var(--ink);
+}
+
+.toast {
+  padding: calc(8px * var(--sf)) calc(14px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--ui-card);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.historyNote {
+  margin: 0;
+  color: var(--ink);
+}
+
+.historyEmpty {
+  margin: 0;
+  color: var(--mid);
+}
+
+.historyList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf));
+  font-size: 0.9rem;
+  color: var(--ink);
+}
