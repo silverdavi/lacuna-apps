@@ -1366,6 +1366,49 @@
       }
     },
     {
+      "id": "@lacuna/ics-calendar",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Serialize events (with optional recurrence) to an iCalendar .ics string, parse .ics back to events, validate .ics text, and round-trip recurrence rules to and from RRULE.",
+      "today": [
+        "toolbox/modules/ics-calendar/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "icsCalendar"
+      ],
+      "public": true,
+      "path": "toolbox/modules/ics-calendar/0.1.0",
+      "bridge": {
+        "component": "icsCalendar",
+        "kind": "logic",
+        "exports": [
+          "toIcs",
+          "fromIcs",
+          "validateIcs",
+          "icsToRRule",
+          "rruleToIcsRec"
+        ],
+        "types": [
+          "IcsEvent",
+          "IcsEventList"
+        ],
+        "signature": "toIcs(events: IcsEvent[]); fromIcs(text: string); validateIcs(text: string); icsToRRule(rec: IcsRecurrence)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "30b41f2dfb1872e1",
+            "lines": 270,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/image-ops",
       "layer": 3,
       "status": "exists",
@@ -1709,6 +1752,54 @@
             "source": "f8c5c7e28e4c81c8",
             "lines": 193,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/recurrence",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Expand daily, weekly, monthly and yearly repeat rules into concrete local dates, with interval, end-date and count limits plus basic RRULE round-tripping.",
+      "today": [
+        "toolbox/modules/recurrence/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "recurrence"
+      ],
+      "public": true,
+      "path": "toolbox/modules/recurrence/0.1.0",
+      "bridge": {
+        "component": "recurrence",
+        "kind": "logic",
+        "exports": [
+          "parseRule",
+          "nextOccurrences",
+          "isRecurring",
+          "occurrencesBetween",
+          "ruleToRRule",
+          "rruleToRule"
+        ],
+        "types": [
+          "RecurrenceFrequency",
+          "RecurrenceRule"
+        ],
+        "signature": "parseRule(input: string); nextOccurrences(rule: RecurrenceRule, count: number); isRecurring(rule: RecurrenceRule, date: string); occurrencesBetween(rule: RecurrenceRule, from: string, to: string)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "8b1ffe7f3695ead8",
+            "lines": 177,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
           }
         }
       }
