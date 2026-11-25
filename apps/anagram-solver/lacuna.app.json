@@ -1,0 +1,83 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.anagram-solver",
+  "name": "Anagram Solver",
+  "version": "0.1.0",
+  "summary": "Find anagrams for any word or phrase.",
+  "description": "Type a word or phrase and find all its anagrams from a built-in dictionary. Optionally include the original word in results, copy results to the clipboard, and keep a favorites list that survives reloads.",
+  "category": "productivity",
+  "tags": ["anagram", "words", "favorites"],
+  "icon": "search",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/anagram-solver",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:anagram-solver"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "anagram-solver",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Anagram Solver favorite records in this space's mock store."
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "anagram-solver"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

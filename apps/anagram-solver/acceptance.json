@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7d4ef538d3eeb95bc06269face065f730cc320eed1bde7f944721b114204a2f2",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Anagram Solver\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"listen\" in the field labelled \"Word or phrase\" and clicking the button \"Find anagrams\" shows a results list containing the items \"silent\", \"enlist\", \"inlets\", \"tinsel\", and \"listen\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the checkbox labelled \"Include original\" checked, typing \"listen\" and clicking \"Find anagrams\" shows the results list containing \"listen\" as the first item, followed by \"silent\", \"enlist\", \"inlets\", and \"tinsel\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the checkbox labelled \"Include original\" unchecked, typing \"listen\" and clicking \"Find anagrams\" shows a results list that does not contain \"listen\"."
+    },
+    {
+      "id": "A5",
+      "text": "After finding anagrams for \"listen\", clicking the button \"Copy results\" shows a toast with the text \"Copied 5 anagrams to clipboard\"."
+    },
+    {
+      "id": "A6",
+      "text": "After finding anagrams for \"listen\", clicking the button \"Add to favorites\" next to the result \"silent\" adds a row to the table on the tab labelled \"Favorites\" containing \"silent\"."
+    },
+    {
+      "id": "A7",
+      "text": "On the tab labelled \"Favorites\", with the row for \"silent\" present, clicking the button \"Remove\" in that row removes the row and the table shows the text \"No favorites yet\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"aab\" in the field labelled \"Word or phrase\" and clicking \"Find anagrams\" shows a results list containing only \"aba\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the favorites list: after adding \"silent\" to favorites and reloading the page, the tab labelled \"Favorites\" still shows a row containing \"silent\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9ab43ab5459225795370b34fe9942a84ffd7a616be1433626439aca0e39d2d09"
+    }
+  ]
+}

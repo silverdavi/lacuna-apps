@@ -1,0 +1,20 @@
+/* App-local tab styling. Uses the app's own .as-tab class (not the kit's
+   .lc-tab) so it does not restyle the shared kit. Colors are Lacuna tokens
+   only; the base color is also set inline so it wins regardless of cascade. */
+
+.as-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+  color: var(--ink-60);
+}
+
+.as-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
