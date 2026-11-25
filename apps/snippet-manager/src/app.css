@@ -1,0 +1,37 @@
+.sm-code {
+  margin: calc(12px * var(--sf)) 0;
+}
+
+.sm-tags {
+  margin: calc(8px * var(--sf)) 0 calc(12px * var(--sf));
+}
+
+.sm-error {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--danger, var(--accent));
+  margin-bottom: calc(8px * var(--sf));
+}
+
+.sm-toolbar {
+  display: grid;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
+
+.sm-row-actions {
+  display: flex;
+  gap: calc(4px * var(--sf));
+}
+
+.sm-search {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--sans);
+  font-size: calc(14px * var(--tf));
+  color: var(--ink);
+  background: var(--paper);
+  border: calc(1px * var(--sf)) solid var(--hair-strong);
+  border-radius: calc(4px * var(--sf));
+  padding: calc(4px * var(--sf));
+}

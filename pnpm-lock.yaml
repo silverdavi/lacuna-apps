@@ -2025,6 +2025,67 @@ importers:
         specifier: ^6.2.0
         version: 6.4.5
 
+  apps/snippet-manager:
+    dependencies:
+      '@lacuna/code-area':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/code-area/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
+      '@lacuna/filter-bar':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/filter-bar/0.1.0
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
+      '@lacuna/record-form':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/record-form/0.1.0
+      '@lacuna/record-table':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/record-table/0.1.0
+      '@lacuna/search-box':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/search-box/0.1.0
+      '@lacuna/tag-input':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/tag-input/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../toolbox
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-clipboard/0.1.0
+      '@lacuna/use-collection':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-collection/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.5)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.5
+
   apps/subscription-tracker:
     dependencies:
       '@lacuna/host-mock':
@@ -2351,6 +2412,19 @@ importers:
 
   toolbox/modules/file-save-open/0.1.0: {}
 
+  toolbox/modules/filter-bar/0.1.0:
+    dependencies:
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../date-picker/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/format-duration/0.1.0: {}
 
   toolbox/modules/fuzzy-search/0.1.0: {}
@@ -2459,6 +2533,28 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/record-form/0.1.0:
+    dependencies:
+      '@lacuna/combobox':
+        specifier: workspace:0.1.0
+        version: link:../../combobox/0.1.0
+      '@lacuna/date-picker':
+        specifier: workspace:0.1.0
+        version: link:../../date-picker/0.1.0
+      '@lacuna/schema-validate':
+        specifier: workspace:0.1.0
+        version: link:../../schema-validate/0.1.0
+      '@lacuna/use-form':
+        specifier: workspace:0.1.0
+        version: link:../../use-form/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/record-table/0.1.0:
     dependencies:
       '@lacuna/query-spec':
@@ -2478,11 +2574,36 @@ importers:
         specifier: workspace:0.1.0
         version: link:../../date-math/0.1.0
 
+  toolbox/modules/schema-validate/0.1.0: {}
+
+  toolbox/modules/search-box/0.1.0:
+    dependencies:
+      '@lacuna/fuzzy-search':
+        specifier: workspace:0.1.0
+        version: link:../../fuzzy-search/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/streak-calc/0.1.0:
     dependencies:
       '@lacuna/date-math':
         specifier: workspace:0.1.0
         version: link:../../date-math/0.1.0
+
+  toolbox/modules/tag-input/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
 
   toolbox/modules/text-transforms/0.1.0: {}
 
@@ -2552,6 +2673,19 @@ importers:
 
   toolbox/modules/use-drag-reorder/0.1.0:
     dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/use-form/0.1.0:
+    dependencies:
+      '@lacuna/schema-validate':
+        specifier: workspace:0.1.0
+        version: link:../../schema-validate/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1

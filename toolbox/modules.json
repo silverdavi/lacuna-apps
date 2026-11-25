@@ -1292,6 +1292,50 @@
       }
     },
     {
+      "id": "@lacuna/filter-bar",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A toolbar of toggleable filter chips, a date-range picker, and a sort control for narrowing and ordering a list of records.",
+      "today": [
+        "toolbox/modules/filter-bar/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-picker"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "FilterBar"
+      ],
+      "public": true,
+      "path": "toolbox/modules/filter-bar/0.1.0",
+      "bridge": {
+        "component": "FilterBar",
+        "kind": "widget",
+        "exports": [
+          "FilterBar"
+        ],
+        "types": [
+          "FilterChipDef",
+          "SortDef",
+          "FilterBarProps"
+        ],
+        "signature": "",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "08e47585d54ddab6",
+            "lines": 177,
+            "dependencies": {
+              "@lacuna/date-picker": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/format-duration",
       "layer": 3,
       "status": "exists",
@@ -2155,6 +2199,57 @@
       }
     },
     {
+      "id": "@lacuna/record-form",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Schema-driven form rendering text, number, date, and select fields from a declarative definition, with validation, dirty tracking, and submit handling.",
+      "today": [
+        "toolbox/modules/record-form/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/combobox",
+        "@lacuna/date-picker",
+        "@lacuna/schema-validate",
+        "@lacuna/use-form"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "RecordForm"
+      ],
+      "public": true,
+      "path": "toolbox/modules/record-form/0.1.0",
+      "bridge": {
+        "component": "RecordForm",
+        "kind": "widget",
+        "exports": [
+          "RecordForm"
+        ],
+        "types": [
+          "FieldType",
+          "FieldDef",
+          "RecordValues",
+          "RecordFormProps"
+        ],
+        "signature": "RecordForm(props: RecordFormProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "abc94db0f962fd61",
+            "lines": 331,
+            "dependencies": {
+              "@lacuna/combobox": "0.1.0",
+              "@lacuna/date-picker": "0.1.0",
+              "@lacuna/schema-validate": "0.1.0",
+              "@lacuna/use-form": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/record-table",
       "layer": 2,
       "status": "exists",
@@ -2247,6 +2342,91 @@
       }
     },
     {
+      "id": "@lacuna/schema-validate",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Pure field-schema definition and validation for text, number, date, and choice fields with required, min/max, pattern, and custom message support.",
+      "today": [
+        "toolbox/modules/schema-validate/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "schemaValidate"
+      ],
+      "public": true,
+      "path": "toolbox/modules/schema-validate/0.1.0",
+      "bridge": {
+        "component": "schemaValidate",
+        "kind": "logic",
+        "exports": [
+          "validateField",
+          "validateForm"
+        ],
+        "types": [
+          "FieldType",
+          "FieldSchema",
+          "ValidationError",
+          "ValidationResult"
+        ],
+        "signature": "validateField( schema: FieldSchema, value: string | number | null | undefined, ); validateForm( schemas: FieldSchema[], values: Record<string, string | number | null | undefined>, )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "067b6d27d56d087c",
+            "lines": 144,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/search-box",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Search input with ranked fuzzy-match results, keyboard navigation, and highlighted match ranges.",
+      "today": [
+        "toolbox/modules/search-box/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/fuzzy-search"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "SearchBox"
+      ],
+      "public": true,
+      "path": "toolbox/modules/search-box/0.1.0",
+      "bridge": {
+        "component": "SearchBox",
+        "kind": "widget",
+        "exports": [
+          "SearchBox"
+        ],
+        "types": [
+          "SearchBoxField",
+          "SearchBoxProps"
+        ],
+        "signature": "SearchBox({ records, fields, placeholder, maxResults = 10, onSelect, onQueryChange, renderResul...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "13ec0f29e6344dcd",
+            "lines": 234,
+            "dependencies": {
+              "@lacuna/fuzzy-search": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/streak-calc",
       "layer": 3,
       "status": "exists",
@@ -2286,6 +2466,44 @@
             "dependencies": {
               "@lacuna/date-math": "0.1.0"
             }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/tag-input",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Text input that adds and removes tags as removable chips, with optional autocomplete suggestions and keyboard navigation.",
+      "today": [
+        "toolbox/modules/tag-input/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "TagInput"
+      ],
+      "public": true,
+      "path": "toolbox/modules/tag-input/0.1.0",
+      "bridge": {
+        "component": "TagInput",
+        "kind": "widget",
+        "exports": [
+          "TagInput"
+        ],
+        "types": [
+          "TagInputProps"
+        ],
+        "signature": "TagInput({ tags, onChange, suggestions, placeholder, maxTags, disabled = false, 'aria-label': ...)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "625de40486f07da3",
+            "lines": 279,
+            "dependencies": {}
           }
         }
       }
@@ -2553,6 +2771,55 @@
             "source": "2f3e7db4fa06b82e",
             "lines": 183,
             "dependencies": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/use-form",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Form state with dirty tracking, per-field schema validation, and controlled submit.",
+      "today": [
+        "toolbox/modules/use-form/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/schema-validate"
+      ],
+      "formats": [],
+      "keywords": [
+        "hook",
+        "useForm"
+      ],
+      "public": true,
+      "path": "toolbox/modules/use-form/0.1.0",
+      "bridge": {
+        "component": "useForm",
+        "kind": "hook",
+        "exports": [
+          "useForm"
+        ],
+        "types": [
+          "FieldValue",
+          "FormField",
+          "FormValues",
+          "FormErrors",
+          "FormConfig",
+          "FormState",
+          "FormActions",
+          "UseFormReturn"
+        ],
+        "signature": "useForm(config: FormConfig)",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "d6b9ba48f51e8bf5",
+            "lines": 120,
+            "dependencies": {
+              "@lacuna/schema-validate": "0.1.0"
+            }
           }
         }
       }
