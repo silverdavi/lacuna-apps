@@ -1,0 +1,82 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.dream-journal",
+  "name": "Dream Journal",
+  "version": "0.1.0",
+  "summary": "Log recurring dreams, moods, and wake times. Search and filter your archive.",
+  "description": "Log dreams with a title, description, and tags. Search by text and filter by tag. Export the archive as CSV. The data stays on this device.",
+  "category": "personal",
+  "tags": ["dreams", "reflection", "journaling"],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/dream-journal"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:dream",
+    "edit:dream",
+    "export:csv"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "dream",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the dream entries in the journal"
+      }
+    ],
+    "platform": [
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "dream"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
