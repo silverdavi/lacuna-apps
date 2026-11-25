@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.period-tracker",
+  "name": "Period Tracker",
+  "version": "0.1.0",
+  "summary": "Log period start dates and lengths, see the average cycle and the next period.",
+  "description": "Record each period with a start date and a length in days. The average cycle length and the next predicted period fall out of the start dates, a month calendar marks the starts, and an ICS export copies the periods to the clipboard. The log stays on this device.",
+  "category": "personal",
+  "tags": ["period", "cycle", "calendar"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/period-tracker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:period-record",
+    "view:calendar",
+    "export:ics"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "period-record",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the period start dates and lengths"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "period-record"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
