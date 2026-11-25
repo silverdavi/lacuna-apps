@@ -6,7 +6,7 @@
   "summary": "Generate v1 and v4 UUIDs, one or a batch at a time.",
   "description": "Pick a version and a batch size, press Generate, and keep the result on this page. Copy all, clear, or delete any ID. The history is stored on this device and survives reloads.",
   "category": "productivity",
-  "icon": "grid",
+  "icon": "vault",
   "relationship": {
     "kind": "standalone"
   },
@@ -32,30 +32,30 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
-      "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0",
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
-    "edit:settings"
+    "create:uuid",
+    "export:uuid",
+    "edit:uuid"
   ],
   "permissions": {
     "records": [
       {
-        "kind": "settings",
+        "kind": "uuid",
         "access": [
           "read",
           "write",
-          "create"
+          "create",
+          "delete"
         ],
         "purpose": "Store the generated UUID history on this device"
       }
     ],
-    "platform": [
-      "identity.profile.read"
-    ],
+
+    "platform": [],
     "network": {
       "origins": []
     },
@@ -68,7 +68,7 @@
   },
   "sharing": {
     "owns": [
-      "settings"
+      "uuid"
     ],
     "reads": [],
     "handoffs": []

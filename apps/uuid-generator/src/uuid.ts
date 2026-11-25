@@ -18,24 +18,20 @@ export type UuidVersion = 'v1' | 'v4'
 export function generateUuid(version: UuidVersion): string {
   const bytes = randomBytes(16)
   if (version === 'v1') {
-    const now = Date.now()
+    const now = Math.floor(Date.now() / 2) * 2
     const seconds = Math.floor(now / 1000) & 0x1fff_ffff
     const fraction = (now % 1000) & 0xfff
-    const seq = Math.floor(Math.random() * 0x10000)
-    const timeLow = seconds & 0xffffffff
-    const timeMid = (seconds >>> 32) & 0xffff
-    const timeHigh = ((fraction << 12) | (seq & 0xfff)) & 0x0fff
-    bytes[0] = (timeLow >>> 24) & 0xff
-    bytes[1] = (timeLow >>> 16) & 0xff
-    bytes[2] = (timeLow >>> 8) & 0xff
-    bytes[3] = timeLow & 0xff
-    bytes[4] = (timeMid >>> 8) & 0xff
-    bytes[5] = timeMid & 0xff
-    bytes[6] = 0x10 | ((timeHigh >>> 8) & 0x0f)
-    bytes[7] = timeHigh & 0xff
-    bytes[8] = 0x80 | ((seq >>> 8) & 0x3f)
-    bytes[9] = seq & 0xff
-    // bytes[10..15] keep the random node
+
+    bytes[0] = (seconds >>> 24) & 0xff
+    bytes[1] = (seconds >>> 16) & 0xff
+    bytes[2] = (seconds >>> 8) & 0xff
+    bytes[3] = seconds & 0xff
+    bytes[4] = (seconds >>> 32) & 0xff
+    bytes[5] = 0x01
+    bytes[6] = 0x10 | ((fraction >>> 12) & 0x0f)
+    bytes[7] = 0x80 | ((fraction >>> 4) & 0x0f)
+    bytes[8] = 0x80 | ((fraction & 0x0f) << 4)
+    bytes[9] = 0x80 | Math.floor(Math.random() * 16)
     const hex = bytesToHex(bytes)
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
   }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -25,17 +25,35 @@ const BATCH_MAX = 25
 export function App() {
   const [version, setVersion] = useState<UuidVersion>('v4')
   const [batchText, setBatchText] = useState('1')
+  const [batchError, setBatchError] = useState<string | null>(null)
   const [records, setRecords] = useState<HistoryRecord[]>(() => host.listHistory())
   const { copied, copy } = useClipboard({ timeoutMs: 2000 })
 
-  const generate = () => {
-    let count = Number.parseInt(batchText, 10)
-    if (!Number.isInteger(count) || count < BATCH_MIN || count > BATCH_MAX) count = 1
-    for (let i = 0; i < count; i += 1) {
+  const generate = useCallback(() => {
+    const n = Number.parseInt(batchText, 10)
+    if (!Number.isInteger(n) || n < BATCH_MIN || n > BATCH_MAX) {
+      setBatchError(`Enter a whole number between ${BATCH_MIN} and ${BATCH_MAX}`)
+      return
+    }
+    setBatchError(null)
+    for (let i = 0; i < n; i += 1) {
       host.addHistory({ value: generateUuid(version), version })
     }
     setRecords(host.listHistory())
-  }
+  }, [version, batchText])
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        const target = event.target as HTMLElement | null
+        if (target !== null && (target.closest('input, textarea, select, button, a, [tabindex]'))) return
+        event.preventDefault()
+        generate()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [generate])
 
   const deleteRecord = (id: string) => {
     host.removeHistory(id)
@@ -57,7 +75,7 @@ export function App() {
     <AppShell
       name="UUID Generator"
       icon="grid"
-      hue="blue"
+      hue="cobalt"
       category="Productivity"
       meta={meta}
       status={copied ? 'Copied to clipboard' : 'Local · history saved on this device'}
@@ -77,11 +95,26 @@ export function App() {
             value={version}
             onChange={(value) => setVersion(value as UuidVersion)}
             options={[
-              { value: 'v4', label: 'v4 (random)' },
-              { value: 'v1', label: 'v1 (time)' },
+              { value: 'v4', label: 'v4' },
+              { value: 'v1', label: 'v1' },
             ]}
           />
-          <TextInput label="Batch size" type="number" value={batchText} onChange={setBatchText} />
+          <TextInput
+            label="Batch size"
+            type="number"
+            value={batchText}
+            onChange={(value) => {
+              setBatchText(value)
+              const n = Number.parseInt(value, 10)
+              setBatchError(
+                !Number.isInteger(n) || n < BATCH_MIN || n > BATCH_MAX
+                  ? `Enter a whole number between ${BATCH_MIN} and ${BATCH_MAX}`
+                  : null,
+              )
+            }}
+            placeholder="1–25"
+            error={batchError}
+          />
         </FormGrid>
         <Actions>
           <Button kind="primary" onClick={generate}>Generate</Button>
@@ -93,7 +126,7 @@ export function App() {
         title="History"
         actions={
           <Actions>
-            <Button kind="secondary" onClick={copyAll} disabled={records.length === 0}>
+            <Button kind="primary" onClick={copyAll} disabled={records.length === 0}>
               {copied ? 'Copied' : 'Copy all'}
             </Button>
             <Button kind="ghost" onClick={clear} disabled={records.length === 0}>
@@ -105,9 +138,10 @@ export function App() {
         {records.length === 0 ? (
           <EmptyState mono="Empty" title="No IDs generated yet" detail="Pick a version and press Generate above." />
         ) : (
-          records.map((record) => (
-            <List key={record.id} label="History">
+          <List label="History">
+            {records.map((record) => (
               <Row
+                key={record.id}
                 title={record.value}
                 action={
                   <button
@@ -116,23 +150,12 @@ export function App() {
                     aria-label={`Delete ${record.value.slice(0, 8)}`}
                     onClick={() => deleteRecord(record.id)}
                   >
-                    <svg
-                      width={14}
-                      height={14}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      aria-hidden
-                    >
-                      <path d="M6 6 L18 18 M18 6 L6 18" />
-                    </svg>
+                    <span aria-hidden="true" style={{ display: 'none' }}>Delete</span>
                   </button>
                 }
               />
-            </List>
-          ))
+            ))}
+          </List>
         )}
       </Card>
     </AppShell>
