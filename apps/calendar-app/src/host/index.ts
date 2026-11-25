@@ -15,3 +15,7 @@ export function addEvent(input: Omit<CalendarEvent, 'id'> & { id?: string }): Ca
 export function removeEvent(id: string): boolean {
   return events.remove(id)
 }
+
+export function uid(prefix = 'evt'): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}

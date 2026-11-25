@@ -1,97 +1,145 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useEffect, useMemo, useRef, useState } from 'react'
+// Personal Calendar: add, view, and delete events on a month grid,
+// with ICS import/export.
+import { useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import { addDays, addMonths, startOfMonth, endOfMonth, toISODate } from '@lacuna/date-math'
+import { saveText } from '@lacuna/file-save-open'
+import { toIcs, fromIcs } from '@lacuna/ics-calendar'
 import {
-  Actions,
   AppShell,
-  Button,
   Card,
-  EmptyState,
-  FormGrid,
-  Kpi,
-  KpiRow,
-  PrimaryButton,
+  Button,
   TextInput,
+  FormGrid,
+  Actions,
 } from '@lacuna/ui'
-import { addMonths, fromISODate, startOfWeek, toISODate } from '@lacuna/date-math'
-import { fromIcs, toIcs, validateIcs, type IcsEvent } from '@lacuna/ics-calendar'
-import { openFile, saveText } from '@lacuna/file-save-open'
-import { addEvent, listEvents, removeEvent, type CalendarEvent } from './host'
-import './app.css'
+import { listEvents, addEvent, removeEvent, uid } from './host'
+import type { CalendarEvent } from './host'
 
-const DAY_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
 
-function monthHeading(anchor: string): string {
-  const d = fromISODate(anchor)
-  if (!d) return ''
-  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const VIEW_KEY = 'lacuna.calendar-app:view-date'
+
+function nowUtc(): Date {
+  const t = new Date()
+  return new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()))
 }
 
-function monthCells(anchor: string): { iso: string; inMonth: boolean }[] {
-  const d = fromISODate(anchor)
-  if (!d) return []
-  const first = new Date(d.getFullYear(), d.getMonth(), 1)
-  const start = startOfWeek(first, 1)
-  const cells: { iso: string; inMonth: boolean }[] = []
-  for (let i = 0; i < 42; i++) {
-    const cell = new Date(start.getTime() + i * 86400000)
-    cells.push({
-      iso: toISODate(cell),
-      inMonth: cell.getMonth() === d.getMonth(),
-    })
+function loadViewDate(): Date {
+  try {
+    const raw = localStorage.getItem(VIEW_KEY)
+    if (raw && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      const [y, m, d] = raw.split('-').map(Number)
+      return new Date(Date.UTC(y, m - 1, d))
+    }
+  } catch {
+    // fall through to today
   }
-  return cells
+  return nowUtc()
 }
 
-function timeOf(startDate: string): string {
-  const t = startDate.slice(11, 16)
-  return /^\d{2}:\d{2}$/.test(t) ? t : ''
+function saveViewDate(d: Date): void {
+  try {
+    localStorage.setItem(VIEW_KEY, isoDate(d))
+  } catch {
+    // ignore
+  }
 }
 
-function eventDateTime(ev: CalendarEvent): string {
-  return ev.time === '' ? ev.date : `${ev.date}T${ev.time}`
+function usDate(d: Date): string {
+  return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
 }
 
-interface FormState {
-  title: string
-  date: string
-  time: string
-  error: string | null
+function isoDate(d: Date): string {
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
-function detailRows(ev: CalendarEvent): Array<[string, string]> {
-  const rows: Array<[string, string]> = [['Date', ev.date]]
-  if (ev.time !== '') rows.push(['Time', ev.time])
-  return rows
+function monthShort(d: Date): string {
+  return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCFullYear()}`
 }
 
-const TODAY = toISODate(new Date())
+function timeShort(t: string): string {
+  const [h, m] = t.split(':').map(Number)
+  const period = h < 12 ? 'AM' : 'PM'
+  const hh = h % 12 === 0 ? 12 : h % 12
+  return `${hh}:${String(m).padStart(2, '0')} ${period}`
+}
+
+function normalizeDate(v: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}/.test(v)) {
+    const m = /^(\d{4})(\d{2})(\d{2})/.exec(v)
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`
+  }
+  return v.slice(0, 10)
+}
+
+function eventFromIcs(e: { id: string; summary: string; startDate: string }): CalendarEvent {
+  const allDay = !e.startDate.includes('T')
+  const date = normalizeDate(e.startDate)
+  const time = allDay ? '' : `${e.startDate.slice(11, 13)}:${e.startDate.slice(14, 16)}`
+  return { id: e.id, title: e.summary, date, time }
+}
+
+function EventDialog({
+  label,
+  onClose,
+  children,
+}: {
+  label: string
+  onClose: () => void
+  children: ReactNode
+}) {
+  return (
+    <div className="cal-overlay">
+      <div role="dialog" aria-label={label} className="cal-dialog">
+        {children}
+      </div>
+      <button
+        type="button"
+        className="cal-dialog-close"
+        aria-label={`Close ${label}`}
+        onClick={onClose}
+      >
+        ×
+      </button>
+    </div>
+  )
+}
 
 export function App() {
   const [events, setEvents] = useState<CalendarEvent[]>(() => listEvents())
-  const [anchor, setAnchor] = useState(TODAY)
-  const [form, setForm] = useState<FormState | null>(null)
-  const [selected, setSelected] = useState<CalendarEvent | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
-  const importRef = useRef<HTMLInputElement>(null)
+  const [currentDate, setCurrentDate] = useState<Date>(loadViewDate)
+  const [detail, setDetail] = useState<CalendarEvent | null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [draft, setDraft] = useState({ title: '', date: '', time: '' })
+  const [formError, setFormError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (notice === null) return
-    const t = setTimeout(() => setNotice(null), 4000)
-    return () => clearTimeout(t)
-  }, [notice])
+  const month = useMemo(() => startOfMonth(currentDate), [currentDate])
+  const daysInMonth = useMemo(() => endOfMonth(month).getUTCDate(), [month])
+  const cells = useMemo(
+    () => Array.from({ length: daysInMonth }, (_, i) => addDays(month, i)),
+    [month, daysInMonth],
+  )
+  const todayIso = isoDate(nowUtc())
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setForm(null)
-        setSelected(null)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
-  const byDay = useMemo(() => {
+  const byDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>()
     for (const ev of events) {
       const list = map.get(ev.date) ?? []
@@ -101,258 +149,283 @@ export function App() {
     return map
   }, [events])
 
-  const cells = useMemo(() => monthCells(anchor), [anchor])
-  const total = events.length
-  const currentEvents = useMemo(
+  const monthEvents = useMemo(
     () =>
-      cells
-        .filter((c) => c.inMonth)
-        .flatMap((c) => byDay.get(c.iso) ?? [])
-        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
-    [cells, byDay],
+      events
+        .filter((ev) => {
+          const d = new Date(ev.date + 'T00:00:00Z')
+          return (
+            d.getUTCMonth() === currentDate.getUTCMonth() &&
+            d.getUTCFullYear() === currentDate.getUTCFullYear()
+          )
+        })
+        .sort((a, b) =>
+          a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date),
+        ),
+    [events, currentDate],
   )
 
-  function shift(offset: number) {
-    const d = fromISODate(anchor)
-    if (!d) return
-    setAnchor(toISODate(addMonths(d, offset)))
+  const onNav = (offset: 1 | -1) =>
+    setCurrentDate((prev) => addMonths(startOfMonth(prev), offset))
+
+  const openAdd = () => {
+    const inCurrentMonth = cells.some((d) => isoDate(d) === todayIso)
+    setDraft({
+      title: '',
+      date: inCurrentMonth ? todayIso : toISODate(month),
+      time: '',
+    })
+    setFormError(null)
+    setShowForm(true)
   }
 
-  function refresh() {
-    setEvents(listEvents())
-  }
-
-  function openForm() {
-    setForm({ title: '', date: anchor, time: '', error: null })
-  }
-
-  function saveForm() {
-    if (!form) return
-    const title = form.title.trim()
-    if (title === '') {
-      setForm({ ...form, error: 'Title is required' })
+  const onSubmit = () => {
+    if (!draft.title.trim()) {
+      setFormError('Title is required')
       return
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date)) {
-      setForm({ ...form, error: 'Pick a valid date' })
+    if (!draft.date) {
+      setFormError('Date is required')
       return
     }
-    addEvent({ title, date: form.date, time: form.time })
+    addEvent({
+      id: uid(),
+      title: draft.title.trim(),
+      date: draft.date,
+      time: draft.time || '',
+    })
     setEvents(listEvents())
-    setForm(null)
-    setSelected(null)
+    setShowForm(false)
+    const target = new Date(draft.date + 'T00:00:00Z')
+    setCurrentDate(target)
+    saveViewDate(target)
   }
 
-  function deleteSelected() {
-    if (!selected) return
-    removeEvent(selected.id)
+  const onDelete = (id: string) => {
+    removeEvent(id)
     setEvents(listEvents())
-    setSelected(null)
+    setDetail(null)
   }
 
-  function exportIcs() {
-    const out: IcsEvent[] = events.map((ev) => ({
-      id: ev.id,
-      summary: ev.title,
-      startDate: eventDateTime(ev),
-      allDay: ev.time === '',
-    }))
-    saveText(toIcs(out), { filename: 'calendar.ics', mimeType: 'text/calendar' })
+  const onExport = () => {
+    const ics = toIcs(
+      events.map((ev) => ({
+        id: ev.id,
+        summary: ev.title,
+        startDate: ev.time ? `${ev.date}T${ev.time.padEnd(8, ':0').slice(0, 8)}` : ev.date,
+        allDay: !ev.time,
+      })),
+    )
+    saveText(ics, { filename: 'calendar.ics', mimeType: 'text/calendar' })
   }
 
-  async function importIcs(file: File) {
-    const result = await openFile(file, 'text')
-    if (!result.ok) {
-      setNotice('Could not read that file')
-      return
+  const fileInput = useRef<HTMLInputElement | null>(null)
+
+  const onImportClick = () => {
+    fileInput.current?.click()
+  }
+
+  const onImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    const text = await file.text()
+    const imported = fromIcs(text).map(eventFromIcs)
+    const existing = new Set(events.map((e) => e.id))
+    const fresh = imported.filter((ev) => !existing.has(ev.id))
+    for (const ev of fresh) addEvent(ev)
+    if (fresh.length > 0) setEvents(listEvents())
+    if (imported.length > 0 && imported[0].date) {
+      const target = new Date(imported[0].date + 'T00:00:00Z')
+      setCurrentDate(target)
+      saveViewDate(target)
     }
-    const text = typeof result.data === 'string' ? result.data : String(result.data)
-    if (!validateIcs(text)) {
-      setNotice('That file is not a valid calendar file')
-      return
-    }
-    let added = 0
-    for (const ev of fromIcs(text)) {
-      const title = ev.summary.trim()
-      if (title === '' || !/^\d{4}-\d{2}-\d{2}/.test(ev.startDate)) continue
-      if (events.some((e) => e.id === ev.id)) continue
-      addEvent({ id: ev.id, title, date: ev.startDate.slice(0, 10), time: timeOf(ev.startDate) })
-      added += 1
-    }
-    setEvents(listEvents())
-    setNotice(added > 0 ? `Imported ${added} event${added === 1 ? '' : 's'}` : 'No new events found')
   }
 
   return (
     <>
-      <input
-        ref={importRef}
-        type="file"
-        accept=".ics,text/calendar"
-        tabIndex={-1}
-        aria-hidden="true"
-        style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0 }}
-        onChange={(e) => {
-          const file = e.target.files?.[0]
-          if (file) void importIcs(file)
-          e.target.value = ''
-        }}
-      />
       <AppShell
         name="Personal Calendar"
         icon="calendar"
         hue="teal"
-        category="Productivity"
-        meta={`${total} ${total === 1 ? 'event' : 'events'}`}
-        status={notice ?? undefined}
+        category="productivity"
+        meta={`${events.length} event${events.length === 1 ? '' : 's'} · ${monthShort(currentDate)}`}
+        status={
+          detail
+            ? `Viewing ${detail.title}`
+            : showForm
+              ? 'Adding an event'
+              : `Showing ${MONTH_NAMES[currentDate.getUTCMonth()]} ${currentDate.getUTCFullYear()}`
+        }
+        side={
+          <div className="cal-card-stack">
+            <Card title="This month" mono={`${monthEvents.length} events`} flush accent>
+              {monthEvents.length === 0 ? (
+                <p style={{ margin: 0, color: 'var(--ink-60)' }}>No events this month</p>
+              ) : (
+                <div className="cal-list">
+                  {monthEvents.map((ev) => (
+                    <div key={ev.id} className="cal-list-row">
+                      <span className="cal-list-date">{ev.date}</span>
+                      <button className="cal-list-title" onClick={() => setDetail(ev)}>
+                        {ev.title}
+                      </button>
+                      {ev.time && (
+                        <span className="cal-list-time">{timeShort(ev.time)}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
+        }
       >
-        <div className="cal-stack">
-          <Card mono="Month" title={monthHeading(anchor)}>
-            <div className="cal-card-stack">
-              <div className="cal-toolbar">
-                <div className="cal-nav">
-                  <Button kind="ghost" onClick={() => shift(-1)}>
-                    Previous month
-                  </Button>
-                  <Button kind="ghost" onClick={() => shift(1)}>
-                    Next month
-                  </Button>
-                </div>
-                <div className="cal-actions">
-                  <Button kind="secondary" onClick={() => importRef.current?.click()}>
-                    Import ICS
-                  </Button>
-                  <Button kind="secondary" onClick={exportIcs}>
-                    Export ICS
-                  </Button>
-                  <PrimaryButton onClick={openForm}>Add event</PrimaryButton>
-                </div>
+        <Card
+          title={
+            <h2 aria-label="Month title">
+              {MONTH_NAMES[currentDate.getUTCMonth()]} {currentDate.getUTCFullYear()}
+            </h2>
+          }
+          mono={`${events.length} event${events.length === 1 ? '' : 's'}`}
+          actions={
+            <div className="cal-toolbar">
+              <div className="cal-nav">
+                <Button ariaLabel="Previous month" onClick={() => onNav(-1)}>
+                  ←
+                </Button>
+                <Button ariaLabel="Next month" onClick={() => onNav(1)}>
+                  →
+                </Button>
               </div>
-              <div className="cal-grid">
-                {DAY_ABBR.map((d) => (
-                  <div key={d} className="cal-grid-head">
+              <div className="cal-actions">
+                <Button ariaLabel="Import ICS" onClick={onImportClick}>
+                  Import ICS
+                </Button>
+                <Button ariaLabel="Export ICS" onClick={onExport}>
+                  Export ICS
+                </Button>
+                <Button kind="primary" ariaLabel="Add event" onClick={openAdd}>
+                  + Add
+                </Button>
+              </div>
+            </div>
+          }
+        >
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".ics,text/calendar"
+            style={{ display: 'none' }}
+            onChange={(e) => void onImport(e)}
+          />
+          <div role="grid" aria-label="Month">
+            <div className="cal-grid">
+              <div role="row" aria-label="Weekdays">
+                {DAY_NAMES.map((d) => (
+                  <div key={d} className="cal-grid-head" role="columnheader">
                     {d}
                   </div>
                 ))}
-                {cells.map((c) => {
-                  const dayEvents = byDay.get(c.iso) ?? []
-                  const dayNum = Number(c.iso.slice(8, 10))
+              </div>
+              {Array.from({ length: 6 }, (_, r) => (
+                <div key={r} role="row" aria-label={`Week ${r + 1}`}>
+                  {Array.from({ length: 7 }, (_, c) => {
+                    const d = addDays(month, r * 7 + c)
+                    const iso = isoDate(d)
+                    const inMonth = d.getUTCMonth() === month.getUTCMonth()
+                    const cellEvents = inMonth ? (byDate.get(iso) ?? []) : []
                     return (
                       <div
-                        key={c.iso}
-                        className={`cal-cell${c.inMonth ? '' : ' off'}${c.iso === TODAY ? ' today' : ''}`}
+                        key={iso}
+                        role="gridcell"
+                        aria-label={usDate(d)}
+                        className={`cal-cell${iso === todayIso ? ' today' : ''}${
+                          inMonth ? '' : ' off'
+                        }`}
                       >
-                        <div className="cal-cell-date">{c.inMonth ? dayNum : null}</div>
-                        {dayEvents.map((ev) => (
-                          <button
-                            key={ev.id}
-                            type="button"
-                            className="cal-block"
-                            title={ev.title}
-                            onClick={() => setSelected(ev)}
-                          >
+                        <span className="cal-cell-date">{d.getUTCDate()}</span>
+                        {cellEvents.map((ev) => (
+                          <button key={ev.id} className="cal-block" onClick={() => setDetail(ev)}>
                             {ev.title}
                           </button>
                         ))}
                       </div>
                     )
-                })}
-              </div>
+                  })}
+                </div>
+              ))}
             </div>
-          </Card>
+          </div>
+        </Card>
+      </AppShell>
 
-          <Card mono="This month" title="This month's events">
-            {currentEvents.length === 0 ? (
-              <div className="cal-month-empty">
-                <div className="lc-mono lc-mono-sm lc-faint">Empty</div>
-                <div className="lc-empty-title">No events this month</div>
-                <div className="lc-body-sm">Add an event or import a calendar file to fill the grid.</div>
-              </div>
-            ) : (
-              <>
-              <div className="cal-list">
-                {currentEvents.map((ev) => (
-                  <div key={ev.id} className="cal-list-row">
-                    <button type="button" className="cal-list-title" onClick={() => setSelected(ev)}>
-                      {ev.title}
-                    </button>
-                    <span className="cal-list-date">{ev.date}</span>
-                    <span className="cal-list-time">{ev.time === '' ? 'All day' : ev.time}</span>
-                    <span className="cal-list-key">{ev.title}</span>
-                  </div>
-                ))}
-              </div>
-                <KpiRow>
-                  <Kpi value={String(currentEvents.length)} label="Events this month" accent />
-                </KpiRow>
-              </>
-            )}
-          </Card>
-        </div>
-
-        {form !== null ? (
-          <div className="cal-overlay" role="dialog" aria-modal="true" aria-label="New event">
-            <div className="cal-dialog">
-              <h2>New event</h2>
-              <FormGrid>
-                <TextInput
-                  label="Title"
-                  value={form.title}
-                  onChange={(v) => setForm({ ...form, title: v })}
-                  error={form.error}
-                />
-                <TextInput
-                  label="Date"
-                  type="date"
-                  value={form.date}
-                  onChange={(v) => setForm({ ...form, date: v })}
-                />
-                <TextInput
-                  label="Time"
-                  type="time"
-                  value={form.time}
-                  onChange={(v) => setForm({ ...form, time: v })}
-                  hint="Leave blank for all day"
-                />
-              </FormGrid>
+      {showForm && (
+        <EventDialog label="Event form" onClose={() => setShowForm(false)}>
+          <FormGrid>
+            <TextInput
+              label="Title"
+              value={draft.title}
+              onChange={(v) => setDraft((d) => ({ ...d, title: v }))}
+              error={formError === 'Title is required' ? 'Title is required' : null}
+              placeholder="e.g. Team Sync"
+            />
+            <TextInput
+              label="Date"
+              type="date"
+              value={draft.date}
+              onChange={(v) => setDraft((d) => ({ ...d, date: v }))}
+              error={formError === 'Date is required' ? 'Date is required' : null}
+            />
+            <TextInput
+              label="Time"
+              type="time"
+              value={draft.time}
+              onChange={(v) => setDraft((d) => ({ ...d, time: v }))}
+            />
+            <div>
               <Actions>
-                <PrimaryButton onClick={saveForm}>Save</PrimaryButton>
-                <Button kind="ghost" onClick={() => setForm(null)}>
+                <Button ariaLabel="Save" kind="primary" onClick={onSubmit}>
+                  Save
+                </Button>
+                <Button ariaLabel="Cancel" onClick={() => setShowForm(false)}>
                   Cancel
                 </Button>
               </Actions>
             </div>
-          </div>
-        ) : null}
+          </FormGrid>
+        </EventDialog>
+      )}
 
-        {selected !== null ? (
-          <div className="cal-overlay" role="dialog" aria-modal="true" aria-label="Event details">
-            <div className="cal-dialog">
-              <h2>Event</h2>
-              <div className="cal-detail">
-                <div className="cal-detail-title">{selected.title}</div>
-                <div className="cal-detail-rows">
-                  {detailRows(selected).map(([label, value]) => (
-                    <div key={label} className="cal-detail-row">
-                      <span className="cal-detail-label">{label}</span>
-                      <span className="cal-detail-value">{value}</span>
-                    </div>
-                  ))}
-                </div>
-                {selected.time !== '' ? <span className="cal-detail-key">{selected.time}</span> : null}
+      {detail && (
+        <EventDialog label="Event details" onClose={() => setDetail(null)}>
+          <div className="cal-detail">
+            <div className="cal-detail-title">{detail.title}</div>
+            <div className="cal-detail-rows">
+              <div className="cal-detail-row">
+                <span className="cal-detail-label">Title: </span>
+                <span className="cal-detail-value">{detail.title}</span>
               </div>
-              <Actions>
-                <PrimaryButton onClick={deleteSelected}>Delete</PrimaryButton>
-                <Button kind="ghost" onClick={() => setSelected(null)}>
-                  Close
-                </Button>
-              </Actions>
+              <div className="cal-detail-row">
+                <span className="cal-detail-label">Date: </span>
+                <span className="cal-detail-value">{detail.date}</span>
+              </div>
+              <div className="cal-detail-row">
+                <span className="cal-detail-label">Time: </span>
+                <span className="cal-detail-value">{detail.time || 'All day'}</span>
+              </div>
             </div>
+            <Actions>
+              <Button ariaLabel="Delete" kind="danger" onClick={() => onDelete(detail.id)}>
+                Delete
+              </Button>
+              <Button ariaLabel="Close" onClick={() => setDetail(null)}>
+                Close
+              </Button>
+            </Actions>
           </div>
-        ) : null}
-      </AppShell>
+        </EventDialog>
+      )}
     </>
   )
 }
-
-export { monthHeading }

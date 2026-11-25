@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "spec_sha256": "30fae6e4cc076f56e4a2c78b2ca075b17395f6699ac34843e7ba872ffc537a59",
+  "spec_sha256": "f835aa2d9dda4ec583f19c480b686d5dc4223b6f42086e6de5755b3a5ae7ff70",
   "checks": [
     {
       "id": "A1",
-      "text": "The page shows the heading \"Personal Calendar\" and a month grid displaying the current month's days."
+      "text": "The page shows the heading \"Personal Calendar\" and a month grid named \"Month\" displaying the current month's days (the cell for day 28 exists in every month)."
     },
     {
       "id": "A2",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "b977f1a1c42a70fddfec8f74e427d9ef2e5d5c57e458ab8e7539d3c9d85ec4b8"
+      "sha256": "28c59181fbcf0beb2658855e742e98b0882cc7ba2276b432458c70c36ce65a54"
     }
   ]
 }

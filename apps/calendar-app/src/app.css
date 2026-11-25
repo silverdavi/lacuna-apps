@@ -59,7 +59,7 @@
 }
 
 .cal-cell.off {
-  opacity: 0.55;
+  opacity: 0.82;
 }
 
 .cal-cell.today .cal-cell-date {
@@ -73,7 +73,7 @@
 .cal-cell-date {
   font-family: var(--mono);
   font-size: calc(11px * var(--tf));
-  color: var(--ink-80);
+  color: var(--ink);
   white-space: nowrap;
 }
 
