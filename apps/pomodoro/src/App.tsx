@@ -10,9 +10,13 @@ import {
   Stack,
   TextInput,
 } from '@lacuna/ui'
-import { BREAK_SECONDS, loadState, saveState } from './host/mock'
-
-const STORAGE_KEY = 'lacuna.pomodoro.work-minutes'
+import {
+  BREAK_SECONDS,
+  loadState,
+  saveState,
+  loadWorkMinutes,
+  saveWorkMinutes,
+} from './host'
 
 function formatTime(totalSeconds: number): string {
   const s = Math.max(0, totalSeconds)
@@ -21,24 +25,13 @@ function formatTime(totalSeconds: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-function loadWorkMinutes(): number {
-  const raw = window.localStorage.getItem(STORAGE_KEY)
-  const parsed = raw !== null ? Number(raw) : 25
-  if (Number.isFinite(parsed) && parsed >= 1 && parsed <= 120) {
-    return Math.floor(parsed)
-  }
-  return 25
-}
-
-function saveWorkMinutes(minutes: number): void {
-  window.localStorage.setItem(STORAGE_KEY, String(minutes))
-}
-
 export function App() {
   const [state, setState] = useState(() => loadState())
   const [workMinutes, setWorkMinutes] = useState(() => loadWorkMinutes())
 
   useEffect(() => {
+    // Persist the state the app should reopen in: a live countdown restarts
+    // idle on the next open instead of ticking in the background.
     saveState(state.phase === 'running' ? { ...state, phase: 'idle' } : state)
   }, [state])
 
@@ -55,6 +48,8 @@ export function App() {
   }, [state.phase])
 
   useEffect(() => {
+    // An interval that reaches zero while running hands off to the other
+    // mode: work ends into a 5-minute break, a break ends into work.
     if (state.phase !== 'running' || state.remainingSeconds > 0) return
     const nextMode = state.mode === 'work' ? 'break' : 'work'
     const nextDuration = nextMode === 'work' ? workMinutes * 60 : BREAK_SECONDS
@@ -101,6 +96,7 @@ export function App() {
   const isWork = state.mode === 'work'
 
   const startLabel = isRunning ? 'Pause' : isPaused ? 'Resume' : 'Start'
+  const status = isRunning ? 'Running' : isPaused ? 'Paused' : 'Idle'
 
   const workDuration = workMinutes * 60
   const progress = isWork
@@ -115,7 +111,6 @@ export function App() {
       icon="tasks"
       hue="rust"
       category="Productivity"
-      meta={isRunning ? 'Running' : isPaused ? 'Paused' : 'Idle'}
     >
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'calc(16px * var(--sf))', alignItems: 'start' }}>
         <div style={{ display: 'grid', gap: 'calc(16px * var(--sf))' }}>
@@ -140,6 +135,26 @@ export function App() {
                 >
                   {displayTime}
                 </MonoLabel>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  minHeight: 'calc(16px * var(--sf))',
+                }}
+              >
+                {isPaused ? (
+                  <MonoLabel
+                    style={{
+                      fontSize: 'calc(11px * var(--tf))',
+                      letterSpacing: 'calc(2px * var(--sf))',
+                      color: 'var(--ink-60)',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Paused
+                  </MonoLabel>
+                ) : null}
               </div>
               <div
                 style={{
