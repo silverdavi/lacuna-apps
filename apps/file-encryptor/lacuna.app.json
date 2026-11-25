@@ -1,0 +1,93 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.file-encryptor",
+  "name": "File Encryptor",
+  "version": "0.1.0",
+  "summary": "Encrypt or decrypt a file with a passphrase, then download the result.",
+  "description": "Drop or browse a file, choose a passphrase, and pick Encrypt or Decrypt. The result can be downloaded or copied. The last operations and an optional default passphrase are kept on this device. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["file", "encrypt", "decrypt", "passphrase", "security"],
+  "icon": "vault",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/file-encryptor",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/passphrase-crypto": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:file",
+    "edit:file"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "file-encryptor-session",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep recent operations and an optional default passphrase on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "file-encryptor-session"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
