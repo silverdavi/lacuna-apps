@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   AppShell,
+  Body,
   Button,
   Card,
   EmptyState,
@@ -14,6 +15,8 @@ import {
   TextInput,
 } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
 
 function TabBar({
   items,
@@ -47,6 +50,8 @@ type Preset = { name: string; bpm: number; signature: string }
 
 type Tab = 'metronome' | 'presets'
 
+const APP_ID = 'lacuna.metronome'
+const BACKUP_VERSION = 1
 const SIGNATURES = ['2/4', '3/4', '4/4', '6/8']
 
 const clampBpm = (value: number) => {
@@ -62,6 +67,7 @@ function App() {
   const [running, setRunning] = useState(false)
   const [beat, setBeat] = useState(0)
   const [presetName, setPresetName] = useState('')
+  const [importMsg, setImportMsg] = useState('')
   const [toast, setToast] = useState('')
   const toastRef = useRef(toast)
   toastRef.current = toast
@@ -124,6 +130,83 @@ function App() {
   const deletePreset = (id: string) => {
     actions.remove(id)
     flash('Preset deleted')
+  }
+
+  const backupText = () =>
+    exportBackup({
+      appId: APP_ID,
+      version: BACKUP_VERSION,
+      filename: 'metronome',
+      records: presets.map((item) => ({
+        id: item.id,
+        data: item.data,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+    })
+
+  const csvText = () =>
+    [
+      'name,bpm,signature',
+      ...presets.map((item) =>
+        [item.data.name, item.data.bpm, item.data.signature]
+          .map((field) => (String(field).includes(',') || String(field).includes('"') ? `"${String(field).replace(/"/g, '""')}"` : String(field)))
+          .join(','),
+      ),
+    ].join('\n')
+
+  const exportOptions: ExportOption[] = [
+    {
+      id: 'json',
+      label: 'JSON (full backup)',
+      mimeType: 'application/json',
+      extension: 'json',
+      getData: backupText,
+    },
+    {
+      id: 'csv',
+      label: 'CSV',
+      mimeType: 'text/csv',
+      extension: 'csv',
+      getData: csvText,
+    },
+  ]
+
+  const pickImport = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'application/json,.json'
+    input.onchange = () => {
+      const file = input.files?.[0]
+      if (file === undefined || file === null) return
+      file
+        .text()
+        .then((text) => {
+          try {
+            const result = importBackup<Preset>(text, {
+              currentVersion: BACKUP_VERSION,
+              validate: (record) =>
+                typeof record.data.name === 'string' &&
+                typeof record.data.bpm === 'number' &&
+                typeof record.data.signature === 'string'
+                  ? null
+                  : 'not a preset record',
+            })
+            const known = new Set(presets.map((item) => item.id))
+            let added = 0
+            for (const record of result.records) {
+              if (known.has(record.id)) continue
+              actions.add(record.data)
+              added += 1
+            }
+            setImportMsg(added > 0 ? `Imported ${added} new ${added === 1 ? 'preset' : 'presets'}.` : 'No new presets in that backup.')
+          } catch (err) {
+            setImportMsg(err instanceof Error ? err.message : 'Could not read that file.')
+          }
+        })
+        .catch(() => setImportMsg('Could not read that file.'))
+    }
+    input.click()
   }
 
   const intervalMs = Math.round(60000 / bpmNumber)
@@ -223,35 +306,57 @@ function App() {
             </KpiRow>
           </Stack>
         ) : (
-          <Card title="Presets" mono="Saved">
-            {presets.length === 0 ? (
-              <EmptyState
-                title="No presets yet"
-                detail="Save one from the Metronome tab."
-                actionLabel="Name a preset, then save it"
-              />
-            ) : (
-              <List label="Presets">
-                {presets.map((item) => (
-                  <Row
-                    key={item.id}
-                    title={item.data.name}
-                    meta={`${item.data.bpm} BPM`}
-                    value={item.data.signature}
-                    action={
-                      <Button
-                        kind="secondary"
-                        ariaLabel={`Delete ${item.data.name}`}
-                        onClick={() => deletePreset(item.id)}
-                      >
-                        Delete
-                      </Button>
-                    }
-                  />
-                ))}
-              </List>
-            )}
-          </Card>
+          <Stack>
+            <Card title="Presets" mono="Saved">
+              {presets.length === 0 ? (
+                <EmptyState
+                  title="No presets yet"
+                  detail="Save one from the Metronome tab."
+                  actionLabel="Name a preset, then save it"
+                />
+              ) : (
+                <List label="Presets">
+                  {presets.map((item) => (
+                    <Row
+                      key={item.id}
+                      title={item.data.name}
+                      meta={`${item.data.bpm} BPM`}
+                      value={item.data.signature}
+                      action={
+                        <Button
+                          kind="secondary"
+                          ariaLabel={`Delete ${item.data.name}`}
+                          onClick={() => deletePreset(item.id)}
+                        >
+                          Delete
+                        </Button>
+                      }
+                    />
+                  ))}
+                </List>
+              )}
+            </Card>
+            <Card title="Export & import" mono="Data">
+              <Body sm>
+                Download your presets as a JSON backup or CSV, or merge a previous backup.
+                Importing adds new presets without duplicating existing ones.
+              </Body>
+              <Stack>
+                <ExportMenu
+                  options={exportOptions}
+                  fileName="metronome"
+                  ariaLabel="Export presets"
+                  disabled={presets.length === 0}
+                  onExport={() => flash('Presets exported')}
+                  onError={() => flash('Export failed')}
+                />
+                <Button kind="ghost" onClick={pickImport}>
+                  Import backup
+                </Button>
+                {importMsg !== '' && <Body sm>{importMsg}</Body>}
+              </Stack>
+            </Card>
+          </Stack>
         )}
       </AppShell>
     </>
