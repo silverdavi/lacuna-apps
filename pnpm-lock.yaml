@@ -4630,12 +4630,18 @@ importers:
 
   apps/weekly-planner:
     dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
       '@lacuna/date-math':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/date-math/0.1.0
       '@lacuna/ics-calendar':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/ics-calendar/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
@@ -4645,6 +4651,9 @@ importers:
       '@lacuna/use-collection':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/use-collection/0.1.0
+      '@lacuna/use-undo-stack':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-undo-stack/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1

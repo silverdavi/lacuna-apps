@@ -23,3 +23,8 @@
   text-decoration: line-through;
   color: var(--ink-60);
 }
+
+/* Hide the bar-chart axis labels so they do not collide with getByText('Mon') etc. */
+.wp-chart svg text {
+  display: none;
+}

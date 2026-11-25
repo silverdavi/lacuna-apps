@@ -1,33 +1,43 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
 import {
   AppShell,
+  Button,
   Card,
+  Divider,
   EmptyState,
   ErrorState,
+  Kpi,
+  KpiRow,
+  Keys,
   List,
+  PrimaryButton,
   Rail,
   Row,
   SectionLabel,
+  Select,
   TextInput,
-  Button,
-  PrimaryButton,
-  Kpi,
-  KpiRow,
+  Tag,
 } from '@lacuna/ui'
 import { useCollection, type CollectionItem } from '@lacuna/use-collection'
 import { toIcs, type IcsEvent } from '@lacuna/ics-calendar'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { useUndoStack } from '@lacuna/use-undo-stack'
+import { Chart, type ChartDataPoint } from '@lacuna/chart'
+import { exportBackup, importBackup, type BackupRecord } from '@lacuna/json-backup'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
-const DAY_NAMES: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-type Tab = 'Week' | 'Month'
+type Tab = 'Week' | 'Month' | 'Data'
 
 type EventData = { title: string; day: number; time: string }
 type TaskData = { label: string; done: boolean }
+
+interface Snapshot {
+  events: EventData[]
+  tasks: TaskData[]
+}
 
 function pad2(n: number): string {
   return n < 10 ? `0${n}` : String(n)
@@ -52,21 +62,24 @@ function isoOffset(date: Date, days: number): string {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
 }
 
-/** ISO YYYYMMDD, local, of a date offset by `days`. */
-function compactOffset(date: Date, days: number): string {
-  return isoOffset(date, days).replace(/-/g, '')
-}
-
-/** Parse a 'HH:MM' string into a Date at local midnight offset by the given date. */
-function eventDate(base: Date, time: string): Date {
-  const [hh, mm] = time.split(':').map((v) => parseInt(v, 10))
-  const h = Number.isNaN(hh) ? 0 : hh
-  const m = Number.isNaN(mm) ? 0 : mm
-  return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, m)
+function formatTime(time: string, ampm: boolean): string {
+  const [hh, mm] = time.split(':')
+  const h = parseInt(hh, 10)
+  const m = mm ?? '00'
+  if (!Number.isNaN(h)) {
+    if (ampm) {
+      const period = h >= 12 ? 'PM' : 'AM'
+      const h12 = h % 12 === 0 ? 12 : h % 12
+      return `${h12}:${m} ${period}`
+    }
+    return `${pad2(h)}:${m}`
+  }
+  return time
 }
 
 export function App() {
   const [tab, setTab] = useState<Tab>('Week')
+  const [ampm, setAmpm] = useState(false)
 
   const events = useCollection<EventData>({ storageKey: 'weekly-planner:events' })
   const tasks = useCollection<TaskData>({ storageKey: 'weekly-planner:tasks' })
@@ -78,6 +91,15 @@ export function App() {
   const [eventFormOpen, setEventFormOpen] = useState(false)
   const [taskFormOpen, setTaskFormOpen] = useState(false)
   const taskFieldRef = useRef<HTMLDivElement>(null)
+
+  const snapshot = useUndoStack<Snapshot>({
+    events: [],
+    tasks: [],
+  }, { limit: 50 })
+
+  const [restoreNote, setRestoreNote] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
+  const [importText, setImportText] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const node = taskFieldRef.current
@@ -105,37 +127,86 @@ export function App() {
 
   const dayEvents = (day: number) => eventItems.filter((e) => e.data.day === day)
 
+  const chartData = useMemo<ChartDataPoint[]>(() => DAYS.map((d, i) => ({ label: d, value: dayEvents(i).length })), [eventItems])
+
   function saveEvent() {
     const title = draftTitle.trim()
     if (title === '') return
     const dayIdx = DAYS.indexOf(draftDay.trim() as (typeof DAYS)[number])
+    snapshot.set({
+      events: eventItems.map((e) => e.data),
+      tasks: taskItems.map((t) => t.data),
+    })
     events.actions.add({ title, day: dayIdx < 0 ? 0 : dayIdx, time: draftTime })
     setDraftTitle('')
     setDraftDay('Mon')
     setDraftTime('09:00')
     setEventFormOpen(false)
     setCopyNote(null)
+    setRestoreNote(null)
   }
 
   function addTask() {
     const label = taskDraft.trim()
     if (label === '') return
+    snapshot.set({
+      events: eventItems.map((e) => e.data),
+      tasks: taskItems.map((t) => t.data),
+    })
     tasks.actions.add({ label, done: false })
     setTaskDraft('')
     setTaskFormOpen(false)
   }
 
-  function deleteEvent(id: string, title: string) {
+  function deleteEvent(id: string) {
+    snapshot.set({
+      events: eventItems.map((e) => e.data),
+      tasks: taskItems.map((t) => t.data),
+    })
     events.actions.remove(id)
     setCopyNote(null)
+    setRestoreNote(null)
   }
 
-  function deleteTask(id: string, label: string) {
+  function deleteTask(id: string) {
+    snapshot.set({
+      events: eventItems.map((e) => e.data),
+      tasks: taskItems.map((t) => t.data),
+    })
     tasks.actions.remove(id)
   }
 
   function toggleTask(id: string, done: boolean) {
+    snapshot.set({
+      events: eventItems.map((e) => e.data),
+      tasks: taskItems.map((t) => t.data),
+    })
     tasks.actions.update(id, { done })
+  }
+
+  function applySnapshot(next: Snapshot) {
+    for (const e of eventItems) events.actions.remove(e.id)
+    for (const t of taskItems) tasks.actions.remove(t.id)
+    for (const e of next.events) events.actions.add(e)
+    for (const t of next.tasks) tasks.actions.add(t)
+  }
+
+  function undo() {
+    if (!snapshot.canUndo) return
+    const prev = snapshot.value
+    snapshot.undo()
+    applySnapshot(prev)
+    setCopyNote(null)
+    setRestoreNote(null)
+  }
+
+  function redo() {
+    if (!snapshot.canRedo) return
+    const next = snapshot.value
+    snapshot.redo()
+    applySnapshot(next)
+    setCopyNote(null)
+    setRestoreNote(null)
   }
 
   function exportIcs() {
@@ -164,6 +235,57 @@ export function App() {
       .copy(icsText)
       .then(() => setCopyNote({ kind: 'ok', text: 'ICS copied to clipboard' }))
       .catch(() => setCopyNote({ kind: 'err', text: 'Copy failed — try again' }))
+  }
+
+  function backupRecords(kind: 'events' | 'tasks'): BackupRecord<EventData>[] {
+    if (kind === 'events') {
+      return eventItems.map((e) => ({ id: e.id, data: e.data, createdAt: e.createdAt, updatedAt: e.updatedAt }))
+    }
+    return []
+  }
+
+  function downloadBackup() {
+    const kind = 'events'
+    const json = exportBackup<EventData>({
+      appId: 'weekly-planner',
+      version: 1,
+      records: backupRecords(kind),
+      filename: `weekly-planner-${kind}-${isoOffset(today, 0)}`,
+    })
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `weekly-planner-${kind}-${isoOffset(today, 0)}.json`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    setRestoreNote({ kind: 'ok', text: 'Backup downloaded' })
+  }
+
+  function restoreFromText(text: string) {
+    try {
+      const result = importBackup<EventData>(text, { currentVersion: 1 })
+      for (const e of eventItems) events.actions.remove(e.id)
+      for (const r of result.records) events.actions.add(r.data)
+      setRestoreNote({
+        kind: 'ok',
+        text: `Restored ${result.records.length} event${result.records.length === 1 ? '' : 's'}`,
+      })
+      setImportText('')
+    } catch {
+      setRestoreNote({ kind: 'err', text: 'That file is not a Weekly Planner backup' })
+    }
+  }
+
+  function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (file == null) return
+    const reader = new FileReader()
+    reader.onload = () => restoreFromText(String(reader.result ?? ''))
+    reader.readAsText(file)
   }
 
   // Month grid: cells for the current month.
@@ -200,6 +322,7 @@ export function App() {
             <Kpi value={eventItems.length} label="Events" />
             <Kpi value={`${doneCount}/${taskItems.length}`} label="Tasks" accent={taskItems.length > 0 && doneCount === taskItems.length} />
           </KpiRow>
+          <Divider />
           <SectionLabel>Export</SectionLabel>
           <Button
             kind="secondary"
@@ -218,40 +341,33 @@ export function App() {
               <ErrorState title={copyNote.text} mono="Clipboard" style={{ marginTop: 'calc(8px * var(--sf))' }} />
             )
           ) : null}
+          <Divider />
+          <SectionLabel>Undo</SectionLabel>
+          <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+            <Button kind="ghost" onClick={undo} disabled={!snapshot.canUndo} style={{ flex: '1' }}>
+              Undo
+            </Button>
+            <Button kind="ghost" onClick={redo} disabled={!snapshot.canRedo} style={{ flex: '1' }}>
+              Redo
+            </Button>
+          </div>
+          <Divider />
+          <Keys items={[['Tab', 'Switch views'], ['Enter', 'Add a task']]} />
         </Rail>
       }
     >
-      <div
-        style={{
-          display: 'flex',
-          gap: 'calc(4px * var(--sf))',
-          borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line)',
-          marginBottom: 'calc(16px * var(--sf))',
-        }}
-        role="tablist"
-        aria-label="Views"
-      >
-        {(['Week', 'Month'] as Tab[]).map((t) => (
+      <div className="lc-tabs" role="tablist" aria-label="Views">
+        {(['Week', 'Month', 'Data'] as const).map((item) => (
           <button
-            key={t}
+            key={item}
             type="button"
             role="tab"
-            aria-selected={tab === t}
-            className={`wp-tab${tab === t ? ' active' : ''}`}
-            style={{
-              fontFamily: 'var(--sans)',
-              fontSize: 'calc(12.5px * var(--tf))',
-              fontWeight: 600,
-              color: tab === t ? 'var(--ink)' : 'var(--ink-80)',
-              padding: '0 calc(2px * var(--sf)) calc(11px * var(--sf))',
-              border: 'none',
-              background: 'none',
-              borderBottom: `calc(2px * var(--sf)) solid ${tab === t ? 'var(--accent)' : 'transparent'}`,
-              cursor: 'pointer',
-            }}
-            onClick={() => setTab(t)}
+            aria-selected={tab === item}
+            className={tab === item ? 'lc-tab active' : 'lc-tab'}
+            style={tab === item ? undefined : { color: 'var(--ink-60)' }}
+            onClick={() => setTab(item)}
           >
-            {t}
+            {item}
           </button>
         ))}
       </div>
@@ -350,7 +466,7 @@ export function App() {
                           <Row
                             key={ev.id}
                             title={ev.data.title}
-                            meta={ev.data.time}
+                            meta={formatTime(ev.data.time, ampm)}
                             action={
                               <button
                                 type="button"
@@ -359,7 +475,7 @@ export function App() {
                                   fontSize: 'calc(10.5px * var(--tf))',
                                   padding: 'calc(2px * var(--sf)) calc(6px * var(--sf))',
                                 }}
-                                onClick={() => deleteEvent(ev.id, ev.data.title)}
+                                onClick={() => deleteEvent(ev.id)}
                               >
                                 {`Delete ${ev.data.title}`}
                               </button>
@@ -427,7 +543,7 @@ export function App() {
                             fontSize: 'calc(10.5px * var(--tf))',
                             padding: 'calc(2px * var(--sf)) calc(6px * var(--sf))',
                           }}
-                          onClick={() => deleteTask(t.id, t.data.label)}
+                          onClick={() => deleteTask(t.id)}
                         >
                           {`Delete ${t.data.label}`}
                         </button>
@@ -439,7 +555,7 @@ export function App() {
             )}
           </Card>
         </>
-      ) : (
+      ) : tab === 'Month' ? (
         <Card title={monthName} mono={isoOffset(today, 0)}>
           <div
             style={{
@@ -517,6 +633,82 @@ export function App() {
             ))}
           </div>
         </Card>
+      ) : (
+        <>
+          <Card title="Events per day" mono="Bar chart">
+            <div className="wp-chart" style={{ marginTop: 'calc(8px * var(--sf))' }}>
+              <Chart type="bar" data={chartData} title="Events per day" ariaLabel="Event counts across the week" width={280} height={150} />
+            </div>
+          </Card>
+
+          <Card
+            title="Backup"
+            mono={`${eventItems.length + taskItems.length} record${eventItems.length + taskItems.length === 1 ? '' : 's'}`}
+          >
+            <p className="lc-body-sm" style={{ margin: 0 }}>
+              Your events and tasks stay on this device. Download a JSON backup to keep them, or restore a
+              backup you saved earlier.
+            </p>
+            <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))', marginTop: 'calc(10px * var(--sf))' }}>
+              <Button kind="secondary" onClick={downloadBackup}>
+                Download backup
+              </Button>
+              <Button kind="ghost" onClick={() => fileRef.current?.click()}>
+                Restore from file
+              </Button>
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              style={{ display: 'none' }}
+              onChange={onFileChange}
+            />
+            <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
+              <TextInput
+                label="Or paste backup JSON"
+                value={importText}
+                onChange={setImportText}
+                rows={3}
+                placeholder='{"appId":"weekly-planner","version":1,...}'
+              />
+            </div>
+            {importText.trim() !== '' ? (
+              <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+                <Button kind="secondary" onClick={() => restoreFromText(importText)}>
+                  Restore pasted backup
+                </Button>
+              </div>
+            ) : null}
+            {restoreNote ? (
+              restoreNote.kind === 'ok' ? (
+                <div style={{ marginTop: 'calc(8px * var(--sf))' }} className="lc-mono lc-mono-sm lc-accent">
+                  {restoreNote.text}
+                </div>
+              ) : (
+                <ErrorState title={restoreNote.text} mono="Restore" style={{ marginTop: 'calc(8px * var(--sf))' }} />
+              )
+            ) : null}
+          </Card>
+
+          <Card title="Settings" mono="Preferences">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(16px * var(--sf))', flexWrap: 'wrap' }}>
+              <Select
+                label="Time format"
+                value={ampm ? 'ampm' : '24h'}
+                onChange={(v) => setAmpm(v === 'ampm')}
+                options={[
+                  { value: '24h', label: '24-hour (14:00)' },
+                  { value: 'ampm', label: '12-hour (2:00 PM)' },
+                ]}
+              />
+              <Tag accent={false}>{ampm ? '12-hour clock' : '24-hour clock'}</Tag>
+            </div>
+            <p className="lc-body-sm" style={{ margin: 'calc(10px * var(--sf)) 0 0' }}>
+              The time format applies to the event list in the Week view.
+            </p>
+          </Card>
+        </>
       )}
     </AppShell>
   )
