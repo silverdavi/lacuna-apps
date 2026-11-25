@@ -1,129 +1,92 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-// clipboard may need the document focused; harmless in a new tab.
-async function focus(page: any) {
-  await page.evaluate(() => (document as any).focus?.())
+async function addTask(page: Page, name: string) {
+  await page.getByLabel('Task').fill(name)
+  await page.getByRole('button', { name: 'Add task' }).click()
 }
 
-test('[A1] page shows the heading "Checklist App"', async ({ page }) => {
+async function tickTask(page: Page, name: string) {
+  await page.getByRole('checkbox', { name }).click()
+}
+
+test('[A1] page shows heading "Checklist App"', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Checklist App' })).toBeVisible()
 })
 
-test('[A2] adding "Buy milk" shows the item and "0 of 1 done"', async ({ page }) => {
+test('[A2] adding a task creates a list item and shows 0 of 1 done', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
+  await addTask(page, 'Buy milk')
   await expect(page.getByRole('listitem').filter({ hasText: 'Buy milk' })).toBeVisible()
   await expect(page.getByText('0 of 1 done')).toBeVisible()
 })
 
-test('[A3] checking "Buy milk" changes progress to "1 of 1 done"', async ({ page }) => {
+test('[A3] ticking a task updates progress to 1 of 1 done', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page
-    .getByRole('listitem')
-    .filter({ hasText: 'Buy milk' })
-    .getByRole('checkbox')
-    .click()
+  await addTask(page, 'Buy milk')
+  await tickTask(page, 'Buy milk')
   await expect(page.getByText('1 of 1 done')).toBeVisible()
 })
 
-test('[A4] adding "Walk dog" shows the second item and "1 of 2 done"', async ({ page }) => {
+test('[A4] adding a second task adds it unchecked and shows 1 of 2 done', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page.getByLabel('Task').fill('Walk dog')
-  await page.getByRole('button', { name: 'Add task' }).click()
+  await addTask(page, 'Buy milk')
+  await tickTask(page, 'Buy milk')
+  await addTask(page, 'Walk dog')
   await expect(page.getByRole('listitem').filter({ hasText: 'Walk dog' })).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: 'Walk dog' })).not.toBeChecked()
   await expect(page.getByText('1 of 2 done')).toBeVisible()
 })
 
-test('[A5] deleting "Walk dog" returns progress to "1 of 1 done"', async ({ page }) => {
+test('[A5] deleting a task removes it and updates progress', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page.getByLabel('Task').fill('Walk dog')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page
-    .getByRole('listitem')
-    .filter({ hasText: 'Walk dog' })
-    .getByRole('checkbox')
-    .click()
+  await addTask(page, 'Buy milk')
+  await tickTask(page, 'Buy milk')
+  await addTask(page, 'Walk dog')
   await page.getByRole('button', { name: 'Delete Walk dog' }).click()
   await expect(page.getByRole('listitem').filter({ hasText: 'Walk dog' })).toHaveCount(0)
   await expect(page.getByText('1 of 1 done')).toBeVisible()
 })
 
-test('[A6] "Copy as Markdown" copies the Markdown to the clipboard', async ({
-  page,
-  context,
-}) => {
+test('[A6] Copy as Markdown puts exact markdown on the clipboard', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page.getByLabel('Task').fill('Walk dog')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page
-    .getByRole('listitem')
-    .filter({ hasText: 'Walk dog' })
-    .getByRole('checkbox')
-    .click()
-  await focus(page)
+  await addTask(page, 'Buy milk')
+  await addTask(page, 'Walk dog')
+  await tickTask(page, 'Walk dog')
   await page.getByRole('button', { name: 'Copy as Markdown' }).click()
   const text = await page.evaluate(() => navigator.clipboard.readText())
   expect(text).toBe('- [ ] Buy milk\n- [x] Walk dog')
 })
 
-test('[A7] History shows "No history yet" until an event, then the event', async ({
-  page,
-}) => {
+test('[A7] History tab shows empty state then lists actions after ticking', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('No history yet')).toBeVisible()
+  await addTask(page, 'Buy milk')
   await page.getByRole('tab', { name: 'History' }).click()
   await expect(page.getByText('No history yet')).toBeVisible()
   await page.getByRole('tab', { name: 'Tasks' }).click()
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page
-    .getByRole('listitem')
-    .filter({ hasText: 'Buy milk' })
-    .getByRole('checkbox')
-    .click()
+  await tickTask(page, 'Buy milk')
   await page.getByRole('tab', { name: 'History' }).click()
   await expect(page.getByText('No history yet')).toHaveCount(0)
   await expect(page.getByRole('listitem').filter({ hasText: 'Buy milk' })).toBeVisible()
 })
 
-test('[A8] ArrowDown on the "Buy milk" handle moves it below "Walk dog"', async ({
-  page,
-}) => {
+test('[A8] pressing ArrowDown on Reorder moves task below the next one', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page.getByLabel('Task').fill('Walk dog')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page.getByText('Buy milk').first().locator('xpath=..').getByRole('button').focus()
+  await addTask(page, 'Buy milk')
+  await addTask(page, 'Walk dog')
+  const reorder = page.getByRole('button', { name: 'Reorder Buy milk' })
+  await reorder.focus()
   await page.keyboard.press('ArrowDown')
   const items = page.getByRole('listitem')
-  await expect(items.first()).toContainText('Walk dog')
+  await expect(items.nth(0)).toContainText('Walk dog')
 })
 
-test('[A9] reload keeps "Buy milk" and its checked state', async ({ page }) => {
+test('[A9] ticked task persists after reload', async ({ page }) => {
   await page.goto('/')
-  await page.getByLabel('Task').fill('Buy milk')
-  await page.getByRole('button', { name: 'Add task' }).click()
-  await page
-    .getByRole('listitem')
-    .filter({ hasText: 'Buy milk' })
-    .getByRole('checkbox')
-    .click()
+  await addTask(page, 'Buy milk')
+  await tickTask(page, 'Buy milk')
   await page.reload()
-  await expect(page.getByRole('listitem').filter({ hasText: 'Buy milk' })).toBeVisible()
-  await expect(
-    page.getByRole('listitem').filter({ hasText: 'Buy milk' }).getByRole('checkbox'),
-  ).toBeChecked()
+  await expect(page.getByRole('checkbox', { name: 'Buy milk' })).toBeChecked()
   await expect(page.getByText('1 of 1 done')).toBeVisible()
 })

@@ -114,10 +114,9 @@ export function App() {
   const onAdd = useCallback(() => {
     const text = newTask.trim()
     if (!text) return
-    actions.add({ text, done: tasks.length > 0, tags: [] })
-    setHistory(pushHistory({ text, action: 'added', done: tasks.length > 0 }))
+    actions.add({ text, done: false, tags: [] })
     setNewTask('')
-  }, [actions, newTask, tasks.length])
+  }, [actions, newTask])
 
   const onToggle = useCallback(
     (id: string, checked: boolean) => {
@@ -306,7 +305,7 @@ export function App() {
       </div>
 
       <Card
-        title="Tasks"
+        title={tab === 'Tasks' ? 'Tasks' : undefined}
         mono="Task list"
       >
           <form
@@ -317,11 +316,8 @@ export function App() {
               onAdd()
             }}
           >
-            <label htmlFor="checklist-new-task" style={{ fontFamily: 'var(--sans)', fontSize: 'calc(14px * var(--tf))', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>
-              Task
-            </label>
             <input
-              id="checklist-new-task"
+              aria-label="Task"
               type="text"
               value={newTask}
               onChange={(event) => setNewTask(event.target.value)}
@@ -380,7 +376,7 @@ export function App() {
                         <button
                           type="button"
                           data-reorder-handle={record.text}
-                          aria-label={`Move ${record.text} down`}
+                          aria-label={`Reorder ${record.text}`}
                           onClick={() => onReorder(index, 1)}
                           onKeyDown={(event) => {
                             if (event.key === 'ArrowDown') {
@@ -402,7 +398,7 @@ export function App() {
                             fontSize: 'calc(12px * var(--tf))',
                           }}
                         >
-                          Move
+                          Reorder
                         </button>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))', marginTop: 'calc(4px * var(--sf))' }}>
@@ -429,7 +425,7 @@ export function App() {
           </Stack>
       </Card>
 
-      <Card title="History" mono="Events">
+      <Card title={tab === 'History' ? 'History' : undefined} mono="Events">
         {history.length === 0 ? (
           <EmptyState
             mono="Empty"
@@ -438,17 +434,17 @@ export function App() {
             actionLabel="Go to tasks"
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(8px * var(--sf))' }} aria-label="History">
+          <ul aria-label="History" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'calc(8px * var(--sf))' }}>
             {history.map((event) => (
-              <div key={event.id} role="group" style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
+              <li key={event.id} role="group" style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
                 <span style={{ flexGrow: 1, fontSize: 'calc(14px * var(--tf))', fontFamily: 'var(--sans)', color: 'var(--ink)' }}>
                   {event.text}
                 </span>
                 <MonoLabel>{event.action}</MonoLabel>
                 <MonoLabel sm>{event.done ? 'done' : 'open'}</MonoLabel>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </Card>
 

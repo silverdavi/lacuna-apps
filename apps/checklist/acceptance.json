@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "03eef2e7c3793c31fcb520059ae6904d9e94d9cc4f3e47184e156fc3a128959e",
+  "spec_sha256": "1ca9f0daa10bc9d089efd88cd1fa0b274bdba61bf8380d076d27b81ac8ac00a8",
   "checks": [
     {
       "id": "A1",
@@ -8,41 +8,41 @@
     },
     {
       "id": "A2",
-      "text": "Typing \"Buy milk\" in the field labelled \"Task\" and clicking the button \"Add task\" adds a list item containing \"Buy milk\" and the progress text \"0 of 1 done\"."
+      "text": "From the empty page, typing \"Buy milk\" in the field labelled \"Task\" and clicking the button \"Add task\" adds a list item containing \"Buy milk\"; the progress text reads \"0 of 1 done\"."
     },
     {
       "id": "A3",
-      "text": "Clicking the checkbox on the list item \"Buy milk\" changes the progress text to \"1 of 1 done\"."
+      "text": "After adding \"Buy milk\", ticking its checkbox (accessible name \"Buy milk\") changes the progress text to \"1 of 1 done\"."
     },
     {
       "id": "A4",
-      "text": "Typing \"Walk dog\" in the field labelled \"Task\" and clicking \"Add task\" adds a second list item containing \"Walk dog\"; the progress text shows \"1 of 2 done\"."
+      "text": "After adding \"Buy milk\" and ticking it, typing \"Walk dog\" in \"Task\" and clicking \"Add task\" adds a second list item containing \"Walk dog\" (new tasks are always unchecked); the progress text reads \"1 of 2 done\"."
     },
     {
       "id": "A5",
-      "text": "Clicking the button \"Delete Walk dog\" removes that list item and the progress text returns to \"1 of 1 done\"."
+      "text": "After A4's steps, clicking the button \"Delete Walk dog\" removes the \"Walk dog\" item and the progress text reads \"1 of 1 done\"."
     },
     {
       "id": "A6",
-      "text": "With two tasks \"Buy milk\" (unchecked) and \"Walk dog\" (checked), clicking the button \"Copy as Markdown\" copies the text \"- [ ] Buy milk\\n- [x] Walk dog\" to the clipboard."
+      "text": "After adding \"Buy milk\" and \"Walk dog\" and ticking only \"Walk dog\", clicking the button \"Copy as Markdown\" puts exactly the text \"- [ ] Buy milk\\n- [x] Walk dog\" (two lines joined by one newline) on the clipboard."
     },
     {
       "id": "A7",
-      "text": "Clicking the tab \"History\" shows the text \"No history yet\"; after checking \"Buy milk\" and then clicking the tab \"History\", the text \"No history yet\" is gone and a list item containing \"Buy milk\" is visible."
+      "text": "After adding \"Buy milk\", clicking the tab \"History\" shows the text \"No history yet\". Clicking the tab \"Tasks\", ticking \"Buy milk\", then clicking the tab \"History\" again shows no \"No history yet\" text and shows a list item containing \"Buy milk\"."
     },
     {
       "id": "A8",
-      "text": "With tasks \"Buy milk\" and \"Walk dog\", pressing the key \"ArrowDown\" while the reorder handle for \"Buy milk\" is focused moves \"Buy milk\" below \"Walk dog\", so the first list item contains \"Walk dog\"."
+      "text": "After adding \"Buy milk\" then \"Walk dog\", focusing the button \"Reorder Buy milk\" and pressing the key \"ArrowDown\" moves \"Buy milk\" below \"Walk dog\": the first list item of the task list contains \"Walk dog\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the task \"Buy milk\" and its checked state, with progress text \"1 of 1 done\"."
+      "text": "After adding \"Buy milk\" and ticking it, reloading the page keeps the task \"Buy milk\" ticked and the progress text reads \"1 of 1 done\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "b5302cbe3fca52fafebf611d4df11ae6d5fd2f0be262f29f51f1a32a2cc4556c"
+      "sha256": "ee56cbadbb1eb8165e47f97c446c7dbc5f343678714b0842e88db6680960eb46"
     }
   ]
 }
