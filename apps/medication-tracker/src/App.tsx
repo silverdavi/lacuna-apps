@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
+  Actions,
   AppShell,
   Button,
   Card,
   EmptyState,
   FormGrid,
-  List,
-  Row,
+  Kpi,
+  KpiRow,
+  Rail,
   Table,
   Tag,
   TextInput,
@@ -83,7 +85,7 @@ export function App() {
       loggedAt: new Date().toISOString(),
     }
     const created = doseStore.add(entry)
-    setDoses([...doses, created])
+    setDoses((current) => [...current, created])
   }
 
   function deleteMedication(med: Medication) {
@@ -102,8 +104,20 @@ export function App() {
   const query = search.trim().toLowerCase()
   const filtered = query ? meds.filter((m) => m.name.toLowerCase().includes(query)) : meds
 
+  useEffect(() => {
+    setMeds(medStore.list())
+    setDoses(doseStore.list())
+  }, [])
+
   return (
-    <AppShell name="Medication Reminder" icon="calendar" hue="teal" category="Health">
+    <AppShell
+      name="Medication Reminder"
+      icon="clinic"
+      hue="teal"
+      category="Healthcare"
+      meta={meds.length === 1 ? '1 medication' : `${meds.length} medications`}
+      side={<Rail title="Doses" note={`${doses.length} logged`} chips={['Add a medication', 'Log a dose', 'Search the list', 'Export CSV', 'Dose history']} />}
+    >
       <div className="lc-tabs" role="tablist" aria-label="Medication Reminder views">
         {TABS.map((t) => (
           <button
@@ -111,7 +125,7 @@ export function App() {
             type="button"
             role="tab"
             aria-selected={tab === t}
-            className="mr-tab"
+            className="lc-tab"
             style={{
               fontFamily: 'var(--sans)',
               fontSize: 'calc(12.5px * var(--tf))',
@@ -131,7 +145,7 @@ export function App() {
       </div>
 
       {tab === 'Medications' ? (
-        <Card title="Medications">
+        <Card mono="Input" title="New medication">
           <FormGrid>
             <TextInput
               label="Medication name"
@@ -169,15 +183,18 @@ export function App() {
               placeholder="Filter medications"
             />
           </FormGrid>
-          <Button kind="primary" onClick={addMedication}>
-            Add medication
-          </Button>
+          <Actions>
+            <Button kind="primary" onClick={addMedication}>
+              Add medication
+            </Button>
+          </Actions>
         </Card>
       ) : null}
 
       {tab === 'Medications' ? (
         <Card
-          title="List"
+          mono="List"
+          title="Medications"
           actions={
             meds.length > 0 ? (
               <span>
@@ -205,42 +222,21 @@ export function App() {
               />
             )
           ) : (
-            <List label="Medications">
+            <div role="list" aria-label="Medications" className="mr-meds-list">
               {filtered.map((m) => (
-                <Row
-                  key={m.id}
-                  title={m.name}
-                  meta={`${m.dose} at ${m.time}`}
-                  action={
-                    <span>
-                      <Button kind="secondary" onClick={() => logDose(m)}>
-                        Log dose
-                      </Button>
-                      <Button kind="ghost" onClick={() => deleteMedication(m)}>
-                        Delete {m.name}
-                      </Button>
-                    </span>
-                  }
-                />
-              ))}
-            </List>
-          )}
-        </Card>
-      ) : null}
-
-      {tab === 'Medications' ? (
-        <Card title="Dose log">
-          {doses.length === 0 ? (
-            <EmptyState
-              title="No doses logged"
-              detail="Use the Log dose button next to a medication to record a dose."
-              actionLabel="Log a dose"
-            />
-          ) : (
-            <div className="mr-dose-log" aria-label="Dose log">
-              {doses.map((d) => (
-                <div key={d.id}>
-                  {d.medicationName} {d.dose} taken at {d.time}
+                <div key={m.id} role="listitem" className="mr-med-item">
+                  <div>
+                    <div className="mr-med-name">{m.name}</div>
+                    <div className="mr-med-meta">{m.dose} at {m.time}</div>
+                  </div>
+                  <div className="mr-med-actions">
+                    <Button kind="secondary" onClick={() => logDose(m)}>
+                      Log dose
+                    </Button>
+                    <Button kind="ghost" onClick={() => deleteMedication(m)}>
+                      Delete {m.name}
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -248,8 +244,33 @@ export function App() {
         </Card>
       ) : null}
 
+      {tab === 'Medications' ? (
+        <Card mono="Log" title="Dose log">
+          <section className="mr-dose-log" aria-label="Dose log">
+            {doses.length === 0 ? (
+              <EmptyState
+                title="No doses logged"
+                detail="Use the Log dose button next to a medication to record a dose."
+                actionLabel="Log a dose"
+              />
+            ) : (
+              <>
+                <KpiRow>
+                  <Kpi value={String(doses.length)} label="Doses logged" accent />
+                </KpiRow>
+                {doses.map((d) => (
+                  <div key={d.id}>
+                    {d.medicationName} {d.dose} taken at {d.time}
+                  </div>
+                ))}
+              </>
+            )}
+          </section>
+        </Card>
+      ) : null}
+
       {tab === 'History' ? (
-        <Card title="Dose history">
+        <Card mono="History" title="Dose history">
           <Table
             label="Dose history"
             columns={[

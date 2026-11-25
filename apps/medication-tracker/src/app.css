@@ -2,9 +2,6 @@
    Colors come from @lacuna/ui tokens; sizing uses the kit scale vars.
    No .lk-* / .lc-* selectors here (the kit owns those). */
 
-/* Dose log is rendered as div[role=list] so it does not add <li> siblings to
-   the medication list; each entry is a single text node so the exact phrase
-   stays contiguous for screen readers. */
 .mr-dose-log {
   display: flex;
   flex-direction: column;
@@ -16,6 +13,38 @@
   padding: calc(10px * var(--sf)) 0;
   border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
 }
-.mr-dose-log > div:last-child {
+.mr-dose-log > div:last-of-type {
   border-bottom: none;
+}
+
+.mr-meds-list {
+  display: flex;
+  flex-direction: column;
+}
+.mr-med-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(12px * var(--sf));
+  padding: calc(10px * var(--sf)) 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+.mr-meds-list > div:last-child .mr-med-item {
+  border-bottom: none;
+}
+.mr-med-name {
+  font-size: calc(13px * var(--tf));
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.mr-med-meta {
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+  margin-top: calc(2px * var(--sf));
+}
+.mr-med-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6px * var(--sf));
 }

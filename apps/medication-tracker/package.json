@@ -1,5 +1,5 @@
 {
-  "name": "@lacuna-app/medication-tracker",
+  "name": "@lacuna/app-medication-tracker",
   "private": true,
   "version": "0.1.0",
   "type": "module",

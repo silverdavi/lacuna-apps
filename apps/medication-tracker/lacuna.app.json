@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "summary": "Track your medications and log doses.",
   "description": "A list of medications with scheduled times. Add a medication, log a dose when you take it, and review the dose history. The data stays on this device.",
-  "category": "personal",
-  "icon": "calendar",
+  "category": "healthcare",
+  "icon": "clinic",
   "relationship": {
     "kind": "standalone"
   },
@@ -40,7 +40,10 @@
     }
   },
   "capabilities": [
-    "edit:medication"
+    "create:medication",
+    "edit:dose",
+    "edit:medication",
+    "export:csv"
   ],
   "permissions": {
     "records": [
@@ -52,7 +55,16 @@
           "create",
           "delete"
         ],
-        "purpose": "Store medication names, doses, and logged doses"
+        "purpose": "Store medication names, doses, and scheduled times"
+      },
+      {
+        "kind": "dose",
+        "access": [
+          "read",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the logged doses of each medication"
       }
     ],
     "platform": [

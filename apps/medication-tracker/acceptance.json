@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "2f0f116c4148f5614ed8d9f2b8bc990879f9cb330c807dae09bb6bcc601191ed",
+  "spec_sha256": "8272888eae61a63f31ebf9363ed67ad8e71b985debd11dda6d4539d457254d5c",
   "checks": [
     {
       "id": "A1",
-      "text": "The page shows the heading \"Medication Reminder\" and the text \"No medications yet\" when no medications have been added."
+      "text": "The page shows the heading \"Medication Reminder\" and the text \"No medications yet\"."
     },
     {
       "id": "A2",
-      "text": "Typing \"Lisinopril\" in the field labelled \"Medication name\", \"10 mg\" in the field labelled \"Dose\", and \"08:00\" in the field labelled \"Time\", then clicking the button \"Add medication\" adds a list item containing \"Lisinopril\", \"10 mg\", and \"08:00\", and the text \"No medications yet\" is gone."
+      "text": "Typing \"Lisinopril\" in the field labelled \"Medication name\", \"10 mg\" in \"Dose\", and \"08:00\" in \"Time\", then clicking the button \"Add medication\" adds a list item in the medication list containing \"Lisinopril\", \"10 mg\" and \"08:00\"; \"No medications yet\" is gone."
     },
     {
       "id": "A3",
-      "text": "After adding \"Lisinopril\" 10 mg at 08:00, clicking the button \"Log dose\" on the Lisinopril item adds a log entry showing \"Lisinopril 10 mg taken at 08:00\" in the \"Dose log\" section."
+      "text": "After adding Lisinopril 10 mg 08:00, clicking the button \"Log dose\" on the Lisinopril item adds an entry with the text \"Lisinopril 10 mg taken at 08:00\" to the region named \"Dose log\"."
     },
     {
       "id": "A4",
-      "text": "After logging a dose for Lisinopril, clicking the button \"Delete Lisinopril\" removes the medication from the list and the \"Dose log\" section shows \"No doses logged\"."
+      "text": "After logging a dose for Lisinopril, clicking the button \"Delete Lisinopril\" removes the medication from the medication list and the \"Dose log\" region shows \"No doses logged\" (deleting a medication also removes its logged doses)."
     },
     {
       "id": "A5",
-      "text": "Clicking the tab \"History\" shows a table with columns \"Date\", \"Medication\", \"Dose\", and \"Time\", and after logging Lisinopril 10 mg at 08:00, the table contains a row with \"Lisinopril\", \"10 mg\", and \"08:00\"."
+      "text": "After adding Lisinopril 10 mg 08:00 and logging a dose, clicking the tab \"History\" shows a table with column headers \"Date\", \"Medication\", \"Dose\" and \"Time\" and a body row containing \"Lisinopril\", \"10 mg\" and \"08:00\"."
     },
     {
       "id": "A6",
-      "text": "With Lisinopril 10 mg at 08:00 added, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"Medication,Dose,Time\" and the row \"Lisinopril,10 mg,08:00\"."
+      "text": "With Lisinopril 10 mg 08:00 added, clicking the button \"Export CSV\" puts this exact text on the clipboard: \"Medication,Dose,Time\\nLisinopril,10 mg,08:00\"."
     },
     {
       "id": "A7",
-      "text": "After adding \"Metformin\" 500 mg at 12:00, the list shows two items: \"Lisinopril\" and \"Metformin\", and the \"Dose log\" section is empty."
+      "text": "After adding Lisinopril 10 mg 08:00 and then Metformin 500 mg 12:00, the medication list has two items containing \"Lisinopril\" and \"Metformin\"; the \"Dose log\" region shows \"No doses logged\"."
     },
     {
       "id": "A8",
-      "text": "Typing \"Lis\" in the field labelled \"Search\" filters the list to show only the item containing \"Lisinopril\" and hides \"Metformin\"."
+      "text": "With Lisinopril and Metformin added, typing \"Lis\" in the field labelled \"Search\" leaves only the item containing \"Lisinopril\"; the \"Metformin\" item is not present."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the medication \"Lisinopril\" with dose \"10 mg\" and time \"08:00\" in the list, and the logged dose \"Lisinopril 10 mg taken at 08:00\" in the \"Dose log\" section."
+      "text": "After adding Lisinopril 10 mg 08:00 and logging a dose, reloading keeps the \"Lisinopril\" item (with \"10 mg\" and \"08:00\") in the medication list and the entry \"Lisinopril 10 mg taken at 08:00\" in the \"Dose log\" region."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "dfc4f075471ceff849bb180d463f91a4868abc1467c4f27ac8e576a45ead9515"
+      "sha256": "cca3094f42857a6188fdb6dc112cbb64369ea56d3091bc78d58467de0480babe"
     }
   ]
 }
