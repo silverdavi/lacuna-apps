@@ -19,4 +19,8 @@ export const host = {
   removeCard(id: string): boolean {
     return cardStore.remove(id)
   },
+
+  replaceAll(records: SavedCard[]): void {
+    cardStore.replaceAll(records)
+  },
 }

@@ -2,12 +2,14 @@
   overflow: auto;
   margin: 0 calc(0.5rem * -1);
 }
+
 .bc-table {
   width: 100%;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: calc(0.5rem * 0.5);
 }
+
 .bc-table td {
   width: 20%;
   text-align: center;
@@ -15,7 +17,29 @@
   min-height: calc(3.5rem * 1.143);
   vertical-align: middle;
 }
+
 .bc-free {
   background: var(--surface-3);
   color: var(--text-2);
+}
+
+.bc-import-note {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--sf));
+  color: var(--accent);
+  margin-bottom: calc(8px * var(--sf));
+}
+
+.bc-toast {
+  position: fixed;
+  bottom: calc(16px * var(--sf));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: calc(12px * var(--sf));
+  padding: calc(8px * var(--sf)) calc(14px * var(--sf));
+  border-radius: calc(4px * var(--sf));
+  z-index: 100;
 }
