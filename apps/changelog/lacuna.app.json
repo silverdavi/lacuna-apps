@@ -36,6 +36,7 @@
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/markdown-to-html": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
+      "@lacuna/json-backup": "0.1.0",
       "@lacuna/ui": "^0.1.0",
       "@lacuna/use-clipboard": "0.1.0",
       "@lacuna/use-collection": "0.1.0"

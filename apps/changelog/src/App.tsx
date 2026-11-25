@@ -1,12 +1,26 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useEffect, useMemo, useState } from 'react'
-import { AppShell, Card, TextInput, PrimaryButton, Button, EmptyState } from '@lacuna/ui'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  Kpi,
+  KpiRow,
+  MonoLabel,
+  Rail,
+  TextInput,
+} from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { ExportMenu } from '@lacuna/export-menu'
 import { useClipboard } from '@lacuna/use-clipboard'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
 
 type Commit = { message: string }
+
+const APP_ID = 'lacuna.changelog'
+const BACKUP_VERSION = 1
 
 const SECTION_MAP: Record<string, string> = {
   feat: 'Features',
@@ -45,6 +59,72 @@ function buildMarkdown(commits: string[], useTaskList: boolean): string {
   return parts.join('\n\n')
 }
 
+function ActivityBars({ counts }: { counts: { label: string; value: number }[] }) {
+  const width = 300
+  const height = 96
+  const padX = 8
+  const padTop = 10
+  const padBottom = 18
+  const innerW = width - padX * 2
+  const innerH = height - padTop - padBottom
+  const max = Math.max(1, ...counts.map((c) => c.value))
+  const n = counts.length
+  const gap = n > 1 ? 10 : 0
+  const bw = n > 1 ? (innerW - gap * (n - 1)) / n : innerW
+  const bars = counts.map((c, i) => {
+    const x = padX + i * (bw + gap)
+    const h = (c.value / max) * innerH
+    const y = padTop + innerH - h
+    return { x, y, w: bw, h, ...c }
+  })
+  return (
+    <div>
+      <MonoLabel sm>BY SECTION</MonoLabel>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        width="100%"
+        role="img"
+        aria-label="Commits per section"
+        style={{ display: 'block', marginTop: 'calc(8px * var(--sf))' }}
+      >
+        {bars.map((b) => (
+          <g key={b.label}>
+            <rect
+              x={b.x}
+              y={b.y}
+              width={b.w}
+              height={b.h}
+              fill="var(--accent)"
+              fillOpacity={b.value === 0 ? 0 : 0.85}
+              rx="2"
+            />
+            <text
+              x={b.x + b.w / 2}
+              y={b.y - 4}
+              textAnchor="middle"
+              fontSize="calc(9px * var(--tf))"
+              fill="var(--ink-60)"
+              fontFamily="var(--mono)"
+            >
+              {b.value}
+            </text>
+            <text
+              x={b.x + b.w / 2}
+              y={height - 5}
+              textAnchor="middle"
+              fontSize="calc(8px * var(--tf))"
+              fill="var(--ink-40)"
+              fontFamily="var(--mono)"
+            >
+              {b.label}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
 const APP_NAME = 'Changelog Generator'
 const EMBEDDED_MARKER = 'lacuna-embedded'
 
@@ -58,6 +138,10 @@ export function App() {
   const [generated, setGenerated] = useState(false)
   const [checked, setChecked] = useState<Set<number>>(new Set())
   const [embedded, setEmbedded] = useState(() => isEmbeddedHost())
+  const [importMsg, setImportMsg] = useState<string | null>(null)
+  const [importFile, setImportFile] = useState<string | null>(null)
+  const importInputRef = useRef<HTMLInputElement>(null)
+
   const { state, actions } = useCollection<Commit>({
     storageKey: 'changelog.commits',
   })
@@ -100,16 +184,40 @@ export function App() {
     [messages, useTaskList],
   )
 
-  const exportData = useMemo(() => {
-    return JSON.stringify(
-      messages.map((msg) => ({
-        message: msg,
-        section: parseCommit(msg).section,
+  const breakdown = useMemo(
+    () =>
+      sections.order.map((section) => ({
+        label: section,
+        value: sections.map.get(section)!.length,
       })),
-      null,
-      2,
-    )
-  }, [messages])
+    [sections],
+  )
+
+  const exportData = useMemo(
+    () =>
+      JSON.stringify(
+        messages.map((msg) => ({
+          message: msg,
+          section: parseCommit(msg).section,
+        })),
+        null,
+        2,
+      ),
+    [messages],
+  )
+
+  const backupText = () =>
+    exportBackup<Commit>({
+      appId: APP_ID,
+      version: BACKUP_VERSION,
+      filename: 'changelog',
+      records: state.activeItems.map((item) => ({
+        id: item.id,
+        data: { message: item.data.message },
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+    })
 
   function handleCopy() {
     void copy(markdown)
@@ -127,7 +235,41 @@ export function App() {
     setChecked(new Set())
   }
 
+  function pickImport() {
+    importInputRef.current?.click()
+  }
 
+  async function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    try {
+      const text = await file.text()
+      setImportFile(text)
+      const result = importBackup<Commit>(text, {
+        currentVersion: BACKUP_VERSION,
+        validate: (record) =>
+          typeof record.data?.message === 'string' && record.data.message.trim() !== ''
+            ? null
+            : 'missing message',
+      })
+      if (result.records.length === 0) {
+        setImportMsg('No valid commits found in that file.')
+        return
+      }
+      const seen = new Set(state.activeItems.map((item) => item.id))
+      let added = 0
+      for (const record of result.records) {
+        if (seen.has(record.id)) continue
+        seen.add(record.id)
+        actions.add({ message: record.data.message })
+        added += 1
+      }
+      setImportMsg(added > 0 ? `Imported ${added} new commit${added === 1 ? '' : 's'}.` : 'Those commits are already in your list.')
+    } catch {
+      setImportMsg('Could not read that file.')
+    }
+  }
 
   function toggleTask(idx: number) {
     setChecked((prev) => {
@@ -138,6 +280,9 @@ export function App() {
     })
   }
 
+  const count = state.activeItems.length
+  const chips = breakdown.slice(0, 3).map((b) => `${b.label}: ${b.value}`)
+
   return (
     <AppShell
       name="Changelog Generator"
@@ -145,9 +290,39 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={
-        state.activeItems.length > 0
-          ? `${state.activeItems.length} commit${state.activeItems.length === 1 ? '' : 's'}`
+        count > 0
+          ? `${count} commit${count === 1 ? '' : 's'}`
           : undefined
+      }
+      status={
+        count > 0
+          ? `${count} commit${count === 1 ? '' : 's'} · ${sections.order.length} section${sections.order.length === 1 ? '' : 's'}${copied ? ' · copied' : ''}`
+          : 'Ready · add a commit to start'
+      }
+      side={
+        <Rail
+          note={`Commit messages · ${sections.order.length} section${sections.order.length === 1 ? '' : 's'}`}
+          chips={chips.length > 0 ? chips : ['No sections yet']}
+        >
+          {count > 0 ? (
+            <div style={{ display: 'grid', gap: 'calc(8px * var(--sf))' }}>
+              <KpiRow>
+                <Kpi value={String(count)} label="Commits" accent />
+                <Kpi value={String(sections.order.length)} label="Sections" />
+              </KpiRow>
+              {useTaskList && (
+                <Kpi
+                  value={`${checked.size}/${count}`}
+                  label="Marked done"
+                />
+              )}
+            </div>
+          ) : (
+            <p style={{ margin: 0, fontSize: 'calc(12px * var(--sf))', color: 'var(--ink-60)' }}>
+              Add commit messages to see a per-section breakdown here.
+            </p>
+          )}
+        </Rail>
       }
     >
       <div className="chl-stack">
@@ -159,9 +334,9 @@ export function App() {
               onChange={setDraft}
               placeholder="feat: add login"
             />
-            <PrimaryButton onClick={addCommit} disabled={draft.trim() === ''}>
+            <Button kind="primary" onClick={addCommit} disabled={draft.trim() === ''}>
               Add commit
-            </PrimaryButton>
+            </Button>
           </div>
           {state.activeItems.length === 0 ? (
             <EmptyState
@@ -196,22 +371,24 @@ export function App() {
           title="Options"
           mono="settings"
           actions={
-            <PrimaryButton
+            <Button
+              kind="primary"
               onClick={() => setGenerated(true)}
               disabled={state.activeItems.length === 0}
             >
               Generate changelog
-            </PrimaryButton>
+            </Button>
           }
         >
-          <label className="chl-toggle">
+          <div className="chl-toggle">
             <input
               type="checkbox"
+              id="chl-tasklist"
               checked={useTaskList}
               onChange={(e) => setUseTaskList(e.target.checked)}
             />
-            <span>Use task-list items</span>
-          </label>
+            <label htmlFor="chl-tasklist">Use task-list items</label>
+          </div>
         </Card>
 
         {generated && sections.map.size > 0 && (
@@ -228,6 +405,13 @@ export function App() {
                     mimeType: 'application/json',
                     extension: 'json',
                     getData: () => exportData,
+                  },
+                  {
+                    id: 'backup',
+                    label: 'Full backup',
+                    mimeType: 'application/json',
+                    extension: 'json',
+                    getData: () => backupText(),
                   },
                 ]}
                 fileName="changelog"
@@ -256,6 +440,35 @@ export function App() {
             ))}
           </div>
         )}
+
+        {!generated && (
+          <Card title="Activity" mono="stats">
+            {count === 0 ? (
+              <p className="chl-muted">Add commits to see how they split across sections.</p>
+            ) : (
+              <ActivityBars counts={breakdown} />
+            )}
+          </Card>
+        )}
+
+        <Card title="Import & backup" mono="data">
+          <p className="chl-muted">Merge commits from a previous JSON backup. Imports add new commits without duplicating ones you already have.</p>
+          <div className="chl-row">
+            <Button kind="secondary" onClick={pickImport}>
+              Import backup
+            </Button>
+          </div>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept="application/json,.json"
+            style={{ display: 'none' }}
+            aria-hidden
+            tabIndex={-1}
+            onChange={onImportFile}
+          />
+          {importMsg && <p className="chl-muted">{importMsg}</p>}
+        </Card>
       </div>
     </AppShell>
   )
