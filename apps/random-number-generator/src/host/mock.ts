@@ -1,4 +1,4 @@
-const KEY = 'lacuna.random-number-generator.v1'
+import { createMockValue } from '@lacuna/host-mock'
 
 export interface GenerationSettings {
   min: string
@@ -28,43 +28,45 @@ export interface GenerationSession {
   settings: GenerationSettings
   last: LastGeneration | null
   history: HistoryEntry[]
+  /** Serialized settings the user saved with "Save settings". */
+  preset?: string | null
 }
+
+const KEY = 'lacuna.random-number-generator.v1'
 
 const empty = (): GenerationSession => ({
   settings: { min: '', max: '', count: '', dice: '' },
   last: null,
   history: [],
+  preset: null,
 })
+
+function isGenerationSession(v: unknown): v is GenerationSession {
+  if (typeof v !== 'object' || v === null) return false
+  const s = v as Record<string, unknown>
+  if (typeof s.settings !== 'object' || s.settings === null) return false
+  const settings = s.settings as Record<string, unknown>
+  for (const k of ['min', 'max', 'count', 'dice']) {
+    if (typeof settings[k] !== 'string') return false
+  }
+  const last = s.last
+  if (last !== null && last !== undefined) {
+    if (typeof last !== 'object' || last === null) return false
+    if (typeof (last as Record<string, unknown>).result !== 'number') return false
+    if (typeof (last as Record<string, unknown>).seed !== 'string') return false
+  }
+  if (s.history !== undefined && !Array.isArray(s.history)) return false
+  if (s.preset !== undefined && s.preset !== null && typeof s.preset !== 'string') return false
+  return true
+}
+
+const store = createMockValue<GenerationSession>({ key: KEY, fallback: empty(), validate: isGenerationSession })
 
 export const mockGenerationStore = {
   async load(): Promise<GenerationSession> {
-    try {
-      const raw = window.localStorage.getItem(KEY)
-      if (!raw) return empty()
-      const parsed = JSON.parse(raw) as GenerationSession
-      if (typeof parsed !== 'object' || parsed === null || typeof parsed.settings !== 'object') return empty()
-      return {
-        settings: {
-          min: typeof parsed.settings.min === 'string' ? parsed.settings.min : '',
-          max: typeof parsed.settings.max === 'string' ? parsed.settings.max : '',
-          count: typeof parsed.settings.count === 'string' ? parsed.settings.count : '',
-          dice: typeof parsed.settings.dice === 'string' ? parsed.settings.dice : '',
-        },
-        last:
-          parsed.last && typeof parsed.last.result === 'number' && typeof parsed.last.seed === 'string'
-            ? parsed.last
-            : null,
-        history: Array.isArray(parsed.history) ? parsed.history : [],
-      }
-    } catch {
-      return empty()
-    }
+    return store.get()
   },
   async save(session: GenerationSession): Promise<void> {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(session))
-    } catch {
-      return
-    }
+    store.set(session)
   },
 }

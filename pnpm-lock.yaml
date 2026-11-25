@@ -509,9 +509,15 @@ importers:
 
   apps/random-number-generator:
     dependencies:
+      '@lacuna/host-mock':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/host-mock/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
+      '@lacuna/use-clipboard':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/use-clipboard/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
