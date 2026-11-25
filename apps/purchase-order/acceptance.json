@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "a944df5f4f6e8617615fac1f949002a4d3c912bb269467d986e8c75d994e23ba",
+  "spec_sha256": "e9eba89e79b2bf5cf1b5590bb3f460aa57e594ee0114bffedf687765dd4c11c9",
   "checks": [
     {
       "id": "A1",
@@ -12,15 +12,15 @@
     },
     {
       "id": "A3",
-      "text": "In the new order form, clicking the button \"Add line item\" adds a row. Filling the field labelled \"Description\" with \"Widget\", the field labelled \"Quantity\" with \"10\", the field labelled \"Unit price\" with \"25.00\", the field labelled \"Discount %\" with \"5\", and the field labelled \"Tax %\" with \"8\", then clicking \"Save\" shows a table row with \"Acme Corp\", \"Widget\", \"10\", \"$25.00\", and a total of \"$261.00\"."
+      "text": "In the new order form, clicking the button \"Add line item\" adds a row. Filling the field labelled \"Description\" with \"Widget\", the field labelled \"Quantity\" with \"10\", the field labelled \"Unit price\" with \"25.00\", the field labelled \"Discount %\" with \"5\", and the field labelled \"Tax %\" with \"8\", then clicking \"Save\" shows a table row with \"Acme Corp\", \"Widget\", \"10\", \"$25.00\", and a total of \"$256.50\"."
     },
     {
       "id": "A4",
-      "text": "After saving the order from A3, the table shows a row with \"Acme Corp\" and a total of \"$261.00\". Clicking the button \"Delete Acme Corp\" removes that row and the list shows \"No purchase orders yet\"."
+      "text": "After saving the order from A3, the table shows a row with \"Acme Corp\" and a total of \"$256.50\". Clicking the button \"Delete Acme Corp\" removes that row and the list shows \"No purchase orders yet\"."
     },
     {
       "id": "A5",
-      "text": "With the order from A3 saved, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"vendor,order_date,description,quantity,unit_price,discount_pct,tax_pct,total\" and a data row \"Acme Corp,2024-01-15,Widget,10,25.00,5,8,261.00\"."
+      "text": "With the order from A3 saved, clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the header \"vendor,order_date,description,quantity,unit_price,discount_pct,tax_pct,total\" and a data row \"Acme Corp,2024-01-15,Widget,10,25.00,5,8,256.50\"."
     },
     {
       "id": "A6",
@@ -28,7 +28,7 @@
     },
     {
       "id": "A7",
-      "text": "The table has a column header \"Total\". Clicking the header \"Total\" sorts the rows in descending order by total. With two orders (Acme Corp total $261.00 and Beta Inc total $500.00), the first row shows \"Beta Inc\" and the second shows \"Acme Corp\"."
+      "text": "The table has a column header \"Total\". Clicking the header \"Total\" sorts the rows in descending order by total. With two orders (Acme Corp total $256.50 and Beta Inc total $500.00), the first row shows \"Beta Inc\" and the second shows \"Acme Corp\"."
     },
     {
       "id": "A8",
@@ -36,13 +36,13 @@
     },
     {
       "id": "A9",
-      "text": "Reload keeps the order with vendor \"Acme Corp\" and total \"$261.00\" visible in the table."
+      "text": "Reload keeps the order with vendor \"Acme Corp\" and total \"$256.50\" visible in the table."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "8c0cb70fab66517b28fe1ca92e79975012985bceeba3cf4f227c80f777a2409f"
+      "sha256": "7c131f68145e3a08da0d588bc993ca40e6896e522242b8c5f50efdb41a3b3f61"
     }
   ]
 }

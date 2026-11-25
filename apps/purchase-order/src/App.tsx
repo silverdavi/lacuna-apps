@@ -55,7 +55,6 @@ function orderTotalMinor(order: OrderRecord): number {
 
 export function App() {
   const [orders, setOrders] = useState<OrderRecord[]>(() => orderStore.list())
-  const [showForm, setShowForm] = useState(false)
   const [vendor, setVendor] = useState('')
   const [orderDate, setOrderDate] = useState('')
   const [lines, setLines] = useState<FormLine[]>([])
@@ -70,7 +69,10 @@ export function App() {
     if (sortDir !== 'none') {
       rows.sort((a, b) => {
         const d = orderTotalMinor(a) - orderTotalMinor(b)
-        return sortDir === 'asc' ? d : -d
+        if (d !== 0) return sortDir === 'asc' ? d : -d
+        // Tie: later-created orders first when descending, first-created when ascending.
+        const idCmp = Number(a.id.replace(/\D/g, '')) - Number(b.id.replace(/\D/g, ''))
+        return sortDir === 'asc' ? idCmp : -idCmp
       })
     }
     return rows
@@ -147,7 +149,6 @@ export function App() {
     setVendor('')
     setOrderDate('')
     setLines([])
-    setShowForm(false)
   }
 
   function deleteOrder(id: string) {
@@ -201,6 +202,10 @@ export function App() {
             background: 'none',
             border: 'none',
             padding: 0,
+            margin: 0,
+            display: 'block',
+            width: '100%',
+            textAlign: 'inherit',
             cursor: 'pointer',
             color: 'inherit',
             font: 'inherit',
@@ -208,7 +213,7 @@ export function App() {
             letterSpacing: 'inherit',
           }}
         >
-          Total {sortDir === 'desc' ? '↓' : sortDir === 'asc' ? '↑' : ''}
+          Total <span aria-hidden={sortDir !== 'none'}>{sortDir === 'desc' ? '↓' : sortDir === 'asc' ? '↑' : ''}</span>
         </button>
       ),
       num: true,
@@ -252,11 +257,16 @@ export function App() {
               <Button kind="secondary" onClick={exportCsv} disabled={orders.length === 0}>
                 Export CSV
               </Button>
-              {!showForm && (
-                <Button kind="primary" onClick={() => setShowForm(true)}>
-                  New order
-                </Button>
-              )}
+              <Button
+                kind="primary"
+                onClick={() => {
+                  setVendor('')
+                  setOrderDate('')
+                  setLines([])
+                }}
+              >
+                New order
+              </Button>
             </Spread>
           }
         >
@@ -274,8 +284,7 @@ export function App() {
           />
         </Card>
 
-        {showForm && (
-          <Card title="New purchase order" mono="Vendor and line items">
+        <Card title="New purchase order" mono="Vendor and line items">
             <Stack>
               <FormGrid>
                 <TextInput label="Vendor" value={vendor} onChange={setVendor} placeholder="Acme Corp" />
@@ -368,7 +377,6 @@ export function App() {
                   <Button
                     kind="secondary"
                     onClick={() => {
-                      setShowForm(false)
                       setVendor('')
                       setOrderDate('')
                       setLines([])
@@ -383,7 +391,6 @@ export function App() {
               </Spread>
             </Stack>
           </Card>
-        )}
 
         {orders.length > 0 && (
           <Card title="Manage" mono="Delete orders">
