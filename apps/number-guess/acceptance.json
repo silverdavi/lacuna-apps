@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "34e7ac5ae0d592a05551c218230e48db9f5fb2d2e70e6f3902c074df50610611",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Number Guess Game\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"42\" in the field labelled \"Seed\" and clicking the button \"New Game\" starts a game where the hidden number is 17. The text \"Guess the number between 1 and 100\" is visible."
+    },
+    {
+      "id": "A3",
+      "text": "With the Seed \"42\" and the game started, typing \"10\" in the field labelled \"Guess\" and clicking the button \"Submit\" shows the toast \"Too low\" and adds a row to the history table with \"10\" and \"Too low\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the Seed \"42\" and the previous guess of 10, typing \"25\" in the field labelled \"Guess\" and clicking the button \"Submit\" shows the toast \"Too high\" and adds a row to the history table with \"25\" and \"Too high\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the Seed \"42\" and the previous guesses of 10 and 25, typing \"17\" in the field labelled \"Guess\" and clicking the button \"Submit\" shows the toast \"Correct! You won in 3 attempts.\" and the button \"New Game\" is enabled."
+    },
+    {
+      "id": "A6",
+      "text": "After winning with Seed \"42\", the text \"Best Score: 3\" is visible."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"New Game\" with the Seed field still containing \"42\" resets the history table to empty, clears the Guess field, and the toast \"New game started\" appears."
+    },
+    {
+      "id": "A8",
+      "text": "With the Seed \"42\" and the game started, typing \"abc\" in the field labelled \"Guess\" and clicking the button \"Submit\" shows the toast \"Enter a valid number between 1 and 100\" and adds no row to the history table."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the game state: after starting a game with Seed \"42\" and guessing \"10\", reloading the page shows the history table with the row \"10\" and \"Too low\", and the text \"Best Score: 3\" remains visible if it was set previously."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "888f09f82c8bdcfbad807ad807dd9ca01b0ff58bfab4b7109b0428e6bfc173d8"
+    }
+  ]
+}

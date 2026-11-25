@@ -1,0 +1,72 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.number-guess",
+  "name": "Number Guess Game",
+  "version": "0.1.0",
+  "summary": "Guess a hidden number between 1 and 100; a seed picks the number, so the same seed is always the same game.",
+  "description": "Pick a seed and press New Game. The seed picks a hidden number from 1 to 100; guess it and get a Too low, Too high or Correct hint. Your attempts build a history, your best score is kept, and the game survives a reload. Nothing leaves the browser.",
+  "category": "personal",
+  "tags": ["game", "number", "seed"],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/number-guess"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:number-guess"
+  ],
+  "permissions": {
+    "records": [],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
