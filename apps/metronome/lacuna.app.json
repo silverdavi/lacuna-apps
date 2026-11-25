@@ -1,0 +1,84 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.metronome",
+  "name": "Metronome",
+  "version": "0.1.0",
+  "summary": "A steady click for practice sessions.",
+  "description": "Set a tempo in BPM, pick a time signature, and start the click. Save presets with a name and BPM, list them on the Presets tab, and delete the ones you no longer need. Everything stays on this device.",
+  "category": "personal",
+  "tags": ["metronome", "music", "practice", "tempo"],
+  "icon": "settings",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/metronome",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:metronome"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "metronome",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Metronome preset records"
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "metronome"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
