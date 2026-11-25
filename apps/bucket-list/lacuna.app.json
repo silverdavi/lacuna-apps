@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.bucket-list",
+  "name": "Bucket List Tracker",
+  "version": "0.1.0",
+  "summary": "Track bucket-list entries and their steps.",
+  "description": "A small shelf app. Track bucket-list entries with categories, steps, search, and CSV export. Shared buttons and cards. Token colors and type.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/bucket-list",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:bucket-list"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "bucket-list",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Bucket List Tracker records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "bucket-list"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
