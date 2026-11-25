@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "b38d81a887d7aa36a5d4611adc4d9691ac6a930d77be920620339bc476930810",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Secret Santa\" and the text \"No participants yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice\" in the field labelled \"Name\" and clicking the button \"Add participant\" adds a row to the table with the text \"Alice\" and changes the text \"No participants yet\" to \"1 participant\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Bob\" and \"Carol\", the table shows three rows with the names \"Alice\", \"Bob\", and \"Carol\", and the text \"3 participants\" is visible."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Generate pairings\" with only \"Alice\" added shows the message \"Need at least 2 participants\"."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Alice\", \"Bob\", and \"Carol\" added, clicking the button \"Generate pairings\" produces a table with three rows where each row has a \"Giver\" and a \"Receiver\" column, and no row has the same name in both columns."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Settings\" tab, changing the select labelled \"Pairing mode\" to \"No self-pairing\" and clicking \"Generate pairings\" with \"Alice\", \"Bob\", and \"Carol\" added ensures that the row where \"Alice\" is the Giver has \"Bob\" or \"Carol\" as the Receiver, and the row where \"Bob\" is the Giver has \"Alice\" or \"Carol\" as the Receiver."
+    },
+    {
+      "id": "A7",
+      "text": "After generating pairings, clicking the button \"Copy pairings\" displays the toast message \"Pairings copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete Alice\" in the table removes the row for \"Alice\", leaving \"Bob\" and \"Carol\" in the table and showing the text \"2 participants\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the participants \"Alice\", \"Bob\", and \"Carol\" in the table and the text \"3 participants\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f442bc2e11b22ffaa61f171d203387d44c330f45e96e02036e9816cb58f15487"
+    }
+  ]
+}

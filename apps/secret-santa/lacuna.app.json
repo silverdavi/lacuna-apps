@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.secret-santa",
+  "name": "Secret Santa",
+  "version": "0.1.0",
+  "summary": "Generate random Secret Santa pairings with no self-gifts.",
+  "description": "Add participants, pick a pairing mode, and generate a random Secret Santa exchange. Pairings persist in the browser. Works offline.",
+  "category": "personal",
+  "tags": ["gift", "party", "random"],
+  "icon": "people",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Lacuna",
+    "contact": "dev@lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/secret-santa",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:secret-santa"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "secret-santa",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Secret Santa participants"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "secret-santa"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
