@@ -10,6 +10,7 @@
   "dependencies": {
     "@lacuna/big-clock": "workspace:0.1.0",
     "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/csv-parse": "workspace:0.1.0",
     "@lacuna/date-math": "workspace:0.1.0",
     "@lacuna/date-picker": "workspace:0.1.0",
     "@lacuna/export-menu": "workspace:0.1.0",
