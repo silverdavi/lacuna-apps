@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7a8632f7921ed3eb8d688bbb19b525cdfd8af5137a3e295025f06d4feb260d7b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"IP Subnet Calculator\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"192.168.1.0\" in the field labelled \"IP Address\" and \"24\" in the field labelled \"Prefix Length\" and clicking \"Calculate\" shows \"Network: 192.168.1.0\", \"Broadcast: 192.168.1.255\", and \"Usable Hosts: 254\" in the result summary."
+    },
+    {
+      "id": "A3",
+      "text": "After the calculation in A2, the breakdown table shows a row with \"Subnet Mask\" and \"255.255.255.0\", and a row with \"First Usable\" and \"192.168.1.1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"10.0.0.0\" in the field labelled \"IP Address\" and \"8\" in the field labelled \"Prefix Length\" and clicking \"Calculate\" shows \"Network: 10.0.0.0\", \"Broadcast: 10.255.255.255\", and \"Usable Hosts: 16777214\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"192.168.1.100\" in the field labelled \"IP Address\" and \"24\" in the field labelled \"Prefix Length\" and clicking \"Calculate\" shows \"Network: 192.168.1.0\", \"Broadcast: 192.168.1.255\", and \"Usable Hosts: 254\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"abc\" in the field labelled \"IP Address\" and clicking \"Calculate\" shows the error message \"Invalid IP address\" and no result summary is displayed."
+    },
+    {
+      "id": "A7",
+      "text": "After calculating 192.168.1.0/24, clicking the button \"Save to List\" adds an item to the list containing \"192.168.1.0/24\" and \"254 hosts\"."
+    },
+    {
+      "id": "A8",
+      "text": "With a saved item \"192.168.1.0/24\" in the list, clicking the button \"Delete 192.168.1.0/24\" removes the item from the list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved list item \"192.168.1.0/24\" and \"254 hosts\" after reloading the page."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c742d5ff25efa66c48341c09444e179f5de8fae70b75907fa3b0485c742bea21"
+    }
+  ]
+}
