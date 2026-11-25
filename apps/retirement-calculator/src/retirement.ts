@@ -37,9 +37,10 @@ export type RetirementResult = {
   rows: YearRow[]
 }
 
-// The plan runs for `retirementAge - currentAge` full years. The initial savings
-// compound for the whole span, and the monthly contribution is made at the end
-// of every month of that span (standard end-of-period annuity).
+// The plan runs for `retirementAge - currentAge` years. Each year: growth is the
+// opening balance times the annual return, the contribution is twelve times the
+// monthly amount, and the balance is opening + contribution + growth, rounded to
+// cents. The starting savings grow from year one.
 export function calculateRetirement(inputs: RetirementInputs): { result: RetirementResult | null; error: string | null } {
   const currentAge = Number(inputs.currentAge)
   const retirementAge = Number(inputs.retirementAge)
@@ -64,30 +65,18 @@ export function calculateRetirement(inputs: RetirementInputs): { result: Retirem
   }
 
   const years = Math.round(retirementAge - currentAge)
-  const months = years * 12
-  const i = annualReturn / 100 / 12
-
-  const r = annualReturn / 100
-  const factor = i === 0 ? 1 : 1 + 17.4555367053 * r - 247.8470808539 * r * r
-  const savingsGrowth = initialSavings * (Math.pow(1 + i, months) - 1)
-
-  const contributionValue =
-    i === 0 ? monthlyContribution * months : monthlyContribution * ((Math.pow(1 + i, months) - 1) / i) * factor
-
-  const projected = initialSavings + savingsGrowth + contributionValue
-  const totalContributions = initialSavings + monthlyContribution * months
-  const totalGrowth = projected - totalContributions
+  const totalContributions = initialSavings + monthlyContribution * 12 * years
 
   const rows: YearRow[] = []
   let running = initialSavings
   for (let y = 1; y <= years; y++) {
     const contribution = monthlyContribution * 12
-    // The first year is the setup year: contributions are added but interest has
-    // not yet compounded on the opening balance.
-    const growth = y === 1 ? 0 : running * (annualReturn / 100)
-    running = running + contribution + growth
+    const growth = running * (annualReturn / 100)
+    running = Math.round((running + contribution + growth) * 100) / 100
     rows.push({ year: y, contribution, growth, balance: running })
   }
+  const projected = running
+  const totalGrowth = projected - totalContributions
 
   return {
     result: {

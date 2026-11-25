@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "1ad47cf072e299e753daa92e7d0f5cc64dbfa02248d6e2bf85ecbe8b8e559223",
+  "spec_sha256": "cc4fd2b8fb95883f7e408a581d81548a13900959f5fe8c468ed12af8fe611cc1",
   "checks": [
     {
       "id": "A1",
@@ -8,11 +8,11 @@
     },
     {
       "id": "A2",
-      "text": "Typing \"30\" in the field labelled \"Current age\", \"65\" in the field labelled \"Retirement age\", \"50000\" in the field labelled \"Current savings\", \"500\" in the field labelled \"Monthly contribution\", and \"7\" in the field labelled \"Annual return %\" then clicking \"Calculate\" shows the result summary line \"Projected savings at retirement: $1,482,532.00\"."
+      "text": "Typing \"30\" in the field labelled \"Current age\", \"65\" in the field labelled \"Retirement age\", \"50000\" in the field labelled \"Current savings\", \"500\" in the field labelled \"Monthly contribution\", and \"7\" in the field labelled \"Annual return %\" then clicking \"Calculate\" shows the result summary line \"Projected savings at retirement: $1,363,250.32\"."
     },
     {
       "id": "A3",
-      "text": "After clicking \"Calculate\" with the inputs from A2, the breakdown table shows a row for year 1 with \"Year 1\" and \"$56,000.00\" in the balance column."
+      "text": "After clicking \"Calculate\" with the inputs from A2, the breakdown table shows a row for year 1 with \"Year 1\" and \"$59,500.00\" in the balance column."
     },
     {
       "id": "A4",
@@ -24,11 +24,11 @@
     },
     {
       "id": "A6",
-      "text": "Changing the field labelled \"Annual return %\" to \"10\" and clicking \"Calculate\" updates the result summary to \"Projected savings at retirement: $2,138,941.00\"."
+      "text": "Changing the field labelled \"Annual return %\" to \"10\" and clicking \"Calculate\" updates the result summary to \"Projected savings at retirement: $3,031,267.98\"."
     },
     {
       "id": "A7",
-      "text": "Clicking the button \"Copy result\" copies the text \"Projected savings at retirement: $1,482,532.00\" to the clipboard and shows the message \"Copied to clipboard\"."
+      "text": "Clicking the button \"Copy result\" copies the text \"Projected savings at retirement: $1,363,250.32\" to the clipboard and shows the message \"Copied to clipboard\"."
     },
     {
       "id": "A8",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "2e14ebe663ad808762bb2a5ed7e8dfa64c061b58d41a34bf9c2309ac3e68909c"
+      "sha256": "6ace68f6baad0b516995905b40f22aef81a7fd7ac5a8c664efb33dee67fe55b2"
     }
   ]
 }

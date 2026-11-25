@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 import type { CSSProperties } from 'react'
-import type { YearRow } from './retirement'
+import { money, type YearRow } from './retirement'
 
 type Props = {
   rows: YearRow[]
@@ -54,7 +54,6 @@ export function RetirementChart({ rows, width = 320, height = 200 }: Props) {
       height={height}
       role="img"
       aria-label={`Balance by year, ${rows.length} points`}
-      data-point="chart"
       viewBox={`0 0 ${width} ${height}`}
     >
       <polyline
@@ -67,7 +66,7 @@ export function RetirementChart({ rows, width = 320, height = 200 }: Props) {
       {rows.map((row, idx) => (
         <circle
           key={row.year}
-          data-year={row.year}
+          data-point={`Year ${row.year}: ${money(row.balance)}`}
           cx={x(idx)}
           cy={y(row.balance)}
           r={3}
