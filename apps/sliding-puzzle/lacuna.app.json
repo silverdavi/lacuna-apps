@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.sliding-puzzle",
+  "name": "Sliding Tile Puzzle",
+  "version": "0.1.0",
+  "summary": "Slide the numbered tiles to restore the 4x4 grid.",
+  "description": "A classic 15-puzzle: slide the tiles 1 to 15 with the arrow keys until they read in order. Shuffle with a seed, track your move count, and your best score is kept on this device.",
+  "category": "personal",
+  "tags": [],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/sliding-puzzle"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:puzzle",
+    "fill:puzzle"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "puzzle",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the current board, move count, and best score"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "puzzle"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
