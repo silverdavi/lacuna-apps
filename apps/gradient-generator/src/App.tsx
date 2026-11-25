@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -6,189 +6,191 @@ import {
   Card,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
+  List,
   Rail,
+  Row,
   Select,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
-import {
-  deleteGradient,
-  listGradients,
-  loadState,
-  saveGradient,
-  saveState,
-  type GradientKind,
-  type GradientStop,
-  type SavedGradient,
-} from './host'
+import { useLocalRecord } from '@lacuna/use-local-record'
+import { useCollection } from '@lacuna/use-collection'
+import { swatchCss, swatchDisplay } from './colors'
+import type { GradientKind, GradientStop, SavedGradient } from './host'
 
-const TYPE_OPTIONS: { value: GradientKind; label: string }[] = [
+interface WorkState {
+  name: string
+  kind: GradientKind
+  angle: number
+  stops: GradientStop[]
+}
+
+const DEFAULT_WORK: WorkState = {
+  name: '',
+  kind: 'linear',
+  angle: 90,
+  stops: [],
+}
+
+const TYPE_OPTIONS = [
   { value: 'linear', label: 'Linear' },
   { value: 'radial', label: 'Radial' },
 ]
 
-const STOP_COLORS = ['ff0000', '0000ff']
+function isWorkState(v: unknown): v is WorkState {
+  const o = v as Record<string, unknown> | null
+  if (!o || typeof o !== 'object') return false
+  const kind = o.kind
+  if (kind !== 'linear' && kind !== 'radial') return false
+  if (typeof o.name !== 'string') return false
+  if (typeof o.angle !== 'number' || !Number.isFinite(o.angle)) return false
+  if (!Array.isArray(o.stops)) return false
+  return o.stops.every((s) => {
+    const stop = s as Record<string, unknown> | null
+    return (
+      stop &&
+      typeof stop.color === 'string' &&
+      typeof stop.position === 'number' &&
+      stop.position >= 0 &&
+      stop.position <= 100
+    )
+  })
+}
+
+function isSavedGradient(v: unknown): v is Omit<SavedGradient, 'id'> {
+  const o = v as Record<string, unknown> | null
+  if (!o || typeof o !== 'object') return false
+  const kind = o.kind
+  if (kind !== 'linear' && kind !== 'radial') return false
+  if (typeof o.name !== 'string' || o.name.length === 0) return false
+  if (typeof o.angle !== 'number' || !Number.isFinite(o.angle)) return false
+  if (!Array.isArray(o.stops)) return false
+  return o.stops.every((s) => {
+    const stop = s as Record<string, unknown> | null
+    return (
+      stop &&
+      typeof stop.color === 'string' &&
+      typeof stop.position === 'number' &&
+      stop.position >= 0 &&
+      stop.position <= 100
+    )
+  })
+}
+
+function buildCss(kind: GradientKind, angle: number, stops: GradientStop[]): string {
+  const sorted = [...stops].sort((a, b) => a.position - b.position)
+  const parts = sorted.map((s) => `${s.color} ${s.position}%`).join(', ')
+  const direction = kind === 'radial' ? 'circle' : `${angle}deg`
+  return `${kind}-gradient(${direction}, ${parts})`
+}
 
 function nextPosition(index: number, count: number): number {
   if (count <= 1) return 0
   return Math.round((index / (count - 1)) * 100)
 }
 
-function buildCss(kind: GradientKind, angle: number, stops: GradientStop[]): string {
-  const sorted = [...stops].sort((a, b) => a.position - b.position)
-  const parts = sorted.map((s) => `${s.color} ${s.position}%`).join(', ')
-  const direction = kind === 'radial' ? 'at center' : `${angle}deg`
-  return `${kind}-gradient(${direction}, ${parts})`
-}
-
-function parsePosition(raw: string): number | null {
-  const value = Number(raw)
-  if (!Number.isFinite(value)) return null
-  return Math.min(100, Math.max(0, value))
-}
-
-function clampText(value: string, max: number): string {
-  return value.length <= max ? value : value.slice(0, max)
-}
-
 export function App() {
-  const [initial] = useState(loadState)
-  const [kind, setKind] = useState<GradientKind>(initial.kind)
-  const [angle, setAngle] = useState(String(initial.angle))
-  const [stops, setStops] = useState<GradientStop[]>(initial.stops)
-  const [name, setName] = useState(initial.name)
-  const [library, setLibrary] = useState<SavedGradient[]>(listGradients)
+  const { value: work, set: setWork } = useLocalRecord<WorkState>({
+    key: 'lacuna.gradient-generator.work',
+    version: 1,
+    defaultValue: DEFAULT_WORK,
+  })
+
+  const collection = useCollection<Omit<SavedGradient, 'id'>>({
+    storageKey: 'lacuna.gradient-generator.library',
+  })
+
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<number | undefined>(undefined)
 
   const clipboard = useClipboard({
-    onError: () => setToast('Copy failed'),
+    timeoutMs: 2000,
   })
-
-  const flash = useCallback((message: string) => {
-    setToast(message)
-    window.clearTimeout(toastTimer.current)
-    toastTimer.current = window.setTimeout(() => setToast(null), 1600)
-  }, [])
 
   useEffect(() => () => window.clearTimeout(toastTimer.current), [])
 
-  const persist = useCallback(
-    (nextStops: GradientStop[], nextName: string, nextKind: GradientKind, nextAngle: string) => {
-      saveState({
-        name: nextName,
-        kind: nextKind,
-        angle: Number(nextAngle) || 0,
-        stops: nextStops,
-      })
-    },
-    [],
-  )
+  const flash = (message: string) => {
+    setToast(message)
+    window.clearTimeout(toastTimer.current)
+    toastTimer.current = window.setTimeout(() => setToast(null), 6000)
+  }
 
-  const addStop = useCallback(() => {
-    setStops((prev) => {
-      const index = prev.length
-      const next: GradientStop = {
-        color: `#${STOP_COLORS[index % STOP_COLORS.length]}`,
-        position: nextPosition(index, index + 1),
-      }
-      persist([...prev, next], name, kind, angle)
-      return [...prev, next]
-    })
-  }, [angle, kind, name, persist])
+  const stops = work.stops
+  const css = stops.length > 0 ? buildCss(work.kind, work.angle, stops) : ''
 
-  const updateStop = useCallback(
-    (index: number, patch: Partial<GradientStop>) => {
-      setStops((prev) => {
-        const next = prev.map((s, i) => (i === index ? { ...s, ...patch } : s))
-        persist(next, name, kind, angle)
-        return next
-      })
-    },
-    [angle, kind, name, persist],
-  )
+  const setWorkState = (next: WorkState) => setWork(() => next)
 
-  const removeStop = useCallback(
-    (index: number) => {
-      setStops((prev) => {
-        const next = prev.filter((_, i) => i !== index)
-        persist(next, name, kind, angle)
-        return next
-      })
-    },
-    [angle, kind, name, persist],
-  )
+  const addStop = () => {
+    const index = stops.length
+    const stop: GradientStop = {
+      color: swatchDisplay(index),
+      position: nextPosition(index, index + 1),
+    }
+    setWorkState({ ...work, stops: [...stops, stop] })
+  }
 
-  const css = useMemo(() => buildCss(kind, Number(angle) || 0, stops), [kind, angle, stops])
+  const updateStop = (index: number, patch: Partial<GradientStop>) => {
+    const next = stops.map((s, i) => (i === index ? { ...s, ...patch } : s))
+    setWorkState({ ...work, stops: next })
+  }
 
-  const changeType = useCallback(
-    (value: string) => {
-      const nextKind = value as GradientKind
-      setKind(nextKind)
-      persist(stops, name, nextKind, angle)
-    },
-    [angle, name, persist, stops],
-  )
+  const removeStop = (index: number) => {
+    setWorkState({ ...work, stops: stops.filter((_, i) => i !== index) })
+  }
 
-  const changeAngle = useCallback(
-    (value: string) => {
-      const clamped = clampText(value.replace(/[^0-9]/g, ''), 3)
-      setAngle(clamped)
-      persist(stops, name, kind, clamped)
-    },
-    [kind, name, persist, stops],
-  )
+  const positionError = (index: number) => {
+    const stop = stops[index]
+    if (stop == null) return null
+    if (stop.position < 0 || stop.position > 100) {
+      return 'Keep the position between 0 and 100'
+    }
+    return null
+  }
 
-  const changeName = useCallback(
-    (value: string) => {
-      setName(value)
-      persist(stops, value, kind, angle)
-    },
-    [angle, kind, persist, stops],
-  )
-
-  const copyCss = useCallback(() => {
-    void clipboard.copy(css)
+  const copyCss = () => {
     flash('CSS copied')
-  }, [clipboard, css, flash])
+    void clipboard.copy(css).catch(() => undefined)
+  }
 
-  const saveGradientNow = useCallback(() => {
-    const trimmed = name.trim()
-    if (!trimmed) {
+  const saveGradient = () => {
+    const name = work.name.trim()
+    if (!name) {
       flash('Name the gradient first')
       return
     }
-    saveGradient({
-      name: trimmed,
-      kind,
-      angle: Number(angle) || 0,
+    collection.actions.add({
+      name,
+      kind: work.kind,
+      angle: work.angle,
       stops,
     })
-    setLibrary(listGradients())
-    flash('Saved to library')
-  }, [angle, flash, kind, name, stops])
+    flash(`Saved ${name}`)
+  }
 
-  const deleteSaved = useCallback(
-    (gradient: SavedGradient) => {
-      deleteGradient(gradient.id)
-      setLibrary(listGradients())
-      flash(`Deleted ${gradient.name}`)
-    },
-    [flash],
-  )
+  const deleteSaved = (id: string, name: string) => {
+    collection.actions.remove(id)
+    flash(`Deleted ${name}`)
+  }
 
   return (
     <AppShell
       name="Gradient Generator"
       icon="paint"
-      hue="rust"
+      hue="blue"
       category="Productivity"
       meta={stops.length > 0 ? `${stops.length} stop${stops.length === 1 ? '' : 's'}` : 'Ready'}
-      status={toast ?? 'Local · no network'}
+      status={work.kind}
       side={
-        <Rail title="Gradient Generator" note="CSS gradient · local" chips={['Linear', 'Radial']}>
+        <Rail
+          title="Gradient Generator"
+          note="CSS gradient · local library"
+          chips={['Linear or radial', 'Live CSS preview', 'Copy to clipboard', 'Save to library']}
+        >
           <Card mono="Library" title="Saved gradients" flush>
-            {library.length === 0 ? (
+            {collection.state.isLoading ? null : collection.state.activeItems.length === 0 ? (
               <EmptyState
                 mono="Library"
                 title="No gradients saved"
@@ -196,48 +198,47 @@ export function App() {
                 actionLabel="Save gradient"
               />
             ) : (
-              <div>
-                {library.map((g) => (
-                  <div
-                    key={g.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 'calc(8px * var(--sf))',
-                      padding: 'calc(8px * var(--sf)) 0',
-                      borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                    }}
-                  >
-                    <div>
-                      <div>{g.name}</div>
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: 'calc(12px * var(--tf))', opacity: 0.7 }}>
-                        {g.kind} · {g.stops.length} stop{g.stops.length === 1 ? '' : 's'}
-                      </div>
-                    </div>
-                    <Button kind="ghost" ariaLabel={`Delete ${g.name}`} onClick={() => deleteSaved(g)}>
-                      Remove
-                    </Button>
-                  </div>
+              <List label="Saved gradients">
+                {collection.state.activeItems.map((item) => (
+                  <Row
+                    key={item.id}
+                    title={item.data.name}
+                    meta={
+                      <Tag>
+                        {item.data.kind} · {item.data.stops.length} stop{item.data.stops.length === 1 ? '' : 's'}
+                      </Tag>
+                    }
+                    action={
+                      <Button kind="ghost" ariaLabel={`Delete ${item.data.name}`} onClick={() => deleteSaved(item.id, item.data.name)}>
+                        Delete {item.data.name}
+                      </Button>
+                    }
+                  />
                 ))}
-              </div>
+              </List>
             )}
           </Card>
         </Rail>
       }
     >
+      <div role="status" aria-label={toast ?? undefined}>
+        {toast ?? ''}
+      </div>
       <Card mono="Mix" title="Stops">
         <FormGrid>
-          <Select label="Type" value={kind} onChange={changeType} options={TYPE_OPTIONS} />
-          {kind === 'linear' ? (
-            <TextInput
-              label="Angle (deg)"
-              value={angle}
-              onChange={changeAngle}
-              type="number"
-              placeholder="90"
-            />
-          ) : null}
+          <Select
+            label="Type"
+            value={work.kind}
+            onChange={(v) => setWorkState({ ...work, kind: v as GradientKind })}
+            options={TYPE_OPTIONS}
+          />
+          <TextInput
+            label="Angle (deg)"
+            type="number"
+            value={String(work.angle)}
+            onChange={(v) => setWorkState({ ...work, angle: Number(v) || 0 })}
+            placeholder="90"
+          />
         </FormGrid>
 
         {stops.length === 0 ? (
@@ -248,69 +249,61 @@ export function App() {
             actionLabel="Add stop"
           />
         ) : (
-          <div>
+          <List label="Stops">
             {stops.map((stop, index) => (
-              <div
+              <Row
                 key={index}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'calc(10px * var(--sf))',
-                  flexWrap: 'wrap',
-                  padding: 'calc(8px * var(--sf)) 0',
-                  borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                }}
-              >
-                <span style={{ minWidth: 'calc(48px * var(--sf))' }}>Stop {index + 1}</span>
-                <input
-                  type="color"
-                  aria-label={`Stop ${index + 1} color`}
-                  value={stop.color}
-                  onChange={(event) => updateStop(index, { color: event.target.value })}
-                  style={{
-                    width: 'calc(28px * var(--sf))',
-                    height: 'calc(24px * var(--sf))',
-                    padding: 0,
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                  }}
-                />
-                <span style={{ fontFamily: 'var(--mono)' }}>{stop.color}</span>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 'calc(6px * var(--sf))' }}>
-                  <span>Position</span>
-                  <input
-                    className="lc-input"
+                title={
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'calc(6px * var(--sf))' }}>
+                    <input
+                      type="color"
+                      aria-label={`Stop ${index + 1} color`}
+                      value={swatchCss(index)}
+                      onChange={(event) => updateStop(index, { color: event.target.value })}
+                      style={{
+                        width: 'calc(28px * var(--sf))',
+                        height: 'calc(24px * var(--sf))',
+                        padding: 0,
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                      }}
+                    />
+                    Stop {index + 1}
+                  </span>
+                }
+                meta={
+                  <TextInput
+                    label="Position"
                     type="number"
-                    min={0}
-                    max={100}
-                    aria-label={`Stop ${index + 1} Position`}
                     value={String(stop.position)}
-                    onChange={(event) => {
-                      const parsed = parsePosition(event.target.value)
-                      if (parsed != null) updateStop(index, { position: parsed })
+                    onChange={(v) => {
+                      const n = Number(v)
+                      if (Number.isFinite(n)) updateStop(index, { position: n })
                     }}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        const parsed = parsePosition(event.currentTarget.value)
-                        if (parsed != null) updateStop(index, { position: parsed })
-                      }
-                    }}
-                    style={{ width: 'calc(64px * var(--sf))' }}
+                    error={positionError(index)}
                   />
-                  <span style={{ fontFamily: 'var(--mono)' }}>{stop.position}%</span>
-                </label>
-                <span style={{ flex: '1 1 auto' }} />
-                <Button kind="ghost" onClick={() => removeStop(index)}>
-                  Remove
-                </Button>
-              </div>
+                }
+                value={
+                  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'calc(4px * var(--sf))' }}>
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))' }}>{stop.color}</span>
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))' }}>{stop.position}%</span>
+                  </span>
+                }
+                action={
+                  <Button kind="ghost" ariaLabel={`Remove stop ${index + 1}`} onClick={() => removeStop(index)}>
+                    Remove
+                  </Button>
+                }
+              />
             ))}
-          </div>
+          </List>
         )}
 
         <Actions>
-          <Button onClick={addStop}>Add stop</Button>
+          <Button kind="primary" onClick={addStop}>
+            Add stop
+          </Button>
         </Actions>
       </Card>
 
@@ -319,42 +312,54 @@ export function App() {
         title="CSS preview"
         actions={
           <Actions>
-            <Button onClick={copyCss}>{clipboard.copied ? 'Copied' : 'Copy CSS'}</Button>
+            <Button onClick={copyCss}>Copy CSS</Button>
           </Actions>
         }
       >
         {stops.length === 0 ? (
-          <EmptyState mono="CSS" title="Nothing to preview" detail="Add a stop to generate the CSS." actionLabel="Add stop" />
+          <EmptyState
+            mono="CSS"
+            title="Nothing to preview"
+            detail="Add a stop to generate the CSS."
+            actionLabel="Add stop"
+          />
         ) : (
-          <>
+          <div>
             <div
               aria-label="Gradient preview"
               style={{
                 height: 'calc(56px * var(--sf))',
-                borderRadius: 'calc(6px * var(--sf))',
                 background: css,
               }}
             />
-            <div
-              style={{
-                fontFamily: 'var(--mono)',
-                fontSize: 'calc(13px * var(--tf))',
-                marginTop: 'calc(8px * var(--sf))',
-                wordBreak: 'break-all',
-              }}
-            >
-              {css}
-            </div>
-          </>
+            <KpiRow>
+              <Kpi
+                value={
+                  <span role="status" aria-label="CSS preview" style={{ fontFamily: 'var(--mono)', fontSize: 'calc(13px * var(--tf))', wordBreak: 'break-all' }}>
+                    {css}
+                  </span>
+                }
+                label="CSS"
+                accent
+              />
+            </KpiRow>
+          </div>
         )}
       </Card>
 
       <Card mono="Library" title="Save this gradient">
         <FormGrid>
-          <TextInput label="Name" value={name} onChange={changeName} placeholder="e.g. Sunset" />
+          <TextInput
+            label="Name"
+            value={work.name}
+            onChange={(v) => setWorkState({ ...work, name: v })}
+            placeholder="e.g. Sunset"
+          />
         </FormGrid>
         <Actions>
-          <Button kind="primary" onClick={saveGradientNow}>Save gradient</Button>
+          <Button kind="primary" onClick={saveGradient}>
+            Save gradient
+          </Button>
         </Actions>
       </Card>
     </AppShell>

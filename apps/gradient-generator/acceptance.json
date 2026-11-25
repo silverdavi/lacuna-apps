@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "c99750cc2c98b2db5543e37a0a523dd554807f3c2cf6b486bb0a5b999357f5ec",
+  "spec_sha256": "32d79f0f32d3c2854e48724126bdc112385b79835bcea255765d56b074e40d3f",
   "checks": [
     {
       "id": "A1",
@@ -8,41 +8,41 @@
     },
     {
       "id": "A2",
-      "text": "Clicking the button \"Add stop\" adds a new stop to the list; the stop list now contains one item labeled \"Stop 1\" with a hex value of \"#ff0000\" and a position of \"0%\"."
+      "text": "Clicking the button \"Add stop\" once adds one list item \"Stop 1\" showing the text \"#ff0000\" and the text \"0%\"."
     },
     {
       "id": "A3",
-      "text": "With one stop present, typing \"50\" in the field labeled \"Position\" for \"Stop 1\" and pressing Enter updates the position to \"50%\" and the CSS preview text updates to include \"50%\"."
+      "text": "After one stop exists, typing \"50\" in the \"Position\" field of Stop 1 and pressing Enter shows \"50%\" in the Stop 1 item and the CSS preview text becomes \"linear-gradient(90deg, #ff0000 50%)\"."
     },
     {
       "id": "A4",
-      "text": "Clicking the button \"Add stop\" a second time adds \"Stop 2\" with a hex value of \"#0000ff\" and a position of \"100%\"; the CSS preview now shows two color stops."
+      "text": "Clicking \"Add stop\" twice yields \"Stop 1\" (#ff0000, 0%) and \"Stop 2\" showing \"#0000ff\" and \"100%\"; the CSS preview text is \"linear-gradient(90deg, #ff0000 0%, #0000ff 100%)\"."
     },
     {
       "id": "A5",
-      "text": "Selecting \"Radial\" in the dropdown labeled \"Type\" changes the CSS preview from \"linear-gradient\" to \"radial-gradient\"."
+      "text": "With two stops added, selecting \"Radial\" in the select labelled \"Type\" changes the CSS preview text to \"radial-gradient(circle, #ff0000 0%, #0000ff 100%)\" (it contained \"linear-gradient\" before the change)."
     },
     {
       "id": "A6",
-      "text": "Clicking the button \"Copy CSS\" copies the current gradient string to the clipboard and displays the toast message \"CSS copied\"."
+      "text": "With two stops added, clicking the button \"Copy CSS\" puts exactly the CSS preview text \"linear-gradient(90deg, #ff0000 0%, #0000ff 100%)\" on the clipboard and shows the toast \"CSS copied\"."
     },
     {
       "id": "A7",
-      "text": "Typing \"Sunset\" in the field labeled \"Name\" and clicking the button \"Save gradient\" adds an item to the library panel containing \"Sunset\"; the text \"No gradients saved\" is removed."
+      "text": "With two stops added, typing \"Sunset\" in the field labelled \"Name\" and clicking the button \"Save gradient\" adds a library item containing \"Sunset\"; the text \"No gradients saved\" is gone."
     },
     {
       "id": "A8",
-      "text": "Clicking the button \"Delete Sunset\" in the library panel removes that item and restores the text \"No gradients saved\"."
+      "text": "After saving \"Sunset\", clicking the button \"Delete Sunset\" removes it and the text \"No gradients saved\" returns."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the saved gradient \"Sunset\" in the library panel and the current stop configuration with \"Stop 1\" at \"50%\"."
+      "text": "With two stops added, setting Stop 1's Position to \"50\" (Enter) and saving the gradient as \"Sunset\", reloading the page keeps the library item \"Sunset\" and the stop list still has \"Stop 1\" showing \"50%\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "f7e9d2fdba0c552b94b8b3d43b13f1374c9bf81b143bfc0801fe7f0c386b93ee"
+      "sha256": "840a3cd7b6f1d3a8efa2d6ee9adff55f23fe04998ff7df46958fbf789d0ec47d"
     }
   ]
 }

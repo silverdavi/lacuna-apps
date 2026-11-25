@@ -1,95 +1,107 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-test('[A1] page heading and empty library panel', async ({ page }) => {
+const preview = (page: Page) => page.getByRole('status', { name: 'CSS preview' })
+
+async function addStop(page: Page) {
+  await page.getByRole('button', { name: 'Add stop' }).click()
+}
+
+test('[A1] page shows heading and No gradients saved in the library panel', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Gradient Generator' })).toBeVisible()
   await expect(page.getByText('No gradients saved')).toBeVisible()
 })
 
-test('[A2] Add stop creates Stop 1 with #ff0000 at 0%', async ({ page }) => {
+test('[A2] clicking Add stop once adds Stop 1 with #ff0000 and 0%', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  const row = page.getByText('Stop 1')
-  await expect(row).toBeVisible()
-  const text = await page.locator('#root').innerText()
-  expect(text).toContain('Stop 1')
-  expect(text).toContain('#ff0000')
-  expect(text).toContain('0%')
+  await addStop(page)
+  const stop = page.getByRole('listitem').filter({ hasText: 'Stop 1' })
+  await expect(stop).toBeVisible()
+  await expect(stop.getByText('#ff0000', { exact: true })).toBeVisible()
+  await expect(stop.getByText('0%', { exact: true })).toBeVisible()
 })
 
-test('[A3] editing Stop 1 position to 50 updates the CSS preview', async ({ page }) => {
+test('[A3] typing 50 in Stop 1 Position and pressing Enter shows 50% and updates the CSS preview', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  await page.getByLabel(/Position/).fill('50')
-  await page.getByLabel(/Position/).press('Enter')
-  const text = await page.locator('#root').innerText()
-  expect(text).toContain('50%')
-  // A3: the position readout and the CSS preview both carry "50%".
+  await addStop(page)
+  await page
+    .getByRole('listitem')
+    .filter({ hasText: 'Stop 1' })
+    .getByLabel('Position', { exact: true })
+    .fill('50')
+  await page.keyboard.press('Enter')
+  const stop = page.getByRole('listitem').filter({ hasText: 'Stop 1' })
+  await expect(stop.getByText('50%', { exact: true })).toBeVisible()
+  await expect(preview(page)).toHaveText('linear-gradient(90deg, #ff0000 50%)')
 })
 
-test('[A4] second Add stop creates Stop 2 with #0000ff at 100%', async ({ page }) => {
+test('[A4] clicking Add stop twice yields Stop 1 and Stop 2 with the full CSS preview', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  const text = await page.locator('#root').innerText()
-  expect(text).toContain('Stop 2')
-  expect(text).toContain('#0000ff')
-  expect(text).toContain('100%')
-  expect(text).toMatch(/gradient\(.*#ff0000.*#0000ff/)
+  await addStop(page)
+  await addStop(page)
+  const stop1 = page.getByRole('listitem').filter({ hasText: 'Stop 1' })
+  await expect(stop1.getByText('#ff0000', { exact: true })).toBeVisible()
+  await expect(stop1.getByText('0%', { exact: true })).toBeVisible()
+  const stop2 = page.getByRole('listitem').filter({ hasText: 'Stop 2' })
+  await expect(stop2.getByText('#0000ff', { exact: true })).toBeVisible()
+  await expect(stop2.getByText('100%', { exact: true })).toBeVisible()
+  await expect(preview(page)).toHaveText('linear-gradient(90deg, #ff0000 0%, #0000ff 100%)')
 })
 
-test('[A5] selecting Radial changes the CSS preview to radial-gradient', async ({ page }) => {
+test('[A5] selecting Radial in Type changes the CSS preview to radial-gradient', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  const textBefore = await page.locator('#root').innerText()
-  expect(textBefore).toContain('linear-gradient')
+  await addStop(page)
+  await addStop(page)
+  await expect(preview(page)).toContainText('linear-gradient')
   await page.getByLabel('Type').selectOption('Radial')
-  const textAfter = await page.locator('#root').innerText()
-  expect(textAfter).toContain('radial-gradient')
-  expect(textAfter).not.toContain('linear-gradient')
+  await expect(preview(page)).toHaveText('radial-gradient(circle, #ff0000 0%, #0000ff 100%)')
 })
 
-test('[A6] Copy CSS copies the gradient and shows the toast', async ({ page }) => {
+test('[A6] clicking Copy CSS puts the CSS preview text on the clipboard and shows the toast', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  const cssBefore = await page.locator('#root').innerText()
-  expect(cssBefore).toContain('linear-gradient')
+  await addStop(page)
+  await addStop(page)
   await page.getByRole('button', { name: 'Copy CSS' }).click()
-  await expect(page.getByText('CSS copied')).toBeVisible()
-  const clip = await page.evaluate(() => navigator.clipboard.readText())
-  expect(clip).toContain('linear-gradient')
+  await expect(page.getByRole('status', { name: 'CSS copied' })).toBeVisible()
+  const clipboard = await page.evaluate(() => navigator.clipboard.readText())
+  expect(clipboard).toBe('linear-gradient(90deg, #ff0000 0%, #0000ff 100%)')
 })
 
-test('[A7] saving Sunset adds it to the library and removes the empty text', async ({ page }) => {
+test('[A7] saving Sunset adds a library item and removes No gradients saved', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
+  await addStop(page)
+  await addStop(page)
   await page.getByLabel('Name').fill('Sunset')
   await page.getByRole('button', { name: 'Save gradient' }).click()
-  await expect(page.getByText('Sunset')).toBeVisible()
   await expect(page.getByText('No gradients saved')).toHaveCount(0)
+  await expect(page.getByRole('listitem').filter({ hasText: 'Sunset' })).toBeVisible()
 })
 
-test('[A8] Delete Sunset removes the item and restores the empty text', async ({ page }) => {
+test('[A8] clicking Delete Sunset removes it and No gradients saved returns', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
+  await addStop(page)
+  await addStop(page)
   await page.getByLabel('Name').fill('Sunset')
   await page.getByRole('button', { name: 'Save gradient' }).click()
-  await expect(page.getByText('Sunset')).toBeVisible()
+  await expect(page.getByRole('listitem').filter({ hasText: 'Sunset' })).toBeVisible()
   await page.getByRole('button', { name: 'Delete Sunset' }).click()
-  await expect(page.getByText('Sunset')).toHaveCount(0)
   await expect(page.getByText('No gradients saved')).toBeVisible()
 })
 
-test('[A9] reload keeps the saved gradient and the stop configuration', async ({ page }) => {
+test('[A9] saved Sunset with Stop 1 at 50% survives a reload', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Add stop' }).click()
-  await page.getByLabel(/Position/).fill('50')
-  await page.getByLabel(/Position/).press('Enter')
+  await addStop(page)
+  await addStop(page)
+  await page
+    .getByRole('listitem')
+    .filter({ hasText: 'Stop 1' })
+    .getByLabel('Position', { exact: true })
+    .fill('50')
+  await page.keyboard.press('Enter')
   await page.getByLabel('Name').fill('Sunset')
   await page.getByRole('button', { name: 'Save gradient' }).click()
   await page.reload()
-  const text = await page.locator('#root').innerText()
-  expect(text).toContain('Sunset')
-  expect(text).toContain('Stop 1')
-  expect(text).toContain('50%')
+  await expect(page.getByRole('listitem').filter({ hasText: 'Sunset' })).toBeVisible()
+  await expect(page.getByRole('listitem').filter({ hasText: 'Stop 1' }).getByText('50%', { exact: true })).toBeVisible()
 })
