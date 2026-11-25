@@ -1410,6 +1410,46 @@
       }
     },
     {
+      "id": "@lacuna/markdown-to-html",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Converts a CommonMark subset to sanitized HTML strings",
+      "today": [
+        "toolbox/modules/markdown-to-html/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "markdownToHtml"
+      ],
+      "public": true,
+      "path": "toolbox/modules/markdown-to-html/0.1.0",
+      "bridge": {
+        "component": "markdownToHtml",
+        "kind": "logic",
+        "exports": [
+          "markdownToHtml",
+          "parseMarkdown",
+          "sanitizeHtml"
+        ],
+        "types": [
+          "MarkdownToHtmlOptions"
+        ],
+        "signature": "sanitizeHtml(html: string); parseMarkdown(source: string); markdownToHtml(source: string, options?: import('./index').MarkdownToHtmlOptions)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+            "source": "1896ababcae34606",
+            "lines": 204,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/money",
       "layer": 3,
       "status": "exists",
