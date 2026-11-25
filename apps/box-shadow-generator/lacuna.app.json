@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.box-shadow-generator",
+  "name": "Box Shadow Generator",
+  "version": "0.1.0",
+  "summary": "Generate CSS box-shadow values with live preview, presets, and export.",
+  "description": "Set offset, blur, spread, opacity, and color to build a CSS box-shadow value, preview it live, save presets to a library, and export or import the collection as JSON.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "design",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/box-shadow-generator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/text-transforms": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:box-shadow-generator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "box-shadow-generator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Box Shadow Generator settings"
+      }
+    ],
+    "platform": [
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "box-shadow-generator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

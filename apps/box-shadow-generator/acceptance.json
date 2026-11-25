@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ca4c96951772e7a9e13906448e863993ce03df2671be7548856ff81c2198dfe5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Box Shadow Generator\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the default settings (X: 0, Y: 4, Blur: 12, Spread: 0, Color: #000000, Opacity: 100), the code area displays exactly `box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 1);`."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `10` in the field labelled \"X offset\" and `20` in the field labelled \"Y offset\" updates the code area to display `box-shadow: 10px 20px 12px 0px rgba(0, 0, 0, 1);`."
+    },
+    {
+      "id": "A4",
+      "text": "Typing `5` in the field labelled \"Blur\" and `3` in the field labelled \"Spread\" updates the code area to display `box-shadow: 10px 20px 5px 3px rgba(0, 0, 0, 1);`."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Copy CSS\" displays a toast with the text \"CSS copied to clipboard\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing `50` in the field labelled \"Opacity\" updates the code area to display `box-shadow: 10px 20px 5px 3px rgba(0, 0, 0, 0.5);`."
+    },
+    {
+      "id": "A7",
+      "text": "Typing `ff0000` in the hex input of the color picker updates the code area to display `box-shadow: 10px 20px 5px 3px rgba(255, 0, 0, 0.5);`."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labelled \"Reset\" restores the code area to `box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 1);`."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last saved shadow settings: after setting X to `10` and reloading, the field labelled \"X offset\" contains `10` and the code area displays `box-shadow: 10px 4px 12px 0px rgba(0, 0, 0, 1);`."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "721ff519d2cce379d059ce94554c60ae86bf694531b36137bd57bb1486ff2f15"
+    }
+  ]
+}
