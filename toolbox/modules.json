@@ -1192,6 +1192,45 @@
       }
     },
     {
+      "id": "@lacuna/fuzzy-search",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Ranked fuzzy substring matching across record fields with character-level highlight ranges.",
+      "today": [
+        "toolbox/modules/fuzzy-search/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "fuzzySearch"
+      ],
+      "public": true,
+      "path": "toolbox/modules/fuzzy-search/0.1.0",
+      "bridge": {
+        "component": "fuzzySearch",
+        "kind": "logic",
+        "exports": [
+          "fuzzySearch"
+        ],
+        "types": [
+          "FuzzyMatch",
+          "FuzzySearchOptions"
+        ],
+        "signature": "fuzzySearch( records: T[], query: string, options: FuzzySearchOptions )",
+        "releases": {
+          "0.1.0": {
+            "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+            "source": "e19b56ef9fc767c1",
+            "lines": 134,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/heatmap",
       "layer": 2,
       "status": "exists",
