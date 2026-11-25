@@ -6,17 +6,25 @@ import {
   AppShell,
   Button,
   Card,
-  EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   PrimaryButton,
-  Select,
-  Table,
+
   TextInput,
 } from '@lacuna/ui'
 import { toIcs, type IcsEvent } from '@lacuna/ics-calendar'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { addClass, DAYS, listClasses, removeClass, type Class, type Day } from './host'
 import './app.css'
+
+const DAY_ABBR: Record<Day, string> = {
+  Monday: 'Mon',
+  Tuesday: 'Tue',
+  Wednesday: 'Wed',
+  Thursday: 'Thu',
+  Friday: 'Fri',
+}
 
 const DAY_ORDER: Record<Day, number> = {
   Monday: 0,
@@ -59,10 +67,6 @@ export function App() {
   const [sort, setSort] = useState<{ key: 'name' | 'day' | 'start'; dir: 1 | -1 } | null>(null)
 
   const { copied, copy } = useClipboard({ timeoutMs: 1500 })
-
-  function refresh(next: Class[]) {
-    setClasses(next)
-  }
 
   function submit() {
     const trimmed = name.trim()
@@ -123,19 +127,28 @@ export function App() {
     <AppShell
       name="Class Timetable"
       icon="calendar"
-      hue="gold"
+      hue="rust"
       category="Productivity"
       meta={`${classes.length} ${classes.length === 1 ? 'class' : 'classes'}`}
     >
       <Card mono="New" title="Add a class">
         <FormGrid>
           <TextInput label="Class name" value={name} onChange={setName} error={error} />
-          <Select
-            label="Day"
-            value={day}
-            onChange={(value) => setDay(value as Day)}
-            options={DAYS.map((d) => ({ value: d, label: d.slice(0, 3) }))}
-          />
+          <div className="lc-field">
+            <label className="lc-field-label" htmlFor="ct-day">Day</label>
+            <select
+              id="ct-day"
+              className="lc-input"
+              value={day}
+              onChange={(event) => setDay(event.target.value as Day)}
+            >
+              {DAYS.map((d) => (
+                <option key={d} value={d}>
+                  {DAY_ABBR[d]}
+                </option>
+              ))}
+            </select>
+          </div>
           <TextInput label="Start time" value={start} onChange={setStart} placeholder="09:00" />
           <TextInput label="End time" value={end} onChange={setEnd} placeholder="10:00" />
         </FormGrid>
@@ -170,9 +183,9 @@ export function App() {
         {tab === 'Week' ? (
           <div className="ct-grid">
             {DAYS.map((d) => {
-              const dayClasses = classes.filter((c) => c.day === d)
+              const dayClasses = classes.filter((c) => c.day === d).sort((a, b) => a.start.localeCompare(b.start))
               return (
-                <div key={d} className="ct-day">
+                <section key={d} className="ct-day" role="region" aria-label={d}>
                   <h2>{d}</h2>
                   <div className="ct-day-body">
                     {dayClasses.length === 0 ? (
@@ -190,93 +203,73 @@ export function App() {
                       ))
                     )}
                   </div>
-                </div>
+                </section>
               )
             })}
           </div>
         ) : (
           <div className="ct-table-wrap">
-            <Table
-              label="Classes"
-              columns={[
-                {
-                  key: 'name',
-                  label: (
-                    <span
-                      className="ct-th-sort"
-                      onClick={() => toggleSort('name')}
-                      role="button"
-                    >
+            {sortedClasses.length === 0 ? (
+              <p className="lc-faint ct-empty">No classes yet. Add one above.</p>
+            ) : (
+              <div className="ct-table" aria-label="Classes">
+                <div className="ct-table-head" role="row">
+                  <span role="columnheader">
+                    <span className="ct-th-sort" role="button" onClick={() => toggleSort('name')}>
                       Class name
                     </span>
-                  ),
-                },
-                {
-                  key: 'day',
-                  label: (
-                    <span
-                      className="ct-th-sort"
-                      onClick={() => toggleSort('day')}
-                      role="button"
-                    >
+                  </span>
+                  <span role="columnheader">
+                    <span className="ct-th-sort" role="button" onClick={() => toggleSort('day')}>
                       Day
                     </span>
-                  ),
-                },
-                {
-                  key: 'start',
-                  label: (
-                    <span
-                      className="ct-th-sort"
-                      onClick={() => toggleSort('start')}
-                      role="button"
-                    >
+                  </span>
+                  <span role="columnheader">
+                    <span className="ct-th-sort" role="button" onClick={() => toggleSort('start')}>
                       Start
                     </span>
-                  ),
-                },
-                { key: 'end', label: 'End' },
-              ]}
-              rows={sortedClasses.map((c) => ({
-                cells: {
-                  name: c.name,
-                  day: c.day,
-                  start: c.start,
-                  end: c.end,
-                },
-              }))}
-              empty="No classes yet. Add one above."
-            />
+                  </span>
+                  <span role="columnheader">End</span>
+                </div>
+                <table className="ct-table-body">
+                  <tbody>
+                    {sortedClasses.map((c) => (
+                      <tr key={c.id}>
+                        <td>{c.name}</td>
+                        <td>{c.day}</td>
+                        <td>{c.start}</td>
+                        <td>{c.end}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </Card>
 
       {selected != null && (
-        <Card mono="Details" title={selected.name} accent>
-          <div className="ct-detail">
-            {selected.day} · {selected.start}–{selected.end}
+        <div className="ct-overlay">
+          <div className="ct-dialog" role="dialog" aria-modal="true" aria-label="Class details">
+            <KpiRow>
+              <Kpi value={selected.name} label="Class" accent />
+            </KpiRow>
+            <div className="ct-detail">
+              {selected.day} · {selected.start}–{selected.end}
+            </div>
+            <Actions>
+              <Button kind="secondary" onClick={() => setSelectedId(null)}>
+                Close
+              </Button>
+              <Button kind="danger" onClick={() => deleteClass(selected.id)}>
+                Delete class
+              </Button>
+            </Actions>
           </div>
-          <Actions>
-            <Button kind="secondary" onClick={() => setSelectedId(null)}>
-              Close
-            </Button>
-            <Button kind="danger" onClick={() => deleteClass(selected.id)}>
-              Delete class
-            </Button>
-          </Actions>
-        </Card>
+        </div>
       )}
 
-      {classes.length === 0 && (
-        <Card>
-          <EmptyState
-            mono="Empty"
-            title="No classes yet"
-            detail="Add your first class with the form above."
-            actionLabel="Add a class"
-          />
-        </Card>
-      )}
     </AppShell>
   )
 }
