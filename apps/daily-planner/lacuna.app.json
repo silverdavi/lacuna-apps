@@ -1,0 +1,100 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.daily-planner",
+  "name": "Daily Planner",
+  "version": "0.1.0",
+  "summary": "Plan the day: tasks with due dates, recurrences and a streak.",
+  "description": "A task checklist for the day with a calendar view of scheduled work, completion rate and day streak. Export to JSON backup or iCal. Stays on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/daily-planner",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/tracker-kit": "0.2.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-picker": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/recurrence": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:daily-planner"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "daily-planner",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Daily Planner task records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "daily-planner"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
