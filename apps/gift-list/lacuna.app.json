@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.gift-list",
+  "name": "Gift List Tracker",
+  "version": "0.1.0",
+  "summary": "Track gifts to buy, who they are for, and their price.",
+  "description": "Keep one list of gifts. Add items with a recipient and price, mark them purchased, filter by status, search, export as CSV, and delete entries. Everything stays on this device.",
+  "category": "personal",
+  "tags": ["gifts", "lists"],
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/gift-list",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/record-form": "0.1.0",
+      "@lacuna/filter-bar": "0.1.0",
+      "@lacuna/search-box": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/json-backup": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:gift-list"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "gift-list",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own gift list records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "gift-list"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

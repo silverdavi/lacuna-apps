@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "76b64854dc2b0efb08ab5c5b9fb477ba32f9af02c32e8dfe143cce1da1b546be",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Gift List Tracker\" and the text \"No gifts yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Book\" in the field labelled \"Item\", \"Alice\" in the field labelled \"Recipient\", \"15\" in the field labelled \"Price\", and clicking the button \"Add gift\" adds a row to the table with \"Book\", \"Alice\", \"$15.00\", and \"Pending\". The text \"No gifts yet\" disappears."
+    },
+    {
+      "id": "A3",
+      "text": "In the row for \"Book\", clicking the button \"Mark purchased\" changes the status cell to \"Purchased\" and the button label to \"Mark pending\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Toy\" in the field labelled \"Item\", \"Bob\" in the field labelled \"Recipient\", \"20\" in the field labelled \"Price\", and clicking \"Add gift\" adds a second row. The table now has two rows."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the filter chip labelled \"Purchased\" hides the row for \"Toy\" and shows only the row for \"Book\". Clicking the filter chip labelled \"All\" shows both rows again."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"Alice\" in the search box labelled \"Search\" filters the table to show only the row for \"Book\". Clearing the search box shows both rows."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" triggers a download of a file named \"gifts.csv\" containing the header \"Item,Recipient,Price,Status\" and the row \"Book,Alice,15.00,Purchased\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the row for \"Book\", clicking the button \"Delete Book\" removes the row. The table now shows only the row for \"Toy\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the gift \"Toy\" for \"Bob\" with status \"Pending\" and price \"$20.00\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "368dc09738da97596a3f6ee509db758c14c201857b40bf57074f290026cc6b03"
+    }
+  ]
+}

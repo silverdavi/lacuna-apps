@@ -1,0 +1,13 @@
+/* Gift list app-local styles. */
+.gift-toolbar {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+.gift-table thead {
+  display: none;
+}
+
+.gift-actions {
+  white-space: nowrap;
+}
