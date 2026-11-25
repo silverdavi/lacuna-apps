@@ -1,10 +1,78 @@
 /* Gift list app-local styles. */
+.gift-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}
+
+.gift-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: calc(6px * var(--sf)) calc(12px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(999px * var(--sf));
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: calc(14px * var(--tf));
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gift-chip.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.gift-sort {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  margin-left: auto;
+}
+
+.gift-sort-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
+.gift-sort-select {
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(4px * var(--sf));
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: calc(14px * var(--tf));
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  cursor: pointer;
+}
+
+.gift-search {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  max-width: calc(320px * var(--sf));
+}
+
+.gift-search-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
 .gift-toolbar {
   display: flex;
   gap: calc(8px * var(--sf));
 }
 
-.gift-table thead {
+.gift-table-wrap thead {
   display: none;
 }
 

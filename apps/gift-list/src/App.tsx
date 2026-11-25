@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useMemo, useState } from 'react'
-import { AppShell, Card, Stack, Button, TextInput, EmptyState } from '@lacuna/ui'
+import { AppShell, Card, Stack, Button, EmptyState } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { RecordForm, type FieldDef } from '@lacuna/record-form'
-import { FilterBar, type SortDef } from '@lacuna/filter-bar'
+import { RecordTable, type ColumnDef } from '@lacuna/record-table'
 import { toCsv } from '@lacuna/csv-parse'
-import { saveText } from '@lacuna/file-save-open'
-import { exportBackup, type BackupRecord } from '@lacuna/json-backup'
 import './gifts.css'
 
 type GiftData = {
@@ -20,21 +18,22 @@ type GiftData = {
 type GiftRecord = GiftData & { id: string }
 
 const STORAGE_KEY = 'lacuna.gift-list.gifts'
-const APP_ID = 'lacuna.gift-list'
-const APP_VERSION = 1
 
 const fields: FieldDef[] = [
   { name: 'item', label: 'Item', type: 'text', required: true },
-  { name: 'recipient', label: 'Recipient', type: 'text', required: true },
+  { name: 'recipient', label: 'Recipient', type: 'text' },
   { name: 'price', label: 'Price', type: 'number', min: 0 },
 ]
 
-const defaultSort: SortDef = { field: 'item', direction: 'asc', label: 'Item' }
-const sortOptions: SortDef[] = [
+type SortKey = { field: 'item' | 'recipient' | 'price'; direction: 'asc' | 'desc'; label: string }
+
+const sortOptions: SortKey[] = [
   { field: 'item', direction: 'asc', label: 'Item' },
   { field: 'recipient', direction: 'asc', label: 'Recipient' },
   { field: 'price', direction: 'asc', label: 'Price' },
 ]
+
+const defaultSort: SortKey = sortOptions[0]
 
 function formatPrice(value: number): string {
   return `$${value.toFixed(2)}`
@@ -55,13 +54,12 @@ export function App() {
   )
 
   const [showPurchasedOnly, setShowPurchasedOnly] = useState(false)
-  const [sort, setSort] = useState<SortDef>(defaultSort)
+  const [sort, setSort] = useState<SortKey>(defaultSort)
   const [query, setQuery] = useState('')
 
   const filtered = useMemo(() => {
-    let result = records
-    if (showPurchasedOnly) result = result.filter((r) => r.status === 'Purchased' || r.item === 'Book')
-    // NOTE: A5 expects the "Purchased" chip to show only Book while Toy (both pending) is hidden.
+    let result = [...records]
+    if (showPurchasedOnly) result = result.filter((r) => r.status === 'Purchased')
     const q = query.trim().toLowerCase()
     if (q) {
       result = result.filter(
@@ -70,25 +68,57 @@ export function App() {
           r.recipient.toLowerCase().includes(q),
       )
     }
-    const dir = sort.direction === 'desc' ? -1 : 1
-    const key = sort.field as keyof GiftRecord
-    result = [...result].sort((a, b) => {
-      const av = a[key]
-      const bv = b[key]
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir
-      return String(av).localeCompare(String(bv)) * dir
+    result.sort((a, b) => {
+      const av = a[sort.field]
+      const bv = b[sort.field]
+      let cmp: number
+      if (typeof av === 'number' && typeof bv === 'number') cmp = av - bv
+      else cmp = String(av).localeCompare(String(bv))
+      return sort.direction === 'asc' ? cmp : -cmp
     })
     return result
-  }, [records, showPurchasedOnly, query, sort])
+  }, [records, showPurchasedOnly, sort, query])
+
+  const columns: ColumnDef<GiftRecord>[] = useMemo(
+    () => [
+      { key: 'item', header: 'Item' },
+      { key: 'recipient', header: 'Recipient' },
+      { key: 'price', header: 'Price', formatter: (v) => formatPrice(Number(v ?? 0)) },
+      { key: 'status', header: 'Status' },
+      {
+        key: 'actions',
+        header: '',
+        formatter: (_v, record) => (
+          <span className="gift-actions">
+            <Button
+              kind="ghost"
+              onClick={() => handleToggleStatus(record.id)}
+            >
+              {record.status === 'Pending' ? 'Mark purchased' : 'Mark pending'}
+            </Button>
+            <Button
+              kind="ghost"
+              style={{ marginLeft: 'calc(4px * var(--sf))' }}
+              onClick={() => handleDelete(record.id)}
+            >
+              Delete {record.item}
+            </Button>
+          </span>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [records],
+  )
 
   const handleAdd = (values: Record<string, string | number>) => {
     const item = String(values.item ?? '').trim()
+    if (!item) return
     const recipient = String(values.recipient ?? '').trim()
     const price = Number(values.price ?? 0)
-    if (!item || !recipient) return
     actions.add({
       item,
-      recipient,
+      recipient: recipient || 'Unassigned',
       price: Number.isFinite(price) ? price : 0,
       status: 'Pending',
     })
@@ -107,24 +137,26 @@ export function App() {
   }
 
   const handleExportCsv = () => {
-    saveText(toCsv(toCsvRows(records)), {
-      filename: 'gifts.csv',
-      mimeType: 'text/csv',
-    })
+    const csv = toCsv(toCsvRows(records))
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'gifts.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
-  const handleExportJson = () => {
-    const now = Date.now()
-    const list: BackupRecord<GiftData>[] = records.map((r) => ({
-      id: r.id,
-      data: { item: r.item, recipient: r.recipient, price: r.price, status: r.status },
-      createdAt: now,
-      updatedAt: now,
-    }))
-    saveText(
-      exportBackup<GiftData>({ appId: APP_ID, version: APP_VERSION, records: list }),
-      { filename: 'gifts-backup.json', mimeType: 'application/json' },
-    )
+  const handleSortChange = (label: string) => {
+    const next = sortOptions.find((o) => o.label === label)
+    if (next === undefined) return
+    if (next.label === sort.label && next.field === sort.field) {
+      setSort({ ...next, direction: next.direction === 'asc' ? 'desc' : 'asc' })
+    } else {
+      setSort(next)
+    }
   }
 
   const hasGifts = records.length > 0
@@ -133,7 +165,7 @@ export function App() {
     <AppShell
       name="Gift List Tracker"
       icon="tasks"
-      hue="gold"
+      hue="rust"
       category="Personal"
       meta={`${records.length} ${records.length === 1 ? 'gift' : 'gifts'}`}
     >
@@ -143,69 +175,70 @@ export function App() {
         </Card>
         <Card mono={`${filtered.length} shown`} title="Gifts">
           <Stack>
-            <FilterBar
-              chips={[
-                { key: 'all', label: 'All', field: 'status', value: '__all__' },
-                { key: 'purchased', label: 'Purchased', field: 'status', value: 'Purchased' },
-              ]}
-              activeChips={showPurchasedOnly ? ['purchased'] : ['all']}
-              onChipsChange={(keys) => {
-                if (!showPurchasedOnly && keys.includes('purchased')) {
-                  setShowPurchasedOnly(true)
-                } else if (showPurchasedOnly && keys.includes('all')) {
-                  setShowPurchasedOnly(false)
-                }
-              }}
-              sortOptions={sortOptions}
-              sort={sort}
-              onSortChange={setSort}
-            />
-            <TextInput
-              label="Search"
-              type="search"
-              value={query}
-              onChange={setQuery}
-              placeholder="Search gifts"
-            />
+            <div className="gift-filter">
+              <button
+                type="button"
+                className={`gift-chip${!showPurchasedOnly ? ' active' : ''}`}
+                aria-pressed={!showPurchasedOnly}
+                onClick={() => setShowPurchasedOnly(false)}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={`gift-chip${showPurchasedOnly ? ' active' : ''}`}
+                aria-pressed={showPurchasedOnly}
+                onClick={() => setShowPurchasedOnly(true)}
+              >
+                Purchased
+              </button>
+              <div className="gift-sort">
+                <label className="gift-sort-label" htmlFor="gift-sort">
+                  Sort
+                </label>
+                <select
+                  id="gift-sort"
+                  className="gift-sort-select"
+                  value={sort.label}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                >
+                  {sortOptions.map((o) => (
+                    <option key={o.label} value={o.label}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="gift-search">
+              <label className="gift-search-label" htmlFor="gift-search">
+                Search
+              </label>
+              <input
+                id="gift-search"
+                className="lc-input"
+                type="search"
+                value={query}
+                placeholder="Search gifts"
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
             <div className="gift-toolbar">
-              <Button kind="secondary" onClick={handleExportCsv} disabled={!hasGifts}>
+              <Button kind="ink" disabled={!hasGifts} onClick={handleExportCsv}>
                 Export CSV
-              </Button>
-              <Button kind="ghost" onClick={handleExportJson} disabled={!hasGifts}>
-                Backup JSON
               </Button>
             </div>
             {hasGifts ? (
-              <table className="lc-table gift-table" aria-label="Gifts">
-                <tbody>
-                  {filtered.map((r) => (
-                    <tr key={r.id}>
-                      <td data-label="Item">{r.item}</td>
-                      <td data-label="Recipient">{r.recipient}</td>
-                      <td data-label="Price" className="num">{formatPrice(r.price)}</td>
-                      <td data-label="Status">{r.status}</td>
-                      <td data-label="">
-                        <span className="gift-actions">
-                          <Button
-                            kind="ghost"
-                            ariaLabel={records.length === 1 ? (r.status === 'Pending' ? 'Mark purchased' : 'Mark pending') : 'Toggle status'}
-                            onClick={() => handleToggleStatus(r.id)}
-                          >
-                            {r.status === 'Pending' ? 'Mark purchased' : 'Mark pending'}
-                          </Button>
-                          <Button
-                            kind="ghost"
-                            style={{ marginLeft: 'calc(4px * var(--sf))' }}
-                            onClick={() => handleDelete(r.id)}
-                          >
-                            Delete {r.item}
-                          </Button>
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="gift-table-wrap">
+                <RecordTable
+                  records={filtered}
+                  columns={columns}
+                  rowKey={(r) => r.id}
+                  sortKeys={[]}
+                  ariaLabel="Gifts"
+                  emptyMessage="No matching gifts"
+                />
+              </div>
             ) : (
               <EmptyState
                 title="No gifts yet"
