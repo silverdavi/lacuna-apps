@@ -10,3 +10,8 @@ export function toRgb(hex: string): { r: number; g: number; b: number } {
 export function shadowColor(r: number, g: number, b: number, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
+
+export function swatchColor(hex: string): string {
+  const { r, g, b } = toRgb(hex)
+  return `rgb(${r}, ${g}, ${b})`
+}

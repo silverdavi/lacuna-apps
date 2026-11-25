@@ -358,12 +358,6 @@ importers:
 
   apps/box-shadow-generator:
     dependencies:
-      '@lacuna/codecs':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/codecs/0.1.0
-      '@lacuna/combobox':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/combobox/0.1.0
       '@lacuna/file-save-open':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/file-save-open/0.1.0
@@ -379,9 +373,6 @@ importers:
       '@lacuna/use-clipboard':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/use-clipboard/0.1.0
-      '@lacuna/use-local-record':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/use-local-record/0.1.0
       react:
         specifier: ^19.0.0
         version: 19.1.0
