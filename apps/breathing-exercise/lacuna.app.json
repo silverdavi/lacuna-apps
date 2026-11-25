@@ -1,0 +1,76 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.breathing-exercise",
+  "name": "Breathing Exercise",
+  "version": "0.1.0",
+  "summary": "Follow guided Box Breathing or 4-7-8 patterns with a paced countdown.",
+  "description": "Two paced patterns for settling the breath: Box Breathing (in, hold, out, hold, each four counts) and 4-7-8 (in four, hold seven, out eight). Start a pattern and the page steps through each phase with a big clock, a progress ring, and the cycle count. Pause, resume, and reset on this page. The record is the breath; nothing leaves the browser.",
+  "category": "personal",
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/breathing-exercise"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/big-clock": "0.1.0",
+      "@lacuna/progress-ring": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:breath"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "breathing",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the selected pattern and the completed cycle count"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "breathing"
+    ],
+    "reads": [],
+    "handoffs": []
+  }
+}

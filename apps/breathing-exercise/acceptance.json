@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "716ccc57548a726a43bd62e9ebeed45ef8e09b720d5a5bc0193dd26c0de030a7",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Breathing Exercise\" and the text \"Select a pattern to begin\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button labelled \"Box Breathing\" changes the display to show the phase \"Inhale\" and the countdown \"4\" in the BigClock component; the ProgressRing shows 0% progress."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button labelled \"Start\" begins the timer; after 4 seconds, the phase text changes to \"Hold\" and the countdown shows \"4\"; after another 4 seconds, the phase changes to \"Exhale\" and the countdown shows \"4\"."
+    },
+    {
+      "id": "A4",
+      "text": "After completing one full cycle (12 seconds total), the text \"Cycles: 1\" appears below the ProgressRing, and the ProgressRing shows 100% progress before resetting to 0% for the next cycle."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Pause\" stops the countdown; the countdown value remains static (e.g., \"2\" if paused mid-phase) and the button label changes to \"Resume\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Resume\" continues the countdown from the paused value; if paused at \"2\" in \"Inhale\", it counts down to \"1\", \"0\", then switches to \"Hold\" with \"4\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Reset\" sets the phase to \"Ready\", the countdown to \"0\", the text \"Cycles: 0\", and the ProgressRing to 0%."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting the pattern \"4-7-8 Breathing\" and clicking \"Start\" shows the phase \"Inhale\" with countdown \"4\"; after 4 seconds, the phase changes to \"Hold\" with countdown \"7\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the selected pattern \"Box Breathing\" and the cycle count \"Cycles: 2\" if the user had completed two cycles before reloading."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "e6e8413682a347ddf417029514642c67f53d720489aedc875a74502028007ebb"
+    }
+  ]
+}
