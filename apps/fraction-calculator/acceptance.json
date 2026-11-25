@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "50cb0df6f71deb9f98b66b74d98b14f8f16da686f3498f474b7604433030b85f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Fraction Calculator\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the operator select labelled \"Operator\" set to \"+\", the field labelled \"Numerator 1\" set to \"1\", the field labelled \"Denominator 1\" set to \"2\", the field labelled \"Numerator 2\" set to \"1\", and the field labelled \"Denominator 2\" set to \"3\", clicking the button \"Calculate\" shows the text \"5/6\" in the element labelled \"Result\"."
+    },
+    {
+      "id": "A3",
+      "text": "After the calculation in A2, the element labelled \"Decimal\" shows \"0.8333\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the operator select labelled \"Operator\" set to \"\u00d7\", the field labelled \"Numerator 1\" set to \"2\", the field labelled \"Denominator 1\" set to \"3\", the field labelled \"Numerator 2\" set to \"3\", and the field labelled \"Denominator 2\" set to \"4\", clicking \"Calculate\" shows \"1/2\" in the element labelled \"Result\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the operator select labelled \"Operator\" set to \"\u00f7\", the field labelled \"Numerator 1\" set to \"1\", the field labelled \"Denominator 1\" set to \"2\", the field labelled \"Numerator 2\" set to \"1\", and the field labelled \"Denominator 2\" set to \"4\", clicking \"Calculate\" shows \"2/1\" in the element labelled \"Result\"."
+    },
+    {
+      "id": "A6",
+      "text": "After the calculation in A2, clicking the button \"Save\" adds a list item in the history section that contains \"1/2 + 1/3 = 5/6\"."
+    },
+    {
+      "id": "A7",
+      "text": "After the calculation in A2, the tab labelled \"Breakdown\" shows a table row with the text \"Common denominator: 6\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the operator select labelled \"Operator\" set to \"+\", the field labelled \"Numerator 1\" set to \"1\", the field labelled \"Denominator 1\" set to \"2\", the field labelled \"Numerator 2\" set to \"1\", and the field labelled \"Denominator 2\" set to \"3\", clicking \"Calculate\" and then the button \"Copy result\" shows the toast text \"Result copied\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history item containing \"1/2 + 1/3 = 5/6\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "bd84f3e9485344fd373f1ffefcda7c8f6c46426bf2c31dd0b3922721ba100b73"
+    }
+  ]
+}

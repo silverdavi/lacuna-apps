@@ -1,0 +1,72 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.fraction-calculator",
+  "name": "Fraction Calculator",
+  "version": "0.1.0",
+  "summary": "Add, multiply, and divide two fractions and see the reduced result.",
+  "description": "Enter two fractions, pick an operator, and compute the reduced result. See the decimal equivalent, copy the result to the clipboard, and keep a history of the fractions you save on this device.",
+  "category": "productivity",
+  "tags": ["calculator", "fractions", "math"],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/fraction-calculator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:calculation"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "calculation",
+        "access": ["read", "write", "create", "delete"],
+        "purpose": "Store fraction results and the history of calculations"
+      }
+    ],
+    "platform": [
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": ["any"]
+    }
+  },
+  "sharing": {
+    "owns": ["calculation"],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
