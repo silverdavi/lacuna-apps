@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "b3b1acb0e12dc7edb40aeca61e62bef5cfed7d60b2fe1cc2b6f701c72200838d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Vocabulary Builder\" and the tab labels \"Deck\" and \"Study\"."
+    },
+    {
+      "id": "A2",
+      "text": "On the Deck tab, typing \"serendipity\" in the field labelled \"Word\", \"happy accident\" in the field labelled \"Definition\", and clicking the button \"Add word\" adds a list item containing \"serendipity\" and \"happy accident\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"serendipity\" and \"ephemeral\" (definition \"short-lived\"), clicking the tab \"Study\" shows a card with \"serendipity\" on the front; clicking the button \"Flip\" reveals \"happy accident\" on the back."
+    },
+    {
+      "id": "A4",
+      "text": "On the Study tab with the card \"serendipity\" flipped, clicking the button \"Again\" removes \"serendipity\" from the current session queue and shows the text \"1 card due\"."
+    },
+    {
+      "id": "A5",
+      "text": "On the Study tab with the card \"serendipity\" flipped, clicking the button \"Good\" shows the text \"1 card due\" and the card \"serendipity\" is no longer in the current session."
+    },
+    {
+      "id": "A6",
+      "text": "After grading \"serendipity\" as \"Good\" and \"ephemeral\" as \"Again\", the Study tab shows the text \"Session complete\" and the button \"Review due\" is visible."
+    },
+    {
+      "id": "A7",
+      "text": "On the Deck tab, clicking the button \"Delete ephemeral\" removes the list item containing \"ephemeral\" and \"short-lived\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding \"serendipity\" and \"ephemeral\", clicking the button \"Export CSV\" copies a CSV string to the clipboard that contains the line \"serendipity,happy accident\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the word \"serendipity\" with definition \"happy accident\" in the Deck tab list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8f716db7baf0d7d2933a3e8dd53ec69ff7f07794fc53635bd089c0f5aec30225"
+    }
+  ]
+}
