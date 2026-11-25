@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useState } from 'react'
+import { toCsv } from '@lacuna/csv-parse'
+import { saveText } from '@lacuna/file-save-open'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useCollection } from '@lacuna/use-collection'
 import {
@@ -17,6 +19,7 @@ import {
   Rail,
   Row,
   Stack,
+  Table,
   TextInput,
 } from '@lacuna/ui'
 import { tripStore } from './host'
@@ -33,11 +36,15 @@ export function App() {
   const [editValue, setEditValue] = useState('')
   const [destination, setDestination] = useState(() => tripStore.get().destination)
   const [departure, setDeparture] = useState(() => tripStore.get().departureDate)
+  const [exported, setExported] = useState(false)
 
   const { copied, copy } = useClipboard()
 
   const total = items.length
   const packed = items.filter((i) => i.data.checked).length
+  const remaining = total - packed
+  const packedItems = items.filter((i) => i.data.checked)
+  const remainingItems = items.filter((i) => !i.data.checked)
 
   const add = () => {
     const n = name.trim()
@@ -72,9 +79,31 @@ export function App() {
   }
 
   const copySummary = () => {
-    const packedNames = items.filter((i) => i.data.checked).map((i) => i.data.name)
-    const remainingNames = items.filter((i) => !i.data.checked).map((i) => i.data.name)
+    const packedNames = packedItems.map((i) => i.data.name)
+    const remainingNames = remainingItems.map((i) => i.data.name)
     void copy(`Packed: ${packedNames.join(', ')}\nRemaining: ${remainingNames.join(', ')}`)
+  }
+
+  const exportCsv = () => {
+    const rows = [
+      ['item', 'status'],
+      ...items.map((i) => [i.data.name, i.data.checked ? 'packed' : 'remaining']),
+    ]
+    saveText(toCsv(rows), { filename: 'packing-list.csv', mimeType: 'text/csv' })
+    setExported(true)
+    setTimeout(() => setExported(false), 2000)
+  }
+
+  const packAll = () => {
+    for (const item of items) {
+      if (!item.data.checked) actions.update(item.id, { checked: true })
+    }
+  }
+
+  const unpackAll = () => {
+    for (const item of items) {
+      if (item.data.checked) actions.update(item.id, { checked: false })
+    }
   }
 
   // Alt+ArrowUp on the focused list row moves that item above the previous one.
@@ -106,7 +135,7 @@ export function App() {
 
   const trip = tripStore.get()
 
-  const tabs = ['Items', 'Trip details'] as const
+  const tabs = ['Items', 'Summary', 'Trip details'] as const
 
   return (
     <AppShell
@@ -115,12 +144,17 @@ export function App() {
       hue="gold"
       category="Productivity"
       meta={total === 1 ? '1 item' : `${total} items`}
-      status={copied ? 'Copied to clipboard' : undefined}
+      status={copied ? 'Copied to clipboard' : exported ? 'Exported CSV' : undefined}
       actions={
         total > 0 ? (
-          <Button ariaLabel="Copy summary" onClick={copySummary}>
-            Copy summary
-          </Button>
+          <Stack style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5em' }}>
+            <Button ariaLabel="Copy summary" onClick={copySummary}>
+              Copy summary
+            </Button>
+            <Button ariaLabel="Export CSV" onClick={exportCsv}>
+              Export CSV
+            </Button>
+          </Stack>
         ) : undefined
       }
       side={
@@ -189,7 +223,7 @@ export function App() {
                     <KpiRow>
                       <Kpi value={`${packed} of ${total}`} label="packed" accent />
                       <Kpi value={total} label="total items" />
-                      <Kpi value={`${total - packed}`} label="to pack" />
+                      <Kpi value={`${remaining}`} label="to pack" />
                     </KpiRow>
                     <List label="Items">
                       {items.map((item) => {
@@ -197,11 +231,11 @@ export function App() {
                         return (
                           <Row
                             key={item.id}
-                          title={
-                            isEditing ? (
-                              <>
-                                <span className="pl-row-name">{item.data.name}</span>
-                                <input
+                            title={
+                              isEditing ? (
+                                <>
+                                  <span className="pl-row-name">{item.data.name}</span>
+                                  <input
                                     type="text"
                                     aria-label="Edit item name"
                                     value={editValue}
@@ -263,6 +297,48 @@ export function App() {
                         )
                       })}
                     </List>
+                    <Actions>
+                      <Button kind="ghost" ariaLabel="Pack all" onClick={packAll}>
+                        Pack all
+                      </Button>
+                      <Button kind="ghost" ariaLabel="Unpack all" onClick={unpackAll}>
+                        Unpack all
+                      </Button>
+                    </Actions>
+                  </Stack>
+                )}
+              </Card>
+            </Stack>
+          </div>
+        ) : tab === 'Summary' ? (
+          <div role="tabpanel" id="summary-panel" aria-labelledby="summary-tab">
+            <Stack>
+              <Card mono="Summary" title="Packing status">
+                {total === 0 ? (
+                  <EmptyState
+                    mono="Empty"
+                    title="No items yet"
+                    detail="Add items to see a summary."
+                    actionLabel="Go to Items"
+                    onAction={() => setTab('Items')}
+                  />
+                ) : (
+                  <Stack>
+                    <KpiRow>
+                      <Kpi value={`${packed}`} label="packed" accent />
+                      <Kpi value={`${remaining}`} label="remaining" />
+                      <Kpi value={`${total}`} label="total" />
+                    </KpiRow>
+                    <Table
+                      label="Packing summary"
+                      columns={[
+                        { key: 'item', label: 'Item' },
+                        { key: 'status', label: 'Status' },
+                      ]}
+                      rows={items.map((i) => ({
+                        cells: { item: i.data.name, status: i.data.checked ? 'Packed' : 'Remaining' },
+                      }))}
+                    />
                   </Stack>
                 )}
               </Card>
