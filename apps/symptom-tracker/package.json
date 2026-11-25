@@ -5,20 +5,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "node ../scripts/check-app.mjs"
+    "check": "node ../../scripts/check-app.mjs"
   },
   "dependencies": {
     "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/csv-parse": "workspace:0.1.0",
     "@lacuna/date-math": "workspace:0.1.0",
-    "@lacuna/date-picker": "workspace:0.1.0",
-    "@lacuna/export-menu": "workspace:0.1.0",
     "@lacuna/heatmap": "workspace:0.1.0",
     "@lacuna/host-mock": "workspace:0.1.0",
-    "@lacuna/json-backup": "workspace:0.1.0",
     "@lacuna/streak-calc": "workspace:0.1.0",
-    "@lacuna/tracker-kit": "workspace:0.2.0",
     "@lacuna/ui": "workspace:*",
-    "@lacuna/use-clipboard": "workspace:0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

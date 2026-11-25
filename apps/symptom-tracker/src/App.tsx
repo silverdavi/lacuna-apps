@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useMemo, useState } from 'react'
+
 import type { CSSProperties } from 'react'
 import {
   Actions,
@@ -11,9 +12,9 @@ import {
   FormGrid,
   Kpi,
   KpiRow,
-  MonoLabel,
+  List,
   Rail,
-  SectionLabel,
+  Row,
   Select,
   Stack,
   Tag,
@@ -22,12 +23,9 @@ import {
 } from '@lacuna/ui'
 import { Heatmap } from '@lacuna/heatmap'
 import { Chart } from '@lacuna/chart'
-import { ExportMenu } from '@lacuna/export-menu'
-import type { ExportOption } from '@lacuna/export-menu'
-import { exportBackup } from '@lacuna/json-backup'
+import { toCsv } from '@lacuna/csv-parse'
 import { computeStreaks } from '@lacuna/streak-calc'
 import { toISODate, fromISODate, addDays } from '@lacuna/date-math'
-import { useClipboard } from '@lacuna/use-clipboard'
 import { loadState, saveState, makeId } from './host'
 import type { SymptomEntry, SymptomState } from './host'
 
@@ -36,52 +34,25 @@ type Tab = (typeof TABS)[number]
 
 const SEVERITY_OPTIONS = ['1', '2', '3', '4', '5']
 
-const tabButtonStyle = (active: boolean): CSSProperties => ({
-  fontFamily: 'var(--sans)',
-  fontSize: 'calc(13px * var(--tf))',
-  color: active ? 'var(--paper)' : 'var(--ink)',
-  background: active ? 'var(--ink)' : 'transparent',
-  border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-  borderRadius: 'calc(7px * var(--sf))',
-  padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))',
-  cursor: 'pointer',
-})
-
-const detailDayStyle: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  gap: 'calc(8px * var(--sf))',
-  padding: 'calc(8px * var(--sf)) 0',
-  borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-}
-
-const cellHeaderStyle: CSSProperties = {
-  fontFamily: 'var(--mono)',
-  fontSize: 'calc(11px * var(--tf))',
-  color: 'var(--ink-dim)',
-  padding: 'calc(4px * var(--sf))',
-  textAlign: 'center',
-}
+const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
 const dayCellStyle: CSSProperties = {
-  width: 'calc(40px * var(--sf))',
-  height: 'calc(40px * var(--sf))',
-  borderRadius: 'calc(7px * var(--sf))',
-  margin: 'calc(2px * var(--sf))',
+  width: '100%',
+  aspectRatio: '1 / 1',
+  border: 'none',
+  borderRadius: 'calc(2px * var(--sf))',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontFamily: 'var(--sans)',
   fontSize: 'calc(13px * var(--tf))',
   cursor: 'pointer',
-  boxSizing: 'border-box',
+  boxShadow: 'inset 0 0 0 calc(1px * var(--sf)) var(--ui-line2)',
 }
 
 function isoToday(): string {
   return toISODate(new Date())
 }
-
-const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
 function monthGrid(date: string | null, entries: SymptomEntry[]) {
   const ref = (date ? fromISODate(date) : null) ?? new Date()
@@ -109,52 +80,67 @@ function monthGrid(date: string | null, entries: SymptomEntry[]) {
   return { cells, byDay, monthLabel }
 }
 
+function AppTabs({ tab, onSelect }: { tab: Tab; onSelect: (tab: Tab) => void }) {
+  return (
+    <div role="tablist" aria-label="Views" className="lc-tabs">
+      {TABS.map((t) => (
+          <button
+            key={t}
+            type="button"
+            role="tab"
+            aria-selected={tab === t}
+            className={`lc-tab${tab === t ? ' active' : ''}`}
+            style={{ color: 'var(--ink-80)' }}
+            onClick={() => onSelect(t)}
+          >
+          {t}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function MonthGrid({ date, entries, onSelect }: { date: string | null; entries: SymptomEntry[]; onSelect: (iso: string) => void }) {
   const { cells, byDay, monthLabel } = monthGrid(date, entries)
   const selected = date
+  const rows = Array.from({ length: cells.length / 7 }, (_, r) => cells.slice(r * 7, r * 7 + 7))
   return (
-    <div role="table" aria-label={monthLabel}>
-      <div role="row" aria-label="Weekdays">
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 'calc(2px * var(--sf))' }}>
+      <div style={{ gridRow: '1', gridColumn: '1 / -1' }} aria-hidden="true">
         {WEEKDAYS.map((w) => (
-          <div key={w} role="columnheader" style={cellHeaderStyle}>
+          <div key={w} style={{ textAlign: 'center', fontFamily: 'var(--mono)', fontSize: 'calc(11px * var(--tf))', color: 'var(--ink-60)' }}>
             {w}
           </div>
         ))}
       </div>
-      {Array.from({ length: cells.length / 7 }, (_, r) => (
-        <div key={r} role="row">
-          {cells.slice(r * 7, r * 7 + 7).map((c, i) => {
-            const key = `${r}-${i}`
-            if (c.day === null || c.iso === null) {
-              return <div key={key} role="cell" aria-hidden="true" style={dayCellStyle} />
-            }
-            const entriesForDay = byDay.get(c.day) ?? []
-            const isSelected = c.iso === selected
-            return (
-              <button
-                key={key}
-                type="button"
-                role="cell"
-                aria-label={String(c.day)}
-                aria-pressed={isSelected}
-                onClick={() => onSelect(c.iso!)}
-                style={
-                  {
-                    ...dayCellStyle,
-                    background: isSelected ? 'var(--accent)' : entriesForDay.length ? 'color-mix(in oklab, var(--accent) 18%, var(--paper-deep))' : 'var(--paper-deep)',
-                    color: isSelected ? 'var(--paper)' : 'var(--ink)',
-                  } as CSSProperties
-                }
-              >
-                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'calc(2px * var(--sf))' }}>
-                  <span>{c.day}</span>
-                  {entriesForDay.length > 0 && <span aria-hidden="true">●</span>}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      ))}
+      {rows.map((row, r) =>
+        row.map((c, i) => {
+          const key = `${r}-${i}`
+          if (c.day === null || c.iso === null) {
+            return <div key={key} aria-hidden="true" />
+          }
+          const entriesForDay = byDay.get(c.day) ?? []
+          const isSelected = c.iso === selected
+          return (
+            <button
+              key={key}
+              type="button"
+              aria-label={String(c.day)}
+              aria-pressed={isSelected}
+              onClick={() => onSelect(c.iso!)}
+              style={
+                {
+                  ...dayCellStyle,
+                   background: isSelected ? 'var(--accent)' : entriesForDay.length ? 'var(--accent-soft)' : 'var(--paper-deep)',
+                   color: isSelected ? 'var(--on-accent)' : 'var(--ink)',
+                } as CSSProperties
+              }
+            >
+              {c.day}
+            </button>
+          )
+        }),
+      )}
     </div>
   )
 }
@@ -165,13 +151,13 @@ export function App() {
   const [name, setName] = useState('')
   const [severity, setSeverity] = useState('3')
   const [note, setNote] = useState('')
-  const [formDate, setFormDate] = useState<string | null>(isoToday())
-  const [error, setError] = useState<string | null>(null)
-  const [calDate, setCalDate] = useState<string | null>(isoToday())
+  const [formDate, setFormDate] = useState<string>(isoToday())
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [dateError, setDateError] = useState<string | null>(null)
+  const [calDate, setCalDate] = useState<string>(isoToday())
   const [year, setYear] = useState<number>(() => new Date().getFullYear())
-  const [copied, setCopied] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
-  const clipboard = useClipboard()
+  const [copied, setCopied] = useState(false)
 
   const entries = state.entries
 
@@ -182,16 +168,21 @@ export function App() {
 
   function save() {
     const trimmed = name.trim()
-    if (!trimmed) return setError('Type a symptom name first')
-    const sev = Number(severity)
-    if (!Number.isFinite(sev) || sev < 1 || sev > 5) return setError('Pick a severity from 1 to 5')
-    const date = formDate ?? isoToday()
-    if (!fromISODate(date)) return setError('Pick a valid date')
+    if (!trimmed) {
+      setNameError('Type a symptom name first')
+      return
+    }
+    setNameError(null)
+    if (!fromISODate(formDate)) {
+      setDateError('Pick a date in YYYY-MM-DD form')
+      return
+    }
+    setDateError(null)
     const entry: SymptomEntry = {
       id: makeId(),
-      date,
+      date: formDate,
       name: trimmed,
-      severity: sev,
+      severity: Number(severity),
       note: note.trim() ? note.trim() : undefined,
       createdAt: Date.now(),
     }
@@ -199,12 +190,32 @@ export function App() {
     setName('')
     setNote('')
     setSeverity('3')
-    setError(null)
     setFormOpen(false)
   }
 
   function removeEntry(id: string) {
     commit({ entries: entries.filter((e) => e.id !== id) })
+  }
+
+  async function writeClipboard(text: string) {
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = text
+      ta.setAttribute('readonly', '')
+      ta.style.position = 'fixed'
+      ta.style.top = '0'
+      ta.style.left = '0'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.focus()
+      ta.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+      if (ok) return
+    } catch {
+      // fall through to the async clipboard API
+    }
+    await navigator.clipboard.writeText(text)
   }
 
   const dates = useMemo(() => entries.map((e) => e.date), [entries])
@@ -244,56 +255,26 @@ export function App() {
     return points
   }, [entries])
 
-  const dayEntries = useMemo(() => {
-    if (!calDate) return []
-    return entries.filter((e) => e.date === calDate)
-  }, [entries, calDate])
+  const dayEntries = useMemo(() => entries.filter((e) => e.date === calDate), [entries, calDate])
 
-  const calendarLabel = calDate ? (fromISODate(calDate)?.toDateString() ?? calDate) : 'Pick a date'
+  const calendarLabel = fromISODate(calDate)?.toDateString() ?? 'Pick a date'
 
-  const csv = useMemo(() => {
-    const header = 'Date,Symptom,Severity'
-    const lines = entries.map((e) => `${e.date},${e.name},${e.severity}`)
-    return [header, ...lines].join('\n')
-  }, [entries])
+  const csv = useMemo(
+    () => toCsv([['Date', 'Symptom', 'Severity'], ...entries.map((e) => [e.date, e.name, String(e.severity)])]),
+    [entries],
+  )
 
-  const backupJSON = useMemo(() => {
-    return exportBackup({
-      appId: 'lacuna.symptom-tracker',
-      version: 1,
-      records: entries.map((e) => ({
-        id: e.id,
-        data: { date: e.date, name: e.name, severity: e.severity, note: e.note },
-        createdAt: e.createdAt,
-        updatedAt: e.createdAt,
-      })),
-    })
-  }, [entries])
+  function moveMonth(delta: number) {
+    const d = fromISODate(calDate)
+    if (!d) return
+    setCalDate(toISODate(new Date(d.getFullYear(), d.getMonth() + delta, 1)))
+  }
 
-  const exportOptions = useMemo<ExportOption[]>(() => {
-    return [
-      {
-        id: 'json',
-        label: 'JSON',
-        mimeType: 'application/json',
-        extension: 'json',
-        getData: () => backupJSON,
-      },
-      {
-        id: 'csv',
-        label: 'CSV',
-        mimeType: 'text/csv',
-        extension: 'csv',
-        getData: () => csv,
-      },
-    ]
-  }, [backupJSON, csv])
-
-  async function copyCsv() {
-    setCopied(false)
+  async function exportCsv() {
     try {
-      await clipboard.copy(csv)
+      await writeClipboard(csv)
       setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
     }
@@ -306,34 +287,19 @@ export function App() {
       hue="teal"
       category="Healthcare"
       meta={`${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}
-      status={copied ? 'Copied to clipboard' : 'Saved on this device'}
-      side={
-        <Rail title="Symptom Tracker" note="Local · no network" chips={['Log', 'Calendar', 'Trends']} />
-      }
+      status={copied ? 'Copied to clipboard' : 'Local log'}
+      side={<Rail title="Symptom Tracker" note="Daily log · streaks" chips={['Log entries', 'Calendar', 'Heatmap', 'Streak', 'CSV export']} />}
     >
-      <div role="tablist" aria-label="View" style={{ display: 'flex', gap: 'calc(4px * var(--sf))' }}>
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => setTab(t)}
-            style={tabButtonStyle(tab === t)}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <AppTabs tab={tab} onSelect={setTab} />
 
       {tab === 'Log' && (
         <Card mono="New" title="Log a symptom">
           {formOpen ? (
             <Stack>
               <FormGrid>
-                <TextInput label="Symptom name" value={name} onChange={setName} error={error} placeholder="e.g. Headache" />
+                <TextInput label="Symptom name" value={name} onChange={setName} error={nameError} placeholder="e.g. Headache" />
                 <Select label="Severity" value={severity} onChange={setSeverity} options={SEVERITY_OPTIONS} />
-                <TextInput label="Date" value={formDate ?? ''} onChange={(v) => setFormDate(v)} hint="YYYY-MM-DD" />
+                <TextInput label="Date" value={formDate} onChange={setFormDate} error={dateError} hint="YYYY-MM-DD" />
                 <TextInput label="Note" value={note} onChange={setNote} placeholder="Optional detail" />
               </FormGrid>
               <Actions>
@@ -360,26 +326,24 @@ export function App() {
               mono="Empty"
               title="No symptoms logged yet"
               detail="Log your first symptom to start tracking."
-              actionLabel="Use Add symptom above"
+              actionLabel="Press Add symptom"
             />
           ) : (
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }} aria-label="History">
+            <List label="History">
               {entries.map((e) => (
-                <li key={e.id} style={detailDayStyle}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
-                    <Tag accent={e.date === isoToday()}>{e.date}</Tag>
-                    <span>
-                      {e.name}
-                      {e.note ? ` — ${e.note}` : ''}
-                    </span>
-                    <span>Severity: {e.severity}</span>
-                  </span>
-                  <Button kind="ghost" onClick={() => removeEntry(e.id)}>
-                    Delete {e.name}
-                  </Button>
-                </li>
+                <Row
+                  key={e.id}
+                  title={<Tag accent={e.date === isoToday()}>{e.name}</Tag>}
+                  meta={`${e.date}${e.note ? ` · ${e.note}` : ''}`}
+                  value={`Severity: ${e.severity}`}
+                  action={
+                    <Button kind="ghost" onClick={() => removeEntry(e.id)}>
+                      Delete {e.name}
+                    </Button>
+                  }
+                />
               ))}
-            </ul>
+            </List>
           )}
         </Card>
       )}
@@ -388,29 +352,11 @@ export function App() {
         <Card mono="Calendar" title="Symptoms by day">
           <Stack>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}>
-              <Button
-                kind="ghost"
-                ariaLabel="Previous month"
-                onClick={() => {
-                  if (!calDate) return
-                  const d = fromISODate(calDate)
-                  if (!d) return
-                  setCalDate(toISODate(new Date(d.getFullYear(), d.getMonth() - 1, 1)))
-                }}
-              >
+              <Button kind="ghost" ariaLabel="Previous month" onClick={() => moveMonth(-1)}>
                 Prev month
               </Button>
-              <Tag>{calendarLabel}</Tag>
-              <Button
-                kind="ghost"
-                ariaLabel="Next month"
-                onClick={() => {
-                  if (!calDate) return
-                  const d = fromISODate(calDate)
-                  if (!d) return
-                  setCalDate(toISODate(new Date(d.getFullYear(), d.getMonth() + 1, 1)))
-                }}
-              >
+              <Tag accent>{calendarLabel}</Tag>
+              <Button kind="ghost" ariaLabel="Next month" onClick={() => moveMonth(1)}>
                 Next month
               </Button>
               <Button kind="ghost" ariaLabel="Today" onClick={() => setCalDate(isoToday())}>
@@ -423,7 +369,8 @@ export function App() {
       )}
 
       {tab === 'Calendar' && (
-        <Card mono="Day detail" title="Symptoms on the selected day">
+        <div role="region" aria-label="Day detail">
+          <Card mono="Day detail" title="Symptoms on the selected day">
           {dayEntries.length === 0 ? (
             <EmptyState
               mono="Day"
@@ -432,22 +379,19 @@ export function App() {
               actionLabel="Log a symptom"
             />
           ) : (
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }} aria-label="Entries for this day">
+            <List label="Entries for this day">
               {dayEntries.map((e) => (
-                <li key={e.id} style={detailDayStyle}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
-                    <span>{e.name}</span>
-                    {e.note ? <MonoLabel>{e.note}</MonoLabel> : null}
-                    <span>Severity: {e.severity}</span>
-                  </span>
-                  <Button kind="ghost" onClick={() => removeEntry(e.id)}>
-                    Delete {e.name}
-                  </Button>
-                </li>
+                <Row
+                  key={e.id}
+                  title={e.name}
+                  meta={e.note ?? ''}
+                  value={`Severity: ${e.severity}`}
+                />
               ))}
-            </ul>
+            </List>
           )}
-        </Card>
+          </Card>
+        </div>
       )}
 
       {tab === 'Trends' && (
@@ -455,26 +399,16 @@ export function App() {
           <Card mono="Overview" title="Tracking summary">
             <KpiRow>
               <Kpi value={String(entries.length)} label="Entries" />
-              <Kpi value={`${streak.current}`} label="Current streak" accent />
+              <Kpi value={String(streak.current)} label="Current streak" accent />
               <Kpi value={String(streak.longest)} label="Longest streak" />
               <Kpi value={String(avgSeverity)} label="Avg severity" />
             </KpiRow>
-            <SectionLabel>Streak</SectionLabel>
-            <div style={{ marginTop: 'calc(4px * var(--sf))' }}>
-              <Title size="lg" as="h3">
-                Current streak: {streak.current} days
-              </Title>
+            <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+              <Title as="h3">Current streak: {streak.current} days</Title>
             </div>
           </Card>
           <Card mono="Last 30 days" title="Average severity">
-            <Chart
-              type="line"
-              data={chartData}
-              title="Average severity by day"
-              ariaLabel="Average severity by day"
-              width={640}
-              height={220}
-            />
+            <Chart type="line" data={chartData} title="Average severity by day" ariaLabel="Average severity by day" width={640} height={220} />
           </Card>
           <Card mono={`${year} overview`} title="Symptom days">
             <Stack>
@@ -494,10 +428,10 @@ export function App() {
 
       <Card mono="Backup" title="Export data">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
-          <ExportMenu options={exportOptions} fileName="symptom-tracker-backup" ariaLabel="Export" />
-          <Button kind="secondary" onClick={() => void copyCsv()}>
+          <Button kind="secondary" onClick={() => void exportCsv()}>
             {copied ? 'Copied CSV' : 'Export CSV'}
           </Button>
+          <Tag>{entries.length ? 'CSV ready' : 'Nothing to export'}</Tag>
         </div>
       </Card>
     </AppShell>
