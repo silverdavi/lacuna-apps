@@ -1011,6 +1011,49 @@
       }
     },
     {
+      "id": "@lacuna/calendar-month",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A month-view calendar grid with events, single-day selection, and month navigation.",
+      "today": [
+        "toolbox/modules/calendar-month/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/date-math"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "CalendarMonth"
+      ],
+      "public": true,
+      "path": "toolbox/modules/calendar-month/0.1.0",
+      "bridge": {
+        "component": "CalendarMonth",
+        "kind": "widget",
+        "exports": [
+          "CalendarMonth"
+        ],
+        "types": [
+          "CalendarEvent",
+          "CalendarMonthProps"
+        ],
+        "signature": "CalendarMonth(props: CalendarMonthProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "f879fb0f4db05aeffb20e458e8871060488e0913",
+            "source": "50c2caa02a5e1de9",
+            "lines": 274,
+            "dependencies": {
+              "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/canvas-kit",
       "layer": 2,
       "status": "exists",
@@ -1980,6 +2023,44 @@
             "dependencies": {
               "@lacuna/date-picker": "0.1.0"
             }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/flip-card",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A two-sided card that flips between front and back on click or Enter, with optional 0–5 grade buttons on the back.",
+      "today": [
+        "toolbox/modules/flip-card/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "FlipCard"
+      ],
+      "public": true,
+      "path": "toolbox/modules/flip-card/0.1.0",
+      "bridge": {
+        "component": "FlipCard",
+        "kind": "widget",
+        "exports": [
+          "FlipCard"
+        ],
+        "types": [
+          "FlipCardProps"
+        ],
+        "signature": "FlipCard({ front, back, onGrade, disabled = false }: FlipCardProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "f879fb0f4db05aeffb20e458e8871060488e0913",
+            "source": "200eccd5d978ef3f",
+            "lines": 92,
+            "dependencies": {}
           }
         }
       }
@@ -3594,6 +3675,48 @@
             "lines": 92,
             "dependencies": {
               "@lacuna/date-math": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "@lacuna/step-wizard",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A multi-step flow container with a progress indicator, step content, and Back/Next navigation.",
+      "today": [
+        "toolbox/modules/step-wizard/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/ui"
+      ],
+      "formats": [],
+      "keywords": [
+        "widget",
+        "StepWizard"
+      ],
+      "public": true,
+      "path": "toolbox/modules/step-wizard/0.1.0",
+      "bridge": {
+        "component": "StepWizard",
+        "kind": "widget",
+        "exports": [
+          "StepWizard"
+        ],
+        "types": [
+          "StepWizardProps"
+        ],
+        "signature": "StepWizard(props: StepWizardProps)",
+        "releases": {
+          "0.1.0": {
+            "commit": "f879fb0f4db05aeffb20e458e8871060488e0913",
+            "source": "00956ef249194538",
+            "lines": 127,
+            "dependencies": {
+              "@lacuna/ui": "*"
             }
           }
         }

@@ -5871,6 +5871,19 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/calendar-month/0.1.0:
+    dependencies:
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../date-math/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/canvas-kit/0.1.0:
     dependencies:
       '@lacuna/export-menu':
@@ -6128,6 +6141,16 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
+  toolbox/modules/flip-card/0.1.0:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
     devDependencies:
       '@types/react':
         specifier: ^19.0.0
@@ -6417,6 +6440,19 @@ importers:
       '@lacuna/date-math':
         specifier: workspace:0.1.0
         version: link:../../date-math/0.1.0
+
+  toolbox/modules/step-wizard/0.1.0:
+    dependencies:
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
 
   toolbox/modules/streak-calc/0.1.0:
     dependencies:
