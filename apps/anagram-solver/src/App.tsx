@@ -9,7 +9,11 @@ import {
   Checkbox,
   EmptyState,
   FormGrid,
+  Kpi,
+  KpiRow,
   PrimaryButton,
+  Rail,
+  SectionLabel,
   Table,
   TextInput,
 } from '@lacuna/ui'
@@ -121,7 +125,36 @@ export function App() {
       icon="search"
       hue="rust"
       category="Productivity"
-      meta={hasResults ? `${results.length} anagrams` : undefined}
+      meta={hasResults ? `${results.length} anagrams` : 'Ready'}
+      status={
+        activeTab === 'Favorites'
+          ? `${favorites.length} saved`
+          : hasResults
+            ? `${results.length} anagrams found`
+            : 'No search yet'
+      }
+      side={
+        <Rail
+          title="Anagram Solver"
+          note="Dictionary search · favorites saved"
+          chips={['Search', 'Copy', 'Favorites', 'Reload-safe']}
+        >
+          <Card mono="Stats" title="Session">
+            <div className="lk-list">
+              <div className="lk-row">
+                <span className="lk-row-text lk-row-title">Favorites</span>
+                <span className="lk-row-meta">{favorites.length}</span>
+              </div>
+              <div className="lk-row">
+                <span className="lk-row-text lk-row-title">Last result</span>
+                <span className="lk-row-meta">
+                  {results === null ? 'None' : results.length === 0 ? '0 found' : `${results.length} found`}
+                </span>
+              </div>
+            </div>
+          </Card>
+        </Rail>
+      }
     >
       <div role="tablist" className="lc-tabs">
         {['Results', 'Favorites'].map((tab) => (
