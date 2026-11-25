@@ -3,8 +3,8 @@
   "id": "lacuna.breathing-exercise",
   "name": "Breathing Exercise",
   "version": "0.1.0",
-  "summary": "Follow guided Box Breathing or 4-7-8 patterns with a paced countdown.",
-  "description": "Two paced patterns for settling the breath: Box Breathing (in, hold, out, hold, each four counts) and 4-7-8 (in four, hold seven, out eight). Start a pattern and the page steps through each phase with a big clock, a progress ring, and the cycle count. Pause, resume, and reset on this page. The record is the breath; nothing leaves the browser.",
+  "summary": "Four paced patterns with adjustable breaths, cycle targets, and a session log you can export.",
+  "description": "Four paced breathing patterns: Box Breathing, 4-7-8, Coherent 5-5, and the Physiological Sigh. Pick one and the big clock steps through each phase with the countdown and a progress ring; pause, resume, and reset on the page. Tune the inhale, hold, and exhale counts and the session target, and each finished session lands in a log with a chart, CSV, and JSON export. The record is the breath; nothing leaves the browser.",
   "category": "personal",
   "icon": "tasks",
   "relationship": {
@@ -24,7 +24,7 @@
     "inAppPurchases": false,
     "ads": false
   },
-  "maturity": "demo-guided",
+  "maturity": "demo-working",
   "entry": {
     "type": "builtin",
     "route": "/app/breathing-exercise"
@@ -33,13 +33,17 @@
     "hostApi": "^1.0.0",
     "modules": {
       "@lacuna/big-clock": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
       "@lacuna/progress-ring": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
       "@lacuna/ui": "^0.1.0"
     }
   },
   "capabilities": [
-    "create:breath"
+    "create:breath",
+    "export:json",
+    "export:csv"
   ],
   "permissions": {
     "records": [
@@ -48,13 +52,15 @@
         "access": [
           "read",
           "write",
-          "create"
+          "create",
+          "delete"
         ],
-        "purpose": "Store the selected pattern and the completed cycle count"
+        "purpose": "Store the selected pattern, cycle count, and finished sessions in the log"
       }
     ],
     "platform": [
-      "identity.profile.read"
+      "files.save",
+      "files.pick"
     ],
     "network": {
       "origins": []
