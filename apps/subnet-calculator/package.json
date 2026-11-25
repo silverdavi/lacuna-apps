@@ -11,7 +11,13 @@
     "@lacuna/host-mock": "workspace:0.1.0",
     "@lacuna/ui": "workspace:*",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@lacuna/calculator-kit": "workspace:0.2.0",
+    "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/export-menu": "workspace:0.1.0",
+    "@lacuna/number-input": "workspace:0.1.0",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/use-local-record": "workspace:0.1.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

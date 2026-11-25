@@ -1,17 +1,17 @@
-// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useState } from 'react'
-import { Actions, AppShell, Button, Card, EmptyState, FormGrid, List, PrimaryButton, Row, Table, TextInput } from '@lacuna/ui'
-import type { ReactNode } from 'react'
-import { host } from './host'
+import { useMemo, useState } from 'react'
+import { AppShell, Actions, Button, Card, FormGrid, Kpi, KpiRow, List, Pills, Rail, Row, SectionLabel, Stack, Table, Tag, TextInput } from '@lacuna/ui'
+import { Chart } from '@lacuna/chart'
+import { ExportMenu } from '@lacuna/export-menu'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { useLocalRecord } from '@lacuna/use-local-record'
 
-interface SubnetResult {
+type Subnet = {
   ip: string
   prefix: number
-  label: string
   network: string
   broadcast: string
   mask: string
+  wildcard: string
   firstUsable: string
   lastUsable: string
   usableHosts: number
@@ -19,187 +19,312 @@ interface SubnetResult {
 }
 
 function ipToNumber(ip: string): number | null {
-  const parts = ip.trim().split('.')
-  if (parts.length !== 4) return null
-  let value = 0
-  for (const part of parts) {
-    if (!/^\d{1,3}$/.test(part)) return null
-    const n = Number(part)
-    if (n < 0 || n > 255) return null
-    value = value * 256 + n
-  }
-  return value >>> 0
+  const m = ip.trim().match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
+  if (!m) return null
+  const parts = m.slice(1).map(Number)
+  if (parts.some((p) => p > 255)) return null
+  return ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0
 }
 
-function numberToIp(value: number): string {
-  return [(value >>> 24) & 255, (value >>> 16) & 255, (value >>> 8) & 255, value & 255].join('.')
+function numberToIp(n: number): string {
+  return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.')
 }
 
-function calculateSubnet(ip: string, prefix: number): SubnetResult | null {
-  const value = ipToNumber(ip)
-  if (value === null || !Number.isInteger(prefix) || prefix < 8 || prefix > 30) return null
+function calculateSubnet(ip: string, prefix: number): Subnet | null {
+  const addr = ipToNumber(ip)
+  if (addr == null || prefix < 0 || prefix > 32) return null
   const ones = 32 - prefix
-  const hostMask = ones === 0 ? 0 : 2 ** ones - 1
-  const network = (value & ~hostMask) >>> 0
-  const broadcast = (network + hostMask) >>> 0
-  const totalHosts = 2 ** ones
+  const mask = ones === 0 ? 0 : ((~0 << ones) >>> 0)
+  const network = (addr & mask) >>> 0
+  const broadcast = mask === 0 ? 0xffffffff : ((network | (~mask >>> 0)) >>> 0)
+  const totalHosts = prefix <= 1 ? 0 : 1 << ones
+  const usableHosts = prefix <= 1 ? 0 : totalHosts - 2
+  const firstUsable = prefix <= 1 ? numberToIp(network) : numberToIp(network + 1)
+  const lastUsable = prefix <= 1 ? numberToIp(broadcast) : numberToIp(broadcast - 1)
   return {
     ip: ip.trim(),
     prefix,
-    label: `${ip.trim()}/${prefix}`,
     network: numberToIp(network),
     broadcast: numberToIp(broadcast),
-    mask: numberToIp(~hostMask >>> 0),
-    firstUsable: numberToIp((network + 1) >>> 0),
-    lastUsable: numberToIp((broadcast - 1) >>> 0),
-    usableHosts: totalHosts - 2,
+    mask: numberToIp(mask),
+    wildcard: numberToIp(mask === 0 ? 0 : (~mask >>> 0) >>> 0),
+    firstUsable,
+    lastUsable,
+    usableHosts,
     totalHosts,
   }
 }
 
-function summaryItem(label: string, value: string): ReactNode {
-  return (
-    <div key={label}>
-      <div>{`${label}: ${value}`}</div>
-    </div>
-  )
+function fmt(n: number): string {
+  return String(n)
 }
 
 export function App() {
-  const [ip, setIp] = useState('')
-  const [prefix, setPrefix] = useState('')
-  const [result, setResult] = useState<SubnetResult | null>(null)
-  const [ipError, setIpError] = useState<string | null>(null)
-  const [prefixError, setPrefixError] = useState<string | null>(null)
-  const [saved, setSaved] = useState(() => host.list())
+  const [ip, setIp] = useState('192.168.1.0')
+  const [prefix, setPrefix] = useState('24')
+  const [result, setResult] = useState<Subnet | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [tab, setTab] = useState('Result')
+  const { value: items, set: setItems } = useLocalRecord<Subnet[]>({
+    key: 'lacuna.subnet-calculator.saved',
+    version: 1,
+    defaultValue: [],
+  })
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+
+  const chartData = useMemo(
+    () => [
+      { label: 'Usable', value: result?.usableHosts ?? 0 },
+      { label: 'Reserved', value: (result?.totalHosts ?? 0) - (result?.usableHosts ?? 0) },
+    ],
+    [result],
+  )
 
   function calculate() {
-    setIpError(null)
-    setPrefixError(null)
-    const cleanedPrefix = prefix.trim()
-    if (!/^\d{1,2}$/.test(cleanedPrefix) || Number(cleanedPrefix) < 8 || Number(cleanedPrefix) > 30) {
-      setPrefixError('Prefix must be between 8 and 30')
+    const p = Number(prefix)
+    if (Number.isNaN(p) || p < 0 || p > 32) {
       setResult(null)
+      setError('Prefix length must be between 0 and 32.')
       return
     }
-    const value = ipToNumber(ip)
-    if (value === null) {
-      setIpError('Invalid IP address')
+    const s = calculateSubnet(ip, p)
+    if (s == null) {
       setResult(null)
+      setError('Invalid IP address')
       return
     }
-    const next = calculateSubnet(ip, Number(cleanedPrefix))
-    if (next === null) {
-      setIpError('Invalid IP address')
-      setResult(null)
-      return
-    }
-    setResult(next)
+    setError(null)
+    setResult(s)
+    setTab('Result')
   }
 
-  function saveToList() {
-    if (result === null) return
-    setSaved(host.add(result.ip, result.prefix))
+  function save() {
+    if (result == null) return
+    setItems((prev) => (prev.some((i) => i.ip === result.ip && i.prefix === result.prefix) ? prev : [...prev, result]))
   }
 
-  function deleteSaved(id: string) {
-    setSaved(host.remove(id))
+  function remove(item: Subnet) {
+    setItems((prev) => prev.filter((i) => !(i.ip === item.ip && i.prefix === item.prefix)))
   }
+
+  const exportOptions = [
+    {
+      id: 'csv',
+      label: 'CSV',
+      mimeType: 'text/csv',
+      extension: 'csv',
+      getData: () => {
+        const rows = items.map((i) => [i.ip, i.prefix, i.network, i.broadcast, i.mask, fmt(i.usableHosts)].join(','))
+        return ['ip,prefix,network,broadcast,mask,usable_hosts', ...rows].join('\n')
+      },
+    },
+    {
+      id: 'json',
+      label: 'JSON',
+      mimeType: 'application/json',
+      extension: 'json',
+      getData: () => JSON.stringify(items, null, 2),
+    },
+  ]
+
+  const breakdownRows = result
+    ? [
+        { cells: { field: 'Network', value: result.network } },
+        { cells: { field: 'Broadcast', value: result.broadcast } },
+        { cells: { field: 'Subnet Mask', value: result.mask } },
+        { cells: { field: 'Wildcard Mask', value: result.wildcard } },
+        { cells: { field: 'First Usable', value: result.firstUsable } },
+        { cells: { field: 'Last Usable', value: result.lastUsable } },
+        { cells: { field: 'Total Addresses', value: fmt(result.totalHosts) } },
+        { cells: { field: 'Usable Hosts', value: fmt(result.usableHosts) } },
+      ]
+    : []
 
   return (
     <AppShell
       name="IP Subnet Calculator"
-      icon="grid"
+      icon="database"
       hue="teal"
-      category="Networks"
-      meta={`${saved.length} ${saved.length === 1 ? 'item' : 'items'}`}
-    >
-      <Card mono="Input" title="Subnet">
-        <FormGrid>
-          <TextInput
-            label="IP Address"
-            value={ip}
-            onChange={(value) => {
-              setIp(value)
-              if (ipError !== null) setIpError(null)
-            }}
-            placeholder="192.168.1.0"
-            error={ipError}
-            inputMode="numeric"
-          />
-          <TextInput
-            label="Prefix Length"
-            value={prefix}
-            onChange={(value) => {
-              setPrefix(value)
-              if (prefixError !== null) setPrefixError(null)
-            }}
-            placeholder="24"
-            error={prefixError}
-            inputMode="numeric"
-          />
-        </FormGrid>
-        <Actions>
-          <PrimaryButton onClick={calculate}>Calculate</PrimaryButton>
-        </Actions>
-      </Card>
-      {result !== null && (
+      category="Tools"
+      meta={`${items.length} saved`}
+      status={
+        error != null
+          ? 'Input error'
+          : result != null
+            ? `Network ${result.network}`
+            : 'Ready · enter an IP and prefix'
+      }
+      actions={
         <>
-          <Card mono="Result" title="Summary" actions={<PrimaryButton onClick={saveToList}>Save to List</PrimaryButton>}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--sf)' }}>
-              {summaryItem('Network', result.network)}
-              {summaryItem('Broadcast', result.broadcast)}
-              {summaryItem('Usable Hosts', String(result.usableHosts))}
-            </div>
-          </Card>
-          <Card mono="Detail" title="Breakdown">
-            <Table
-              label="Subnet breakdown"
-              columns={[
-                { key: 'field', label: 'Field' },
-                { key: 'value', label: 'Value' },
-              ]}
-              rows={[
-                { cells: { field: 'Subnet Mask', value: result.mask } },
-                { cells: { field: 'Network', value: result.network } },
-                { cells: { field: 'Broadcast', value: result.broadcast } },
-                { cells: { field: 'First Usable', value: result.firstUsable } },
-                { cells: { field: 'Last Usable', value: result.lastUsable } },
-                { cells: { field: 'Total Addresses', value: result.totalHosts.toLocaleString() } },
-              ]}
-            />
-          </Card>
+          {result != null && (
+            <Button
+              kind="secondary"
+              onClick={() =>
+                void copy(
+                  `Network ${result.network}/${result.prefix}  Mask ${result.mask}  Broadcast ${result.broadcast}  Usable ${result.firstUsable}-${result.lastUsable}`,
+                )
+              }
+            >
+              {copied ? 'Copied' : 'Copy'}
+            </Button>
+          )}
+          {items.length > 0 && <ExportMenu options={exportOptions} fileName="subnets" ariaLabel="Export list" />}
         </>
-      )}
-      <Card mono={`${saved.length} saved`} title="Saved Subnets">
-        {saved.length === 0 ? (
-          <EmptyState
-            mono="Empty"
-            title="No saved subnets yet"
-            detail="Calculate a subnet and use Save to List to keep it here."
-            actionLabel="Next: fill in the IP and prefix above"
-          />
-        ) : (
-          <List label="Saved subnets">
-            {saved.map((item) => (
-              <Row
-                key={item.id}
-                title={`${item.ip}/${item.prefix}`}
-                value={`${2 ** (32 - item.prefix) - 2} hosts`}
-                action={
-                  <Button
-                    kind="ghost"
-                    ariaLabel={`Delete ${item.ip}/${item.prefix}`}
-                    onClick={() => deleteSaved(item.id)}
-                  >
-                    Delete
-                  </Button>
-                }
-              />
-            ))}
-          </List>
+      }
+      side={
+        <Stack>
+          <Rail
+            title="Status"
+            chips={
+          result != null && items.length === 0
+            ? [`/${result.prefix}`, result.mask]
+            : ['idle']
+            }
+          >
+            {result != null ? (
+              <KpiRow>
+                <Kpi value={fmt(result.usableHosts)} label="usable hosts" />
+                <Kpi value={fmt(result.totalHosts)} label="total" accent />
+              </KpiRow>
+            ) : (
+              <p className="lc-faint lc-body-sm">No calculation yet</p>
+            )}
+          </Rail>
+          <Rail title="Saved subnets" note={`${items.length} item${items.length === 1 ? '' : 's'}`}>
+            {items.length === 0 ? (
+              <p className="lc-faint lc-body-sm">Nothing saved. Press Save to List after a calculation.</p>
+            ) : (
+              <List label="Saved subnets">
+                {items.map((i) => (
+                  <Row
+                    key={`${i.ip}/${i.prefix}`}
+                    title={`${i.ip}/${i.prefix}`}
+                    meta={`${fmt(i.usableHosts)} hosts`}
+                    action={
+                      <Button kind="ghost" onClick={() => remove(i)} ariaLabel={`Delete ${i.ip}/${i.prefix}`}>
+                        Remove
+                      </Button>
+                    }
+                  />
+                ))}
+              </List>
+            )}
+          </Rail>
+        </Stack>
+      }
+    >
+      <Stack>
+        <Pills items={['Result', `Saved (${items.length})`]} active={tab} onSelect={setTab} />
+
+        {tab === 'Result' && (
+          <Stack>
+            <Card title="Input" mono="IPv4" actions={<Tag>IPv4</Tag>}>
+              <FormGrid>
+                <TextInput
+                  label="IP Address"
+                  value={ip}
+                  onChange={(v) => {
+                    setIp(v)
+                    setError(null)
+                  }}
+                  placeholder="192.168.1.100"
+                />
+                <TextInput
+                  label="Prefix Length"
+                  value={prefix}
+                  onChange={(v) => {
+                    setPrefix(v)
+                    setError(null)
+                  }}
+                  placeholder="24"
+                  inputMode="numeric"
+                />
+              </FormGrid>
+              <Actions>
+                <Button kind="primary" onClick={calculate}>
+                  Calculate
+                </Button>
+              </Actions>
+            </Card>
+
+            {error != null && (
+              <Card title="Error" mono="Input problem" accent>
+                <p className="lc-body" role="alert">
+                  {error}
+                </p>
+              </Card>
+            )}
+
+            {result != null && (
+              <Stack>
+                <Card
+                  title="Result"
+                  actions={
+                    <Button kind="secondary" onClick={save}>
+                      Save to List
+                    </Button>
+                  }
+                >
+                  <List label="Result summary">
+                    <Row title={`Network: ${result.network}`} hot />
+                    <Row title={`Broadcast: ${result.broadcast}`} />
+                    <Row title={`Usable Hosts: ${fmt(result.usableHosts)}`} value={fmt(result.totalHosts) + ' total'} />
+                    <Row title="First Usable" value={result.firstUsable} />
+                    <Row title="Last Usable" value={result.lastUsable} />
+                  </List>
+                </Card>
+
+                <Card title="Breakdown" mono="Address components">
+                  <Table
+                    label="Breakdown"
+                    columns={[
+                      { key: 'field', label: 'Field' },
+                      { key: 'value', label: 'Value' },
+                    ]}
+                    rows={breakdownRows}
+                  />
+                </Card>
+
+                <Card title="Host Range" mono={`of ${fmt(result.totalHosts)} addresses`}>
+                  <Chart data={chartData} type="bar" title="Address distribution" />
+                  <SectionLabel accent>Address ratio</SectionLabel>
+                  <p className="lc-mono lc-mono-sm lc-faint">
+                    {result.usableHosts}/{result.totalHosts} usable ·{' '}
+                    {result.totalHosts === 0 ? 0 : Math.round((result.usableHosts / result.totalHosts) * 100)}% of the
+                    block
+                  </p>
+                </Card>
+              </Stack>
+            )}
+          </Stack>
         )}
-      </Card>
+
+        {tab !== 'Result' && (
+          <Card title="Saved Subnets" mono={`${items.length} item${items.length === 1 ? '' : 's'}`}>
+            {items.length === 0 ? (
+              <p className="lc-faint lc-body-sm">Nothing saved yet. Calculate a subnet and press Save to List.</p>
+            ) : (
+              <Table
+                label="Saved subnet details"
+                columns={[
+                  { key: 'cidr', label: 'CIDR' },
+                  { key: 'network', label: 'Network' },
+                  { key: 'mask', label: 'Mask' },
+                  { key: 'hosts', label: 'Usable Hosts', num: true },
+                ]}
+                rows={items.map((i) => ({
+                  cells: {
+                    cidr: `${i.ip}/${i.prefix}`,
+                    network: i.network,
+                    mask: i.mask,
+                    hosts: fmt(i.usableHosts),
+                  },
+                }))}
+              />
+            )}
+          </Card>
+        )}
+      </Stack>
     </AppShell>
   )
 }
