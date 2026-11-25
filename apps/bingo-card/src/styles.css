@@ -1,0 +1,21 @@
+.bc-board {
+  overflow: auto;
+  margin: 0 calc(0.5rem * -1);
+}
+.bc-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: calc(0.5rem * 0.5);
+}
+.bc-table td {
+  width: 20%;
+  text-align: center;
+  padding: 0;
+  min-height: calc(3.5rem * 1.143);
+  vertical-align: middle;
+}
+.bc-free {
+  background: var(--surface-3);
+  color: var(--text-2);
+}

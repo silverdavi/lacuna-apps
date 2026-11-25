@@ -1,0 +1,75 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.bingo-card",
+  "name": "Bingo Card Generator",
+  "version": "0.1.0",
+  "summary": "Seeded bingo cards you can save, copy, and print.",
+  "description": "Enter a seed and a number range, then generate a bingo card with a free center. Save cards to keep them on this device, copy the numbers to the clipboard, or print the card. Cards persist in the browser between sessions.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/bingo-card",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:card",
+    "edit:card"
+  ],
+  "permissions": {
+    "records": [],
+    "platform": [
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

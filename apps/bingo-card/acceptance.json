@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "cb972867740e017d122f366d024174134b39cc0ac890b76714a67a12f019325b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Bingo Card Generator\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" displays a 5x5 grid where the center cell contains the text \"FREE\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" displays a 5x5 grid where the top-left cell contains the text \"12\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" displays a 5x5 grid where the bottom-right cell contains the text \"68\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" and then clicking the button \"Save card\" adds a list item containing the text \"Card 1\" and the button \"Download Card 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" and then clicking the button \"Print\" opens the browser print dialog."
+    },
+    {
+      "id": "A7",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" and then clicking the button \"Copy numbers\" displays a toast with the text \"Numbers copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the field labelled \"Seed\" set to \"100\", the field labelled \"Min\" set to \"1\", the field labelled \"Max\" set to \"75\", and the select labelled \"Grid size\" set to \"5x5\", clicking the button \"Generate card\" and then clicking the button \"Save card\" adds a list item containing the text \"Card 1\". Clicking the button \"Delete Card 1\" removes the list item."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the list item containing the text \"Card 1\" after clicking \"Save card\" and reloading the page."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f82d95c81b89532933ba4ff7ff4ac4a6bf6751f1eb5591dc04f3707c42b17f59"
+    }
+  ]
+}
