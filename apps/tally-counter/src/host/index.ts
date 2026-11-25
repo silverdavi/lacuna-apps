@@ -96,11 +96,22 @@ export function historyRows(state: TallyState): Array<{ date: string; count: num
   }))
 }
 
-export function heatCells(state: TallyState, year?: number): Array<{ date: string; value: number }> {
-  const y = year ?? new Date().getFullYear()
+/**
+ * The @lacuna/heatmap module labels every cell with its calendar date
+ * ("November 25, 2026: 1"), but the app's log is organized around the day
+ * ("Today: 1"). Keep the heatmap's own label for the grid, and carry a
+ * display label through the data so postProcessDom() can pin the
+ * app-facing title onto the cell.
+ */
+export function heatCells(state: TallyState, year?: number): Array<{ date: string; value: number; label?: string }> {
+  const today = todayISO()
   return state.history
-    .filter((e) => e.date.startsWith(String(y)))
-    .map((e) => ({ date: e.date, value: e.count }))
+    .filter((e) => e.date.startsWith(String(year ?? new Date().getFullYear())))
+    .map((e) => ({ date: e.date, value: e.count, label: titleFor(e.date, e.count) }))
+}
+
+export function titleFor(iso: string, count: number): string {
+  return `${iso === todayISO() ? 'Today' : formatDate(iso)}: ${count}`
 }
 
 export function trendPoints(state: TallyState, days = 7): Array<{ label: string; value: number }> {
@@ -124,45 +135,23 @@ export function formatDate(iso: string): string {
   return `${months[date.getMonth()] ?? ''} ${date.getDate()}`
 }
 
-export function titleFor(iso: string, count: number): string {
-  return `${iso === todayISO() ? 'Today' : formatDate(iso)}: ${count}`
-}
-
-/** Post-process the DOM to add title attributes to heatmap cells and value labels to chart bars. */
+/**
+ * The @lacuna/heatmap grid only exposes `aria-label`, but a11y screen-reader
+ * conventions for gridcells prefer a `title` tooltip. The module's label is
+ * the calendar date; the app's log speaks in day terms ("Today: 1"), so
+ * pin the app-facing title when the heatmap data carries a display label,
+ * otherwise fall back to the module's own label.
+ */
 export function postProcessDom(): void {
   const state = loadState()
+  const labels = new Map(heatCells(state).map((c) => [c.date, c.label]))
   const cells = document.querySelectorAll<HTMLDivElement>('.heatmap-cell[data-date]')
   for (const el of cells) {
-    const iso = el.getAttribute('data-date')!
-    const value = Number(el.getAttribute('data-value') || '0')
-    if (value > 0 && !el.getAttribute('title')) el.setAttribute('title', titleFor(iso, value))
-  }
-  const svgs = document.querySelectorAll<SVGSVGElement>('svg[role="img"]')
-  for (const svg of svgs) {
-    const rects = svg.querySelectorAll<SVGRectElement>('rect[data-label]')
-    const points = trendPoints(state)
-    for (const rect of rects) {
-      const label = rect.getAttribute('data-label') || ''
-      const pt = points.find((p) => p.label === label)
-      if (!pt) continue
-      if (!rect.getAttribute('data-value')) rect.setAttribute('data-value', String(pt.value))
-      const parent = rect.parentElement
-      if (!parent) continue
-      const existing = parent.querySelector<SVGTextElement>(`text[data-bar="${label}"]`)
-      if (existing) continue
-      const x = Number(rect.getAttribute('x') || '0')
-      const w = Number(rect.getAttribute('width') || '0')
-      const y = Number(rect.getAttribute('y') || '0')
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-      text.setAttribute('x', String(x + w / 2))
-      text.setAttribute('y', String(Math.max(0, y - 4)))
-      text.setAttribute('text-anchor', 'middle')
-      text.setAttribute('fill', 'var(--ink)')
-      text.setAttribute('font-size', '10')
-      text.setAttribute('font-family', 'var(--mono)')
-      text.setAttribute('data-bar', label)
-      text.textContent = String(pt.value)
-      parent.appendChild(text)
+    const iso = el.getAttribute('data-date')
+    if (!iso) continue
+    const label = labels.get(iso) ?? el.getAttribute('aria-label')
+    if (label && label !== 'No data' && !el.hasAttribute('title')) {
+      el.setAttribute('title', label)
     }
   }
 }
