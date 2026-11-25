@@ -1,16 +1,1 @@
-/* Parsed pipe-table rows. Mirrors the kit list-row look. */
-.mt-rows {
-  margin: 0;
-  padding: 0;
-}
-.mt-row {
-  padding: calc(10px * var(--sf)) 0;
-  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
-  font-family: var(--sans);
-  font-size: calc(13px * var(--tf));
-  color: var(--ink);
-  overflow-wrap: anywhere;
-}
-.mt-row:last-child {
-  border-bottom: none;
-}
+/* No custom styles needed; the kit's Table component handles the output. */

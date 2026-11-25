@@ -1,48 +1,48 @@
 {
   "version": 1,
-  "spec_sha256": "78056e087d53e53cbf84e5f877ecc56799e1b35ec50dbdfd06dd7e90c8a29592",
+  "spec_sha256": "b05539b6b3f1075e21c151015ce1cb66af8f91e4c2ddacff1f99cce5d6980318",
   "checks": [
     {
       "id": "A1",
-      "text": "Pasting `|A|B|C|\\n|---|---|---|\\n|1|2|3|` shows three rows: \"A, B, C\" and \"1, 2, 3\"."
+      "text": "Entering the text `|A|B|C|` newline `|---|---|---|` newline `|1|2|3|` shows exactly two rows: \"A, B, C\" and \"1, 2, 3\" (the separator row is skipped)."
     },
     {
       "id": "A2",
-      "text": "Pasting `|X|Y|\\n|---|---|\\n|a|b|` shows two rows: \"X, Y\" and \"a, b\"."
+      "text": "Entering `|X|Y|` / `|---|---|` / `|a|b|` (three lines) shows exactly two rows: \"X, Y\" and \"a, b\"."
     },
     {
       "id": "A3",
-      "text": "Pasting `|1|2|3|` shows one row: \"1, 2, 3\"."
+      "text": "Entering the single line `|1|2|3|` shows exactly one row: \"1, 2, 3\"."
     },
     {
       "id": "A4",
-      "text": "Pasting an empty string shows no output."
+      "text": "With empty input, no rows are shown (zero rows)."
     },
     {
       "id": "A5",
-      "text": "Pasting `|A|B|\\n|---|---|\\n|C|D|` shows two rows: \"A, B\" and \"C, D\"."
+      "text": "Entering `|A|B|` / `|---|---|` / `|C|D|` shows exactly two rows: \"A, B\" and \"C, D\"."
     },
     {
       "id": "A6",
-      "text": "Pasting `|X|Y|Z|\\n|---|---|---|\\n|1|2|3|` shows one row: \"X, Y, Z\" and another: \"1, 2, 3\"."
+      "text": "Entering `|X|Y|Z|` / `|---|---|---|` / `|1|2|3|` shows exactly two rows: \"X, Y, Z\" and \"1, 2, 3\"."
     },
     {
       "id": "A7",
-      "text": "Pasting `|A|B|\\n|---|---|\\n|C|D|` with a trailing newline shows two rows: \"A, B\" and \"C, D\"."
+      "text": "Entering `|A|B|` / `|---|---|` / `|C|D|` followed by a trailing newline shows exactly two rows: \"A, B\" and \"C, D\"."
     },
     {
       "id": "A8",
-      "text": "Pasting `|A|B|\\n|---|---|\\n|C|D|` with extra spaces in cells shows \"A, B\" and \"C, D\"."
+      "text": "Entering `| A | B |` / `|---|---|` / `| C | D |` (extra spaces inside cells) shows exactly two rows: \"A, B\" and \"C, D\"."
     },
     {
       "id": "A9",
-      "text": "Reload keeps the input text and output table visible."
+      "text": "After entering `|A|B|` / `|---|---|` / `|C|D|` and reloading the page, the input still contains that text and the two rows \"A, B\" and \"C, D\" are still shown."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "311c83869e5a75e47374b97a86adfc79a47e1c7a6ac796a4c5a4f114e591912c"
+      "sha256": "3992d30c01ccded148a486bff9008fb4d1567935bb724b1ead94121463420dd3"
     }
   ]
 }
