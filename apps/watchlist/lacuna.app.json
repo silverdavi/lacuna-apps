@@ -1,0 +1,88 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.watchlist",
+  "name": "Movie Watchlist",
+  "version": "0.1.0",
+  "summary": "Keep a list of movies and shows to watch, with search, type filter, and CSV export.",
+  "description": "A small shelf app. Add movies and shows with a title, type, year, and rating. Search and filter the list, mark titles as watched, and export the whole list as CSV. Everything stays on this device.",
+  "category": "personal",
+  "tags": ["movies", "shows", "watchlist"],
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/watchlist",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:watchlist"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "watchlist",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Movie Watchlist records"
+      }
+    ],
+    "platform": [
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "watchlist"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "0122256b20f95c0d6dc0ce87d4c776000e461006d922da3a8e11a78d533e7f05",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Movie Watchlist\"."
+    },
+    {
+      "id": "A2",
+      "text": "With no records, the table area shows the text \"No movies yet\"."
+    },
+    {
+      "id": "A3",
+      "text": "Filling the field labelled \"Title\" with \"Inception\", the field labelled \"Year\" with \"2010\", choosing \"Movie\" in the select labelled \"Type\", and clicking the button \"Add\" adds a row containing \"Inception\" and \"2010\"; \"No movies yet\" is gone."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete Inception\" removes that row and the table area shows \"No movies yet\"."
+    },
+    {
+      "id": "A5",
+      "text": "After adding \"Inception\" (Movie, 2010) and \"Breaking Bad\" (Show, 2008), typing \"inception\" in the search box labelled \"Search\" shows only the row containing \"Inception\" and hides the row containing \"Breaking Bad\"."
+    },
+    {
+      "id": "A6",
+      "text": "With both records present, choosing \"Show\" in the select labelled \"Filter by type\" shows only the row containing \"Breaking Bad\" and hides the row containing \"Inception\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that begins with \"Title,Type,Year,Rating\" and contains the line \"Inception,Movie,2010,8.8\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Mark watched\" on the Inception row changes the status cell in that row from \"Unwatched\" to \"Watched\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the record: after adding \"Inception\" (Movie, 2010) and reloading, the table still shows a row containing \"Inception\" and \"2010\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "cffc45ed49fc549d3b7b27974fdc509e9ed6f2774df723b6f0efc75850c7b66b"
+    }
+  ]
+}
