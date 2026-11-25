@@ -1,24 +1,19 @@
 {
   "manifestVersion": 1,
   "id": "lacuna.reaction-time",
-  "name": "Reaction Time Test",
+  "name": "Reaction Time",
   "version": "0.1.0",
-  "summary": "Time how fast you react to a green cue.",
-  "description": "Tap Start trial, wait for the cue to turn green, and click the moment it does. Each reaction is recorded in ms with a timestamp, and the best and average show on the Stats tab. The history stays on this device and survives a reload. Nothing leaves the browser.",
-  "category": "personal",
-  "tags": ["reaction", "speed", "test"],
-  "icon": "analytics",
+  "summary": "Test how fast you react and keep the record.",
+  "description": "Watch for the green square and click as fast as you can. Your results are saved as a record on this device, with a history of every attempt, streaks, and export options.",
+  "category": "productivity",
+  "tags": ["reaction", "timing", "streaks"],
+  "icon": "timesheets",
   "relationship": {
     "kind": "standalone"
   },
   "maintainer": {
     "type": "first-party",
-    "name": "Lacuna",
-    "url": "https://lacunaos.com"
-  },
-  "source": {
-    "repository": "https://github.com/silverdavi/lacuna-apps",
-    "license": "MIT"
+    "name": "Lacuna"
   },
   "pricing": {
     "model": "free",
@@ -33,14 +28,17 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
-      "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0",
-      "@lacuna/host-mock": "0.1.0"
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
     }
   },
   "capabilities": [
-    "create:reaction",
-    "view:reaction"
+    "create:record"
   ],
   "permissions": {
     "records": [
@@ -48,22 +46,20 @@
         "kind": "reaction",
         "access": [
           "read",
-          "create",
-          "delete"
+          "write",
+          "create"
         ],
-        "purpose": "Store recorded reaction times with timestamps"
+        "purpose": "Own reaction-time attempt records in this space's mock store."
       }
     ],
-    "platform": [
-      "clipboard.write"
-    ],
+    "platform": [],
     "network": {
       "origins": []
     },
     "dataClasses": [],
     "availability": {
       "spaceTypes": [
-        "personal"
+        "any"
       ]
     }
   },

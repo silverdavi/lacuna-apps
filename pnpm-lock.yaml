@@ -4162,9 +4162,24 @@ importers:
 
   apps/reaction-time:
     dependencies:
+      '@lacuna/chart':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/chart/0.1.0
+      '@lacuna/date-math':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/date-math/0.1.0
+      '@lacuna/export-menu':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/export-menu/0.1.0
       '@lacuna/host-mock':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/host-mock/0.1.0
+      '@lacuna/json-backup':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/json-backup/0.1.0
+      '@lacuna/streak-calc':
+        specifier: workspace:0.1.0
+        version: link:../../toolbox/modules/streak-calc/0.1.0
       '@lacuna/ui':
         specifier: workspace:*
         version: link:../../toolbox
