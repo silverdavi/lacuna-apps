@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useEffect, useMemo, useState } from 'react'
-import { AppShell, Button, Card, Checkbox, SectionLabel, Stack, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, Checkbox, EmptyState, MonoLabel, Rail, Row, SectionLabel, Stack, TextInput } from '@lacuna/ui'
 import { toISODate, fromISODate } from '@lacuna/date-math'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useHostMock } from './host/mock'
@@ -143,7 +143,37 @@ export function App() {
   }
 
   return (
-    <AppShell name="Daily Planner" icon="docs" hue="gold" category="Productivity">
+    <AppShell
+      name="Daily Planner"
+      icon="docs"
+      hue="gold"
+      category="Productivity"
+      side={
+        <>
+          <Rail title="Today" note={`${today}`} chips={['Live totals', 'Task progress']}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(8px * var(--sf))' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'calc(13px * var(--tf))' }}>
+                <span>Due today</span>
+                <span style={{ fontFamily: 'var(--mono)' }}>{doneCount} of {total}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'calc(13px * var(--tf))' }}>
+                <span>Events</span>
+                <span style={{ fontFamily: 'var(--mono)' }}>{events.length}</span>
+              </div>
+            </div>
+          </Rail>
+          <Rail title="Export" note="ICS calendar" chips={['Copy .ics', 'Calendar format']}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(8px * var(--sf))' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'calc(13px * var(--tf))' }}>
+                <span>All events</span>
+                <span style={{ fontFamily: 'var(--mono)' }}>{events.length}</span>
+              </div>
+            </div>
+          </Rail>
+        </>
+      }
+      status={`${total} due · ${events.length} events`}
+    >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(16px * var(--sf))' }}>
         <div role="tablist" aria-label="Daily Planner views" style={{ display: 'flex', gap: 'calc(16px * var(--sf))' }}>
           {(['Tasks', 'Calendar'] as const).map((t) => (

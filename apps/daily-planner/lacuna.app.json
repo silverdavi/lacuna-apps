@@ -7,7 +7,7 @@
   "description": "A task checklist for the day with a calendar view of scheduled work, completion rate and day streak. Export to JSON backup or iCal. Stays on this device.",
   "category": "productivity",
   "tags": [],
-  "icon": "docs",
+  "icon": "calendar",
   "relationship": {
     "kind": "standalone"
   },
