@@ -7271,6 +7271,31 @@ importers:
         specifier: ^19.0.0
         version: 19.3.0
 
+  toolbox/modules/timer-kit/0.1.0:
+    dependencies:
+      '@lacuna/big-clock':
+        specifier: workspace:0.1.0
+        version: link:../../big-clock/0.1.0
+      '@lacuna/progress-ring':
+        specifier: workspace:0.1.0
+        version: link:../../progress-ring/0.1.0
+      '@lacuna/ui':
+        specifier: workspace:*
+        version: link:../../..
+      '@lacuna/use-timer':
+        specifier: workspace:0.1.0
+        version: link:../../use-timer/0.1.0
+      '@lacuna/use-wake-lock':
+        specifier: workspace:0.1.0
+        version: link:../../use-wake-lock/0.1.0
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+
   toolbox/modules/toast/0.1.0:
     dependencies:
       react:

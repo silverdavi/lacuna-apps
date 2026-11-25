@@ -4234,6 +4234,61 @@
       }
     },
     {
+      "id": "@lacuna/timer-kit",
+      "layer": 2,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "A complete timer composition: big clock, progress ring, phase cycling, alarm tone, and screen wake lock.",
+      "today": [
+        "toolbox/modules/timer-kit/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [
+        "@lacuna/big-clock",
+        "@lacuna/progress-ring",
+        "@lacuna/ui",
+        "@lacuna/use-timer",
+        "@lacuna/use-wake-lock"
+      ],
+      "formats": [],
+      "keywords": [
+        "kit",
+        "TimerKit"
+      ],
+      "public": true,
+      "path": "toolbox/modules/timer-kit/0.1.0",
+      "bridge": {
+        "component": "TimerKit",
+        "kind": "kit",
+        "exports": [
+          "TimerKit",
+          "playAlarm",
+          "setTone",
+          "resetTone"
+        ],
+        "types": [
+          "TimerPhase",
+          "TimerKitProps",
+          "ToneFn"
+        ],
+        "signature": "TimerKit(props: TimerKitProps); setTone(fn: ToneFn); resetTone(); playAlarm()",
+        "releases": {
+          "0.1.0": {
+            "commit": "971986c1de3634fd593390ae3732d4d90d57da93",
+            "source": "d513bc9079bae405",
+            "lines": 255,
+            "dependencies": {
+              "@lacuna/big-clock": "0.1.0",
+              "@lacuna/progress-ring": "0.1.0",
+              "@lacuna/ui": "*",
+              "@lacuna/use-timer": "0.1.0",
+              "@lacuna/use-wake-lock": "0.1.0"
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/toast",
       "layer": 2,
       "status": "exists",
