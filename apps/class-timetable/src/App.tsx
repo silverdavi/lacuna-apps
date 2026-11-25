@@ -10,7 +10,8 @@ import {
   Kpi,
   KpiRow,
   PrimaryButton,
-
+  Rail,
+  Tag,
   TextInput,
 } from '@lacuna/ui'
 import { toIcs, type IcsEvent } from '@lacuna/ics-calendar'
@@ -123,6 +124,12 @@ export function App() {
 
   const selected = selectedId != null ? classes.find((c) => c.id === selectedId) ?? null : null
 
+  const daysWithClasses = DAYS.filter((d) => classes.some((c) => c.day === d))
+
+  const dayChips = daysWithClasses.length
+    ? daysWithClasses.map((d) => DAY_ABBR[d])
+    : ['No days yet']
+
   return (
     <AppShell
       name="Class Timetable"
@@ -130,6 +137,20 @@ export function App() {
       hue="rust"
       category="Productivity"
       meta={`${classes.length} ${classes.length === 1 ? 'class' : 'classes'}`}
+      side={
+        <Rail
+          title="Week"
+          note={classes.length ? `${daysWithClasses.length} of 5 days in use` : 'No classes scheduled'}
+          chips={[`${classes.length} class${classes.length === 1 ? '' : 'es'}`, ...dayChips, 'ICS export']}
+        >
+          {selected != null ? (
+            <div aria-label="Selected class">
+              <Tag accent>{selected.name}</Tag>
+              <span className="ct-rail-detail">{selected.day} · {selected.start}–{selected.end}</span>
+            </div>
+          ) : null}
+        </Rail>
+      }
     >
       <Card mono="New" title="Add a class">
         <FormGrid>
