@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AppShell, Button, Card, List, Row, Tag, TextInput } from '@lacuna/ui'
+import { AppShell, Button, Card, EmptyState, Kpi, KpiRow, List, Rail, Row, Tag, TextInput } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { saveText } from '@lacuna/file-save-open'
 
@@ -51,7 +51,15 @@ export function App() {
     initialItems: [],
   })
 
-
+  const totalEntries = state.activeItems.length
+  const totalSteps = state.activeItems.reduce((sum, { data }) => sum + data.steps.length, 0)
+  const totalDone = state.activeItems.reduce(
+    (sum, { data }) => sum + data.steps.filter((s) => s.done).length,
+    0,
+  )
+  const completeEntries = state.activeItems.filter(
+    ({ data }) => data.steps.length > 0 && data.steps.every((s) => s.done),
+  ).length
 
   const visible = state.activeItems.filter(({ data: entry }) => {
     const matchesQuery = !query || entry.title.toLowerCase().includes(query) || entry.category.toLowerCase().includes(query)
@@ -122,7 +130,7 @@ export function App() {
     })
     const csv = `Title,Category,Progress\n${rows.join('\n')}`
     saveText(csv, { filename: 'bucket-list.csv', mimeType: 'text/csv' })
-    showToast(`Exported ${state.activeItems.length} ${state.activeItems.length === 1 ? 'entry' : 'entries'}`)
+    showToast(`Exported ${totalEntries} ${totalEntries === 1 ? 'entry' : 'entries'}`)
   }
 
   return (
@@ -131,12 +139,48 @@ export function App() {
       icon="tasks"
       hue="gold"
       category="Productivity"
-      meta={`${state.activeItems.length} ${state.activeItems.length === 1 ? 'entry' : 'entries'}`}
+      meta={totalEntries ? `${totalEntries} ${totalEntries === 1 ? 'entry' : 'entries'}` : undefined}
+      status={`${totalDone}/${totalSteps} steps done`}
+      side={
+        <Rail
+          title="Progress"
+          chips={[
+            `${totalEntries} entries`,
+            `${totalDone}/${totalSteps} steps`,
+          ]}
+        >
+          <KpiRow>
+            <Kpi value={totalEntries} label="Entries" />
+            <Kpi value={totalDone} label="Steps done" accent={totalDone > 0} />
+          </KpiRow>
+        </Rail>
+      }
     >
-      <h1>Bucket List Tracker</h1>
+      <h2 style={{ fontFamily: 'var(--sans)', fontSize: 'calc(18px * var(--tf))', fontWeight: 700, color: 'var(--ink)' }}>
+        Bucket List Tracker
+      </h2>
 
-      <div role="tablist" aria-label="Views">
-        <button type="button" role="tab" aria-selected={true}>
+      <div
+        role="tablist"
+        aria-label="Views"
+        style={{ display: 'flex', gap: 'calc(4px * var(--sf))' }}
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={true}
+          style={{
+            fontFamily: 'var(--sans)',
+            fontSize: 'calc(13px * var(--tf))',
+            fontWeight: 600,
+            color: 'var(--ink)',
+            padding: 'calc(4px * var(--sf)) calc(12px * var(--sf))',
+            border: 'none',
+            borderBottom: 'calc(2px * var(--sf)) solid var(--accent)',
+            background: 'none',
+            cursor: 'pointer',
+          }}
+        >
           Entries
         </button>
       </div>
@@ -176,7 +220,22 @@ export function App() {
           Export CSV
         </Button>
         {visible.length === 0 ? (
-          <p>No entries yet</p>
+          totalEntries === 0 ? (
+            <EmptyState
+              mono="Empty"
+              title="No entries yet"
+              detail="Add your first bucket-list entry with the form above."
+              actionLabel="Add entry"
+            />
+          ) : (
+            <EmptyState
+              mono="No matches"
+              title="No entries yet"
+              detail={`Nothing found for "${search}".`}
+              actionLabel="Clear search"
+              onAction={() => setSearch('')}
+            />
+          )
         ) : (
           <List label="Entries">
             {visible.map(({ id: entryId, data: entry }) => {
@@ -185,15 +244,15 @@ export function App() {
               const complete = total > 0 && done === total
               return (
                 <li key={entryId}>
-                    <Row
-                      title={entry.title}
-                      action={
-                        <span>
-                          {complete && <Tag accent>Complete</Tag>}
-                          <span aria-label="Progress">{`${done}/${total}`}</span>
-                        </span>
-                      }
-                    />
+                  <Row
+                    title={entry.title}
+                    value={`${done}/${total}`}
+                    action={
+                      <span>
+                        {complete && <Tag accent>Complete</Tag>}
+                      </span>
+                    }
+                  />
                   {entry.steps.map((step) => (
                     <label key={step.id}>
                       <input
@@ -220,19 +279,19 @@ export function App() {
                       Add step
                     </Button>
                   )}
-                    <Button
-                      kind="ghost"
-                      onClick={() => {
-                        setDraft({ id: entryId, entry })
-                        setEditTitle(entry.title)
-                        setEditCategory(entry.category)
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button kind="ghost" onClick={() => deleteEntry(entryId)}>
-                      Delete
-                    </Button>
+                  <Button
+                    kind="ghost"
+                    onClick={() => {
+                      setDraft({ id: entryId, entry })
+                      setEditTitle(entry.title)
+                      setEditCategory(entry.category)
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button kind="ghost" onClick={() => deleteEntry(entryId)}>
+                    Delete
+                  </Button>
                 </li>
               )
             })}
