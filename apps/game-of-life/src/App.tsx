@@ -131,9 +131,10 @@ export function App() {
               <button
                 key={i}
                 type="button"
-                aria-label={`row ${y + 1}, column ${x + 1}`}
+                aria-label={`Cell row ${y + 1}, column ${x + 1}`}
+                aria-pressed={cells[i] ? true : false}
                 onClick={() => setCells((prev) => toggleAt(prev, i))}
-                style={{ background: cells[i] ? ALIVE : 'transparent' } as CSSProperties}
+                style={{ background: cells[i] ? ALIVE : undefined } as CSSProperties}
               />
             )
           })}

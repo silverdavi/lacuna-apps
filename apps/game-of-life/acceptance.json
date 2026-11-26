@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "96e1d6c767f3c1085e9dd0fbe71f384ae3b5f98a0b9b0bb5eca8307bef666e0f",
+  "spec_sha256": "890cef276bfc9ef116dda5d57c1300cb86a004a63be9a0a77481b68e5771a17d",
   "checks": [
     {
       "id": "A1",
@@ -12,15 +12,15 @@
     },
     {
       "id": "A3",
-      "text": "With the three cells at row 1, columns 1, 2, and 3 alive, clicking the button \"Step\" kills all three cells; the text \"Population: 0\" appears."
+      "text": "With the three cells at row 1, columns 1, 2, and 3 alive, clicking the button \"Step\" leaves cells (1,2) and (2,2) alive (the top edge is a dead border); the text \"Population: 2\" appears."
     },
     {
       "id": "A4",
-      "text": "Clicking the cell at row 2, column 2, the cell at row 3, column 1, and the cell at row 3, column 2 creates a block; the text \"Population: 3\" appears. Clicking the button \"Step\" leaves the block unchanged; the text \"Population: 3\" remains."
+      "text": "Clicking the cell at row 2, column 2, the cell at row 3, column 1, and the cell at row 3, column 2 creates an L-shape of 3 cells; the text \"Population: 3\" appears. Clicking the button \"Step\" fills it into a 2x2 block (rows 2-3, columns 1-2); the text \"Population: 4\" appears, and clicking \"Step\" again leaves \"Population: 4\"."
     },
     {
       "id": "A5",
-      "text": "Clicking the cell at row 2, column 2, the cell at row 2, column 3, and the cell at row 3, column 3 creates a diagonal line; the text \"Population: 3\" appears. Clicking the button \"Step\" kills all three cells; the text \"Population: 0\" appears."
+      "text": "Clicking the cell at row 2, column 2, the cell at row 3, column 3, and the cell at row 4, column 4 creates a diagonal line; the text \"Population: 3\" appears. Clicking the button \"Step\" leaves only the middle cell (3,3); the text \"Population: 1\" appears."
     },
     {
       "id": "A6",
@@ -32,7 +32,7 @@
     },
     {
       "id": "A8",
-      "text": "With the three cells at row 1, columns 1, 2, and 3 alive, clicking the button \"Run\" starts the simulation; after 100 milliseconds, the text \"Population: 0\" appears. Clicking the button \"Stop\" halts the simulation."
+      "text": "With the three cells at row 1, columns 1, 2, and 3 alive, clicking the button \"Run\" starts the simulation (one generation every 200 milliseconds); within 3 seconds the text \"Population: 0\" appears (generations: 3, 2, 0). Clicking the button \"Stop\" halts the simulation."
     },
     {
       "id": "A9",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "0e1661024d969a6375852dab7bbe24fb8e4062280d309177856533607765445a"
+      "sha256": "6534e24dba044326990dd05ac01592cb120478a49b8ff068226dea91489cf050"
     }
   ]
 }

@@ -4,7 +4,7 @@
   "name": "Game of Life",
   "version": "0.1.0",
   "summary": "Step Conway's Game of Life on a grid: toggle cells, run the world, watch patterns emerge.",
-  "description": "Conway's original cellular automaton on a 24-column by 16-row board. Click a cell to toggle it, then step or run the world at a steady pace. Stable patterns such as the block hold, while gliders and other traffic fade or move. The board state stays on this device and survives a reload.",
+  "description": "Conway's original cellular automaton on a 9-column by 9-row board. Click a cell to toggle it, then step or run the world at a steady pace. Stable patterns such as the block hold, while gliders and other traffic fade or move. The board state stays on this device and survives a reload.",
   "category": "personal",
   "icon": "grid",
   "relationship": {
@@ -29,7 +29,8 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0"
     }
   },
   "capabilities": [
