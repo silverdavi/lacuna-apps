@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "spec_sha256": "bb17bce2d726f9b13347f342459e878f000351eb9826ae016572cc45ccc9249a",
+  "spec_sha256": "4233b2c607a02947b0219b80c59618c65a9d26f0cdb029fab3a90e5a5825c31a",
   "checks": [
     {
       "id": "A1",
-      "text": "On first load with no saved state, the page shows the heading \"Lights Out\", the text \"Moves: 0\", and the board displays exactly 13 lit cells (the fixed seed 42 pattern)."
+      "text": "On first load with no saved state, the page shows the heading \"Lights Out\", the text \"Moves: 0\", and the board displays exactly 13 lit cells: the seed 42 pattern listed in the test notes."
     },
     {
       "id": "A2",
-      "text": "Clicking the cell at row 1, column 1 (top-left) toggles it and its right and bottom neighbors; the number of lit cells changes from 13 to 10, and the text \"Moves: 1\" appears."
+      "text": "Clicking the cell at row 1, column 1 (top-left) toggles it and its right and bottom neighbors; the corner (1,1) goes dark while (1,2) and (2,1) light up, so the number of lit cells changes from 13 to 14, and the text \"Moves: 1\" appears."
     },
     {
       "id": "A3",
@@ -32,13 +32,13 @@
     },
     {
       "id": "A8",
-      "text": "Changing the field labelled \"Seed\" from \"42\" to \"7\" and clicking \"New Game\" generates a different board with exactly 11 lit cells, and the move counter shows \"Moves: 0\"."
+      "text": "Changing the field labelled \"Seed\" from \"42\" to \"7\" and clicking \"New Game\" generates the seed 7 board with exactly 17 lit cells (listed in the notes), and the move counter shows \"Moves: 0\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "6841e13b1cb93304007fd47e1aa01dc6d494635207f10f9ca2e0a913e4966fde"
+      "sha256": "6a8ef362a0013b1fecff503fc68d8b67e4aaa9414cbe3d30954ffe6adedf1470"
     }
   ]
 }
