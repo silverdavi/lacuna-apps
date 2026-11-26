@@ -22,8 +22,8 @@ type Filter = 'All' | ActivityType
 const FILTER_BUTTONS: { value: Filter; label: string }[] = [
   { value: 'All', label: 'All' },
   { value: 'Feeding', label: 'Feeding' },
-  { value: 'Sleep', label: 'Naps' },
-  { value: 'Diaper', label: 'Wipes' },
+  { value: 'Sleep', label: 'Sleep' },
+  { value: 'Diaper', label: 'Diaper' },
 ]
 
 function formatDuration(min: number | null): string {
@@ -117,9 +117,9 @@ export function App() {
             value={type}
             onChange={(v) => setType(v as ActivityType)}
             options={[
-              { value: 'Feeding', label: 'Feed' },
-              { value: 'Sleep', label: 'Nap' },
-              { value: 'Diaper', label: 'Wipe' },
+              { value: 'Feeding', label: 'Feeding' },
+              { value: 'Sleep', label: 'Sleep' },
+              { value: 'Diaper', label: 'Diaper' },
             ]}
           />
           <TextInput
@@ -139,7 +139,7 @@ export function App() {
 
       <Card mono={`${visible.length} shown`} title="Log">
         <div role="group" aria-label="Filters" style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap', marginBottom: 'calc(12px * var(--sf))' }}>
-          {FILTER_BUTTONS.filter((f) => f.value === 'All' || entries.some((e) => e.type === f.value)).map((f) => (
+          {FILTER_BUTTONS.map((f) => (
             <Button
               key={f.value}
               kind={filter === f.value ? 'primary' : 'secondary'}
