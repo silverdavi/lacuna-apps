@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useMemo, useState } from 'react'
-import { AppShell, Card, Stack, Button, EmptyState } from '@lacuna/ui'
+import { AppShell, Card, Stack, Button, EmptyState, Kpi, KpiRow, Rail } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { RecordForm, type FieldDef } from '@lacuna/record-form'
 import { RecordTable, type ColumnDef } from '@lacuna/record-table'
@@ -174,13 +174,38 @@ export function App() {
 
   const hasGifts = records.length > 0
 
+  const pendingCount = records.filter((r) => r.status === 'Pending').length
+  const purchasedCount = records.length - pendingCount
+  const totalPrice = records.reduce((sum, r) => sum + (r.price || 0), 0)
+  const purchasedTotal = records
+    .filter((r) => r.status === 'Purchased')
+    .reduce((sum, r) => sum + (r.price || 0), 0)
+
+  const statusText = records.length === 0
+    ? 'Local · nothing saved yet'
+    : `${records.length} ${records.length === 1 ? 'gift' : 'gifts'} · ${formatPrice(totalPrice)} · local`
+
   return (
     <AppShell
       name="Gift List Tracker"
       icon="tasks"
-      hue="rust"
+      hue="gold"
       category="Personal"
       meta={`${records.length} ${records.length === 1 ? 'gift' : 'gifts'}`}
+      status={statusText}
+      side={
+        <Rail title="Summary" note={`${purchasedCount} of ${records.length} purchased`}>
+          <KpiRow>
+            <Kpi value={records.length} label="Gifts" />
+            <Kpi value={pendingCount} label="Pending" />
+            <Kpi value={purchasedCount} label="Purchased" />
+          </KpiRow>
+          <KpiRow>
+            <Kpi value={formatPrice(totalPrice)} label="Total" accent />
+            <Kpi value={formatPrice(purchasedTotal)} label="Spent" />
+          </KpiRow>
+        </Rail>
+      }
     >
       <Stack>
         <Card mono="New" title="Add a gift">
