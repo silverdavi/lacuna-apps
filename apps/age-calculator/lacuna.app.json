@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.age-calculator",
+  "name": "Age Calculator",
+  "version": "0.1.0",
+  "summary": "Work out someone's age in years, months and days.",
+  "description": "Enter a birth date and an optional reference date to see the age in years, months and days, with a breakdown of total days and a small chart. The last calculation is kept on this device.",
+  "category": "productivity",
+  "tags": ["age", "date", "calculator"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/age-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:age-calculator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "age-calculator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Age Calculator records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "age-calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

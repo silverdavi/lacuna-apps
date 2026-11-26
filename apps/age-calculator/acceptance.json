@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "edc4056308b80853509277689a8f1c6a29f404e74aee34915d300beff4b1914b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no input, the page shows the heading \"Age Calculator\", the text \"Enter a birth date to begin\", and the result summary displays \"Years: 0\", \"Months: 0\", \"Days: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the clock fixed to 2025-01-30, typing \"1990-01-15\" in the field labelled \"Birth date\" and clicking the button \"Calculate\" (Reference date left empty, so today is used) shows the result summary with \"Years: 35\", \"Months: 0\", \"Days: 15\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"1990-01-15\" in the field labelled \"Birth date\" and \"2025-06-15\" in the field labelled \"Reference date\", then clicking \"Calculate\", shows the result summary with \"Years: 35\", \"Months: 5\", \"Days: 0\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"2000-02-29\" in the field labelled \"Birth date\" and \"2024-03-01\" in the field labelled \"Reference date\", then clicking \"Calculate\", shows the result summary with \"Years: 24\", \"Months: 0\", \"Days: 1\" (leap day handling; February 2024 has 29 days)."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"2025-01-01\" in the field labelled \"Birth date\" and \"2024-12-31\" in the field labelled \"Reference date\", then clicking \"Calculate\", shows the message \"Reference date must be on or after birth date\" and the result summary remains \"Years: 0\", \"Months: 0\", \"Days: 0\"."
+    },
+    {
+      "id": "A6",
+      "text": "After calculating with Birth date \"1990-01-15\" and Reference date \"2025-06-15\", the breakdown table contains a row with \"Total days\" and the value \"12935\"."
+    },
+    {
+      "id": "A7",
+      "text": "After calculating with Birth date \"1990-01-15\" and Reference date \"2025-06-15\", the chart area displays a bar labelled \"Years\" with a value of \"35\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the clock fixed to 2025-01-30, typing \"1990-01-15\" in the field labelled \"Birth date\" and clicking \"Calculate\" without a reference date shows \"Years: 35\", \"Months: 0\", \"Days: 15\" (same as A2)."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the calculated age: after entering Birth date \"1990-01-15\", Reference date \"2025-06-15\", clicking \"Calculate\", and reloading the page, the result summary still shows \"Years: 35\", \"Months: 5\", \"Days: 0\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "bcbb3cc11e67c3f688a4e22147005ae607c723762cf8ee5efc9cbec6aec3bfad"
+    }
+  ]
+}
