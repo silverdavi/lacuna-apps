@@ -1,20 +1,20 @@
 {
   "manifestVersion": 1,
-  "id": "com.lacuna.maze-generator",
+  "id": "lacuna.maze-generator",
   "name": "Maze Generator",
   "version": "0.1.0",
   "summary": "Generate and solve seeded mazes.",
   "description": "A small shelf app. Generate a deterministic maze from a seed, track your path, and keep a running score of solved mazes.",
-  "category": "games",
+  "category": "personal",
   "tags": ["maze", "puzzle", "game"],
   "icon": "grid",
   "relationship": {
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",
@@ -30,10 +30,10 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
-      "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0",
-      "@lacuna/random": "^0.1.0",
-      "@lacuna/host-mock": "^0.1.0"
+      "@lacuna/tokens": "0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
     }
   },
   "capabilities": [
@@ -75,9 +75,7 @@
   },
   "quality": {
     "tests": [
-      "tests/community-app-open-and-reload.spec.ts",
-      "tests/edit-community-app.spec.ts",
-      "tests/community-app-denied-action.spec.ts"
+      "tests/acceptance.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,

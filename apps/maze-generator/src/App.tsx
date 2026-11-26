@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { mulberry32, randomInt } from '@lacuna/random'
 import {
   Actions,
   AppShell,
+  Button,
   Card,
   EmptyState,
   FormGrid,
   PrimaryButton,
-  Button,
   Table,
   TextInput,
 } from '@lacuna/ui'
@@ -27,10 +27,31 @@ function hashSeed(s: string): number {
 
 const DIRS: Cell[] = [[0, 1], [1, 0], [0, -1], [-1, 0]]
 
+function solvable(open: boolean[][], n: number): boolean {
+  const q: Cell[] = [[0, 0]]
+  const vis: boolean[][] = Array.from({ length: n }, () => Array<boolean>(n).fill(false))
+  vis[0][0] = true
+  while (q.length) {
+    const next = q.shift()
+    if (!next) continue
+    const [r, c] = next
+    if (!vis[r][c]) continue
+    if (r === n - 1 && c === n - 1) return true
+    for (const [dr, dc] of DIRS) {
+      const nr = r + dr
+      const nc = c + dc
+      if (nr >= 0 && nr < n && nc >= 0 && nc < n && open[nr][nc] && !vis[nr][nc]) {
+        vis[nr][nc] = true
+        q.push([nr, nc])
+      }
+    }
+  }
+  return false
+}
+
 function generateMaze(seed: string, n: number, wallProb: number): boolean[][] {
   const open: boolean[][] = Array.from({ length: n }, () => Array<boolean>(n).fill(true))
   const rng = mulberry32(hashSeed(String(seed)))
-  // Carve a spanning tree so the maze is always connected.
   const visited: boolean[][] = Array.from({ length: n }, () => Array<boolean>(n).fill(false))
   const stack: Cell[] = [[0, 0]]
   visited[0][0] = true
@@ -50,7 +71,6 @@ function generateMaze(seed: string, n: number, wallProb: number): boolean[][] {
     visited[nr][nc] = true
     stack.push([nr, nc])
   }
-  // Sprinkle walls without ever blocking the solution.
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       if (r === 0 && c === 0) continue
@@ -65,64 +85,8 @@ function generateMaze(seed: string, n: number, wallProb: number): boolean[][] {
   return open
 }
 
-function solvable(open: boolean[][], n: number): boolean {
-  const q: Cell[] = [[0, 0]]
-  const vis: boolean[][] = Array.from({ length: n }, () => Array<boolean>(n).fill(false))
-  vis[0][0] = true
-  while (q.length) {
-    const [r, c] = q.shift()
-    if (!vis[r][c]) continue
-    if (r === n - 1 && c === n - 1) return true
-    for (const [dr, dc] of DIRS) {
-      const nr = r + dr
-      const nc = c + dc
-      if (nr >= 0 && nr < n && nc >= 0 && nc < n && open[nr][nc] && !vis[nr][nc]) {
-        vis[nr][nc] = true
-        q.push([nr, nc])
-      }
-    }
-  }
-  return false
-}
-
 const SIZES = ['5x5', '7x7', '9x9']
 const WALL_PROB = 0.2
-
-/** Labelled dropdown. The label is a sibling of the select (linked by `for`),
- *  not a wrapper, so the label's text content is exactly the label string and
- *  getByLabel('Size', { exact: true }) resolves cleanly. */
-function SizeSelect({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  options: string[]
-}) {
-  const id = `size-${label.replace(/\s+/g, '-').toLowerCase()}`
-  return (
-    <div className="lc-field">
-      <label htmlFor={id} className="lc-field-label">
-        {label}
-      </label>
-      <select
-        id={id}
-        className="lc-input"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </div>
-  )
-}
 
 export function App() {
   const [seed, setSeed] = useState('42')
@@ -184,12 +148,6 @@ export function App() {
     }
   }
 
-  const cellName = (r: number, c: number) => {
-    if (r === 0 && c === 0) return 'Start'
-    if (r === n - 1 && c === n - 1) return 'Finish'
-    return ''
-  }
-
   return (
     <AppShell
       name="Maze Generator"
@@ -198,11 +156,25 @@ export function App() {
       category="Games"
       status={toast ? 'Solution copied to clipboard' : undefined}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(16px * var(--sf))' }}>
         <Card mono="Controls" title="New maze">
           <FormGrid>
             <TextInput label="Seed" value={seed} onChange={setSeed} />
-            <SizeSelect label="Size" value={size} onChange={setSize} options={SIZES} />
+            <label className="lc-field">
+              <span className="lc-field-label">Size</span>
+              <select
+                className="lc-input"
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
+                aria-label="Size"
+              >
+                {SIZES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </label>
           </FormGrid>
           <Actions>
             <PrimaryButton onClick={generate}>Generate</PrimaryButton>
@@ -215,28 +187,34 @@ export function App() {
           </Actions>
         </Card>
 
-        <div role="tablist" aria-label="Maze sections" style={{ display: 'flex', gap: 8 }}>
-          {(['Maze', 'History'] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              className={`lc-tab${tab === t ? ' active' : ''}`}
-              style={tab === t ? undefined : { color: 'var(--ink-60)' }}
-              onClick={() => setTab(t)}
-            >
-              {t}
-            </button>
-          ))}
+        <div role="tablist" aria-label="Maze sections" style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+          {(['Maze', 'History'] as const).map((t) => {
+            const active = tab === t
+            const style: CSSProperties = {
+              color: active ? 'var(--ink)' : 'var(--mid)',
+            }
+            return (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`lc-tab${active ? ' active' : ''}`}
+                style={style}
+                onClick={() => setTab(t)}
+              >
+                {t}
+              </button>
+            )
+          })}
         </div>
 
         {tab === 'Maze' ? (
-          <Card
-            mono={path.length > 0 ? `Path: ${path.length}` : undefined}
-            title="Maze"
-            actions={<span>{`Score: ${solved ? 1 : 0}`}</span>}
-          >
+          <Card title="Maze">
+            <div style={{ display: 'flex', gap: 'calc(16px * var(--sf))', marginBottom: 'calc(8px * var(--sf))' }}>
+              <span>{`Path: ${path.length}`}</span>
+              <span>{`Score: ${solved ? 1 : 0}`}</span>
+            </div>
             {maze ? (
               <>
                 <div
@@ -244,76 +222,81 @@ export function App() {
                   aria-label="Maze"
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: `repeat(${n}, 44px)`,
-                    gap: 4,
+                    gridTemplateColumns: `repeat(${n}, calc(44px * var(--sf)))`,
+                    gap: 'calc(4px * var(--sf))',
                     width: 'fit-content',
                   }}
                 >
-                    {maze.open.map((row, r) => (
-                      <div key={`row-${r}`} role="row">
-                        {row.map((isOpen, c) => {
-                          const name = cellName(r, c)
-                          const inPath = path.some(([pr, pc]) => pr === r && pc === c)
-                          if (isOpen) {
-                            return (
-                              <div
-                                key={`${r}-${c}`}
-                                role="gridcell"
-                                aria-label={`Row ${r}, Column ${c}`}
-                                style={{
-                                  width: 44,
-                                  height: 44,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <button
-                                  type="button"
-                                  aria-label={name}
-                                  style={{
-                                    width: 40,
-                                    height: 40,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    background: inPath ? 'var(--geo-comm, #2b6cb0)' : 'var(--paper, #fff)',
-                                    border: '1px solid var(--line, #ddd)',
-                                    borderRadius: 4,
-                                    cursor: 'pointer',
-                                    fontSize: 11,
-                                    fontWeight: 600,
-                                    color: inPath ? 'var(--paper, #fff)' : 'var(--ink-60)',
-                                  }}
-                                  onClick={() => onCellClick(r, c)}
-                                />
-                              </div>
-                            )
-                          }
-                          return (
-                            <div
-                              key={`${r}-${c}`}
-                              role="gridcell"
-                              aria-label={`Row ${r}, Column ${c}`}
+                  {maze.open.flatMap((row, r) =>
+                    row.map((isOpen, c) => {
+                      const isStart = r === 0 && c === 0
+                      const isFinish = r === n - 1 && c === n - 1
+                      const inPath = path.some(([pr, pc]) => pr === r && pc === c)
+                      if (isOpen) {
+                        return (
+                          <div
+                            key={`${r}-${c}`}
+                            role="gridcell"
+                            aria-label={`Row ${r}, Column ${c}`}
+                            style={{
+                              width: 'calc(44px * var(--sf))',
+                              height: 'calc(44px * var(--sf))',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Button
+                              kind="secondary"
+                              ariaLabel={isStart ? 'Start' : isFinish ? 'Finish' : `Open cell row ${r} column ${c}`}
                               style={{
-                                width: 44,
-                                height: 44,
-                                background: 'var(--ink, #111)',
-                                border: '1px solid var(--line, #ddd)',
-                                borderRadius: 4,
+                                width: 'calc(40px * var(--sf))',
+                                height: 'calc(40px * var(--sf))',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: inPath ? 'var(--accent)' : 'var(--paper)',
+                                borderWidth: 1,
+                                borderStyle: 'solid',
+                                borderColor: 'var(--ui-line)',
+                                borderRadius: 'calc(4px * var(--sf))',
+                                cursor: 'pointer',
+                                fontSize: 'calc(11px * var(--tf))',
+                                fontWeight: 600,
+                                color: inPath ? 'var(--paper)' : 'var(--ink)',
                               }}
-                            />
-                          )
-                        })}
-                      </div>
-                    ))}
+                              onClick={() => onCellClick(r, c)}
+                            >
+                              {isStart ? 'S' : isFinish ? 'F' : ''}
+                            </Button>
+                          </div>
+                        )
+                      }
+                      return (
+                        <div
+                          key={`${r}-${c}`}
+                          role="gridcell"
+                          aria-label={`Row ${r}, Column ${c}`}
+                          style={{
+                            width: 'calc(44px * var(--sf))',
+                            height: 'calc(44px * var(--sf))',
+                            background: 'var(--ink)',
+                            borderWidth: 1,
+                            borderStyle: 'solid',
+                            borderColor: 'var(--ui-line)',
+                            borderRadius: 'calc(4px * var(--sf))',
+                          }}
+                        />
+                      )
+                    }),
+                  )}
                 </div>
                 {solved && (
-                  <div style={{ marginTop: 12 }}>
+                  <div style={{ marginTop: 'calc(12px * var(--sf))' }}>
                     <Button kind="primary" onClick={copySolution}>
                       Copy Solution
                     </Button>
-                    <div style={{ marginTop: 8 }}>Maze solved!</div>
+                    <div style={{ marginTop: 'calc(8px * var(--sf))' }}>Maze solved!</div>
                   </div>
                 )}
               </>
@@ -322,6 +305,7 @@ export function App() {
                 mono="Empty"
                 title="No maze generated yet"
                 detail="Set a seed and size, then click Generate."
+                actionLabel="Generate a maze"
               />
             )}
           </Card>
@@ -343,7 +327,7 @@ export function App() {
               ]}
               empty="No mazes solved yet"
             />
-            <div style={{ marginTop: 8 }}>{`${stats.solved} maze${stats.solved === 1 ? '' : 's'} solved`}</div>
+            <div style={{ marginTop: 'calc(8px * var(--sf))' }}>{`${stats.solved} maze${stats.solved === 1 ? '' : 's'} solved`}</div>
           </Card>
         )}
       </div>
