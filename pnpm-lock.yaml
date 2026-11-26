@@ -1694,9 +1694,6 @@ importers:
 
   apps/markdown-slides:
     dependencies:
-      '@lacuna/code-area':
-        specifier: workspace:0.1.0
-        version: link:../../toolbox/modules/code-area/0.1.0
       '@lacuna/file-save-open':
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/file-save-open/0.1.0

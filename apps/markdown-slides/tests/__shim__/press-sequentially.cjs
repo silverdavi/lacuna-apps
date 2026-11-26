@@ -10,32 +10,32 @@
 // the shim inserts characters one by one with locator.type() and falls back
 // to `insertText` for control characters.
 
-function collectArg(path, t, out) {
-  const arg = path.node.argument;
+function collectArg(arg, t, out) {
+  if (!arg) return;
   if (arg.type === 'SpreadElement') {
     out.push(arg.argument);
     return;
   }
-  out.push(t.callExpression(
-    t.memberExpression(t.identifier('String'), t.identifier('fromCodePoint')),
-    [t.binaryExpression('+', t.numericLiteral(0), arg)]
-  ));
+  out.push(arg);
 }
 
-module.exports = function () {
-  const t = require('@babel/types');
-  const shimSpecifier = process.env.PW_SHIM_PATH || '';
+module.exports = function (api) {
+  const t = api.types;
 
   return {
     name: 'shim-keyboard-press-sequentially',
     visitor: {
       Program: {
-        enter(programPath) {
-          if (shimSpecifier !== '') {
-            programPath.node.body.unshift(
-              t.importDeclaration([], t.stringLiteral(shimSpecifier))
-            );
-          }
+        enter(programPath, state) {
+          const hubFile = (programPath.hub && programPath.hub.file && programPath.hub.file.opts && programPath.hub.file.opts.filename) || '';
+          const file = state?.filename || hubFile || '';
+          if (file.includes('__shim__')) return;
+          programPath.node.body.unshift(
+            t.importDeclaration(
+              [t.importSpecifier(t.identifier('__msShim'), t.identifier('__msShim'))],
+              t.stringLiteral('./__shim__/keyboard-shim.js')
+            )
+          );
         },
       },
       CallExpression(path) {
@@ -47,18 +47,22 @@ module.exports = function () {
         if (!obj || obj.type !== 'MemberExpression' || obj.computed) return;
         if (!obj.property || obj.property.type !== 'Identifier' || obj.property.name !== 'keyboard') return;
 
-        const args = [];
-        for (let i = 0; i < callee.arguments.length; i += 1) {
-          const a = callee.arguments[i];
-          if (a === null || a === undefined) continue;
-          collectArg(path, t, args);
+        const args = [obj];
+        for (let i = 0; i < path.node.arguments.length; i += 1) {
+          if (i === 0) {
+            collectArg(path.node.arguments[i], t, args);
+          } else {
+            args.push(path.node.arguments[i]);
+          }
         }
-        path.node.callee = t.callExpression(
-          t.memberExpression(
-            t.identifier('__msShim'),
-            t.identifier('pressSequentially')
-          ),
-          args
+        path.replaceWith(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier('__msShim'),
+              t.identifier('pressSequentially')
+            ),
+            args
+          )
         );
       },
     },

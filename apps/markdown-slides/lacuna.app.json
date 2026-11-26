@@ -34,7 +34,6 @@
     "modules": {
       "@lacuna/tokens": "^0.1.0",
       "@lacuna/ui": "^0.1.0",
-      "@lacuna/code-area": "0.1.0",
       "@lacuna/use-undo-stack": "0.1.0",
       "@lacuna/file-save-open": "0.1.0",
       "@lacuna/use-local-record": "0.1.0",

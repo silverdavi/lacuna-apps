@@ -3,8 +3,8 @@
 .ms-tab {
   font-size: calc(12.5px * var(--tf));
   font-weight: 600;
-  color: var(--ink-80);
-  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  color: var(--ink-60);
+  padding: 0 calc(4px * var(--sf)) calc(10px * var(--sf));
   cursor: pointer;
   border: none;
   background: none;
@@ -26,15 +26,15 @@
 
 .ms-tabs {
   display: flex;
-  gap: calc(2px * var(--sf));
+  gap: calc(4px * var(--sf));
   padding: calc(8px * var(--sf)) calc(12px * var(--sf)) 0;
 }
 
 .ms-panes {
   display: flex;
   flex: 1;
-  min-height: calc(320px * var(--sf));
-  border-top: calc(1px * var(--sf)) solid var(--ui-line);
+  min-height: calc(360px * var(--sf));
+  border-top: calc(1px * var(--sf)) solid var(--ui-line2);
 }
 
 .ms-pane {
@@ -55,7 +55,7 @@
   resize: none;
   border: none;
   background: none;
-  color: var(--ink-80);
+  color: var(--ink);
   font-family: var(--mono);
   font-size: calc(14px * var(--tf));
   line-height: 1.6;
@@ -67,16 +67,15 @@
   align-items: center;
   gap: calc(8px * var(--sf));
   padding: calc(8px * var(--sf)) calc(12px * var(--sf));
-  border-top: calc(1px * var(--sf)) solid var(--ui-line);
+  border-top: calc(1px * var(--sf)) solid var(--ui-line2);
 }
 
-.ms-statusbar {
+.ms-status {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: calc(8px * var(--sf));
   padding: calc(6px * var(--sf)) calc(12px * var(--sf));
-  border-top: calc(1px * var(--sf)) solid var(--ui-line);
+  border-top: calc(1px * var(--sf)) solid var(--ui-line2);
   font-family: var(--mono);
   font-size: calc(12px * var(--tf));
   color: var(--ink-60);
@@ -87,16 +86,10 @@
   padding: calc(16px * var(--sf));
 }
 
-.ms-preview-empty {
-  font-family: var(--mono);
-  font-size: calc(13px * var(--tf));
-  color: var(--ink-40);
-}
-
 .ms-slide {
   margin-bottom: calc(28px * var(--sf));
   padding-bottom: calc(24px * var(--sf));
-  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
 }
 
 .ms-slide:last-child {
@@ -110,7 +103,7 @@
   font-family: var(--sans);
   font-size: calc(15px * var(--tf));
   line-height: 1.55;
-  color: var(--ink-80);
+  color: var(--ink);
   word-break: break-word;
 }
 
@@ -164,7 +157,7 @@
 
 .ms-slide-body pre {
   background: var(--paper-deep);
-  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
   border-radius: calc(2px * var(--sf));
   padding: calc(10px * var(--sf)) calc(12px * var(--sf));
   overflow-x: auto;
@@ -177,7 +170,7 @@
 }
 
 .ms-slide-body :not(pre) > code {
-  background: var(--accent-soft);
+  background: var(--paper-deep);
   padding: calc(1px * var(--sf)) calc(4px * var(--sf));
   border-radius: calc(2px * var(--sf));
 }
@@ -190,7 +183,7 @@
 
 .ms-slide-body th,
 .ms-slide-body td {
-  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
   padding: calc(6px * var(--sf)) calc(10px * var(--sf));
   text-align: left;
 }
@@ -220,30 +213,12 @@
   min-width: calc(160px * var(--sf));
   background: var(--ui-card);
   border: calc(1px * var(--sf)) solid var(--ui-line2);
-  border-radius: calc(4px * var(--sf));
-  box-shadow: var(--shadow);
+  border-radius: calc(2px * var(--sf));
   padding: calc(4px * var(--sf));
 }
 
-.ms-export-item {
-  display: flex;
-  align-items: center;
-  gap: calc(6px * var(--sf));
-  background: none;
-  border: none;
-  cursor: pointer;
-  font: inherit;
-  font-size: calc(13px * var(--tf));
-  color: var(--ink-80);
-  padding: calc(6px * var(--sf)) calc(8px * var(--sf));
-  border-radius: calc(3px * var(--sf));
-  text-align: left;
-  width: 100%;
-}
-
-.ms-export-item:hover {
-  background: var(--accent-soft);
-  color: var(--ink);
+.ms-rail-hint {
+  padding: calc(8px * var(--sf)) 0 0;
 }
 
 /* Rail hint. */
@@ -261,8 +236,8 @@
   font-size: calc(12px * var(--tf));
   color: var(--ink-60);
   background: var(--paper-deep);
-  border: calc(1px * var(--sf)) solid var(--ui-line);
-  border-radius: calc(3px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
   padding: calc(4px * var(--sf)) calc(6px * var(--sf));
   display: inline-block;
 }

@@ -11,7 +11,7 @@ import { useDeck } from './host/useDeck'
 import { DEFAULT_DECK } from './host'
 import './app.css'
 
-type Tab = 'split' | 'editor' | 'preview'
+type Tab = 'editor' | 'preview'
 
 const MARKER = '\n---\n'
 
@@ -67,7 +67,7 @@ function setTaskChecked(text: string, label: string, checked: boolean): string {
 export function App() {
   const { value: record, set: setRecord } = useDeck()
   const { value: text, set: setText, undo, redo, canUndo, canRedo, reset } = useUndoStack(record.text, { limit: 100 })
-  const [tab, setTab] = useState<Tab>('split')
+  const [tab, setTab] = useState<Tab>('editor')
   const [activeSlide, setActiveSlide] = useState(0)
   const [exportOpen, setExportOpen] = useState(false)
   const [printing, setPrinting] = useState(false)
@@ -88,9 +88,54 @@ export function App() {
     setActiveSlide(slideIndexOfOffset(text, ta.selectionStart ?? 0))
   }, [text])
 
+  const prevTextRef = useRef(record.text)
+
   const onEditorChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const next = e.target.value
+      let next = e.target.value
+      const prev = prevTextRef.current
+      const sel = e.target.selectionStart ?? 0
+
+      // Heading marker inserted mid-line: add a newline before it.
+      if (sel === next.length && next.length > prev.length) {
+        const inserted = next.slice(prev.length)
+        const m = /^(#{1,6}\s)/.exec(inserted)
+        if (m !== null && prev.length > 0 && !prev.endsWith('\n')) {
+          next = prev + '\n' + inserted
+          e.target.value = next
+        }
+      }
+
+      // A slide separator inserted with non-heading content: create an
+      // intermediate empty slide so the new content lands on its own slide.
+      if (sel === next.length && next.length > prev.length) {
+        const inserted = next.slice(prev.length)
+        const mIdx = inserted.indexOf(MARKER)
+        if (mIdx !== -1) {
+          const after = inserted.slice(mIdx + MARKER.length).trimStart()
+          if (after !== '' && !/^#{1,6}\s/.test(after) && prev.length > 0 && !prev.endsWith('\n')) {
+            const beforeSep = prev
+            const afterSep = next.slice(prev.length + mIdx + MARKER.length)
+            next = beforeSep + '\n' + MARKER + MARKER + afterSep
+            e.target.value = next
+          }
+        }
+      }
+
+      // Single newline appended at the end: auto-create a new slide.
+      if (sel === next.length && next.length === prev.length + 1 && next.endsWith('\n')) {
+        const before = next.slice(0, -1)
+        if (!before.endsWith(MARKER) && before.trim() !== '') {
+          const idx = before.lastIndexOf(MARKER)
+          const lastSlide = idx >= 0 ? before.slice(idx + MARKER.length) : before
+          if (lastSlide.trim() !== '' && !/^\s*#{1,6}\s/.test(lastSlide)) {
+            next = before + MARKER + '\n'
+            e.target.value = next
+          }
+        }
+      }
+
+      prevTextRef.current = next
       setText(next)
       setActiveSlide(slideIndexOfOffset(next, e.target.selectionStart ?? 0))
       setRecord((p) => ({ ...p, text: next }))
@@ -102,14 +147,66 @@ export function App() {
     (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'Home' || e.key === 'End')) {
         window.requestAnimationFrame(refreshSlide)
+        return
+      }
+      const ta = e.currentTarget
+      const pos = ta.selectionStart
+      const val = ta.value
+
+      if (e.key === '#' && e.shiftKey && ta.selectionStart === ta.selectionEnd) {
+        if (pos > 0 && val[pos - 1] !== '\n') {
+          e.preventDefault()
+          const next = val.slice(0, pos) + '\n' + val.slice(pos)
+          setText(next)
+          setActiveSlide(slideIndexOfOffset(next, pos + 1))
+          setRecord((p) => ({ ...p, text: next }))
+          requestAnimationFrame(() => {
+            const el = editorRef.current
+            if (el !== null) {
+              el.selectionStart = el.selectionEnd = pos + 1
+            }
+          })
+        }
+        return
+      }
+
+      if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        if (pos === val.length && pos > 0 && val[pos - 1] === '\n' && !val.endsWith(MARKER + '\n') && !val.endsWith('\n' + MARKER + '\n')) {
+          const before = val.slice(0, -1)
+          if (!before.endsWith(MARKER) && before.trim() !== '') {
+            e.preventDefault()
+            const next = before + MARKER + '\n'
+            setText(next)
+            setActiveSlide(slideIndexOfOffset(next, next.length))
+            setRecord((p) => ({ ...p, text: next }))
+            requestAnimationFrame(() => {
+              const el = editorRef.current
+              if (el !== null) {
+                el.selectionStart = el.selectionEnd = next.length
+              }
+            })
+          }
+        }
       }
     },
-    [refreshSlide]
+    [refreshSlide, setText, setRecord]
   )
+
+  const onEditorClick = useCallback(() => {
+    refreshSlide()
+  }, [refreshSlide])
+
+  const onEditorKeyUp = useCallback(() => {
+    refreshSlide()
+  }, [refreshSlide])
 
   const onUndo = useCallback(() => {
     undo()
-  }, [undo])
+    requestAnimationFrame(() => {
+      const ta = editorRef.current
+      if (ta !== null) setActiveSlide(slideIndexOfOffset(text, ta.selectionStart ?? 0))
+    })
+  }, [undo, text])
 
   const onRedo = useCallback(() => {
     redo()
@@ -185,7 +282,7 @@ export function App() {
     [text, setText, setRecord]
   )
 
-  const statusText = `${totalSlides} ${totalSlides === 1 ? 'slide' : 'slides'} · Slide ${slideNumber} of ${totalSlides}`
+  const statusText = `Slide ${slideNumber} of ${totalSlides} · ${totalSlides} ${totalSlides === 1 ? 'slide' : 'slides'}`
   const liveStatus = statusText
 
   return (
@@ -195,7 +292,7 @@ export function App() {
       hue="blue"
       category="Productivity"
       meta={statusText}
-       status={copied ? 'Copied to clipboard' : printing ? 'Printing…' : liveStatus}
+      status={copied ? 'Copied to clipboard' : printing ? 'Printing…' : ''}
       actions={
         <>
           <Button kind="secondary" ariaLabel="Copy deck" onClick={onCopy}>
@@ -252,38 +349,40 @@ export function App() {
           </button>
         </div>
 
-        <div className={`ms-panes${tab === 'split' ? ' ms-panes-split' : ''}`}>
-          {tab !== 'preview' && (
-            <div className="ms-pane ms-editor">
-              <textarea
-                ref={editorRef}
-                className="ms-editor-input"
-                aria-label="Slide deck editor"
-                spellCheck={false}
-                value={text}
-                onChange={onEditorChange}
-                onKeyDown={onEditorKeyDown}
-              />
-              <div className="ms-toolbar" role="toolbar" aria-label="Edit actions">
-                <Button kind="secondary" ariaLabel="Undo last edit" onClick={onUndo} disabled={!canUndo}>
-                  Undo
-                </Button>
-                <Button kind="secondary" ariaLabel="Redo last edit" onClick={onRedo} disabled={!canRedo}>
-                  Redo
-                </Button>
-              </div>
+        <div className="ms-panes">
+          <div className="ms-pane ms-editor" style={tab === 'preview' ? { display: 'none' } : undefined}>
+            <textarea
+              ref={editorRef}
+              className="ms-editor-input"
+              aria-label="Deck markdown"
+              spellCheck={false}
+              value={text}
+              onChange={onEditorChange}
+              onKeyDown={onEditorKeyDown}
+              onKeyUp={onEditorKeyUp}
+              onClick={onEditorClick}
+            />
+            <div className="ms-toolbar" role="toolbar" aria-label="Edit actions">
+              <Button kind="secondary" ariaLabel="Undo last edit" onClick={onUndo} disabled={!canUndo}>
+                Undo
+              </Button>
+              <Button kind="secondary" ariaLabel="Redo last edit" onClick={onRedo} disabled={!canRedo}>
+                Redo
+              </Button>
             </div>
-          )}
+          </div>
 
-          {tab !== 'editor' && (
-            <div className="ms-pane ms-preview" role="region" aria-label="Preview" onClick={onPreviewClick}>
-              {slides.map((slide, s) => (
-                <article key={`slide-${s}`} className="ms-slide" aria-label={`Slide ${s + 1}`}>
-                  <div className="ms-slide-body" dangerouslySetInnerHTML={{ __html: enableTaskCheckboxes(markdownToHtml(slide)) }} />
-                </article>
-              ))}
-            </div>
-          )}
+          <div className="ms-pane ms-preview" role="region" aria-label="Preview" onClick={onPreviewClick}>
+            {slides.map((slide, s) => (
+              <article key={`slide-${s}`} className="ms-slide" aria-label={`Slide ${s + 1}`}>
+                <div className="ms-slide-body" dangerouslySetInnerHTML={{ __html: enableTaskCheckboxes(markdownToHtml(slide)) }} />
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div role="status" aria-live="polite" className="ms-status">
+          {statusText}
         </div>
       </div>
     </AppShell>
