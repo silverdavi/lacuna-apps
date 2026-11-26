@@ -1,12 +1,12 @@
-import { useCallback, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import {
   AppShell,
+  Board,
   Button,
   Card,
   Divider,
-  EmptyState,
-  Kpi,
-  KpiRow,
+  Keys,
+  MonoLabel,
   Rail,
   Stack,
   Tag,
@@ -185,50 +185,76 @@ export function App() {
   }
 
   const secretRevealed = finished?.won === true
+  const guesses = value.markers.length
+  const lastMarkers = value.markers[value.markers.length - 1]
+
+  const statusText = finished
+    ? finished.won
+      ? `You win in ${finished.guesses} guesses`
+      : 'The code got away'
+    : guesses === 0
+      ? 'Pick four pegs to open the round'
+      : `Seed ${value.seed} · ${lastMarkers.exact} exact · ${lastMarkers.partial} partial`
+
+  const boardCells: ReactNode[] = []
+  for (let r = 0; r < ROWS; r++) {
+    const isDraftRow = r === value.markers.length && finished === null
+    const activeRow: Peg[] = isDraftRow ? draft : value.rows[r]
+    for (let c = 0; c < COLS; c++) {
+      const peg = activeRow[c]
+      boardCells.push(
+        <div key={`b-${r}-${c}`} className="mm-cell mm-cell-input">
+          <select
+            className="lc-input mm-peg-select"
+            aria-label={`Peg ${c + 1} row ${r + 1}`}
+            value={peg}
+            onChange={(e) => onPegChange(r, c, e.target.value as Peg)}
+          >
+            {PEG_OPTIONS.map((o) => {
+              const opt = typeof o === 'string' ? { value: o, label: o } : o
+              return (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              )
+            })}
+          </select>
+        </div>,
+      )
+    }
+  }
 
   return (
     <AppShell
       name="Mastermind Game"
       icon="grid"
-      hue="blue"
+      hue="cobalt"
       category="Games"
-      meta={`Seed: ${value.seed}`}
+      meta={`Seed ${value.seed}`}
+      status={statusText}
       side={
         <Rail
           title="Mastermind"
-          note="4 of 4 colors · 4 rows"
-          chips={['Codebreaker']}
+          note={`${guesses} of ${ROWS} guesses`}
+          chips={['4 pegs', '4 colors', 'crack the code']}
         >
-          <p style={{ margin: 0 }}>Best score: {best}</p>
-          <p style={{ margin: 0 }}>Guesses: {value.markers.length}</p>
-          <KpiRow>
-            <Kpi value={String(value.markers.length)} label="Guesses" accent />
-            <Kpi value={String(best)} label="Best score" />
-          </KpiRow>
-          {finished ? (
-            <EmptyState
-              mono="Result"
-              title={finished.won ? `You win in ${finished.guesses} guesses` : 'The code got away'}
-              detail={
-                finished.won
-                  ? `Seed ${value.seed} broke. Press New game for a fresh seed or Undo to replay.`
-                  : `Four rows and no break on seed ${value.seed}. Press New game for another shot.`
-              }
-              actionLabel="New game"
-            />
-          ) : (
-            <EmptyState
-              mono="In play"
-              title="Pick four pegs"
-              detail="Choose one color per peg, then submit. Black marks an exact hit, gold a color in the wrong slot."
-              actionLabel="Submit guess"
-            />
-          )}
+          <div style={{ display: 'grid', gap: 'calc(6px * var(--sf))' }}>
+            <MonoLabel accent>Guesses: {guesses}</MonoLabel>
+            <MonoLabel>Best score: {best}</MonoLabel>
+            <MonoLabel>Rows left: {ROWS - guesses}</MonoLabel>
+          </div>
           <Divider />
-          <KpiRow>
-            <Kpi value={canUndo ? 'Yes' : 'No'} label="Can undo" />
-            <Kpi value={canRedo ? 'Yes' : 'No'} label="Can redo" />
-          </KpiRow>
+          {finished ? (
+            <MonoLabel accent>{finished.won ? 'Solved' : 'Lost'}</MonoLabel>
+          ) : null}
+          <Divider />
+          <Keys
+            items={[
+              ['Tab', 'Move between pegs'],
+              ['↑ ↓', 'Choose a color'],
+              ['Enter', 'Submit the row'],
+            ]}
+          />
         </Rail>
       }
     >
@@ -253,12 +279,13 @@ export function App() {
         }
       >
         <Stack>
-          <div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <Tag accent>{finished ? (finished.won ? 'Solved' : 'Lost') : 'In play'}</Tag>
-            <Tag>{`Seed ${value.seed}`}</Tag>
+            <Tag>Seed {value.seed}</Tag>
+            <Tag>Best {best === 0 ? '—' : String(best)}</Tag>
           </div>
 
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', maxWidth: 320 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', maxWidth: 320, flexWrap: 'wrap' }}>
             <TextInput
               label="Seed"
               value={seedInput}
@@ -282,31 +309,9 @@ export function App() {
             ))}
           </div>
 
-          <div className="mm-board" aria-label="Guess board">
-            {value.rows.map((row, r) => {
-              const isDraftRow = r === value.markers.length && finished === null
-              const activeRow: Peg[] = isDraftRow ? draft : row
-              return activeRow.map((peg, c) => (
-                <div key={`${r}-${c}`} className="mm-cell mm-cell-input">
-                  <select
-                    className="lc-input mm-peg-select"
-                    aria-label={`Peg ${c + 1} row ${r + 1}`}
-                    value={peg}
-                    onChange={(e) => onPegChange(r, c, e.target.value as Peg)}
-                  >
-                    {PEG_OPTIONS.map((o) => {
-                      const opt = typeof o === 'string' ? { value: o, label: o } : o
-                      return (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      )
-                    })}
-                  </select>
-                </div>
-              ))
-            })}
-          </div>
+          <Board cols={COLS} rows={ROWS} label="Guess board">
+            {boardCells}
+          </Board>
 
           {value.markers.map((m, i) => (
             <div key={i} className="mm-markers">

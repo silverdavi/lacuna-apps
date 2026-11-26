@@ -1,42 +1,30 @@
-.mm-board,
 .mm-secret {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: calc(4px * var(--sf));
   width: 100%;
-  max-width: calc(360px * var(--sf));
+  max-width: calc(320px * var(--sf));
 }
 
-.mm-cell {
+.mm-cell-secret {
   display: grid;
   place-items: center;
   min-height: calc(30px * var(--sf));
   border-radius: calc(6px * var(--sf));
-  background: var(--paper-2, var(--paper));
+  background: var(--ui-card);
 }
 
-.mm-cell-secret .mm-peg {
+.mm-peg {
   width: 72%;
   height: 72%;
+  min-width: calc(20px * var(--sf));
+  min-height: calc(20px * var(--sf));
   border-radius: 50%;
 }
 
-.mm-cell-input {
-  position: relative;
-}
-
-.mm-cell-input .mm-peg-select {
-  width: 100%;
-  padding: calc(2px * var(--sf)) calc(6px * var(--sf));
-  font-size: calc(12px * var(--tf));
-  min-height: 0;
-}
-
-
-
 .mm-markers {
   display: flex;
-  gap: calc(4px * var(--sf));
+  gap: calc(8px * var(--sf));
   align-items: center;
 }
 
