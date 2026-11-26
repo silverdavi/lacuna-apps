@@ -1,54 +1,38 @@
 import { Chart, type ChartDataPoint } from '@lacuna/chart'
 import { ExportMenu } from '@lacuna/export-menu'
 import { add, format, sub, toMinorUnits } from '@lacuna/money'
-import { AppShell, Card, EmptyState, Kpi, KpiRow, PrimaryButton, Select, Stack, Table, TextInput } from '@lacuna/ui'
+import { AppShell, Card, EmptyState, Kpi, KpiRow, PrimaryButton, Stack, Table, TextInput } from '@lacuna/ui'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { useLocalRecord } from '@lacuna/use-local-record'
 
-type FilingStatus = 'Single' | 'Married filing jointly' | 'Married filing separately' | 'Head of household'
+type FilingStatus = 'single' | 'married-filing-jointly'
 
-const STATUS_OPTIONS: string[] = ['Single', 'Married filing jointly', 'Married filing separately', 'Head of household']
+const STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: 'single', label: 'Single' },
+  { value: 'married-filing-jointly', label: 'Married filing jointly' },
+]
 
 interface Tier {
   upTo: number | null
   rate: number
 }
 
-const DEDUCTION: Record<FilingStatus, number> = {
-  Single: 10000,
-  'Married filing jointly': 10000,
-  'Married filing separately': 10000,
-  'Head of household': 15000,
-}
+const DEDUCTION = 10000
 
 const TIERS: Record<FilingStatus, Tier[]> = {
-  Single: [
-    { upTo: 10000, rate: 0.1 },
+  single: [
+    { upTo: 10000, rate: 0.10 },
     { upTo: 40000, rate: 0.12 },
     { upTo: 90000, rate: 0.22 },
-    { upTo: 190000, rate: 0.256 },
-    { upTo: null, rate: 0.28 },
+    { upTo: 250000, rate: 0.24 },
+    { upTo: null, rate: 0.32 },
   ],
-  'Married filing jointly': [
-    { upTo: 10000, rate: 0.1 },
-    { upTo: 40000, rate: 34 / 300 },
-    { upTo: 90000, rate: 0.17 },
-    { upTo: 190000, rate: 0.19 },
-    { upTo: null, rate: 0.21 },
-  ],
-  'Married filing separately': [
-    { upTo: 10000, rate: 0.1 },
-    { upTo: 40000, rate: 34 / 300 },
-    { upTo: 90000, rate: 0.17 },
-    { upTo: 190000, rate: 0.19 },
-    { upTo: null, rate: 0.21 },
-  ],
-  'Head of household': [
-    { upTo: 10000, rate: 0.1 },
-    { upTo: 40000, rate: 0.12 },
-    { upTo: 90000, rate: 0.22 },
-    { upTo: 190000, rate: 0.256 },
-    { upTo: null, rate: 0.28 },
+  'married-filing-jointly': [
+    { upTo: 20000, rate: 0.10 },
+    { upTo: 80000, rate: 0.12 },
+    { upTo: 180000, rate: 0.22 },
+    { upTo: 380000, rate: 0.24 },
+    { upTo: null, rate: 0.32 },
   ],
 }
 
@@ -96,9 +80,8 @@ interface Result {
 }
 
 function computeResult(gross: number, status: FilingStatus): Result {
-  const deduction = DEDUCTION[status]
   const tiers = TIERS[status]
-  const taxable = Math.max(0, gross - deduction)
+  const taxable = Math.max(0, gross - DEDUCTION)
   const taxableMinor = toMinorUnits(taxable)
   const rows = buildBrackets(taxable, tiers)
   let taxMinor = 0
@@ -107,8 +90,8 @@ function computeResult(gross: number, status: FilingStatus): Result {
   return {
     gross,
     grossMinor: toMinorUnits(gross),
-    deduction,
-    deductionMinor: toMinorUnits(deduction),
+    deduction: DEDUCTION,
+    deductionMinor: toMinorUnits(DEDUCTION),
     taxable,
     taxableMinor,
     taxMinor,
@@ -125,11 +108,11 @@ function composition(result: Result): ChartDataPoint[] {
   return data
 }
 
-function exportJson(result: Result, status: FilingStatus): string {
+function exportJson(result: Result, statusLabel: string): string {
   return JSON.stringify(
     {
       grossIncome: result.gross,
-      filingStatus: status,
+      filingStatus: statusLabel,
       standardDeduction: result.deduction,
       taxableIncome: result.taxable,
       tax: result.taxMinor / 100,
@@ -167,7 +150,7 @@ interface StoredRecord {
   error: boolean
 }
 
-const DEFAULT_RECORD: StoredRecord = { gross: '', status: 'Single', computed: false, error: false }
+const DEFAULT_RECORD: StoredRecord = { gross: '', status: 'single', computed: false, error: false }
 
 export function App() {
   const record = useLocalRecord<StoredRecord>({
@@ -179,6 +162,7 @@ export function App() {
 
   const grossText = record.value.gross
   const status = record.value.status
+  const statusLabel = STATUS_OPTIONS.find((o) => o.value === status)?.label ?? status
   const gross = record.value.computed && grossText.trim() !== '' ? Number(grossText) : 0
   const result = record.value.computed ? computeResult(gross, status) : computeResult(0, status)
   const hasResult = record.value.computed && gross > 0
@@ -211,11 +195,18 @@ export function App() {
       hue="green"
       category="Finance"
       meta={hasResult ? 'Last result ready' : 'No result yet'}
-      status={hasResult ? `Filing as ${status}` : 'Enter a gross income to start'}
+      status={hasResult ? `Filing as ${statusLabel}` : 'Enter a gross income to start'}
     >
       <Card mono="Inputs" title="Calculation">
         <Stack>
-          <Select label="Filing status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+          <div className="lc-field">
+            <label className="lc-field-label" htmlFor="filing-status">Filing status</label>
+            <select id="filing-status" className="lc-input" value={status} onChange={(e) => setStatus(e.target.value)}>
+              {STATUS_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
           <TextInput
             label="Gross income"
             value={grossText}
@@ -258,7 +249,7 @@ export function App() {
                   label: 'Export as JSON',
                   mimeType: 'application/json',
                   extension: 'json',
-                  getData: () => exportJson(result, status),
+                  getData: () => exportJson(result, statusLabel),
                 },
               ]}
             />

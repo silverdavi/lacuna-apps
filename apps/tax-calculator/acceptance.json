@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "06c6e5eec4b9cb01296065f2e43f705f69ad0af7b8d4b8131077513197f58ccf",
+  "spec_sha256": "586de1af108f3193b6730639ec7c72e81e2a3c2c0a8676e8876e2cdd0c9f7477",
   "checks": [
     {
       "id": "A1",
@@ -20,7 +20,7 @@
     },
     {
       "id": "A5",
-      "text": "Typing 200000 in the field labelled \"Gross income\", selecting \"Single\" in the select labelled \"Filing status\", and clicking \"Calculate\" shows \"Tax: $41,200.00\", \"Effective rate: 20.60%\", and \"Taxable income: $190,000.00\"."
+      "text": "Typing 200000 in the field labelled \"Gross income\", selecting \"Single\" in the select labelled \"Filing status\", and clicking \"Calculate\" shows \"Tax: $39,600.00\", \"Effective rate: 19.80%\", and \"Taxable income: $190,000.00\"."
     },
     {
       "id": "A6",
@@ -37,12 +37,28 @@
     {
       "id": "A9",
       "text": "Reload keeps the last calculation: after calculating with Gross income 50000 and Filing status \"Single\", reloading the page still shows \"Tax: $4,600.00\" and \"Effective rate: 9.20%\"."
+    },
+    {
+      "id": "A10",
+      "text": "Standard deduction is $10,000 for both filing statuses; taxable income = gross - 10,000 (never below 0). Effective rate = tax / gross income, two decimals."
+    },
+    {
+      "id": "A11",
+      "text": "Single brackets (taxable income): 10% up to 10,000; 12% from 10,000 to 40,000; 22% from 40,000 to 90,000; 24% from 90,000 to 190,000; 32% above 190,000. Married filing jointly: 10% up to 20,000; 12% from 20,000 to 80,000; 22% from 80,000 to 180,000; 24% from 180,000 to 380,000; 32% above."
+    },
+    {
+      "id": "A12",
+      "text": "Computed: 50000 Single: taxable 40,000 -> 10,000 at 10% = 1,000.00 and 30,000 at 12% = 3,600.00, tax 4,600.00, rate 9.20%. 100000 Single: taxable 90,000 -> 1,000 + 3,600 + 50,000 at 22% = 11,000 = 15,600.00, 15.60%. 50000 MFJ: taxable 40,000 -> 20,000 at 10% = 2,000 + 20,000 at 12% = 2,400 = 4,400.00, 8.80%. 200000 Single: taxable 190,000 -> 1,000 + 3,600 + 11,000 + 100,000 at 24% = 24,000 = 39,600.00, 19.80%."
+    },
+    {
+      "id": "A13",
+      "text": "The select labelled \"Filing status\" is a native select (find it with `getByLabel('Filing status', { exact: true })`). Clipboard: `context.grantPermissions` first."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "743ce2cf71c12bd3cbfcb3d1d7841f5b3dfb166bf864ad3514d12f9c3d53d23f"
+      "sha256": "69f2eaccaa6d64fcbe13da42c44d14102bb5a8212a987e6a589e363874097fe5"
     }
   ]
 }
