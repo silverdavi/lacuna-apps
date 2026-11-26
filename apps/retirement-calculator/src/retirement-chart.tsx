@@ -64,14 +64,24 @@ export function RetirementChart({ rows, width = 320, height = 200 }: Props) {
         style={{ strokeLinejoin: 'round' } as CSSProperties}
       />
       {rows.map((row, idx) => (
-        <circle
-          key={row.year}
-          data-point={`Year ${row.year}: ${money(row.balance)}`}
-          cx={x(idx)}
-          cy={y(row.balance)}
-          r={3}
-          fill="var(--accent)"
-        />
+        <g key={row.year}>
+          <circle
+            data-point={`Year ${row.year}: ${money(row.balance)}`}
+            cx={x(idx)}
+            cy={y(row.balance)}
+            r={3}
+            fill="var(--accent)"
+          />
+          <text
+            x={x(idx)}
+            y={y(row.balance) - 7}
+            textAnchor="middle"
+            fontSize="8"
+            fill="var(--ink)"
+          >
+            {`Year ${row.year}: ${money(row.balance)}`}
+          </text>
+        </g>
       ))}
       {labels.map((idx) => (
         <text

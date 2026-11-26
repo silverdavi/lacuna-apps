@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "cc4fd2b8fb95883f7e408a581d81548a13900959f5fe8c468ed12af8fe611cc1",
+  "spec_sha256": "794adf0b7f813dda46902518855792ccb60c76113613ec7a4e02801b8e6dfd4c",
   "checks": [
     {
       "id": "A1",
@@ -24,7 +24,7 @@
     },
     {
       "id": "A6",
-      "text": "Changing the field labelled \"Annual return %\" to \"10\" and clicking \"Calculate\" updates the result summary to \"Projected savings at retirement: $3,031,267.98\"."
+      "text": "Changing the field labelled \"Annual return %\" to \"10\" and clicking \"Calculate\" updates the result summary to \"Projected savings at retirement: $3,031,268.18\"."
     },
     {
       "id": "A7",
@@ -37,12 +37,20 @@
     {
       "id": "A9",
       "text": "Reload keeps the saved plans: after saving two plans and reloading, the list still shows \"Plan 1\" and \"Plan 2\" with their details."
+    },
+    {
+      "id": "A10",
+      "text": "Rule (per year, 35 years, rounded to cents each year): balance = round2(opening + 12 * monthly + opening * rate / 100). Year 1 at 7%: 50000 + 6000 + 3500 = 59,500.00. Year 35 at 7%: 1,363,250.32. Year 1 at 10%: 50000 + 6000 + 5000 = 61,000.00. Year 35 at 10%: 3,031,268.18 (all computed with a script)."
+    },
+    {
+      "id": "A11",
+      "text": "The breakdown table columns are Year, Contribution (12 * monthly), Growth (opening * rate / 100), Balance. Clipboard: `context.grantPermissions` first. Use `getByRole('tab', { name: 'Chart', exact: true })` and `{ name: 'Table', exact: true }`."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "6ace68f6baad0b516995905b40f22aef81a7fd7ac5a8c664efb33dee67fe55b2"
+      "sha256": "9dd6797c5c9703510299c16da8d98591a0e4a74e781b14373888858a7a5f5171"
     }
   ]
 }

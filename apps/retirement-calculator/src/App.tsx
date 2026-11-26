@@ -147,28 +147,15 @@ export function App() {
               <Kpi value={money(result.totalContributions)} label="Contributed, including starting savings" />
               <Kpi value={money(result.totalGrowth)} label="Growth from compound interest" />
             </KpiRow>
-            <div
-              role="tablist"
-              aria-label="View"
-              style={{ display: 'flex', gap: 'calc(4px * var(--sf))' }}
-            >
+            <div role="tablist" aria-label="View" className="lc-tabs">
               {VIEWS.map((v) => (
                 <button
                   key={v}
                   type="button"
                   role="tab"
                   aria-selected={tab === v}
+                  className={`lc-tab${tab === v ? ' active' : ''}`}
                   onClick={() => setTab(v)}
-                  style={{
-                    fontFamily: 'var(--sans)',
-                    fontSize: 'calc(13px * var(--tf))',
-                    color: tab === v ? 'var(--paper)' : 'var(--ink)',
-                    background: tab === v ? 'var(--ink)' : 'transparent',
-                    border: 'calc(1px * var(--sf)) solid var(--hair-strong)',
-                    borderRadius: 'calc(7px * var(--sf))',
-                    padding: 'calc(6px * var(--sf)) calc(12px * var(--sf))',
-                    cursor: 'pointer',
-                  }}
                 >
                   {v}
                 </button>
@@ -228,7 +215,12 @@ export function App() {
               <Row
                 key={plan.id}
                 title={plan.title}
-                meta={`${plan.ages} · ${plan.returnPct}`}
+                meta={
+                  <span>
+                    {plan.ages}
+                    <span className="lc-chip">{plan.returnPct}</span>
+                  </span>
+                }
                 value={money(plan.projected)}
               />
             ))}
