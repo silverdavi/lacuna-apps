@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "cce43ef7bc5a6036cb863a9c03ac6adbe5779a62f5a1f30a0a936e9fee59b387",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Filling \"Hex\" with `#FF5733` shows 255 in \"R\", 87 in \"G\", 51 in \"B\", 11 in \"H\", 100 in \"S\" and 60 in \"L\"."
+    },
+    {
+      "id": "A2",
+      "text": "With \"Hex\" set to `#FF5733`, the page shows the texts \"Contrast on White: 3.15\" and \"Contrast on Black: 6.66\"."
+    },
+    {
+      "id": "A3",
+      "text": "Filling \"R\" with 128, \"G\" with 64 and \"B\" with 32 shows `#804020` in \"Hex\"."
+    },
+    {
+      "id": "A4",
+      "text": "With \"Hex\" set to `#FF5733`, clicking \"Generate Palette\" shows five swatches reading, in order, `#FF5733`, `#B1FF33`, `#33FFAA`, `#335FFF`, `#FC33FF`."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Hex\" set to `#FF5733`, clicking \"Copy Hex\" makes the button read \"Copied!\" and the clipboard text is `#FF5733`."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Hex\" set to `#FF5733`, filling \"H\" with 200 shows `#33BBFF` in \"Hex\"."
+    },
+    {
+      "id": "A7",
+      "text": "After generating the palette for `#FF5733`, clicking \"Remove #B1FF33\" leaves four swatches and none reads `#B1FF33`."
+    },
+    {
+      "id": "A8",
+      "text": "Filling \"Hex\" with `#zzz` shows the text \"Invalid hex\" and leaves \"R\" at 0."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the current color and palette: after setting \"Hex\" to `#123456`, clicking \"Generate Palette\" and reloading, \"Hex\" shows `#123456` and the first swatch reads `#123456`."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "156558987dc3e2a55a8ff7d7dec3d4eca7cd2f2a33a77707b382ee6091678525"
+    }
+  ]
+}

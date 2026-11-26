@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.color-picker",
+  "name": "Color Picker",
+  "version": "0.1.0",
+  "summary": "Convert between hex, RGB and HSL, check contrast, and keep a palette.",
+  "description": "Color Picker converts a color between hex, RGB and HSL, reports WCAG contrast ratios on white and black, copies the hex value, and builds a palette of harmonic swatches. The current color and palette persist across reloads.",
+  "category": "productivity",
+  "tags": [
+    "color",
+    "contrast",
+    "palette"
+  ],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Lacuna shelf",
+    "contact": "shelf@lacuna.app"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/color-picker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/color-math": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:color-picker"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "color-picker",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Color Picker records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "color-picker"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

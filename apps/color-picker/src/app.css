@@ -1,0 +1,37 @@
+.cp-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(8px * var(--sf));
+}
+
+.cp-cell {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.cp-cell-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-60);
+}
+
+.cp-swatch {
+  height: calc(40px * var(--sf));
+  border-radius: calc(2px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.cp-contrast-note {
+  display: flex;
+  gap: calc(16px * var(--sf));
+  flex-wrap: wrap;
+  color: var(--ink-60);
+}
+
+.cp-contrast-note span {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+}
