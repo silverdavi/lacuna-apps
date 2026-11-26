@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/draw-canvas",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A canvas drawing surface with brush, eraser, shapes, layers, pan/zoom, undo/redo, and PNG export.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/use-pointer-draw": "workspace:0.1.0",
+    "@lacuna/use-undo-stack": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "DrawCanvas",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "959006e604df4469",
+    "lines": 373,
+    "exports": [
+      "DrawCanvas"
+    ],
+    "types": [
+      "DrawCanvasProps"
+    ],
+    "signature": "DrawCanvas(props: DrawCanvasProps)"
+  }
+}

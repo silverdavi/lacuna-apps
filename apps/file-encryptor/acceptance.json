@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2cdb9020b8b805b18d83e0edb9d233555aed22c5da85e9a43336c5e9fb53bb76",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"File Encryptor\" and the text \"Drop a file or click to browse\"."
+    },
+    {
+      "id": "A2",
+      "text": "Loading a file named \"notes.txt\" with content \"hello world\" through the drop zone shows a preview panel with the filename \"notes.txt\", the size \"11 bytes\", and the text \"hello world\"."
+    },
+    {
+      "id": "A3",
+      "text": "With \"notes.txt\" loaded, typing \"secret123\" in the field labelled \"Passphrase\", selecting \"Encrypt\" in the select labelled \"Mode\", and clicking the button \"Transform\" shows the success message \"Encrypted notes.txt\" and enables the button \"Download result\"."
+    },
+    {
+      "id": "A4",
+      "text": "After A3's steps, clicking \"Download result\" triggers a download whose suggested filename is \"notes.txt.enc\"."
+    },
+    {
+      "id": "A5",
+      "text": "Encrypt notes.txt with passphrase \"secret123\" and click \"Download result\" to obtain the encrypted bytes (read them from `await download.path()`). Reload the page, load those bytes as a file named \"notes.txt.enc\" through the drop zone, type \"secret123\" in \"Passphrase\", select \"Decrypt\" in \"Mode\", and click \"Transform\": the success message \"Decrypted notes.txt.enc\" appears and the preview panel shows the text \"hello world\"."
+    },
+    {
+      "id": "A6",
+      "text": "After encrypting \"notes.txt\" with passphrase \"secret123\", the list labelled \"Recent operations\" has one item containing \"notes.txt\", \"Encrypt\" and a timestamp of the form YYYY-MM-DD HH:MM. Clicking the button \"Clear list\" removes all items and shows the text \"No operations yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"defaultpass\" in the field labelled \"Default passphrase\" and clicking the button \"Save default\" shows the message \"Default passphrase saved\". After reloading, the field labelled \"Default passphrase\" has the value \"defaultpass\"."
+    },
+    {
+      "id": "A8",
+      "text": "With \"notes.txt\" (plain text \"hello world\", not encrypted) loaded, typing \"wrongpass\" in \"Passphrase\", selecting \"Decrypt\" in \"Mode\", and clicking \"Transform\" shows the error message \"Decryption failed: invalid passphrase or corrupted file\"."
+    },
+    {
+      "id": "A9",
+      "text": "After saving the default passphrase \"defaultpass\" as in A7 and reloading, the field labelled \"Default passphrase\" has the value \"defaultpass\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "19f5f3e50b8c10ae56c56e247b081484f1a5130f852fd70eee30db722fd06063"
+    }
+  ]
+}

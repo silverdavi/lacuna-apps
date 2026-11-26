@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "24206e0c1adf041ba50d5c77a2b6281d54026753761c404134beeb7145f7aee0",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no input, the page shows the heading \"JSON Schema Validator\", a button labelled \"Validate\", and the text \"No validation results yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `{\"name\": \"Alice\"}` into the textarea labelled \"JSON Data\" and `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}}` into the textarea labelled \"Schema\", then clicking \"Validate\" shows the text \"Validation passed\" and hides \"No validation results yet\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `{\"name\": 123}` into the textarea labelled \"JSON Data\" and `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}}` into the textarea labelled \"Schema\", then clicking \"Validate\" shows the text \"Validation failed\" and a list item containing \"name: expected string, got number\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing `{\"age\": 25}` into the textarea labelled \"JSON Data\" and `{\"type\": \"object\", \"required\": [\"name\"]}` into the textarea labelled \"Schema\", then clicking \"Validate\" shows the text \"Validation failed\" and a list item containing \"name: required field missing\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing `{\"code\": \"ABC123\"}` into the textarea labelled \"JSON Data\" and `{\"type\": \"object\", \"properties\": {\"code\": {\"type\": \"string\", \"pattern\": \"^[A-Z]{3}$\"}}}` into the textarea labelled \"Schema\", then clicking \"Validate\" shows the text \"Validation failed\" and a list item containing \"code: does not match pattern ^[A-Z]{3}$\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing `{\"value\": 150}` into the textarea labelled \"JSON Data\" and `{\"type\": \"object\", \"properties\": {\"value\": {\"type\": \"number\", \"minimum\": 100, \"maximum\": 100}}}` into the textarea labelled \"Schema\", then clicking \"Validate\" shows the text \"Validation failed\" and a list item containing \"value: 150 is greater than maximum 100\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing `not json` into the textarea labelled \"JSON Data\" and clicking \"Validate\" shows the text \"Invalid JSON in data field\" and does not show \"Validation passed\" or \"Validation failed\"."
+    },
+    {
+      "id": "A8",
+      "text": "After a successful validation with \"Validation passed\" visible, clicking the button \"Download Report\" triggers a file download named \"validation-report.json\" containing the text `\"status\":\"pass\"`."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last validation result: after validating `{\"name\": \"Alice\"}` against a valid schema to show \"Validation passed\", reloading the page still shows the text \"Validation passed\" and the same JSON and Schema text in their respective textareas."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "220a97de85c5c49ff5a23e8e0e072171973fd0eb44cd07b8108f935730bd7a08"
+    }
+  ]
+}

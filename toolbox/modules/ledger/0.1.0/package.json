@@ -1,0 +1,37 @@
+{
+  "name": "@lacuna/ledger",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure double-entry ledger with accounts, categories, running balances, net worth, and budget-versus-actuals comparisons.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "ledger",
+    "kind": "logic",
+    "commit": "27329c567b38ee51f94c3eee413b237ebb05a433",
+    "source": "127c34e8f3bb0604",
+    "lines": 149,
+    "exports": [
+      "createLedger",
+      "addTransaction",
+      "removeTransaction",
+      "getBalance",
+      "getRunningBalance",
+      "getNetWorth",
+      "getBudgetActuals",
+      "getTransactionsByCategory"
+    ],
+    "types": [
+      "Account",
+      "Category",
+      "Transaction",
+      "BalanceEntry",
+      "BudgetActual",
+      "Ledger"
+    ],
+    "signature": "createLedger(accounts: Account[], categories: Category[]); addTransaction(ledger: Ledger, tx: Omit<Transaction, 'id'>); removeTransaction(ledger: Ledger, txId: string); getBalance(ledger: Ledger, accountId: string, asOf?: string)"
+  }
+}

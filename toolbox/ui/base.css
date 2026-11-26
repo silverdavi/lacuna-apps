@@ -1,0 +1,7 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+   Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy. */
+/* The one stylesheet an app loads: bundled fonts and tokens, the Lacuna UI classes, then the app kit.
+   src/main.tsx imports it as '@lacuna/ui/base.css'. */
+@import './tokens.css';
+@import './ui.css';
+@import './kit.css';

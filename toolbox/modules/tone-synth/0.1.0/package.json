@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/tone-synth",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions for scheduling Web Audio tones, clicks, and notes with sample-accurate timing.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "toneSynth",
+    "kind": "logic",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "997f34a3748d03a7",
+    "lines": 129,
+    "exports": [
+      "midiToFreq",
+      "scheduleTone",
+      "createNoiseBuffer",
+      "scheduleClick",
+      "scheduleNote"
+    ],
+    "types": [
+      "ToneOptions",
+      "ClickOptions",
+      "NoteOptions"
+    ],
+    "signature": "midiToFreq(midi: number); scheduleTone(ctx: AudioContext, opts?: ToneOptions); createNoiseBuffer(ctx: AudioContext, duration: number); scheduleClick(ctx: AudioContext, opts?: ClickOptions)"
+  }
+}

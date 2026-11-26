@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.timezone-converter",
+  "name": "Timezone Converter",
+  "version": "0.1.0",
+  "summary": "Convert a date and time between two IANA timezones.",
+  "description": "Pick a source and target timezone, enter a date and time, and read the converted time. Save conversions to a local history, swap the timezones, or copy the result.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/timezone-converter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:timezone-converter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "timezone-converter",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Timezone Converter records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "timezone-converter"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

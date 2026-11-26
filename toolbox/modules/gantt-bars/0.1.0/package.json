@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/gantt-bars",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Horizontal timeline bars for tasks with dependency arrows and drag or arrow-key rescheduling.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "GanttBars",
+    "kind": "widget",
+    "commit": "02e528989c1ce79e4abef257c3998b2f6e09cda8",
+    "source": "2666542aa8474173",
+    "lines": 223,
+    "exports": [
+      "GanttBars"
+    ],
+    "types": [
+      "GanttBar",
+      "GanttBarsProps"
+    ],
+    "signature": "GanttBars({ bars, onBarsChange, width = 800, height = 300, dayWidth = 20, onDragStart, onDragEn...)"
+  }
+}

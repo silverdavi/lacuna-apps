@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "21cc5edef49466ee535f4c37e129adb61efa21ad7c70e1b2971ced386682d624",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Markdown Editor\", a tab labelled \"Write\" and a tab labelled \"Preview\". The \"Write\" tab is active by default, showing the editor area and a status bar showing \"0 words\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `# Hello` into the editor area updates the status bar to show \"1 words\". Clicking the \"Preview\" tab shows the rendered heading \"Hello\" in the preview pane."
+    },
+    {
+      "id": "A3",
+      "text": "In the \"Write\" tab, typing `- [ ] Buy milk` and `- [ ] Walk dog` creates a task list. Clicking the \"Preview\" tab shows two unchecked checkboxes. Clicking the first checkbox in the preview changes the editor text to `- [x] Buy milk` and `- [ ] Walk dog`."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Write\" tab, typing `| Name | Age |` and `|------|-----|` and `| Alice | 30 |` creates a table. Clicking the \"Preview\" tab shows a table with the header cells \"Name\" and \"Age\", and a body cell \"Alice\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Write\" tab, typing `**bold**` and clicking the \"Preview\" tab shows the text \"bold\" with a `strong` tag. Typing `*italic*` and clicking the \"Preview\" tab shows the text \"italic\" with an `em` tag."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Write\" tab, typing ` indented code` (four spaces) creates a code block. Clicking the \"Preview\" tab shows the text \"indented code\" inside a `pre` tag."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"Export\" button in the toolbar downloads a file named `document.md` containing the exact text currently in the editor."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Write\" tab, typing `# Test` and then pressing `Ctrl+Z` reverts the editor to its previous empty state, and the status bar shows \"0 words\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the document text. After typing `# Saved` in the editor, reloading the page shows the editor containing `# Saved` and the status bar showing \"1 words\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d5506cdb4f16a13917190c6c08aceb51eb556ab30473551aaf46cc0805fa102c"
+    }
+  ]
+}

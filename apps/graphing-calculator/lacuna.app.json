@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.graphing-calculator",
+  "name": "Graphing Calculator",
+  "version": "0.1.0",
+  "summary": "Plot functions of x, adjust the window, and read sampled values.",
+  "description": "Type a function of x, plot it, adjust the viewing window, and read the sampled values in a table. Functions persist on this device and export as a PNG.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/graphing-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/money-input": "0.1.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:graphing-calculator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "graphing-calculator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Graphing Calculator records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "graphing-calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

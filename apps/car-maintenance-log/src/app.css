@@ -1,0 +1,22 @@
+.cm-tabs {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(16px * var(--sf));
+}
+
+.cm-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-80);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+  cursor: pointer;
+}
+
+.cm-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}

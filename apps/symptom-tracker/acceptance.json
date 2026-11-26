@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "dc4202a9e43d71d1ce518e235e0dc9a5c34922e9e6c5d03252988ac59e1c94c9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Symptom Tracker\" and, with no entries, shows the text \"No symptoms logged yet\" in the main content area."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add symptom\" opens a form. Typing \"Headache\" in the field labelled \"Symptom name\", selecting \"3\" in the field labelled \"Severity\", and clicking \"Save\" adds a list item containing \"Headache\" and \"Severity: 3\"; the text \"No symptoms logged yet\" is replaced by the list."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Headache\" (Severity 3), clicking \"Add symptom\" again, typing \"Fatigue\" in \"Symptom name\", selecting \"5\" in \"Severity\", and clicking \"Save\" adds a second list item containing \"Fatigue\" and \"Severity: 5\"; the list now contains both items."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete Headache\" removes the Headache entry from the list; the list now contains only \"Fatigue\" and the text \"No symptoms logged yet\" is not shown."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"Calendar\" switches the view to a month grid; clicking the day cell labelled \"15\" in the current month highlights that day and shows the text \"No symptoms on this day\" if no entry exists for that date."
+    },
+    {
+      "id": "A6",
+      "text": "After adding a symptom with the date set to the 15th of the current month, clicking the tab \"Calendar\" and then clicking the day cell labelled \"15\" shows the text \"Headache\" in the day detail panel."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"Trends\" displays a heatmap grid; after logging symptoms on three consecutive days, the streak counter shows \"Current streak: 3 days\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that includes the header \"Date,Symptom,Severity\" and a row for each logged entry."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the logged symptoms: after adding \"Headache\" (Severity 3) and reloading the page, the list still contains \"Headache\" and \"Severity: 3\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "094e01b06161558f6956c1e1fe95d9ed8162001337a784ab9b8266c81f4d57af"
+    }
+  ]
+}

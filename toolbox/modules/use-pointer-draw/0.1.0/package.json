@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/use-pointer-draw",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "React hook that captures pointer events into smoothed, pressure-aware freehand strokes with pan and zoom transforms for sketch pads and annotation tools.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "usePointerDraw",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "2c31c89e9803dd2d",
+    "lines": 306,
+    "exports": [
+      "usePointerDraw"
+    ],
+    "types": [
+      "Point",
+      "Stroke",
+      "Transform",
+      "PointerDrawOptions",
+      "PointerDrawReturn",
+      "SurfaceProps"
+    ],
+    "signature": "usePointerDraw(options?: PointerDrawOptions)"
+  }
+}

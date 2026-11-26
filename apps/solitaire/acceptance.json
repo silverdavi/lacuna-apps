@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "8cddd1604f22661b6caf37ed1355b1df6a418133230d09e8394c59f57edfb527",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page shows the heading \"Solitaire Game\", the text \"Score: 0\", the text \"Best: 0\", and a button labelled \"New Game\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New Game\" deals the board; the text \"Score: 0\" remains, and the stock pile displays the text \"24\" indicating the number of remaining cards."
+    },
+    {
+      "id": "A3",
+      "text": "With the board dealt, pressing the \"ArrowRight\" key while the stock pile is focused moves the top card to the waste pile; the stock pile text changes to \"23\" and the waste pile displays the text \"K\" for the King of Spades (the first card in a seeded shuffle)."
+    },
+    {
+      "id": "A4",
+      "text": "With the King of Spades in the waste pile, pressing the \"ArrowDown\" key while the waste pile is focused moves the King of Spades to the first foundation pile; the waste pile is empty, the first foundation pile displays \"K\", and the text \"Score: 10\" appears."
+    },
+    {
+      "id": "A5",
+      "text": "With the King of Spades in the first foundation pile, pressing the \"ArrowUp\" key while the first foundation pile is focused moves the King of Spades back to the waste pile; the first foundation pile is empty, the waste pile displays \"K\", and the text \"Score: 0\" appears."
+    },
+    {
+      "id": "A6",
+      "text": "After moving the King of Spades to the first foundation pile (Score: 10), reloading the page still shows the first foundation pile displaying \"K\" and the text \"Score: 10\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the King of Spades in the first foundation pile, clicking the button \"New Game\" resets the board; the first foundation pile is empty, the stock pile displays \"24\", and the text \"Score: 0\" appears."
+    },
+    {
+      "id": "A8",
+      "text": "After moving the King of Spades to the first foundation pile (Score: 10), reloading the page still shows the text \"Best: 10\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a3a644782d2ed0706209bc9253fd4740908bb63f353be6de4bdbcb15943daeca"
+    }
+  ]
+}

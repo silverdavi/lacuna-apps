@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "75479a1cd2907e1e09a8826b0f79a8efe021706fd18c2dbbb6a797abfc83dcc1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no image loaded, the page shows the heading \"Image Color Extractor\", the text \"Drop an image or click to browse\", and the button \"Browse files\"."
+    },
+    {
+      "id": "A2",
+      "text": "After dropping a solid red PNG file (256x256, #FF0000) into the drop zone, the swatch grid displays exactly one swatch with the hex value \"#FF0000\" and the label \"Red\"."
+    },
+    {
+      "id": "A3",
+      "text": "After loading a solid red image, clicking the button \"Extract colors\" with the field labelled \"Number of colors\" set to \"5\" shows five swatches, all displaying \"#FF0000\"."
+    },
+    {
+      "id": "A4",
+      "text": "After loading a solid red image and extracting 5 colors, clicking the first swatch shows the detail panel with the text \"Hex: #FF0000\", \"RGB: 255, 0, 0\", \"HSL: 0, 100%, 50%\", and \"OKLCH: 0.62797, 0.25773, 29.22\"."
+    },
+    {
+      "id": "A5",
+      "text": "After loading a solid red image and extracting 5 colors, clicking the button \"Copy hex\" on the first swatch copies \"#FF0000\" to the clipboard and shows the toast message \"Copied #FF0000\"."
+    },
+    {
+      "id": "A6",
+      "text": "After loading a solid red image and extracting 5 colors, clicking the button \"Add to palette\" on the first swatch adds a new swatch to the palette section with the hex value \"#FF0000\" and the label \"Red\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding \"#FF0000\" to the palette, clicking the button \"Remove\" on that palette swatch removes it, and the palette section shows the text \"No colors in palette\"."
+    },
+    {
+      "id": "A8",
+      "text": "After loading a solid red image and extracting 5 colors, the contrast ratio display shows \"Contrast with white: 4.58:1\" and \"Contrast with black: 21.00:1\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the extracted palette: after adding \"#FF0000\" to the palette and reloading the page, the palette section still shows a swatch with the hex value \"#FF0000\" and the label \"Red\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "5ddf89384e087198ea32ac1dc55758889e2ab56d8d76af958669f42d035281bd"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/board-grid",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A 2D cell board with roving keyboard focus for grid-based games and puzzles.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "BoardGrid",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "a2fea890caad1524",
+    "lines": 186,
+    "exports": [
+      "BoardGrid"
+    ],
+    "types": [
+      "BoardGridProps"
+    ],
+    "signature": "BoardGrid(props: BoardGridProps)"
+  }
+}

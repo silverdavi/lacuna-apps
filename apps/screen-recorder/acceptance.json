@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "1e53436a58bd0c28862bfa8133833f0b5382e15d77a5ce9f1c75683f9b5ea81d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Screen Recorder\" and, with no recordings, shows the text \"No recordings yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Record screen\" starts a recording; after 3 seconds, clicking the button \"Stop\" adds a list item containing \"Screen\" and the text \"0:03\", and the button label changes to \"Record screen\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the list item for the screen recording, clicking the button \"Delete\" removes that item, and the text \"No recordings yet\" reappears."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab \"Camera\" shows a button \"Capture frame\"; clicking it adds a list item containing \"Frame\" and the text \"0:00\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Library\" tab, every list item has a button \"Download\"; clicking \"Download\" on the item containing \"Screen\" triggers a file download with a name ending in \".webm\"."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting \"1080p\" in the field labelled \"Resolution\" and then recording a 2-second screen clip adds a list item containing \"1080p\" and \"0:02\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding a screen recording and a camera frame, reloading the page still shows both list items with their original labels and durations."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear all\" in the \"Library\" tab removes all list items and shows the text \"No recordings yet\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8199f15d5f95b4cd85eaef224adaedfddcb2866ef8834b4beb4bb3549237290d"
+    }
+  ]
+}

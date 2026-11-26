@@ -1,3 +1,5 @@
+import { createMockRecordStore } from '@lacuna/host-mock'
+
 export interface Subscription {
   id: string
   name: string
@@ -19,18 +21,7 @@ function isSubscription(value: unknown): value is Subscription {
   )
 }
 
-export function loadSubscriptions(): Subscription[] {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return []
-    const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter(isSubscription)
-  } catch {
-    return []
-  }
-}
-
-export function saveSubscriptions(subscriptions: Subscription[]): void {
-  window.localStorage.setItem(KEY, JSON.stringify(subscriptions))
-}
+export const store = createMockRecordStore<Subscription>({
+  key: KEY,
+  validate: isSubscription,
+})

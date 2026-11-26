@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6730c6c95b05d900b64cc102731769d82e87af841323d072056bf3b8a32717d3",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Period Tracker\" and, with no records, shows the text \"No periods recorded yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add period\" form, typing \"2023-10-01\" in the field labelled \"Start date\" and \"5\" in the field labelled \"Length (days)\", then clicking the button \"Add period\", adds a list item containing \"2023-10-01\" and \"5 days\". The text \"No periods recorded yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second period with Start date \"2023-10-28\" and Length \"4\", the summary section displays \"Average cycle: 27 days\" and \"Next period: 2023-11-24\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete 2023-10-01\" removes the first list item. The summary updates to show \"Average cycle: \u2014\" and \"Next period: \u2014\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab labelled \"Calendar\" switches the view to a month grid. The date \"2023-10-01\" is highlighted with the label \"Period start\" and the date \"2023-10-28\" is highlighted with the label \"Period start\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Calendar\" view, clicking the date \"2023-11-24\" displays a tooltip or badge with the text \"Predicted period\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export ICS\" copies a string starting with \"BEGIN:VCALENDAR\" to the clipboard and displays the message \"Calendar exported\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Settings\" tab, changing the value in the field labelled \"Default length\" from \"5\" to \"7\" and clicking \"Save settings\" updates the default length used for new predictions."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the period list: after adding a period with Start date \"2023-10-01\" and reloading the page, the list item containing \"2023-10-01\" and \"5 days\" is still visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d5db18ada6b17d1a2e340de96dd2c556cb9698e1a35744c485e1979ae48eef3b"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d9d6a4d498fce7ecca4176bbee0212dfb13b16ebbdff40d1d7d17d3dfbcdd159",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Calorie Counter\" and, with no entries, shows the text \"No meals logged yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Meal name\" with \"Oatmeal\", selecting \"Breakfast\" in the select labelled \"Category\", entering \"300\" in the field labelled \"Calories\", and clicking the button \"Add meal\" adds a row to the table containing \"Oatmeal\", \"Breakfast\", and \"300\"; the summary panel shows \"Total: 300 kcal\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second meal with \"Meal name\" \"Salad\", \"Category\" \"Lunch\", and \"Calories\" \"450\", the table contains both rows, and the summary panel shows \"Total: 750 kcal\" and \"Mean: 375 kcal\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the column header \"Calories\" in the table sorts the rows in descending order, placing \"Salad\" (450) above \"Oatmeal\" (300); clicking it again sorts in ascending order, placing \"Oatmeal\" above \"Salad\"."
+    },
+    {
+      "id": "A5",
+      "text": "Selecting \"Breakfast\" in the filter select labelled \"Filter by category\" hides the \"Salad\" row and shows only the \"Oatmeal\" row; the summary panel updates to show \"Total: 300 kcal\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete Oatmeal\" removes that row from the table; the summary panel updates to show \"Total: 450 kcal\" and \"Mean: 450 kcal\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard containing the header \"Name,Category,Calories\" and the row \"Salad,Lunch,450\"."
+    },
+    {
+      "id": "A8",
+      "text": "Entering \"0\" in the field labelled \"Calories\" and clicking \"Add meal\" shows the error message \"Calories must be greater than 0\" and does not add a new row."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the logged meals: after adding \"Oatmeal\" (Breakfast, 300) and \"Salad\" (Lunch, 450), reloading the page still shows both rows in the table and the summary \"Total: 750 kcal\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ba976bf17d9cc7546660f2908c82f88cc0853b92e7d389e0a2913b7e9d4dc931"
+    }
+  ]
+}

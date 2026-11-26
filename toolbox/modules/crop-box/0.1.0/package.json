@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/crop-box",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Resizable and draggable crop rectangle with handles over an image, with optional aspect-ratio locking.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "CropBox",
+    "kind": "widget",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "35dd5cd1e7cfc44d",
+    "lines": 209,
+    "exports": [
+      "CropBox"
+    ],
+    "types": [
+      "CropBoxProps"
+    ],
+    "signature": "CropBox({ imageWidth, imageHeight, crop, onCropChange, aspectRatio, minSize = 10, label = 'Cr...)"
+  }
+}

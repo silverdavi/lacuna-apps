@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2beb939552b4d44f04cffe79c5da7104a99d0d12e6639e5f2c62f1fc798b0e3c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no components the page shows the heading \"Grade Calculator\", the text \"No components yet\", and the summary line \"Weighted Grade: 0.00%\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Component Name\" with \"Midterm\", the field labelled \"Score\" with \"85\", and the field labelled \"Weight\" with \"40\", then clicking the button \"Add component\" adds a table row that contains \"Midterm\", \"85.00\", \"40%\", and \"34.00\"; the summary shows \"Weighted Grade: 34.00%\" and \"No components yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After also adding a component with Name \"Final Exam\", Score \"92\", and Weight \"60\", a table row contains \"Final Exam\", \"92.00\", \"60%\", and \"55.20\", and the summary shows \"Weighted Grade: 89.20%\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add component\" with an empty Component Name, or with a Score that is empty, negative, or greater than 100, adds no table row and shows the message \"Enter a name and a score between 0 and 100\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every table row has a button named \"Delete <name>\". With the components Midterm (85, 40) and Final Exam (92, 60), clicking \"Delete Final Exam\" removes that row and the summary shows \"Weighted Grade: 34.00%\"."
+    },
+    {
+      "id": "A6",
+      "text": "When the sum of weights is not 100, the app still computes the weighted average based on the provided weights: adding only a component with Name \"Quiz\", Score \"100\", and Weight \"10\" shows \"Weighted Grade: 10.00%\" and a warning text \"Weights sum to 10%\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"abc\" in the field labelled \"Score\" and pressing Tab shows the message \"Score must be a number\" and adds no table row."
+    },
+    {
+      "id": "A8",
+      "text": "With components Midterm (85, 40) and Final Exam (92, 60), the breakdown table shows a total row with the text \"Total\" and \"100%\" in the weight column."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the component list: after adding Midterm (85, 40) and reloading the page, the table still shows a row with \"Midterm\", \"85.00\", \"40%\", and the summary line \"Weighted Grade: 34.00%\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2d89892f7118f9bbcd9ddc07d2a158c0b25b44cc8e948ba9312706b7e2269859"
+    }
+  ]
+}

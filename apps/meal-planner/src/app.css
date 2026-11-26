@@ -1,0 +1,23 @@
+/* App-specific structure. The kit owns the visual language; this file adds
+   layout the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+
+.mp-tabs {
+  display: flex;
+  gap: calc(12px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.mp-tab {
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-80);
+  background: none;
+  border: none;
+  padding: calc(8px * var(--sf)) calc(2px * var(--sf));
+  cursor: pointer;
+}
+
+.mp-tab.active {
+  color: var(--ink);
+}

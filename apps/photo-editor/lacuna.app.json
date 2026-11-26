@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.photo-editor",
+  "name": "Photo Editor Filters",
+  "version": "0.1.0",
+  "summary": "Apply filters and transforms to an image, then export it as a PNG.",
+  "description": "Drop or browse for an image, apply a filter and a transform, and export the result as a PNG. The loaded image and its current edits are kept on this device, so they survive a reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["image", "filter", "transform", "edit"],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/photo-editor",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:image",
+    "edit:image"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "photo-editor-session",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the loaded image and its current edits on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "photo-editor-session"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

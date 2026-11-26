@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ca2f38587030c06fd476e3739aef9716879b8881dda39b912a9e5a66dc2e5e7e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"String Art Generator\" and a canvas area with the text \"No pattern generated yet\" visible."
+    },
+    {
+      "id": "A2",
+      "text": "Setting the slider labelled \"Points\" to 12, the slider labelled \"Step\" to 5, and clicking the button \"Generate\" replaces \"No pattern generated yet\" with a canvas element that has a non-zero width and height, and the text \"Pattern ready\" appears below the canvas."
+    },
+    {
+      "id": "A3",
+      "text": "After generating a pattern with Points 12 and Step 5, changing the slider labelled \"Color\" to the value \"#FF0000\" and clicking \"Generate\" again updates the canvas; the text \"Pattern ready\" remains visible and the canvas element is present."
+    },
+    {
+      "id": "A4",
+      "text": "Setting the slider labelled \"Points\" to 3 and clicking \"Generate\" shows the message \"Minimum 4 points required\" and the canvas area still displays \"No pattern generated yet\"."
+    },
+    {
+      "id": "A5",
+      "text": "After generating a valid pattern, clicking the button \"Export PNG\" triggers a file download with the filename \"string-art.png\" and the file size is greater than 0 bytes."
+    },
+    {
+      "id": "A6",
+      "text": "After generating a pattern with Points 10 and Step 3, clicking the button \"Clear\" removes the canvas element, restores the text \"No pattern generated yet\", and resets the slider labelled \"Points\" to its default value of 8."
+    },
+    {
+      "id": "A7",
+      "text": "The tab labelled \"History\" is initially inactive. After generating two patterns with different settings, clicking the tab \"History\" shows a list containing two items, each displaying the point count and step value used, such as \"12 points, step 5\" and \"10 points, step 3\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the History tab, each history item has a button labelled \"Delete\". Clicking \"Delete\" on the item showing \"10 points, step 3\" removes that item from the list, leaving only the item showing \"12 points, step 5\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the generated pattern: after generating a pattern with Points 12 and Step 5, reloading the page still shows the canvas element with \"Pattern ready\" visible and the slider labelled \"Points\" set to 12."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1aa243b5d9dd540761fb17f28828792a6a9dc402fd711c0c09baa43a907e1a92"
+    }
+  ]
+}

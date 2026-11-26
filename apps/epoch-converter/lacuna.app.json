@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.epoch-converter",
+  "name": "Epoch Converter",
+  "version": "0.1.0",
+  "summary": "Convert between Unix timestamps and UTC dates, with a persisted conversion history.",
+  "description": "Type a Unix timestamp (seconds) or an ISO-8601 UTC date and the other updates instantly. Copy either value to the clipboard, set the fields to now, and keep a history of recent conversions that survives reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["unix", "epoch", "timestamp", "date", "converter"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/epoch-converter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:epoch-converter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "epoch-converter",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the conversion history on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "epoch-converter"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/chart",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Small SVG chart with line, bar, and donut types, axes, labels, and hover tooltips.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Chart",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "2fb6c820ec6d871c",
+    "lines": 226,
+    "exports": [
+      "Chart"
+    ],
+    "types": [
+      "ChartDataPoint",
+      "ChartProps"
+    ],
+    "signature": ""
+  }
+}

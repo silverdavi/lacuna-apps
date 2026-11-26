@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ff21d76139880841fc68b2173ccc450fa18a15d67de50908327e053db62fcde7",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Encrypted Notes\" and the empty state shows the text \"No notes yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Meeting notes\" in the field labelled \"Title\", typing \"Buy milk\" in the editor area, typing \"secret123\" in the field labelled \"Passphrase\", and clicking the button \"Save note\" adds a list item containing \"Meeting notes\" and the status bar shows \"Saved\"."
+    },
+    {
+      "id": "A3",
+      "text": "After saving \"Meeting notes\" with passphrase \"secret123\", clicking the list item \"Meeting notes\" opens the note view, the editor area contains \"Buy milk\", and the button \"Export Markdown\" is visible."
+    },
+    {
+      "id": "A4",
+      "text": "In the note view for \"Meeting notes\", clicking the button \"Export Markdown\" copies the text \"Buy milk\" to the clipboard and the status bar shows \"Copied to clipboard\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the note view for \"Meeting notes\", typing \"Buy eggs\" in the editor area and clicking the button \"Save changes\" updates the note; the status bar shows \"Saved\" and the editor area contains \"Buy eggs\"."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Meeting notes\" open, clicking the button \"Delete note\" shows a confirmation dialog with the text \"Delete this note?\" and the button \"Confirm delete\"; clicking \"Confirm delete\" removes the note from the list and the list shows \"No notes yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"Wrong pass\" in the field labelled \"Passphrase\" and clicking the button \"Unlock\" for the note \"Meeting notes\" shows the error message \"Incorrect passphrase\" and does not open the note view."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"# Hello\" in the editor area for a new note, saving it, and then opening the note view shows the rendered heading \"Hello\" in the Markdown view area."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the note \"Meeting notes\" in the list; clicking it and entering the correct passphrase \"secret123\" shows the editor area containing \"Buy eggs\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "3bf6cbb7f11f8cbada3f11ee876897c41c9bbb2de6df2ccfe57fc78353c9e483"
+    }
+  ]
+}

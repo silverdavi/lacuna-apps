@@ -1,0 +1,67 @@
+/* App-specific layout. The kit owns the visual language; this file only adds
+   structure that the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+.bm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}
+
+.bm-tablewrap {
+  overflow-x: auto;
+}
+
+.bm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bm-table th {
+  text-align: left;
+  padding: 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.bm-table td {
+  padding: calc(8px * var(--sf)) calc(10px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  vertical-align: middle;
+}
+
+.bm-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.bm-sort {
+  all: unset;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  font-weight: 600;
+  text-align: left;
+  padding: calc(8px * var(--sf)) calc(10px * var(--sf));
+  white-space: nowrap;
+}
+.bm-sort:hover {
+  color: var(--ink);
+}
+
+.bm-row-actions {
+  display: flex;
+  gap: calc(6px * var(--sf));
+  white-space: nowrap;
+}
+
+.bm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(6px * var(--sf));
+}
+
+.bm-url {
+  word-break: break-all;
+  color: var(--ink-60);
+}

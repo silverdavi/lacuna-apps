@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "8671dc57f6e5708bec655e8a3aca3e4ab3d1860d9d097f21d580dd414b9afa8e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Bucket List Tracker\" and, with no entries, the text \"No entries yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the tab labelled \"Entries\", typing \"Skydive\" in the field labelled \"Title\", selecting \"Adventure\" in the select labelled \"Category\", and clicking the button \"Add entry\" creates a list item containing \"Skydive\" and \"Adventure\"; the text \"No entries yet\" is no longer visible."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Add step\" inside the \"Skydive\" item, typing \"Book jump\" in the field labelled \"Step\", and pressing Enter adds a checkable item \"Book jump\" to that entry's checklist; the progress indicator for \"Skydive\" shows \"0/1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the checkbox next to \"Book jump\" in the \"Skydive\" entry changes the progress indicator for \"Skydive\" to \"1/1\" and displays the text \"Complete\" next to the entry title."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"Sky\" in the input labelled \"Search\" filters the list to show only the item \"Skydive\"; typing \"Ocean\" in the same input shows the text \"No entries yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export CSV\" displays a toast with the text \"Exported 1 entry\" and triggers a download of a file containing the line \"Skydive,Adventure,1/1\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Edit\" on the \"Skydive\" item opens a form; changing the field labelled \"Title\" to \"Bungee\" and clicking \"Save\" updates the list item to show \"Bungee\" instead of \"Skydive\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete\" on the \"Bungee\" item removes it from the list; the list then shows the text \"No entries yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry \"Skydive\" with category \"Adventure\" and the checked step \"Book jump\" visible in the list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a9c86cf6bb43287683d07165a6dd705561fa9e7b4cd46536188aa61090112249"
+    }
+  ]
+}

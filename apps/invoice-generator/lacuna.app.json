@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.invoice-generator",
+  "name": "Invoice Generator",
+  "version": "0.1.0",
+  "summary": "Compose an invoice with line items, tax, and discounts; export to PDF or copy the text.",
+  "description": "A small shelf app. Enter a client, an invoice number, and an issue date, then add line items with quantity, unit price, discount, and tax rate. The document preview updates live with per-line subtotals, tax, and the total. Export to PDF opens the print dialog with the invoice laid out on an A4 sheet; copy to clipboard puts the invoice text on the clipboard. The invoice persists on this device.",
+  "category": "productivity",
+  "tags": ["invoice", "billing", "documents"],
+  "icon": "invoice",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Lacuna",
+    "contact": "apps@lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/invoice-generator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/line-items": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:invoice-generator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "invoice",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own invoice records"
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "invoice"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

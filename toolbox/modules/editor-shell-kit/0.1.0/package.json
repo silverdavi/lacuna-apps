@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/editor-shell-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A document editing shell composing a toolbar, undo/redo, keyboard shortcuts, local persistence, autosave status, and export.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/export-menu": "workspace:0.1.0",
+    "@lacuna/use-local-record": "workspace:0.1.0",
+    "@lacuna/use-undo-stack": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "EditorShellKit",
+    "kind": "kit",
+    "commit": "b294bc982dbaf54e7d2d6ec83acf556e63cb91a8",
+    "source": "2ec527c75da842e3",
+    "lines": 304,
+    "exports": [
+      "EditorShellKit"
+    ],
+    "types": [
+      "EditorShellKitProps"
+    ],
+    "signature": "EditorShellKit(props: EditorShellKitProps)"
+  }
+}

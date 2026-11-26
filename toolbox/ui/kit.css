@@ -1,0 +1,268 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+   Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy. */
+/* App kit styles: the page frame for shelf apps and the gaps ui.css leaves for them.
+   Reads tokens only. Class prefix: lk-. Loaded through base.css after tokens.css and ui.css. */
+
+/* ---------------------------------------------------------------- page frame
+   The Lacuna desktop ground (paper with the dot grid) behind one framed app window.
+   Unlike the product shell, the page scrolls as a whole, so nothing is clipped on a phone. */
+.lk-shell {
+  height: auto; min-height: 100vh; overflow: visible;
+  background-color: var(--paper);
+  background-image: radial-gradient(circle, var(--hair) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+#root { height: auto; min-height: 100%; }
+.lk-top { flex: none; }
+/* Small labels are held to WCAG AA here: the faint and mute inks of the product shell are below it. */
+.lk-shell .lc-mono.lc-faint, .lk-shell .lc-spacechip, .lk-shell .lc-cv-statusbar, .lk-shell .lc-tag { color: var(--mid); }
+.lk-shell .lc-tag.accent { color: var(--accent); }
+.lk-shell .lc-app-bar .lc-mono, .lk-shell .lc-chip { color: var(--ink-80); }
+:root[data-appearance='dark'] .lk-shell { --accent: #E27B55; --on-accent: #10171A; --danger: #EE8372; }
+.lk-shell .lc-desk-head { overflow: visible; }
+.lk-crumb {
+  font-family: var(--mono); font-size: calc(10px * var(--tf)); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--mid); padding: 2px 4px;
+}
+/* Current page. Twin of the product launcher rule on .lc-cv-crumbs .here.
+   Ink word, 2px accent underline. Apps do not restyle this. */
+.lk-shell .lc-cv-crumbs .here {
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+/* The mark, the APPS chip and the category are links to the Lacuna desktop. Same look as before, as links. */
+.lk-shell a.lc-spacechip, .lk-shell a.lk-crumb { text-decoration: none; cursor: pointer; }
+.lk-shell a.lc-spacechip:hover, .lk-shell a.lk-crumb:hover { color: var(--ink); }
+.lk-shell .lc-brand-home:focus-visible, .lk-shell a.lc-spacechip:focus-visible, .lk-shell a.lk-crumb:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.lk-win {
+  flex: 0 1 auto; width: calc(100% - calc(48px * var(--sf))); max-width: 1120px;
+  margin: calc(24px * var(--sf)) auto; overflow: visible;
+}
+/* Inside the Lacuna desktop the host window already has the title bar, so the app is the board. */
+.lk-shell.lk-embedded .lk-win {
+  width: 100%; max-width: none; margin: 0; border: 0; box-shadow: none;
+}
+.lk-shell.lk-embedded .lk-win > .lc-app-bar { display: none; }
+.lk-shell .lc-app-bar .lk-name { margin: 0; line-height: 1.2; flex: 0 1 auto; max-width: none; }
+.lk-grow { flex: 1; }
+.lk-shell .lc-app-body { min-height: 0; }
+.lk-main {
+  overflow: visible; padding: calc(16px * var(--sf)); gap: calc(12px * var(--sf));
+  background: var(--ui-bg);
+}
+.lk-side {
+  width: 260px; flex: 0 0 260px; overflow: visible;
+  padding: calc(16px * var(--sf)) calc(12px * var(--sf));
+  display: flex; flex-direction: column; gap: calc(12px * var(--sf));
+}
+.lk-status { margin-top: auto; }
+
+/* ---------------------------------------------------------------- right rail */
+.lk-rail { padding: calc(14px * var(--sf)) calc(12px * var(--sf)); }
+.lk-rail-note { margin-top: calc(6px * var(--sf)); padding-bottom: calc(10px * var(--sf)); border-bottom: 1px solid var(--hair-strong); }
+.lk-rail .lc-envelope-fields { margin-top: calc(12px * var(--sf)); }
+.lk-rail .lc-chip { white-space: normal; }
+.lk-rail-body { margin-top: calc(12px * var(--sf)); font-size: calc(12px * var(--tf)); color: var(--ink-60); line-height: 1.5; }
+.lk-rail > :first-child { margin-top: 0; }
+
+/* ---------------------------------------------------------------- section label */
+.lk-section { margin: 0; font-weight: 400; }
+
+/* ---------------------------------------------------------------- headings inside panels
+   A raw h2/h3 inside the frame still reads as Lacuna: serif, medium weight. */
+.lk-main h2:not(.lc-mono), .lk-main h3:not(.lc-mono) {
+  font-family: var(--serif); font-weight: 500; letter-spacing: -0.015em; line-height: 1.2;
+  color: var(--ink); margin: 0;
+}
+.lk-main h2:not(.lc-mono) { font-size: calc(19px * var(--tf)); }
+.lk-main h3:not(.lc-mono) { font-size: calc(16px * var(--tf)); }
+.lk-main p { margin: 0; }
+
+/* ---------------------------------------------------------------- controls
+   Raw controls inside the frame inherit the kit look, so a missed className is not a broken page. */
+.lk-shell .lc-field { display: block; }
+.lk-shell .lc-field-label { display: block; }
+.lk-main input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file']):not(.lc-input),
+.lk-main select:not(.lc-input), .lk-main textarea:not(.lc-input) {
+  border: 1px solid var(--ui-line2); border-radius: 2px; background: var(--ui-card);
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  font-family: var(--sans); font-size: calc(13px * var(--tf)); color: var(--ink);
+}
+.lk-main button:not([class]) {
+  font-family: var(--sans); font-size: calc(12.5px * var(--tf)); font-weight: 600; line-height: 1.2;
+  border: 1px solid var(--ui-line2); border-radius: 2px; background: var(--ui-card); color: var(--ink);
+  padding: calc(8px * var(--sf)) calc(18px * var(--sf)); cursor: pointer;
+}
+.lk-shell select.lc-input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-60) 50%), linear-gradient(135deg, var(--ink-60) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: calc(30px * var(--sf)); }
+.lk-shell .lc-input::placeholder { color: var(--ink-40); }
+.lk-shell .lc-input[aria-invalid='true'] { border-color: var(--danger); }
+/* Focus ring and hit target. Twin of the product launcher .lc-btn rule.
+   Apps do not set outline. Phone rules below raise the hit target to 44px. */
+.lk-shell .lc-btn { min-height: 24px; min-width: 24px; }
+.lk-shell .lc-btn:focus-visible, .lk-shell .lc-input:focus-visible, .lk-shell .lc-pill:focus-visible,
+.lk-shell .lc-tab:focus-visible, .lk-main button:focus-visible, .lk-main input:focus-visible,
+.lk-main select:focus-visible, .lk-main textarea:focus-visible, .lk-row-text:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.lk-shell .lc-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; }
+.lk-shell .lc-btn.danger { border-color: var(--danger); color: var(--danger); background: var(--ui-card); }
+.lk-field-error, .lk-field-hint {
+  display: block; margin-top: calc(4px * var(--sf));
+  font-family: var(--mono); font-size: calc(9px * var(--tf)); letter-spacing: 0.6px; text-transform: uppercase;
+}
+.lk-field-error { color: var(--danger); }
+.lk-field-hint { color: var(--ink-40); }
+.lk-check { display: inline-flex; align-items: center; gap: calc(8px * var(--sf)); font-size: calc(13px * var(--tf)); color: var(--ink-80); cursor: pointer; }
+.lk-check input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+.lk-check { margin: calc(4px * var(--sf)) calc(18px * var(--sf)) calc(4px * var(--sf)) 0; min-height: 24px; }
+.lk-check:last-child { margin-right: 0; }
+/* Buttons that sit next to each other never touch. */
+.lk-shell .lc-btn + .lc-btn { margin-left: calc(8px * var(--sf)); }
+
+/* ---------------------------------------------------------------- native range, colour and file inputs
+   Apps may use these raw; the kit makes them flat and square like everything else. */
+.lk-shell input[type='range'] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: calc(20px * var(--sf)); margin: 0; background: transparent; accent-color: var(--accent);
+}
+.lk-shell input[type='range']::-webkit-slider-runnable-track { height: 4px; background: var(--ink); border: 0; border-radius: 0; }
+.lk-shell input[type='range']::-moz-range-track { height: 4px; background: var(--ink); border: 0; border-radius: 0; }
+.lk-shell input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 18px; margin-top: -7px; background: var(--accent); border: 1px solid var(--ink); border-radius: 0; box-shadow: 2px 2px 0 var(--ink);
+}
+.lk-shell input[type='range']::-moz-range-thumb { width: 14px; height: 18px; background: var(--accent); border: 1px solid var(--ink); border-radius: 0; }
+.lk-shell input[type='color'] {
+  -webkit-appearance: none; appearance: none; width: calc(48px * var(--sf)); height: calc(34px * var(--sf)); padding: 3px; background: var(--ui-card);
+  border: 1px solid var(--ink); border-radius: 0; box-shadow: 2px 2px 0 var(--ink); cursor: pointer;
+}
+.lk-shell input[type='color']::-webkit-color-swatch-wrapper { padding: 0; }
+.lk-shell input[type='color']::-webkit-color-swatch { border: 0; border-radius: 0; }
+.lk-shell input[type='file'] { font-family: var(--mono); font-size: calc(11px * var(--tf)); color: var(--ink-60); max-width: 100%; }
+.lk-shell input[type='file']::file-selector-button {
+  font-family: var(--sans); font-size: calc(12.5px * var(--tf)); font-weight: 600; color: var(--ink); background: var(--ui-card);
+  border: 1px solid var(--ink); border-radius: 0; padding: calc(6px * var(--sf)) calc(12px * var(--sf)); margin-right: calc(10px * var(--sf)); cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- board and keys
+   A board is a grid of square cells of one fixed size. The grid lines are the gaps; cells carry only a background. */
+.lk-board {
+  --cell-size: min(calc(var(--cell, 28px) * var(--sf)), calc((100vw - 56px) / var(--cols)));
+  display: grid; grid-template-columns: repeat(var(--cols), var(--cell-size)); grid-auto-rows: var(--cell-size);
+  gap: 1px; padding: 1px; width: max-content; max-width: 100%; margin: 0 auto;
+  background: var(--ui-line2); border: 1px solid var(--ui-line2); box-shadow: none;
+}
+.lk-shell .lk-board > * {
+  box-sizing: border-box; width: 100%; height: 100%; min-width: 0; min-height: 0 !important; margin: 0; padding: 0 !important;
+  border: 0 !important; border-radius: 0 !important; aspect-ratio: auto !important; box-shadow: none !important;
+  display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(var(--cell-size) * 0.55) !important;
+  line-height: 1; color: var(--ink);
+}
+.lk-board > :where(*) { background: var(--ui-bg); }
+.lk-shell .lk-board > button { cursor: pointer; }
+.lk-shell .lk-board > button:hover:not(:disabled) { background: var(--paper-deep); }
+.lk-keys { margin: calc(10px * var(--sf)) 0 0; display: grid; gap: calc(6px * var(--sf)); }
+.lk-key-row { display: flex; align-items: center; gap: calc(10px * var(--sf)); }
+.lk-key-row dt, .lk-key-row dd { margin: 0; }
+.lk-key-row dd { font-size: calc(12.5px * var(--tf)); color: var(--ink-80); }
+.lk-kbd {
+  display: inline-grid; place-items: center; min-width: calc(26px * var(--sf)); height: calc(24px * var(--sf)); padding: 0 calc(6px * var(--sf));
+  font-family: var(--mono); font-size: calc(10.5px * var(--tf)); color: var(--ink); background: var(--ui-card);
+  border: 1px solid var(--ink); box-shadow: 2px 2px 0 var(--ink);
+}
+
+/* ---------------------------------------------------------------- shelf widgets
+   Toolbox widgets written before the kit set their look inline (8px corners, soft drop shadows, pills).
+   Inside the frame they are drawn flat like everything else: square corners, hard offset shadow.
+   Percent radii (a disc, a ring) are left alone. Remove this block when the widgets draw with the kit. */
+.lk-shell [style*='border-radius: calc('], .lk-shell [style*='border-radius: 999'],
+.lk-shell [style*='border-radius: 6px'], .lk-shell [style*='border-radius: 8px'], .lk-shell [style*='border-radius: 12px'] {
+  border-radius: 2px !important;
+}
+.lk-shell [style*='box-shadow'][style*='rgba('] { box-shadow: 3px 3px 0 var(--ink) !important; }
+.lk-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0 calc(12px * var(--sf)); align-items: start; }
+.lk-form .lc-field { margin-bottom: calc(12px * var(--sf)); }
+.lk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: calc(8px * var(--sf)); }
+
+/* ---------------------------------------------------------------- list rows */
+.lk-list { list-style: none; margin: 0; padding: 0; }
+.lk-row {
+  display: flex; align-items: center; gap: calc(12px * var(--sf));
+  padding: calc(10px * var(--sf)) 0; border-bottom: 1px solid var(--ui-line); min-width: 0;
+}
+.lk-row:last-child { border-bottom: none; }
+.lk-row.hot { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); padding-left: calc(10px * var(--sf)); }
+.lk-row-text {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-align: left;
+  background: none; border: none; padding: 0; color: inherit; font: inherit;
+}
+button.lk-row-text { cursor: pointer; }
+.lk-row-title { font-size: calc(13px * var(--tf)); font-weight: 500; color: var(--ink); overflow-wrap: anywhere; }
+.lk-row-meta { font-size: calc(11px * var(--tf)); color: var(--ink-60); }
+.lk-row-value { font-family: var(--mono); font-size: calc(11px * var(--tf)); color: var(--ink-60); letter-spacing: 0.4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------------------------------------------------------------- tables
+   A raw table inside the frame gets the kit look too. */
+.lk-main table:not(.lc-table) { width: 100%; border-collapse: collapse; }
+.lk-main table:not(.lc-table) th {
+  font-family: var(--mono); font-size: calc(9px * var(--tf)); letter-spacing: 0.9px; text-transform: uppercase;
+  color: var(--ink-60); text-align: left; font-weight: 400;
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf)); border-bottom: 1px solid var(--hair-strong);
+}
+.lk-main table:not(.lc-table) td {
+  font-size: calc(12.5px * var(--tf)); color: var(--ink-80);
+  padding: calc(10px * var(--sf)) calc(12px * var(--sf)); border-bottom: 1px solid var(--ui-line);
+}
+.lk-shell .lc-table tfoot td { font-weight: 600; color: var(--ink); border-bottom: none; border-top: 1px solid var(--hair-strong); }
+.lk-shell .lc-table td.num { font-family: var(--mono); font-size: calc(11.5px * var(--tf)); }
+
+/* ---------------------------------------------------------------- empty and error states */
+.lk-shell .lc-empty { border: 1px dashed var(--ui-line2); border-radius: 2px; background: var(--ui-bg); }
+.lk-error {
+  display: grid; gap: calc(6px * var(--sf)); padding: calc(12px * var(--sf)) calc(16px * var(--sf));
+  border: 1px solid var(--hair-strong); border-left: 4px solid var(--danger); background: var(--ui-card); min-width: 0;
+}
+.lk-error-mono { color: var(--danger); }
+
+/* ---------------------------------------------------------------- big result number */
+.lk-shell .lc-kpirow { border-top: none; padding-top: 0; }
+.lk-shell .lc-kpi-value { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* ---------------------------------------------------------------- bold frame
+   The app window is the active Lacuna window: ink border, a hard offset ink shadow, and the app's hue as a
+   thick title band. The hue marks identity (band, plate, rail shadow, section marks, selected row).
+   Rust stays the one action colour. */
+.lk-shell .lk-win { border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); margin-bottom: calc(28px * var(--sf)); }
+:root[data-appearance='dark'] .lk-shell .lk-win { box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.6); }
+:root[data-appearance='dark'] .lk-shell.lk-embedded .lk-win { box-shadow: none; }
+.lk-shell .lk-win > .lc-app-bar {
+  height: 42px; border-top-width: 6px; border-bottom: 1px solid var(--ink);
+  background: color-mix(in srgb, var(--win-accent) 22%, var(--ui-card));
+}
+.lk-shell .lk-side .lc-envelope { box-shadow: 3px 3px 0 var(--win-accent); }
+.lk-section::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 7px;
+  background: var(--win-accent); border: 1px solid var(--ink);
+}
+.lk-shell .lk-win .lk-row.hot { background: color-mix(in srgb, var(--win-accent) 14%, transparent); box-shadow: inset 4px 0 0 var(--win-accent); }
+
+/* ---------------------------------------------------------------- tablet and phone */
+@media (max-width: 1000px) {
+  .lk-shell .lc-app-body { flex-direction: column; }
+  .lk-side { width: auto; flex: 0 0 auto; max-height: none; border-left: none; border-top: 1px solid var(--ui-line); flex-direction: row; flex-wrap: wrap; }
+  .lk-side > * { flex: 1 1 220px; }
+}
+@media (max-width: 720px) {
+  .lk-win { width: calc(100% - calc(16px * var(--sf))); margin: calc(8px * var(--sf)) auto; }
+  .lk-shell .lk-win { box-shadow: 3px 3px 0 var(--ink); margin-bottom: calc(14px * var(--sf)); }
+  .lk-shell.lk-embedded .lk-win { box-shadow: none; margin: 0; width: 100%; }
+  .lk-main { padding: calc(12px * var(--sf)); }
+  .lk-shell .lc-spacechip { display: none; }
+  .lk-shell .lc-btn, .lk-shell .lc-input, .lk-main button:not([class]) { min-height: 44px; }
+  .lk-shell .lc-input { font-size: calc(16px * var(--tf)); }
+  .lk-shell .lc-kpi-value { font-size: calc(22px * var(--tf)); }
+  .lk-shell .lc-kpirow > :first-child { grid-column: 1 / -1; }
+  .lk-shell .lc-table tfoot { display: block; width: 100%; }
+  .lk-row { flex-wrap: wrap; }
+  .lk-actions .lc-btn { flex: 1 1 auto; justify-content: center; }
+}
