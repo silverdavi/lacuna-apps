@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "601183a3c611c27086361d03078df633cd3af25dadf79aceb1b2fe9e6946813e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Dream Journal\" and, with no entries, the text \"No dreams yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the form, typing \"Flying\" in the field labelled \"Title\", \"I soared over a lake\" in the field labelled \"Description\", and \"night, calm\" in the field labelled \"Tags\", then clicking the button \"Save dream\" adds a list item containing \"Flying\", \"I soared over a lake\", and the tags \"night\" and \"calm\"; the text \"No dreams yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the dream from A2, clicking the button \"Edit Flying\" opens the form with the field labelled \"Title\" showing \"Flying\" and the field labelled \"Description\" showing \"I soared over a lake\"; changing the field labelled \"Description\" to \"I soared over a river\" and clicking \"Save dream\" updates the list item to contain \"I soared over a river\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the dream from A2 present, typing \"soared\" in the field labelled \"Search\" filters the list to show only the item containing \"Flying\"; typing \"zzz\" in the field labelled \"Search\" shows the text \"No dreams match\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the dream from A2 present, selecting \"night\" in the select labelled \"Tag\" filters the list to show the item containing \"Flying\"; selecting \"calm\" in the select labelled \"Tag\" also shows the item containing \"Flying\"; selecting \"work\" in the select labelled \"Tag\" shows the text \"No dreams match\"."
+    },
+    {
+      "id": "A6",
+      "text": "With the dream from A2 present, clicking the button \"Delete Flying\" removes that list item and the page shows the text \"No dreams yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the dream from A2 present, clicking the button \"Export CSV\" shows the toast \"Exported 1 dream(s) to CSV\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding the dream from A2, reloading the page still shows the list item containing \"Flying\" and \"I soared over a lake\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the dream titled \"Flying\" with the description \"I soared over a lake\" and the tags \"night\" and \"calm\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "68af936287138ecf71e601110b11a0ad46adadab603f901b14ce394c37121803"
+    }
+  ]
+}
