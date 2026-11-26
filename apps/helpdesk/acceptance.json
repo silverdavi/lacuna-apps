@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "13a6dc7d3ef8dabbc379370e795e7a2c1f5d8f812ff3f3656b7ed5c06a473360",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Helpdesk\". With no tickets, the list area shows the text \"No tickets yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Server down\" in the field labelled \"Subject\", \"Alice\" in \"Customer\", selecting \"High\" in the select labelled \"Priority\" and clicking the button \"Add ticket\" adds a table data row containing \"Server down\", \"Alice\" and \"High\" (status \"Open\"); the text \"No tickets yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Server down\" (Alice, High) and \"Login issue\" (Bob, Low), the table has exactly two data rows. Clicking the column header \"Priority\" sorts by priority rank High, Medium, Low: the \"Server down\" row comes before the \"Login issue\" row."
+    },
+    {
+      "id": "A4",
+      "text": "With both tickets added, typing \"Alice\" in the search box labelled \"Search\" leaves exactly one data row (containing \"Alice\"); clearing the box shows two rows again."
+    },
+    {
+      "id": "A5",
+      "text": "With \"Server down\" (Open) and \"Login issue\" (edited to status \"Closed\" via Edit, status select, Save), clicking the chip button \"Open\" shows only the \"Server down\" row, clicking \"Closed\" shows only the \"Login issue\" row, and clicking \"All\" shows both rows."
+    },
+    {
+      "id": "A6",
+      "text": "With \"Server down\" added, clicking the button \"Edit\" in its row opens a form; selecting \"Closed\" in the select labelled \"Status\" and clicking \"Save\" updates that row to show \"Closed\"."
+    },
+    {
+      "id": "A7",
+      "text": "With both tickets added, clicking the button \"Delete\" in the \"Login issue\" row removes it; exactly one data row remains, containing \"Server down\"."
+    },
+    {
+      "id": "A8",
+      "text": "With \"Server down\" (Alice, High) added, clicking the button \"Export CSV\" downloads a file named \"helpdesk.csv\" whose first line is \"Subject,Customer,Priority,Status\" and which contains the line \"Server down,Alice,High,Open\"."
+    },
+    {
+      "id": "A9",
+      "text": "After adding \"Server down\" (Alice, High), reloading shows a row with \"Server down\", \"Alice\", \"High\" and \"Open\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "447378b07274a2f5df2b24d5cda9c38f35082220e9c65b370eded46ad07a75ae"
+    }
+  ]
+}
