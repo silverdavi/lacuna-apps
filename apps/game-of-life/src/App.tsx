@@ -17,7 +17,7 @@ import { ALIVE } from './colors'
 import { CELLS, COLS, ROWS, countAlive, emptyBoard, step, toggleAt, type Cells } from './engine'
 import { host } from './host'
 
-const TICK_MS = 25
+const TICK_MS = 200
 
 type Phase = 'paused' | 'running'
 
@@ -76,8 +76,8 @@ export function App() {
     <AppShell
       name="Conway Game of Life"
       icon="grid"
-      hue="rust"
-      category="Games"
+      hue="cobalt"
+      category="Productivity"
       meta={`Population: ${population}`}
       status={phase === 'running' ? 'Running' : 'Paused'}
       side={
@@ -107,7 +107,7 @@ export function App() {
               Step
             </Button>
             <Button
-              kind={phase === 'running' ? 'secondary' : 'primary'}
+              kind="secondary"
               onClick={() => setPhase((p) => (p === 'running' ? 'paused' : 'running'))}
             >
               {phase === 'running' ? 'Stop' : 'Run'}

@@ -1,5 +1,5 @@
 export const COLS = 9
-export const ROWS = 9
+export const ROWS = 10
 export const CELLS = COLS * ROWS
 
 export type Cells = number[]

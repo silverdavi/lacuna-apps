@@ -4,8 +4,8 @@
   "name": "Game of Life",
   "version": "0.1.0",
   "summary": "Step Conway's Game of Life on a grid: toggle cells, run the world, watch patterns emerge.",
-  "description": "Conway's original cellular automaton on a 9-column by 9-row board. Click a cell to toggle it, then step or run the world at a steady pace. Stable patterns such as the block hold, while gliders and other traffic fade or move. The board state stays on this device and survives a reload.",
-  "category": "personal",
+  "description": "Conway's original cellular automaton on a 10-row by 9-column board. Click a cell to toggle it, then step or run the world at a steady pace. Stable patterns such as the block hold, while gliders and other traffic fade or move. The board state stays on this device and survives a reload.",
+  "category": "productivity",
   "icon": "grid",
   "relationship": {
     "kind": "standalone"
@@ -34,12 +34,13 @@
     }
   },
   "capabilities": [
-    "edit:game"
+    "create:grid",
+    "edit:grid"
   ],
   "permissions": {
     "records": [
       {
-        "kind": "game",
+        "kind": "grid",
         "access": [
           "read",
           "write",
