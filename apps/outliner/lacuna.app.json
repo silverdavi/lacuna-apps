@@ -1,0 +1,88 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.outliner",
+  "name": "Outline App",
+  "version": "0.1.0",
+  "summary": "A hierarchical outline manager with nested items, reordering, and Markdown export.",
+  "description": "Add outline items, nest them with indent and outdent, reorder with the drag handle, and export the outline as Markdown to the clipboard. Items are saved in this browser and survive a reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/outliner"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-drag-reorder": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:outline-item",
+    "edit:outline-item",
+    "export:outline"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "outline-item",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the text and structure of each outline item"
+      }
+    ],
+    "platform": [
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "outline-item"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

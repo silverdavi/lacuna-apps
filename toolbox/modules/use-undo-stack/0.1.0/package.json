@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/use-undo-stack",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Undo and redo for any editor state: present value plus past and future stacks.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useUndoStack",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "dddfa1a242548120",
+    "lines": 62,
+    "exports": [
+      "useUndoStack"
+    ],
+    "types": [
+      "UndoStack"
+    ],
+    "signature": "useUndoStack( initial: T, options?: { limit?: number } )"
+  }
+}

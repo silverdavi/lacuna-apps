@@ -1,5 +1,18 @@
 import { useMemo, useState } from 'react'
-import { Body, Button, Stack, TextInput } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Rail,
+  Select,
+  Stack,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
 import { host, type Subscription } from './host'
 import './app.css'
 
@@ -65,88 +78,85 @@ export function App() {
     sortKey === key ? (key === 'name' ? ' \u2191' : ' \u2193') : ''
 
   return (
-    <main className="sub-app">
-      <h1 className="sub-heading">Subscription Tracker</h1>
+    <AppShell
+      name="Subscription Tracker"
+      icon="bills"
+      hue="green"
+      category="Productivity"
+      meta={`${subscriptions.length} ${subscriptions.length === 1 ? 'subscription' : 'subscriptions'}`}
+      status="Saved on this device"
+      side={
+        <Rail
+          title="Subscription Tracker"
+          note="Recurring bills · local"
+          chips={['Monthly', 'Works offline']}
+        >
+          <Body>Total monthly: {formatCost(total)}</Body>
+        </Rail>
+      }
+    >
       <Stack lg>
-        <div className="sub-form">
-          <TextInput label="Name" value={name} onChange={setName} />
-          <label className="sub-field">
-            <span className="sub-label">Category</span>
-            <select
-              className="lc-input"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="sub-field">
-            <span className="sub-label">Monthly cost</span>
-            <input
-              className="lc-input"
-              type="number"
-              min="0"
-              step="0.01"
-              inputMode="decimal"
-              value={cost}
-              onChange={(event) => setCost(event.target.value)}
-            />
-          </label>
-          <Button kind="primary" onClick={onAdd}>
-            Add subscription
-          </Button>
+        <Card mono="New" title="Add a subscription">
+          <FormGrid>
+            <TextInput label="Name" value={name} onChange={setName} />
+            <Select label="Category" value={category} onChange={setCategory} options={CATEGORIES} />
+            <TextInput label="Monthly cost" value={cost} onChange={setCost} inputMode="decimal" />
+          </FormGrid>
           {error && (
             <div className="sub-error" role="alert">
               {error}
             </div>
           )}
-        </div>
+          <Actions>
+            <Button kind="primary" onClick={onAdd}>
+              Add subscription
+            </Button>
+          </Actions>
+        </Card>
 
-        <div className="sub-summary">
-          <Body>Total monthly: {formatCost(total)}</Body>
-        </div>
-
-        {subscriptions.length === 0 ? (
-          <Body>No subscriptions yet</Body>
-        ) : (
-          <table className="lc-table sub-table">
-            <thead>
-              <tr>
-                <th scope="col">
-                  <button type="button" className="sub-sort" onClick={() => onSort('name')}>
-                    Name{arrow('name')}
-                  </button>
-                </th>
-                <th scope="col">Category</th>
-                <th scope="col" className="num">
-                  <button type="button" className="sub-sort sub-sort-num" onClick={() => onSort('cost')}>
-                    Monthly cost{arrow('cost')}
-                  </button>
-                </th>
-                <th scope="col" />
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((s) => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{s.category}</td>
-                  <td className="num">{formatCost(s.cost)}</td>
-                  <td className="num">
+        <Card mono={`${subscriptions.length} ${subscriptions.length === 1 ? 'bill' : 'bills'}`} title="Subscriptions">
+          {subscriptions.length === 0 ? (
+            <EmptyState mono="Empty" title="No subscriptions yet" detail="Add your first one above." />
+          ) : (
+            <Table
+              label="Subscriptions"
+              columns={[
+                {
+                  key: 'name',
+                  label: (
+                    <button type="button" className="sub-sort" onClick={() => onSort('name')}>
+                      Name{arrow('name')}
+                    </button>
+                  ),
+                },
+                { key: 'category', label: 'Category' },
+                {
+                  key: 'cost',
+                  num: true,
+                  label: (
+                    <button type="button" className="sub-sort sub-sort-num" onClick={() => onSort('cost')}>
+                      Monthly cost{arrow('cost')}
+                    </button>
+                  ),
+                },
+                { key: 'action', label: '' },
+              ]}
+              rows={visible.map((s) => ({
+                cells: {
+                  name: s.name,
+                  category: s.category,
+                  cost: formatCost(s.cost),
+                  action: (
                     <Button kind="ghost" onClick={() => onDelete(s.id)}>
                       Delete {s.name}
                     </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                  ),
+                },
+              }))}
+            />
+          )}
+        </Card>
       </Stack>
-    </main>
+    </AppShell>
   )
 }

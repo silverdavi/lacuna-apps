@@ -1,0 +1,65 @@
+.dp-canvas-wrap {
+  background: var(--paper);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  padding: calc(8px * var(--sf));
+  display: inline-block;
+  max-width: 100%;
+}
+
+.dp-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  background: var(--paper);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.dp-btn-row {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  flex-wrap: wrap;
+}
+
+.dp-list {
+  min-height: calc(44px * var(--sf));
+}
+
+.dp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf));
+}
+
+.dp-color-row {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(12px * var(--sf));
+}
+
+.dp-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(84px * var(--sf));
+  height: calc(40px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--on-accent);
+}
+
+.dp-label-accent h2 {
+  color: var(--ink-80) !important;
+}
+
+.dp-tag-active span.lc-tag.accent {
+  color: var(--ink-80) !important;
+  border-color: var(--ink-80) !important;
+}
+
+.dp-list li.lk-row.hot {
+  background: var(--ui-card) !important;
+}

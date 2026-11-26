@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.net-worth",
+  "name": "Net Worth Tracker",
+  "version": "0.1.0",
+  "summary": "Track assets and liabilities and see your net worth at a glance.",
+  "description": "Add assets and liabilities by category, watch the total net worth update live, delete entries when circumstances change, and see a per-category breakdown. Export the ledger as CSV to the clipboard. Entries stay on this device.",
+  "category": "productivity",
+  "tags": ["net-worth", "assets", "liabilities", "money"],
+  "icon": "wallet",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/net-worth",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/chart": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:entry",
+    "edit:entry",
+    "export:csv"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "entry",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Net Worth Tracker entries"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "net-worth"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

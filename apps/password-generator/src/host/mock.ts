@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export interface Settings {
   length: number
   lowercase: boolean
@@ -21,28 +23,26 @@ export const DEFAULT_SETTINGS: Settings = {
   symbols: true,
 }
 
+function isSettings(v: unknown): v is Settings {
+  if (typeof v !== 'object' || v === null) return false
+  const s = v as Record<string, unknown>
+  return (
+    typeof s.length === 'number' &&
+    Number.isFinite(s.length) &&
+    typeof s.lowercase === 'boolean' &&
+    typeof s.uppercase === 'boolean' &&
+    typeof s.digits === 'boolean' &&
+    typeof s.symbols === 'boolean'
+  )
+}
+
+const store = createMockValue<Settings>({ key: KEY, fallback: DEFAULT_SETTINGS, validate: isSettings })
+
 export const mockHost: Host = {
   loadSettings() {
-    try {
-      const raw = window.localStorage.getItem(KEY)
-      if (!raw) return null
-      const data = JSON.parse(raw) as Partial<Settings>
-      return {
-        length: typeof data.length === 'number' && Number.isFinite(data.length) ? data.length : DEFAULT_SETTINGS.length,
-        lowercase: typeof data.lowercase === 'boolean' ? data.lowercase : DEFAULT_SETTINGS.lowercase,
-        uppercase: typeof data.uppercase === 'boolean' ? data.uppercase : DEFAULT_SETTINGS.uppercase,
-        digits: typeof data.digits === 'boolean' ? data.digits : DEFAULT_SETTINGS.digits,
-        symbols: typeof data.symbols === 'boolean' ? data.symbols : DEFAULT_SETTINGS.symbols,
-      }
-    } catch {
-      return null
-    }
+    return store.get()
   },
   saveSettings(settings: Settings) {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(settings))
-    } catch {
-      // storage unavailable; settings stay in memory only
-    }
+    store.set(settings)
   },
 }

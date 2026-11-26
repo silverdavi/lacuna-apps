@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.meal-planner",
+  "name": "Meal Planner",
+  "version": "0.1.0",
+  "summary": "Plan the week's meals and build a shopping list.",
+  "description": "Plan a week of meals with a day-of-week per meal, then build one deduplicated shopping list from the ingredients. Shared ingredients are counted once with their quantity. Copy the list to the clipboard, export the week as an .ics calendar, and delete meals when plans change. Everything stays on this device.",
+  "category": "personal",
+  "tags": ["meals", "shopping", "planning"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/meal-planner",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:meal-planner"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "meal",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own planned meals"
+      }
+    ],
+    "platform": [
+      "files.save",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "meal"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

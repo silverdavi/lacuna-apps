@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "c92b32a5c8d025974aabd4c2f5fdb619bc51dd220cdc43842ce5ac9916a06974",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Cooking Unit Converter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"1\" in the field labelled \"Amount\" and selecting \"Cups\" in the select labelled \"From unit\", then selecting \"Tablespoons\" in the select labelled \"To unit\", shows \"16\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"250\" in the field labelled \"Amount\" and selecting \"Grams\" in the select labelled \"From unit\", then selecting \"Ounces\" in the select labelled \"To unit\", shows \"8.82\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"1 1/2\" in the field labelled \"Amount\" and selecting \"Cups\" in the select labelled \"From unit\", then selecting \"Teaspoons\" in the select labelled \"To unit\", shows \"72\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"100\" in the field labelled \"Amount\" and selecting \"Celsius\" in the select labelled \"From unit\", then selecting \"Fahrenheit\" in the select labelled \"To unit\", shows \"212\" in the field labelled \"Result\"."
+    },
+    {
+      "id": "A6",
+      "text": "After performing the conversion in A2, clicking the button \"Copy result\" shows the toast \"Copied 16 Tablespoons to clipboard\"."
+    },
+    {
+      "id": "A7",
+      "text": "After performing the conversion in A2, the tab labelled \"History\" shows a list item containing \"1 Cups \u2192 16 Tablespoons\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear history\" on the tab labelled \"History\" removes all list items and shows the text \"No conversions yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history entry \"1 Cups \u2192 16 Tablespoons\" visible on the tab labelled \"History\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "3a8805eeb3a58972d154b372576104fefeb5b22810fe2d2bc7a7086ea7c7dd39"
+    }
+  ]
+}

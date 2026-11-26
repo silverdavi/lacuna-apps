@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "0cbcc085054cc3cfea086635585035d126c72dc413d5f761ffa7ca802e48347c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Text Readability Score\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"The cat sat on the mat.\" into the code editor (the area labelled \"Input text\") shows \"Words: 6\", \"Sentences: 1\", \"Paragraphs: 1\", and \"Characters: 24\" in the stats panel."
+    },
+    {
+      "id": "A3",
+      "text": "With the text \"The cat sat on the mat.\" in the editor, the score labelled \"Flesch Reading Ease\" shows \"90.0\" and the score labelled \"Flesch-Kincaid Grade Level\" shows \"0.0\"."
+    },
+    {
+      "id": "A4",
+      "text": "Replacing the editor content with \"The quick brown fox jumps over the lazy dog. It was a very good day.\" shows \"Words: 16\", \"Sentences: 2\", and the score labelled \"Flesch Reading Ease\" shows \"80.5\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the checkbox labelled \"Gunning Fog\" makes the score labelled \"Gunning Fog\" appear in the results panel; unchecking it removes that row."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Copy report\" shows a toast with the text \"Report copied to clipboard\" and the clipboard contains a line starting with \"Text Readability Report\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Download .txt\" triggers a file download named \"readability-report.txt\" whose first line is \"Text Readability Report\"."
+    },
+    {
+      "id": "A8",
+      "text": "Switching to the tab labelled \"History\" after running an analysis shows a table row containing \"The cat sat on the mat.\" and \"90.0\"; clicking the button labelled \"Clear history\" removes all rows and shows \"No analyses yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the editor text \"The cat sat on the mat.\" and the checked state of the checkbox labelled \"Gunning Fog\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f03f3f328dd8411f63b88f9098f2a07809d946ab80a22dc131095fa8e123fe08"
+    }
+  ]
+}

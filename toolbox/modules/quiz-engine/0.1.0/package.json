@@ -1,0 +1,38 @@
+{
+  "name": "@lacuna/quiz-engine",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions for building question banks, creating shuffled quiz sessions, checking answers, and computing scores.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/random": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "quizEngine",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "729e3ff2dfa35eac",
+    "lines": 110,
+    "exports": [
+      "createSession",
+      "checkAnswer",
+      "scoreSession",
+      "validateQuestionBank"
+    ],
+    "types": [
+      "QuestionType",
+      "ChoiceQuestion",
+      "TextQuestion",
+      "NumberQuestion",
+      "Question",
+      "QuizSession",
+      "AnswerResult",
+      "Score"
+    ],
+    "signature": "createSession(questions: Question[], seed: number); checkAnswer(question: Question, given: string | number); scoreSession( session: QuizSession, answers: AnswerResult[], ); validateQuestionBank(questions: Question[])"
+  }
+}

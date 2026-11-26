@@ -1,0 +1,21 @@
+/* App-level styles for photo-editor. */
+.pe-tabs {
+  display: flex;
+  gap: calc(2px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+.pe-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 400;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+.pe-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}

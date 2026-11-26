@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "393c6330614b1924b4d435da05a1f9ef322ae4b16b3a3921fda908540b48ad96",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Reaction Time Test\", the button \"Start trial\", and the text \"Ready to start\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Start trial\" changes the main display to \"Wait for green...\" and disables the \"Start trial\" button."
+    },
+    {
+      "id": "A3",
+      "text": "After the wait phase completes (simulated by a fixed 1000ms delay for testing), the main display changes to \"Click now!\" and the \"Start trial\" button remains disabled."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the main display area while it shows \"Click now!\" records a reaction time. If the user clicks exactly 250ms after the green state appears, the display shows \"250 ms\" and a new row is added to the table labelled \"History\" with the value \"250\"."
+    },
+    {
+      "id": "A5",
+      "text": "After recording a reaction time of 250 ms, the button \"Start trial\" becomes enabled again and the main display shows \"Ready to start\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Stats\" shows a table labelled \"All results\" with columns \"Time (ms)\" and \"Date\". The row added in A4 appears with \"250\" in the \"Time (ms)\" column."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"Stats\" tab, clicking the button \"Copy best\" copies the text \"Best: 250 ms\" to the clipboard and shows the toast \"Copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Stats\" tab, clicking the button \"Clear history\" removes all rows from the table labelled \"All results\" and shows the text \"No results yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history: after recording a reaction time of 250 ms and reloading the page, the \"Stats\" tab still shows a row with \"250\" in the \"Time (ms)\" column."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "743d5da9c58569ac6f160a5034507e46565a92220e7c447862775627bb711db6"
+    }
+  ]
+}

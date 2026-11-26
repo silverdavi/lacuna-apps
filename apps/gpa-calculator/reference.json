@@ -1,0 +1,17 @@
+{
+  "repo": "sndnyang/superbGPACalculator",
+  "url": "https://github.com/sndnyang/superbGPACalculator",
+  "sha": "599ae9a6c77e515f9525a82e8474b904ba618760",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2019 sndnyang"
+  ],
+  "files": [
+    "static/js/file.js",
+    "static/js/function.js",
+    "static/js/UploadFile.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "a682084537a4437c81afac0de608793cf408b63e31bfa3cb2a98154b549d4f5a"
+}

@@ -1,0 +1,136 @@
+.rb-tabs {
+  display: flex;
+  gap: calc(20px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.rb-tab {
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.rb-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.rb-card-actions {
+  margin-top: calc(12px * var(--sf));
+}
+
+.rb-entry {
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  padding: calc(12px * var(--sf));
+}
+
+.rb-entry-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: calc(10px * var(--sf));
+}
+
+.rb-entry-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  letter-spacing: calc(0.6px * var(--tf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
+.rb-entry-actions {
+  margin-top: calc(10px * var(--sf));
+}
+
+.rb-preview {
+  line-height: 1.6;
+}
+
+.rb-preview-name {
+  font-family: var(--serif);
+  font-size: calc(22px * var(--tf));
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rb-preview-email {
+  margin-top: calc(4px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}
+
+.rb-preview-section {
+  margin-top: calc(16px * var(--sf));
+}
+
+.rb-preview-heading {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  letter-spacing: calc(0.6px * var(--tf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+  padding-bottom: calc(6px * var(--sf));
+}
+
+.rb-preview-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: calc(8px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+  padding-bottom: calc(8px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
+
+.rb-preview-card-title {
+  font-family: var(--serif);
+  font-size: calc(15px * var(--tf));
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rb-preview-body {
+  margin-top: calc(8px * var(--sf));
+  color: var(--ink);
+}
+
+.rb-preview-skills {
+  margin-top: calc(8px * var(--sf));
+  color: var(--ink);
+}
+
+.rb-preview-list {
+  margin: calc(8px * var(--sf)) 0 0;
+  padding-left: calc(18px * var(--sf));
+  color: var(--ink);
+}
+
+.rb-preview-list li {
+  margin-bottom: calc(4px * var(--sf));
+}
+
+.rb-preview-li-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rb-preview-li-sep {
+  color: var(--ink-60);
+}
+
+.rb-preview-li-company {
+  color: var(--ink-80);
+}
+
+.rb-preview-li-dates {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}

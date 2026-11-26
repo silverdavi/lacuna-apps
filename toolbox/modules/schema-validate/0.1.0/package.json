@@ -1,0 +1,29 @@
+{
+  "name": "@lacuna/schema-validate",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure field-schema definition and validation for text, number, date, and choice fields with required, min/max, pattern, and custom message support.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "schemaValidate",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "067b6d27d56d087c",
+    "lines": 144,
+    "exports": [
+      "validateField",
+      "validateForm"
+    ],
+    "types": [
+      "FieldType",
+      "FieldSchema",
+      "ValidationError",
+      "ValidationResult"
+    ],
+    "signature": "validateField( schema: FieldSchema, value: string | number | null | undefined, ); validateForm( schemas: FieldSchema[], values: Record<string, string | number | null | undefined>, )"
+  }
+}

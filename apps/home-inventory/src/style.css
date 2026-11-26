@@ -1,0 +1,27 @@
+.inv-table-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 6.25em 12.5em;
+  gap: 0;
+}
+.inv-table-head,
+.inv-table-row,
+.inv-table-rows,
+.inv-table-item {
+  display: contents;
+}
+.inv-table-head > span,
+.inv-table-row > span,
+.inv-table-item > span {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 0.0625rem solid var(--ui-line);
+}
+.inv-table-head > span {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.inv-table-item > span {
+  border-bottom-color: transparent;
+}

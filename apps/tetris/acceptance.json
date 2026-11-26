@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "3e640a1ec3d634a0ca8366871e31ef88ab191b378883c125bc28f4dfe20b8219",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On initial load, the page displays the heading \"Classic Tetris\", a grid of 10 columns by 20 rows, the text \"Score: 0\", and the text \"Best: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "Pressing the key \"ArrowLeft\" moves the active tetromino one cell to the left; if the tetromino is at the left wall, it does not move."
+    },
+    {
+      "id": "A3",
+      "text": "Pressing the key \"ArrowRight\" moves the active tetromino one cell to the right; if the tetromino is at the right wall, it does not move."
+    },
+    {
+      "id": "A4",
+      "text": "Pressing the key \"ArrowDown\" moves the active tetromino one cell down immediately; if the tetromino is on the floor, it locks in place and a new tetromino appears at the top."
+    },
+    {
+      "id": "A5",
+      "text": "Pressing the key \"ArrowUp\" rotates the active tetromino 90 degrees clockwise; if rotation is blocked by walls or other blocks, the tetromino remains in its original orientation."
+    },
+    {
+      "id": "A6",
+      "text": "When a horizontal line is completely filled with blocks, that line disappears, blocks above it shift down one row, and the text \"Score: 100\" is displayed (assuming the first line clear)."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Restart\" clears the board, resets the text \"Score: 0\", and spawns a new tetromino at the top center of the grid."
+    },
+    {
+      "id": "A8",
+      "text": "If the best score is 0 and the player clears one line (score becomes 100), the text \"Best: 100\" is displayed."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after clearing a line to reach a score of 100, reloading the page displays the text \"Best: 100\" and \"Score: 0\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d0467738b0a39df5c2083a3df7863c50fc9924448e422ea75fa4e45762b0bdc1"
+    }
+  ]
+}

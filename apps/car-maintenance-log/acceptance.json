@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "b12b5a3e3856d00636e0c8c8b72b3cfe476a5a13b38ca97f4f422c18aeab31fa",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Car Maintenance Log\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add record\" opens a form. Filling \"Title\" with \"Oil Change\", \"Date\" with \"2024-01-15\", \"Mileage\" with \"5000\", \"Cost\" with \"85.50\", and \"Type\" with \"Service\", then clicking \"Save\" adds a list item containing \"Oil Change\", \"2024-01-15\", \"5,000 mi\", and \"$85.50\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding the Oil Change record, clicking \"Add record\" again, filling \"Title\" with \"Brake Pads\", \"Date\" with \"2024-03-20\", \"Mileage\" with \"12000\", \"Cost\" with \"240.00\", and \"Type\" with \"Service\", then clicking \"Save\" adds a second list item containing \"Brake Pads\", \"2024-03-20\", \"12,000 mi\", and \"$240.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"oil\" in the search box labelled \"Search\" filters the list to show only the \"Oil Change\" item; the \"Brake Pads\" item is not visible."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Oil Change\" removes that item from the list; the list now shows only \"Brake Pads\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Upcoming\" shows a section with the heading \"Upcoming Maintenance\". Clicking \"Add upcoming\" fills \"Task\" with \"Tire Rotation\", \"Due Mileage\" with \"15000\", and \"Interval\" with \"5000\", then clicking \"Save\" adds an item containing \"Tire Rotation\" and \"Due at 15,000 mi\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the current mileage field labelled \"Current Mileage\" set to \"14000\", the Upcoming tab shows \"Tire Rotation\" with the status text \"Due in 1,000 mi\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" shows a toast with the text \"Exported 2 records to CSV\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the \"Oil Change\" record visible in the list with the text \"2024-01-15\" and \"$85.50\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9d18eab07517a23519792ad1ab75e1f87ada7d9ceeef61dfad6c0111209d34df"
+    }
+  ]
+}

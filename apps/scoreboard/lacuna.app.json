@@ -1,0 +1,86 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.scoreboard",
+  "name": "Score Keeper",
+  "version": "0.1.0",
+  "summary": "A small scoreboard for names and scores.",
+  "description": "Score Keeper is a simple scoreboard: add entries with a name and a score, edit or delete them, search and sort the list, and export it as CSV to the clipboard.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/scoreboard",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/query-spec": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:scoreboard"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "scoreboard",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Score Keeper entries"
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "scoreboard"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

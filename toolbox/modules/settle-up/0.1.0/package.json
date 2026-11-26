@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/settle-up",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions that compute each participant's net balance from shared expenses and produce a minimal who-pays-whom settlement plan.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/money": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "settleUp",
+    "kind": "logic",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "80da96668ac6ee52",
+    "lines": 113,
+    "exports": [
+      "settleExpenses",
+      "formatSettleAmount"
+    ],
+    "types": [
+      "Expense",
+      "Balance",
+      "Transfer",
+      "SettlementResult"
+    ],
+    "signature": "settleExpenses(expenses: readonly Expense[]); formatSettleAmount(amount: number, currency: string)"
+  }
+}

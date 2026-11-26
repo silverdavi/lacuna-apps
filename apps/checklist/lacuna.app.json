@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.checklist",
+  "name": "Checklist App",
+  "version": "0.1.0",
+  "summary": "A checklist of tasks with reorder, history, and Markdown export.",
+  "description": "Add, check, reorder, and delete tasks. Track progress, browse a history of events, and copy the list as Markdown. Tasks stay in the browser.",
+  "category": "productivity",
+  "tags": ["tasks", "checklist", "todo"],
+  "icon": "tasks",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/checklist"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/record-form": "0.1.0",
+      "@lacuna/filter-bar": "0.1.0",
+      "@lacuna/search-box": "0.1.0",
+      "@lacuna/confirm-dialog": "0.2.0",
+      "@lacuna/tag-input": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:checklist"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "checklist",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Checklist App tasks and history"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "checklist"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

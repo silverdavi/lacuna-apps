@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/calendar-month",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A month-view calendar grid with events, single-day selection, and month navigation.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "CalendarMonth",
+    "kind": "widget",
+    "commit": "f879fb0f4db05aeffb20e458e8871060488e0913",
+    "source": "50c2caa02a5e1de9",
+    "lines": 274,
+    "exports": [
+      "CalendarMonth"
+    ],
+    "types": [
+      "CalendarEvent",
+      "CalendarMonthProps"
+    ],
+    "signature": "CalendarMonth(props: CalendarMonthProps)"
+  }
+}

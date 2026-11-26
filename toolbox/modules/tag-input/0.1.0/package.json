@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/tag-input",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Text input that adds and removes tags as removable chips, with optional autocomplete suggestions and keyboard navigation.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "TagInput",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "625de40486f07da3",
+    "lines": 279,
+    "exports": [
+      "TagInput"
+    ],
+    "types": [
+      "TagInputProps"
+    ],
+    "signature": "TagInput({ tags, onChange, suggestions, placeholder, maxTags, disabled = false, 'aria-label': ...)"
+  }
+}

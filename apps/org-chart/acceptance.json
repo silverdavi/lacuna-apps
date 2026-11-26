@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "3179c7be1e2d3b21fdf32a4b79bbbe622ade5b53e252b7fbea1dc6e969d9c7dc",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Org Chart\" and the text \"No roles yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"CEO\" in the field labelled \"Role name\" and clicking the button \"Add role\" adds a list item containing \"CEO\" and the text \"No roles yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "With \"CEO\" present, typing \"CTO\" in the field labelled \"Role name\", choosing \"CEO\" in the select labelled \"Reports to\", and clicking \"Add role\" adds a list item containing \"CTO\" indented under \"CEO\"."
+    },
+    {
+      "id": "A4",
+      "text": "With \"CEO\" and \"CTO\" present, clicking the button labelled \"Delete CTO\" removes the \"CTO\" item and the list shows only \"CEO\"."
+    },
+    {
+      "id": "A5",
+      "text": "With \"CEO\" and \"CTO\" present, clicking the button \"Export JSON\" copies the text `{\"name\":\"CEO\",\"children\":[{\"name\":\"CTO\",\"children\":[]}]}` to the clipboard."
+    },
+    {
+      "id": "A6",
+      "text": "With \"CEO\" and \"CTO\" present, clicking the tab labelled \"Outline\" shows a nested list where \"CTO\" is indented under \"CEO\"; clicking the tab labelled \"Canvas\" returns to the tree view."
+    },
+    {
+      "id": "A7",
+      "text": "With \"CEO\" and \"CTO\" present, clicking the button labelled \"Zoom in\" changes the zoom indicator from \"100%\" to \"125%\"."
+    },
+    {
+      "id": "A8",
+      "text": "With \"CEO\" and \"CTO\" present, clicking the button labelled \"Auto layout\" does not change the list order; \"CEO\" remains the first item and \"CTO\" remains the second item."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the roles: after adding \"CEO\" and \"CTO\" (CTO reports to CEO), reloading the page still shows the list items \"CEO\" and \"CTO\" with \"CTO\" indented under \"CEO\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "63f75c6bde61baa0fb3fda17abedcd6c6df062ea5af6155d4e83f7845a137b83"
+    }
+  ]
+}

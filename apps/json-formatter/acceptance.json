@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4318837798f1f14da7518ee58679661f6b213bd7b5718059df21de6346c280f0",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"JSON Formatter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `{\"name\":\"Alice\",\"age\":30}` in the editor labelled \"Input JSON\" and clicking the button \"Format\" shows the text `{\\n \"name\": \"Alice\",\\n \"age\": 30\\n}` in the editor labelled \"Output JSON\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `{\"name\":\"Alice\"` in the editor labelled \"Input JSON\" and clicking the button \"Format\" shows the message \"Invalid JSON: Unexpected end of JSON input\" and the editor labelled \"Output JSON\" is empty."
+    },
+    {
+      "id": "A4",
+      "text": "Typing `{\"name\":\"Alice\",\"age\":30}` in the editor labelled \"Input JSON\" and clicking the button \"Copy Output\" shows the toast \"Copied to clipboard\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing `{\"name\":\"Alice\",\"age\":30}` in the editor labelled \"Input JSON\", clicking the button \"Validate\", and then typing `{\"name\":\"Bob\",\"age\":25}` in the editor labelled \"Input JSON\" and clicking the button \"Validate\" shows the message \"Validation passed\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing `{\"name\":\"Alice\",\"age\":30}` in the editor labelled \"Input JSON\", clicking the button \"Validate\", and then typing `{\"name\":\"Alice\",\"age\":\"thirty\"}` in the editor labelled \"Input JSON\" and clicking the button \"Validate\" shows the message \"age must be a number\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab labelled \"History\" shows a list of previously formatted JSON snippets; the first item contains the text `{\"name\":\"Alice\",\"age\":30}`."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear History\" on the History tab removes all items from the list and shows the text \"No history yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the text `{\"name\":\"Alice\",\"age\":30}` in the editor labelled \"Input JSON\" and the formatted output in the editor labelled \"Output JSON\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "20e068aae7eb1924704929d568d5941692f1524b8db75d1c009e5935a69607b8"
+    }
+  ]
+}

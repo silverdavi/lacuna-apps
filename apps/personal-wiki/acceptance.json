@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "78e0c32cb5712636273a8d6be3bd4ac8407ac02cf9c1c1f99a2b9924b56830d4",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Personal Wiki\" and, with no notes, shows the text \"No notes yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Meeting Notes\" in the field labelled \"Title\" and clicking the button \"New note\" adds a list item containing \"Meeting Notes\" and switches to the editor view with the field labelled \"Content\" focused."
+    },
+    {
+      "id": "A3",
+      "text": "In the editor, typing \"# Hello\\n- [ ] Task 1\\n- [x] Task 2\" in the field labelled \"Content\" and clicking the tab \"Preview\" shows the rendered text \"Hello\", a checkbox labelled \"Task 1\" that is unchecked, and a checkbox labelled \"Task 2\" that is checked."
+    },
+    {
+      "id": "A4",
+      "text": "In the Preview tab, clicking the checkbox labelled \"Task 1\" updates the underlying Markdown so that the line \"- [ ] Task 1\" becomes \"- [x] Task 1\", and the checkbox is now checked."
+    },
+    {
+      "id": "A5",
+      "text": "With the note \"Meeting Notes\" open, clicking the button \"Export HTML\" copies the string \"<h1>Hello</h1>\\n<ul>\\n<li><input type=\\\"checkbox\\\" checked> Task 1</li>\\n<li><input type=\\\"checkbox\\\" checked> Task 2</li>\\n</ul>\" to the clipboard."
+    },
+    {
+      "id": "A6",
+      "text": "In the note list, clicking the button \"Delete Meeting Notes\" removes the note; the list shows \"No notes yet\" and the editor view is hidden."
+    },
+    {
+      "id": "A7",
+      "text": "Creating a note titled \"Second Note\" and typing \"Link to [[Meeting Notes]]\" in Content, then switching to Preview, shows a clickable link with the text \"Meeting Notes\"; clicking it opens the \"Meeting Notes\" note in the editor."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"abc\" in the field labelled \"Search\" filters the note list to show only notes whose title contains \"abc\"; clearing the search field restores all notes."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the note titled \"Meeting Notes\" with the content \"# Hello\\n- [x] Task 1\\n- [x] Task 2\" and the list item \"Meeting Notes\" visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "02ea0033a3de01eec4bb65d60a4241e0cc7027d981bb913199297fce74c843c0"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ec67c8b00a298f91f01a7119fab54d14cb24f6a92b23e88abfbe0b500fb0627b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Rock Paper Scissors\", the text \"No rounds yet\", and the score line \"Score: 0\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the field labelled \"Seed\" empty, clicking the button \"Rock\" shows the text \"You: Rock\", a computer choice of \"Rock\", \"Paper\" or \"Scissors\", the result \"Draw\", and the score line \"Score: 0\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the field labelled \"Seed\" containing \"42\", clicking the button \"Rock\" shows the text \"You: Rock\", the computer choice \"Scissors\", the result \"Win\", and the score line \"Score: 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the field labelled \"Seed\" containing \"42\", after the previous round, clicking the button \"Paper\" shows the text \"You: Paper\", the computer choice \"Rock\", the result \"Win\", and the score line \"Score: 2\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the field labelled \"Seed\" containing \"7\", clicking the button \"Scissors\" shows the text \"You: Scissors\", the computer choice \"Rock\", the result \"Lose\", and the score line \"Score: 0\"."
+    },
+    {
+      "id": "A6",
+      "text": "After playing at least one round, the tab labelled \"History\" shows a table with a row containing \"Rock\", \"Scissors\", and \"Win\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy score\" shows the toast \"Score copied\"."
+    },
+    {
+      "id": "A8",
+      "text": "With the field labelled \"Seed\" containing \"42\", after playing two rounds, clicking the button \"Restart\" clears the round display, shows the text \"No rounds yet\", and resets the score line to \"Score: 0\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after playing a winning round with Seed \"42\", reloading the page still shows the text \"Best: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "32d0282f2981560c295fd904ed49031c4705d294a34379cae3d7a6e396962a5e"
+    }
+  ]
+}

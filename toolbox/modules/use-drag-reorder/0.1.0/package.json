@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/use-drag-reorder",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "React hook for pointer- and keyboard-driven reordering of items within a single list or across multiple lists.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useDragReorder",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "2f3e7db4fa06b82e",
+    "lines": 183,
+    "exports": [
+      "useDragReorder"
+    ],
+    "types": [
+      "DragReorderOptions",
+      "DragReorderReturn",
+      "ItemProps",
+      "ListProps"
+    ],
+    "signature": "useDragReorder(options?: DragReorderOptions)"
+  }
+}
