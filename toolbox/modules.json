@@ -2509,6 +2509,44 @@
       }
     },
     {
+      "id": "@lacuna/text-stats",
+      "layer": 3,
+      "status": "exists",
+      "version": "0.1.0",
+      "summary": "Computes word, character, sentence, paragraph counts and estimated reading time from a text string.",
+      "today": [
+        "toolbox/modules/text-stats/0.1.0/src/index.ts"
+      ],
+      "gap": "",
+      "dependsOn": [],
+      "formats": [],
+      "keywords": [
+        "logic",
+        "textStats"
+      ],
+      "public": true,
+      "path": "toolbox/modules/text-stats/0.1.0",
+      "bridge": {
+        "component": "textStats",
+        "kind": "logic",
+        "exports": [
+          "textStats"
+        ],
+        "types": [
+          "TextStats"
+        ],
+        "signature": "textStats(text: string, wpm: number = DEFAULT_WPM)",
+        "releases": {
+          "0.1.0": {
+            "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+            "source": "edf5253e9db3b5ba",
+            "lines": 44,
+            "dependencies": {}
+          }
+        }
+      }
+    },
+    {
       "id": "@lacuna/text-transforms",
       "layer": 3,
       "status": "exists",
