@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.image-compressor",
+  "name": "Image Compressor",
+  "version": "0.1.0",
+  "summary": "Compress and resize images, kept on this device.",
+  "description": "Drop an image, tune quality, format and output width, rotate or flip it, then download the compressed result. The last-used options are remembered for the next visit.",
+  "category": "productivity",
+  "tags": ["image", "compress", "resize"],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/image-compressor",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:image-compressor"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "image-compressor",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Remember last-used compressor options"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "image-compressor"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
