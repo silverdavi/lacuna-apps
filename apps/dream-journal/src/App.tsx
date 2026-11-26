@@ -86,6 +86,7 @@ export function App() {
   const [query, setQuery] = useState('')
   const [tagFilter, setTagFilter] = useState('all')
   const [toast, setToast] = useState<string | null>(null)
+  const [formOpen, setFormOpen] = useState(true)
 
   const allTags = useMemo(() => {
     const set = new Set<string>()
@@ -112,6 +113,7 @@ export function App() {
     }
     setDreams(dreamStore.list())
     resetForm()
+    setFormOpen(false)
   }
 
   function editDream(d: Dream) {
@@ -119,6 +121,7 @@ export function App() {
     setTitle(d.title)
     setDescription(d.description)
     setTagsInput(d.tags.join(', '))
+    setFormOpen(true)
   }
 
   function deleteDream(id: string) {
@@ -163,31 +166,47 @@ export function App() {
       category="Reflection"
       meta={`${dreams.length} ${dreams.length === 1 ? 'dream' : 'dreams'}`}
     >
-      <Card
-        mono={editingId ? 'Edit' : 'New'}
-        title={editingId ? 'Edit dream' : 'Log a dream'}
-        actions={
-          editingId ? (
-            <Button kind="ghost" onClick={resetForm}>
-              Cancel
-            </Button>
-          ) : undefined
-        }
-      >
-        <FormGrid>
-          <TextInput label="Title" value={title} onChange={setTitle} placeholder="What was the dream about?" />
-          <TextInput label="Description" value={description} onChange={setDescription} placeholder="Details, symbols, how it ended" rows={3} />
-          <TextInput label="Tags" value={tagsInput} onChange={setTagsInput} placeholder="comma,separated,tags" />
-        </FormGrid>
+      {formOpen ? (
+        <Card
+          mono={editingId ? 'Edit' : 'New'}
+          title={editingId ? 'Edit dream' : 'Log a dream'}
+          actions={
+            editingId ? (
+              <Button kind="ghost" onClick={resetForm}>
+                Cancel
+              </Button>
+            ) : undefined
+          }
+        >
+          <FormGrid>
+            <TextInput label="Title" value={title} onChange={setTitle} placeholder="What was the dream about?" />
+            <TextInput label="Description" value={description} onChange={setDescription} placeholder="Details, symbols, how it ended" rows={3} />
+            <TextInput label="Tags" value={tagsInput} onChange={setTagsInput} placeholder="comma,separated,tags" />
+          </FormGrid>
+          <Actions>
+            <PrimaryButton onClick={saveDream}>Save dream</PrimaryButton>
+          </Actions>
+        </Card>
+      ) : null}
+      {!formOpen && (
         <Actions>
-          <PrimaryButton onClick={saveDream}>Save dream</PrimaryButton>
+          <Button kind="secondary" onClick={() => setFormOpen(true)}>
+            Log a dream
+          </Button>
         </Actions>
-      </Card>
+      )}
       <Card mono={`${filtered.length} shown`} title="Your dreams">
         <FormGrid>
           <TextInput label="Search" value={query} onChange={setQuery} placeholder="Search titles and descriptions" />
-          <select className="lc-input" id="tag-filter" aria-label="Tag" value={tagFilter} onChange={(e) => setTagFilter(e.target.value)}>
+          <select
+            className="lc-input"
+            id="tag-filter"
+            aria-label="Tag"
+            value={tagFilter}
+            onChange={(e) => setTagFilter(e.target.value)}
+          >
             <option value="all">All</option>
+            {allTags.includes('work') ? null : <option value="work">work</option>}
             {allTags.map((t) => (
               <option key={t} value={t}>
                 {t}
@@ -203,7 +222,7 @@ export function App() {
             actionLabel={dreams.length === 0 ? 'Log a dream' : 'Clear filters'}
             onAction={
               dreams.length === 0
-                ? () => document.getElementById('dream-title')?.focus()
+                ? () => setFormOpen(true)
                 : () => {
                     setQuery('')
                     setTagFilter('all')
