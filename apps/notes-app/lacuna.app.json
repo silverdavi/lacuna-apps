@@ -1,0 +1,99 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.notes-app",
+  "name": "Quick Notes",
+  "version": "0.1.0",
+  "summary": "Capture, organize, and export short text notes.",
+  "description": "Quick Notes is a small shelf of short notes with a title and markdown content. Create, edit, delete, search, filter, and export the notes as a JSON backup. Archived notes sit in their own view. Notes persist on this device.",
+  "category": "productivity",
+  "tags": ["notes", "search", "archive", "export"],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/notes-app"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/record-form": "0.1.0",
+      "@lacuna/filter-bar": "0.1.0",
+      "@lacuna/search-box": "0.1.0",
+      "@lacuna/confirm-dialog": "0.2.0",
+      "@lacuna/tag-input": "0.1.0",
+      "@lacuna/export-menu": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:note",
+    "edit:note",
+    "export:note"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "note",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Quick Notes records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "note"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts",
+      "tests/notes-app.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

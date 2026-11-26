@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.soundboard",
+  "name": "Soundboard",
+  "version": "0.1.0",
+  "summary": "Record short sound clips, replay them with hotkeys, and keep a running score.",
+  "description": "A small soundboard. Record a clip, and it joins a list you can play, delete, or export. Playing a clip raises your score; the best score sticks. Press a number to play its clip, and the board survives a reload.",
+  "category": "personal",
+  "tags": [],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/soundboard",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/format-duration": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0",
+      "@lacuna/use-media-recorder": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:clip"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "clip",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the recorded sound clips"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "clip"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,196 @@
+/* Journal preview styling — uses a custom class on the MarkdownView element. */
+.journal-preview {
+  font-family: var(--sans);
+  font-size: calc(13.5px * var(--tf));
+  line-height: 1.65;
+  color: var(--ink);
+  min-height: calc(220px * var(--sf));
+  overflow-y: auto;
+  max-height: calc(480px * var(--sf));
+  padding: calc(14px * var(--sf)) calc(16px * var(--sf));
+  background: var(--paper);
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(2px * var(--sf));
+}
+
+.journal-preview h1,
+.journal-preview h2,
+.journal-preview h3,
+.journal-preview h4 {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.25;
+  margin: calc(18px * var(--sf)) 0 calc(8px * var(--sf));
+  color: var(--ink);
+}
+
+.journal-preview h1 {
+  font-size: calc(22px * var(--tf));
+  letter-spacing: -0.015em;
+}
+
+.journal-preview h2 {
+  font-size: calc(18px * var(--tf));
+  letter-spacing: -0.01em;
+}
+
+.journal-preview h3 {
+  font-size: calc(15px * var(--tf));
+}
+
+.journal-preview h4 {
+  font-size: calc(13px * var(--tf));
+}
+
+.journal-preview h1:first-child,
+.journal-preview h2:first-child,
+.journal-preview h3:first-child,
+.journal-preview h4:first-child {
+  margin-top: 0;
+}
+
+.journal-preview p {
+  margin: 0 0 calc(10px * var(--sf));
+}
+
+.journal-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.journal-preview ul,
+.journal-preview ol {
+  margin: 0 0 calc(10px * var(--sf));
+  padding-left: calc(20px * var(--sf));
+}
+
+.journal-preview li {
+  margin-bottom: calc(3px * var(--sf));
+}
+
+.journal-preview li:last-child {
+  margin-bottom: 0;
+}
+
+.journal-preview li[role="checkbox"] {
+  list-style: none;
+  margin-left: -calc(20px * var(--sf));
+}
+
+.journal-preview li[role="checkbox"] > span[role="checkbox"] {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: calc(6px * var(--sf));
+  cursor: pointer;
+  padding: calc(2px * var(--sf)) 0;
+  border-radius: calc(2px * var(--sf));
+}
+
+.journal-preview li[role="checkbox"] > span[role="checkbox"]::before {
+  content: '';
+  width: calc(14px * var(--sf));
+  height: calc(14px * var(--sf));
+  border: calc(1.5px * var(--sf)) solid var(--mid);
+  border-radius: calc(2px * var(--sf));
+  flex-shrink: 0;
+  margin-top: calc(2px * var(--sf));
+  background: var(--ui-card);
+}
+
+.journal-preview li[role="checkbox"] > span[role="checkbox"][aria-checked="true"]::before {
+  background: var(--accent);
+  border-color: var(--accent);
+  content: '✓';
+  color: var(--on-accent);
+  font-size: calc(10px * var(--tf));
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.journal-preview li[role="checkbox"] > span[role="checkbox"][aria-checked="true"] {
+  color: var(--ink-60);
+}
+
+.journal-preview code {
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--tf));
+  background: var(--accent-soft);
+  padding: calc(1px * var(--sf)) calc(4px * var(--sf));
+  border-radius: calc(2px * var(--sf));
+  color: var(--ink);
+}
+
+.journal-preview pre {
+  background: var(--ink);
+  color: var(--paper);
+  padding: calc(10px * var(--sf)) calc(12px * var(--sf));
+  border-radius: calc(2px * var(--sf));
+  overflow-x: auto;
+  margin: 0 0 calc(10px * var(--sf));
+}
+
+.journal-preview pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+.journal-preview blockquote {
+  border-left: calc(3px * var(--sf)) solid var(--hair-strong);
+  padding-left: calc(12px * var(--sf));
+  margin: 0 0 calc(10px * var(--sf));
+  color: var(--ink-60);
+}
+
+.journal-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 calc(10px * var(--sf));
+  font-size: calc(12.5px * var(--tf));
+}
+
+.journal-preview th,
+.journal-preview td {
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  padding: calc(5px * var(--sf)) calc(8px * var(--sf));
+  text-align: left;
+}
+
+.journal-preview th {
+  background: var(--accent-soft);
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  letter-spacing: calc(1px * var(--tf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
+.journal-preview a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
+}
+
+.journal-preview a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.journal-preview hr {
+  border: none;
+  border-top: calc(1px * var(--sf)) solid var(--ui-line2);
+  margin: calc(14px * var(--sf)) 0;
+}
+
+/* Journal-specific field hint with WCAG-compliant contrast. */
+.journal-field-hint {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  letter-spacing: calc(0.4px * var(--tf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+  display: block;
+  margin-top: calc(4px * var(--sf));
+}
+
+

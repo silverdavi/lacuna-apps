@@ -1,6 +1,7 @@
-import { loadEntries, saveEntries, type BudgetEntry, type EntryType } from './mock'
+import { isEntry, loadEntries, saveEntries, type BudgetEntry, type EntryType } from './mock'
 
 export type { BudgetEntry, EntryType }
+export { isEntry }
 
 let nextId = 1
 

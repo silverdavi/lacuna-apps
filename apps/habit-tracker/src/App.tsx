@@ -1,327 +1,280 @@
-import { useEffect, useRef, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack, TextInput, Title } from '@lacuna/ui'
-import { addHabit, deleteHabit, dayKey, isDone, listHabits, renameHabit, streak, toggleDay, type Habit } from './host'
+import { useEffect, useState } from 'react'
+import {
+  AppShell,
+  Button,
+  Card,
+  EmptyState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  List,
+  Row,
+  Tag,
+  TextInput,
+} from '@lacuna/ui'
+import { useClipboard } from '@lacuna/use-clipboard'
+import {
+  dayKey,
+  isDone,
+  lastSeven,
+  rename,
+  remove,
+  streak,
+  toggleDone,
+  validateName,
+  type Habit,
+} from './engine'
+import { store } from './host/mock'
 
-const SP = 'calc(8px * var(--sf))'
-const SP_SM = 'calc(4px * var(--sf))'
-const RADIUS = 'calc(8px * var(--sf))'
-const RADIUS_SM = 'calc(4px * var(--sf))'
-
-interface DayCell {
-  key: string
-  label: string
-}
-
-function lastSeven(today: Date): DayCell[] {
-  const out: DayCell[] = []
-  for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    out.push({ key: dayKey(d), label: i === 0 ? 'Today' : i === 1 ? '1 day ago' : `${i} days ago` })
-  }
-  return out
-}
+const TABS = ['Today', 'Streaks', 'History'] as const
+type Tab = (typeof TABS)[number]
 
 export function App() {
-  const [habits, setHabits] = useState<Habit[]>(() => listHabits())
-  const [today, setToday] = useState<Date>(() => new Date())
-  const [name, setName] = useState('')
-  const [error, setError] = useState('')
-  const [renaming, setRenaming] = useState('')
+  const [tab, setTab] = useState<Tab>('Today')
+  const [habits, setHabits] = useState<Habit[]>(() => store.list())
+  const [newName, setNewName] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const renameInputRef = useRef<HTMLInputElement>(null)
-  const cancelRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    setHabits(listHabits())
-  }, [])
-
-  useEffect(() => {
-    if (confirm) cancelRef.current?.focus()
-  }, [confirm])
-
-  useEffect(() => {
-    if (renaming) {
-      renameInputRef.current?.focus()
-      renameInputRef.current?.select()
-    }
-  }, [renaming])
+  const [deleting, setDeleting] = useState<Habit | null>(null)
+  const clipboard = useClipboard()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (confirm) setConfirm('')
-        else if (renaming) setRenaming('')
-      }
+      if (e.key === 'Escape' && deleting) setDeleting(null)
     }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [confirm, renaming])
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [deleting])
 
-  const days = lastSeven(today)
+  const today = dayKey(new Date())
+  const cells = lastSeven(new Date())
 
-  function refresh() {
-    setToday(new Date())
-    setHabits(listHabits())
+  function persist(next: Habit[]) {
+    setHabits(next)
+    store.replaceAll(next)
   }
 
-  function onAdd() {
-    const n = name.trim()
-    if (!n) {
-      setError('Enter a habit name.')
+  function addHabit() {
+    const msg = validateName(newName, habits)
+    if (msg) {
+      setError(msg)
       return
     }
-    if (habits.some((h) => h.name.toLowerCase() === n.toLowerCase())) {
-      setError('That habit already exists.')
+    setError(null)
+    const created = store.add({ name: newName.trim(), done: [] })
+    setNewName('')
+    setHabits([...habits, created])
+  }
+
+  function startRename(h: Habit) {
+    setRenamingId(h.id)
+    setRenameValue(h.name)
+    setError(null)
+  }
+
+  function cancelRename() {
+    setRenamingId(null)
+    setError(null)
+  }
+
+  function commitRename() {
+    if (!renamingId) return
+    const target = habits.find((h) => h.id === renamingId)
+    if (!target) return
+    const msg = validateName(renameValue, habits.filter((h) => h.id !== renamingId))
+    if (msg) {
+      setError(msg)
       return
     }
-    addHabit(n)
-    setName('')
-    setError('')
-    refresh()
+    persist(rename(habits, renamingId, renameValue))
+    setRenamingId(null)
   }
 
-  function onRenameCancel() {
-    setRenaming('')
-    setRenameValue('')
+  function renameErrorText(): string | null {
+    if (!renamingId) return null
+    const target = habits.find((h) => h.id === renamingId)
+    if (!target) return null
+    if (renameValue.trim() === target.name) return null
+    return validateName(renameValue, habits.filter((h) => h.id !== renamingId))
   }
 
-  function onRenameSave() {
-    const n = renameValue.trim()
-    const target = habits.find((h) => h.id === renaming)
-    if (target && n) renameHabit(target.id, n)
-    onRenameCancel()
-    refresh()
+  function copyHistory() {
+    const lines = habits.map((h) => {
+      const ticks = h.done.map((d) => {
+        const date = new Date(d + 'T12:00:00')
+        return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      })
+      return `${h.name}: ${ticks.length} check-ins${ticks.length ? ' (' + ticks.join(', ') + ')' : ''}`
+    })
+    void clipboard.copy(lines.join('\n'))
   }
 
-  function onConfirmDelete() {
-    if (confirm) deleteHabit(confirm)
-    setConfirm('')
-    refresh()
-  }
+  const best = habits.length ? Math.max(...habits.map((h) => streak(h, new Date()))) : 0
+  const tickedToday = habits.filter((h) => isDone(h, today)).length
+  const renamingTarget = habits.find((h) => h.id === renamingId)
 
-  const toDelete = habits.find((h) => h.id === confirm)
-  const toRename = habits.find((h) => h.id === renaming)
+  function onRenameKey(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') commitRename()
+    if (e.key === 'Escape') cancelRename()
+  }
 
   return (
-    <main style={{ maxWidth: 'calc(720px * var(--sf))' }}>
-      <Card title="Habit tracker">
-        <Stack>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              onAdd()
-            }}
-          >
-            <div style={{ display: 'flex', gap: SP, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-              <TextInput label="Habit name" value={name} onChange={(v) => { setName(v); setError('') }} />
-              <Button kind="primary" onClick={onAdd} style={{ flex: 'none' }}>
-                Add habit
-              </Button>
+    <AppShell name="Habit tracker">
+      <KpiRow>
+        <Kpi value={habits.length} label="Habits" />
+        <Kpi value={tickedToday} label="Done today" accent={tickedToday > 0} />
+        <Kpi value={best} label="Best streak" accent={best > 0} />
+      </KpiRow>
+
+      <Card title="Habits">
+        <FormGrid>
+          {renamingTarget ? (
+            <div onKeyDown={(e) => {
+              if (e.key === 'Enter') commitRename()
+              if (e.key === 'Escape') cancelRename()
+            }}>
+              <TextInput
+                label={`New name for ${renamingTarget.name}`}
+                value={renameValue}
+                onChange={(v) => {
+                  setRenameValue(v)
+                  if (error) setError(null)
+                }}
+                error={error ?? renameErrorText()}
+                hint="Enter renames, Escape cancels."
+              />
             </div>
-            {error && (
-              <p role="alert" style={{ margin: `${SP} 0 0`, color: 'var(--accent)' }}>
-                {error}
-              </p>
-            )}
-          </form>
-          <MonoLabel sm>Habits</MonoLabel>
-          {habits.length === 0 ? (
-            <Body sm>No habits yet. Add one above.</Body>
           ) : (
-            <ul role="list" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: SP }}>
-              {habits.map((h) => (
-                <li
-                  key={h.id}
-                  role="listitem"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: SP,
-                    border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                    borderRadius: RADIUS,
-                    padding: SP,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      alignItems: 'center',
-                      gap: SP,
-                    }}
-                  >
-                    <span style={{ fontWeight: 600 }}>{h.name}</span>
-                    <span style={{ color: 'var(--ink-60)' }}>
-                      Streak: {streak(h, today)}
-                    </span>
-                    <span style={{ flex: 1 }} />
-                    <Button
-                      kind="ghost"
-                      onClick={() => {
-                        setRenaming(h.id)
-                        setRenameValue(h.name)
-                      }}
-                    >
+            <TextInput
+              label="Habit name"
+              value={newName}
+              onChange={(v) => {
+                setNewName(v)
+                if (error) setError(null)
+              }}
+              error={error}
+            />
+          )}
+        </FormGrid>
+        {renamingTarget ? (
+          <span>
+            <Button kind="primary" onClick={commitRename}>
+              Save name
+            </Button>
+            <Button kind="secondary" onClick={cancelRename}>
+              Cancel
+            </Button>
+          </span>
+        ) : (
+          <Button kind="primary" onClick={addHabit}>
+            Add habit
+          </Button>
+        )}
+      </Card>
+
+      <Card
+        title="Today"
+        mono="Last seven days"
+        actions={
+          tab === 'History' && habits.length > 0 ? (
+            <Button kind="secondary" onClick={copyHistory}>
+              Copy summary
+            </Button>
+          ) : undefined
+        }
+      >
+        {habits.length === 0 ? (
+          <EmptyState title="No habits yet" detail="Add a habit above and tick the days you did it." />
+        ) : tab === 'Today' ? (
+          <List label="Habits">
+            {habits.map((h) => (
+              <Row
+                key={h.id}
+                title={h.name}
+                value={`Streak: ${streak(h, new Date())}`}
+                meta={
+                  <span>
+                    {cells.map((c) => (
+                      <input
+                        key={c.key}
+                        type="checkbox"
+                        checked={isDone(h, c.key)}
+                        aria-label={`${h.name}, ${c.label}`}
+                        style={{ margin: '0 2px' }}
+                        onChange={() => persist(toggleDone(habits, h.id, c.key))}
+                      />
+                    ))}
+                  </span>
+                }
+                action={
+                  <span>
+                    <Button kind="ghost" onClick={() => startRename(h)}>
                       Rename {h.name}
                     </Button>
-                    <Button kind="ghost" onClick={() => setConfirm(h.id)}>
+                    <Button kind="ghost" onClick={() => setDeleting(h)}>
                       Delete {h.name}
                     </Button>
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: SP_SM }}>
-                    {days.map((d) => {
-                      const done = isDone(h, d.key)
-                      return (
-                        <button
-                          key={d.key}
-                          type="button"
-                          role="checkbox"
-                          aria-checked={done}
-                          aria-label={`${h.name}, ${d.label}`}
-                          onClick={() => {
-                            toggleDay(h.id, d.key)
-                            refresh()
-                          }}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: SP_SM,
-                            minWidth: 'calc(24px * var(--sf))',
-                            height: 'calc(24px * var(--sf))',
-                            padding: `${SP_SM} ${SP_SM}`,
-                            border: done ? 'calc(1px * var(--sf)) solid var(--accent)' : 'calc(1px * var(--sf)) solid var(--ui-line2)',
-                            borderRadius: RADIUS_SM,
-                            background: done ? 'var(--accent)' : 'transparent',
-                            color: done ? 'var(--on-accent)' : 'var(--ink)',
-                            cursor: 'pointer',
-                            fontSize: 'calc(12px * var(--tf))',
-                            lineHeight: 1.2,
-                          }}
-                        >
-                          {done && <span aria-hidden="true">✓</span>}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Stack>
-      </Card>
-      {renaming && toRename && (
-        <div
-          onClick={onRenameCancel}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10,
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Rename ${toRename.name}`}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: 'var(--paper)',
-              color: 'var(--ink)',
-              border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-              borderRadius: RADIUS,
-              padding: 'calc(16px * var(--sf))',
-              width: 'calc(320px * var(--sf))',
-              boxShadow: 'var(--shadow)',
-            }}
-          >
-            <Title size="md">Rename habit</Title>
-            <label className="lc-field" style={{ display: 'block', margin: 'calc(8px * var(--sf)) 0 0' }}>
-              <span className="lc-field-label">New name for {toRename.name}</span>
-              <input
-                ref={renameInputRef}
-                className="lc-input"
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    onRenameSave()
-                  }
-                }}
+                  </span>
+                }
               />
-            </label>
-            <div
-              style={{
-                display: 'flex',
-                gap: SP,
-                marginTop: 'calc(16px * var(--sf))',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <button type="button" className="lc-btn" onClick={onRenameCancel}>
-                Cancel
-              </button>
-              <button type="button" className="lc-btn lc-btn-primary" onClick={onRenameSave}>
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {confirm && toDelete && (
+            ))}
+          </List>
+        ) : tab === 'Streaks' ? (
+          <List label="Streaks">
+            {habits.map((h) => (
+              <Row
+                key={h.id}
+                title={h.name}
+                value={`Streak: ${streak(h, new Date())}`}
+                action={
+                  <Tag accent={streak(h, new Date()) > 0}>
+                    {streak(h, new Date()) > 0 ? 'active' : 'resting'}
+                  </Tag>
+                }
+              />
+            ))}
+          </List>
+        ) : (
+          <List label="Check-in history">
+            {habits.map((h) => (
+              <Row key={h.id} title={h.name} value={`${h.done.length} check-ins`} />
+            ))}
+          </List>
+        )}
+        {tab === 'History' && clipboard.copied ? <Tag accent>copied</Tag> : null}
+      </Card>
+
+      {deleting ? (
         <div
-          onClick={() => setConfirm('')}
+          role="dialog"
+          aria-label={`Delete ${deleting.name}?`}
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            background: 'color-mix(in srgb, var(--ink) 55%, transparent)',
+            display: 'grid',
+            placeItems: 'center',
             zIndex: 10,
           }}
         >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Delete ${toDelete.name}?`}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: 'var(--paper)',
-              color: 'var(--ink)',
-              border: 'calc(1px * var(--sf)) solid var(--ui-line2)',
-              borderRadius: RADIUS,
-              padding: 'calc(16px * var(--sf))',
-              width: 'calc(320px * var(--sf))',
-              boxShadow: 'var(--shadow)',
-            }}
-          >
-            <Title size="md">Delete {toDelete.name}?</Title>
-            <Body sm style={{ marginTop: SP_SM }}>This removes the habit and its ticks.</Body>
-            <div
-              style={{
-                display: 'flex',
-                gap: SP,
-                marginTop: 'calc(16px * var(--sf))',
-                justifyContent: 'flex-end',
+          <Card title={`Delete ${deleting.name}?`}>
+            <p style={{ color: 'var(--ink)' }}>This removes the habit and all of its ticks.</p>
+            <Button
+              kind="danger"
+              onClick={() => {
+                persist(remove(habits, deleting.id))
+                setDeleting(null)
               }}
             >
-              <button ref={cancelRef} type="button" className="lc-btn" onClick={() => setConfirm('')}>
-                Cancel
-              </button>
-              <button type="button" className="lc-btn lc-btn-primary" onClick={onConfirmDelete}>
-                Confirm delete
-              </button>
-            </div>
-          </div>
+              Confirm delete
+            </Button>
+            <Button kind="secondary" onClick={() => setDeleting(null)}>
+              Cancel
+            </Button>
+          </Card>
         </div>
-      )}
-    </main>
+      ) : null}
+    </AppShell>
   )
 }

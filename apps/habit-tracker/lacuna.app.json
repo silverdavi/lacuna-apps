@@ -33,8 +33,13 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0"
     }
   },
   "capabilities": [
@@ -75,7 +80,8 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts"
+      "tests/acceptance.spec.ts",
+      "tests/engine.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,

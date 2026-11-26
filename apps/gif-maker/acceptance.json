@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "abe4bfc03ba3f14d74dfcc816d6c37e39b0bf63976b78e71303d6aa788ea34e8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"GIF Maker\" and the drop zone shows the text \"Drop images or video here\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add sample frames\" adds three list items labeled \"frame-1.png\", \"frame-2.png\" and \"frame-3.png\" to the frame list, and the summary line shows \"Frames: 3\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the three sample frames present, typing \"200\" in the field labelled \"Frame delay (ms)\" and clicking \"Apply\" changes the summary line to \"Frames: 3, Delay: 200ms\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete frame-2.png\" removes that item from the list, leaving \"frame-1.png\" and \"frame-3.png\", and the summary shows \"Frames: 2\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"Settings\" shows the field labelled \"Width\" with value \"800\" and the field labelled \"Height\" with value \"600\"; clicking the tab \"Frames\" returns to the frame list."
+    },
+    {
+      "id": "A6",
+      "text": "In the Settings tab, typing \"400\" in the field labelled \"Width\" and \"300\" in the field labelled \"Height\", then clicking \"Apply\", changes the summary line to \"Frames: 2, Delay: 200ms, Size: 400x300\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export GIF\" shows a progress ring that completes and then displays the text \"GIF ready: gif-maker-800x600.gif\" and enables the button \"Download\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Download\" copies the filename \"gif-maker-800x600.gif\" to the clipboard and shows the toast \"Copied to clipboard\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the frame list and settings: after adding the sample frames, setting delay to 200 and size to 400x300, reloading the page still shows \"Frames: 2, Delay: 200ms, Size: 400x300\" and the list items \"frame-1.png\" and \"frame-3.png\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4d511dd3fe6865706b7b49a805ea8d096c7e2c4f2421dc3bcbb16b5358865590"
+    }
+  ]
+}

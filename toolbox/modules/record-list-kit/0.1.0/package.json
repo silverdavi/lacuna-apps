@@ -1,0 +1,39 @@
+{
+  "name": "@lacuna/record-list-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Full record-list composition: search, create/edit, delete with confirm, and CSV export over a local collection.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/confirm-dialog": "workspace:0.2.0",
+    "@lacuna/export-menu": "workspace:0.1.0",
+    "@lacuna/record-form": "workspace:0.1.0",
+    "@lacuna/record-table": "workspace:0.1.0",
+    "@lacuna/use-collection": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "RecordListKit",
+    "kind": "kit",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "d07b27a350fcd3d6",
+    "lines": 352,
+    "exports": [
+      "RecordListKit"
+    ],
+    "types": [
+      "RecordListKitColumn",
+      "RecordListKitProps"
+    ],
+    "signature": "RecordListKit({ storageKey, fields, columns, searchFields, emptyMessage = 'No records', createLabel...)"
+  }
+}

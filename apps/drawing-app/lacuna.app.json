@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.drawing-app",
+  "name": "Digital Drawing Canvas",
+  "version": "0.1.0",
+  "summary": "Draw on a layered canvas with a brush, eraser, and rectangle, pick a hex color, zoom, undo, and export a PNG.",
+  "description": "Add layers, pick a brush, eraser, or rectangle tool, set the paint from a hex field, draw, zoom, undo, and export the canvas as a PNG. Everything stays on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/drawing-app",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/use-undo-stack": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/color-math": "0.1.0",
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:layer",
+    "fill:stroke",
+    "export:png"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "drawing-app",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the layers, strokes, and color of the current drawing"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "drawing-app"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.portfolio-tracker",
+  "name": "Stock Portfolio",
+  "version": "0.1.0",
+  "summary": "Track holdings, log prices, and watch your portfolio's value change.",
+  "description": "Add stock holdings with share counts and purchase prices, log current prices over time, and follow total value, cost, and gain/loss. History is kept on this device.",
+  "category": "personal",
+  "tags": [
+    "stocks",
+    "portfolio",
+    "investing"
+  ],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/portfolio-tracker"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:holding",
+    "create:price-snapshot"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "portfolio-tracker",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store holdings and the price snapshots logged against them"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "portfolio-tracker"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

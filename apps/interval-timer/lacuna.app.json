@@ -1,0 +1,96 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.interval-timer",
+  "name": "Interval Timer",
+  "version": "0.1.0",
+  "summary": "Run work and rest intervals, round by round.",
+  "description": "Set the work and rest lengths in seconds, then run them back to back. Pause and resume mid-interval, stop to reset, and follow every completed round in the history. The running timer survives a reload. Nothing leaves the browser.",
+  "category": "personal",
+  "tags": ["timer", "intervals", "workout"],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/interval-timer"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
+      "@lacuna/heatmap": "0.1.0",
+      "@lacuna/chart": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:interval",
+    "edit:interval",
+    "create:round"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "interval",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store completed work and rest intervals"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "interval"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

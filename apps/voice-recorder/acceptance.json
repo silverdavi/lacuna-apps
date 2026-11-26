@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "a8184114932bfb33bd0bf524cd73bdc83bdb96d96b821a3e9fef1795f4361fee",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Voice Recorder\" and the text \"No clips yet\" is visible."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Record\" changes the button label to \"Stop\" and starts an elapsed timer that displays \"00:00\" initially."
+    },
+    {
+      "id": "A3",
+      "text": "After clicking \"Stop\", the elapsed timer stops and a new list item appears containing the text \"Clip 1\" and a duration in the format \"00:0X\" where X is the number of seconds recorded (at least 1 second). The text \"No clips yet\" is no longer visible."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Download\" on the list item for \"Clip 1\" triggers a file download with the filename \"Clip 1.wav\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete\" on the list item for \"Clip 1\" removes that item from the list. If no other clips exist, the text \"No clips yet\" reappears."
+    },
+    {
+      "id": "A6",
+      "text": "After recording a second clip, the list shows two items: \"Clip 1\" and \"Clip 2\", each with their respective durations."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"Settings\" shows a select labelled \"Format\" with options \"WAV\" and \"MP3\". Selecting \"MP3\" and then recording a new clip results in a list item \"Clip 3\" with a duration, and clicking \"Download\" on it triggers a file download with the filename \"Clip 3.mp3\"."
+    },
+    {
+      "id": "A8",
+      "text": "After recording \"Clip 1\" and \"Clip 2\", reloading the page still shows both list items with the exact text \"Clip 1\" and \"Clip 2\" and their original durations."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8a3c76ad0c1a4945aee33c318ed1b5d043d140e3aa89d76816754d216b298945"
+    }
+  ]
+}

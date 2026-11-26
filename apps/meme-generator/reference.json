@@ -1,0 +1,18 @@
+{
+  "repo": "lijinke666/react-meme-generator",
+  "url": "https://github.com/lijinke666/react-meme-generator",
+  "sha": "4f581dabcfee862ae87369f4a88bd60bfbe00012",
+  "spdx": "MIT",
+  "licence_path": "LICENCE",
+  "copyright": [
+    "Copyright (c) 2017-2018 jinke.Li"
+  ],
+  "files": [
+    "main.js",
+    "src/components/Container/index.js",
+    "src/components/ErrorBoundary/index.js",
+    "src/config.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "91d2dddbb06e90276767f46e8324e9dac2c7932fd5ad024afd1f51e11c79703d"
+}

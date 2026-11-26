@@ -1,0 +1,38 @@
+{
+  "name": "@lacuna/use-collection",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Persisted, in-memory list of typed records with add, update, remove, reorder, and archive operations.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/use-local-record": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useCollection",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "c8084caf7a9a25f3",
+    "lines": 269,
+    "exports": [
+      "useCollection"
+    ],
+    "types": [
+      "CollectionItem",
+      "CollectionOptions",
+      "CollectionState",
+      "CollectionActions",
+      "UseCollectionReturn"
+    ],
+    "signature": "useCollection( options: CollectionOptions<T>, )"
+  }
+}

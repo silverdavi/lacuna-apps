@@ -1,0 +1,82 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.reaction-time",
+  "name": "Reaction Time",
+  "version": "0.1.0",
+  "summary": "Test how fast you react and keep the record.",
+  "description": "Watch for the green square and click as fast as you can. Your results are saved as a record on this device, with a history of every attempt, streaks, and export options.",
+  "category": "productivity",
+  "tags": ["reaction", "timing", "streaks"],
+  "icon": "timesheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/reaction-time"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/streak-calc": "0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:record"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "reaction",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own reaction-time attempt records in this space's mock store."
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "reaction"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

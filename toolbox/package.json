@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Snapshot of Lacuna tokens and presentational components.",
+  "description": "Snapshot of Lacuna tokens, bundled fonts, presentational components, and the app kit.",
   "exports": {
     ".": "./ui/index.tsx",
     "./tokens.css": "./ui/tokens.css",
-    "./ui.css": "./ui/ui.css"
+    "./ui.css": "./ui/ui.css",
+    "./base.css": "./ui/base.css",
+    "./fonts.css": "./fonts/fonts.css"
   },
   "peerDependencies": {
     "react": "^19.0.0"

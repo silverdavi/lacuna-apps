@@ -1,0 +1,94 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.image-resizer",
+  "name": "Image Resizer",
+  "version": "0.1.0",
+  "summary": "Resize, rotate and re-encode an image, then download it.",
+  "description": "Drop an image to begin. Set a target width, pick an output format and quality, rotate if needed, and download the result. Every image you process is kept in a history on this device so you can find it again after a reload. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["image", "resize", "rotate", "convert"],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/image-resizer",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:image",
+    "edit:image"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "image-resizer-history",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the images you have resized on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "image-resizer-history"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

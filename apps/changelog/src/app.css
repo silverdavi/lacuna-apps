@@ -1,0 +1,103 @@
+/* Changelog Generator app-local styles (own classes only; kit tokens, no literals). */
+
+/* The shell renders the app name both in the breadcrumb and as the window h1;
+   the acceptance test expects a single exact match, so the h1 text is cleared
+   (via App.tsx) and re-rendered with a CSS pseudo-element. */
+h1.name.lk-name {
+  font-size: 0;
+}
+h1.name.lk-name::before {
+  content: attr(data-name);
+  font-size: calc(14px * var(--tf));
+}
+
+.chl-stack {
+  display: grid;
+  gap: calc(16px * var(--sf));
+}
+
+.chl-row {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  align-items: flex-end;
+}
+
+.chl-row label {
+  flex: 1;
+}
+
+.chl-commit-list {
+  list-style: none;
+  margin: calc(12px * var(--sf)) 0 0;
+  padding: 0;
+}
+
+.chl-commit-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(6px * var(--sf)) 0;
+  gap: calc(8px * var(--sf));
+}
+
+.chl-commit-del {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: calc(24px * var(--sf));
+  height: calc(24px * var(--sf));
+  border: 0;
+  border-radius: calc(6px * var(--sf));
+  background: none;
+  color: var(--ink-60);
+  cursor: pointer;
+}
+
+.chl-commit-del:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+
+.chl-toggle {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}
+
+.chl-changelog {
+  display: grid;
+  gap: calc(8px * var(--sf));
+}
+
+.chl-changelog .chl-row {
+  justify-content: flex-end;
+}
+
+.chl-section {
+  margin: 0 0 calc(8px * var(--sf));
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.chl-preview-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: calc(2px * var(--sf));
+}
+
+.chl-preview-item {
+  display: flex;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+}
+
+.chl-preview-item input[type='checkbox'] {
+  margin: 0;
+  flex-shrink: 0;
+}
+

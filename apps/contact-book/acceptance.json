@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6d58c5df9dede77e5ff9208ffa7f2c9af615cde90ef2d2708b7e374d2f56db65",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Contact Book\" and, with no contacts saved, the table area shows the text \"No contacts yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add contact\" opens a form; filling the field labelled \"Name\" with \"Ada Lovelace\", the field labelled \"Email\" with \"ada@example.com\", and the field labelled \"Phone\" with \"555-0101\", then clicking \"Save\", adds a row to the table containing \"Ada Lovelace\" and \"ada@example.com\"; the text \"No contacts yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"ada\" in the input labelled \"Search\" filters the table to show only the row containing \"Ada Lovelace\"; typing \"zzz\" in the same input shows the text \"No contacts match\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Edit Ada Lovelace\" opens the form pre-filled with \"Ada Lovelace\" in the Name field; changing the Name field to \"Ada King\" and clicking \"Save\" updates the table row to show \"Ada King\" and \"ada@example.com\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Ada King\" removes that row from the table and the table area shows \"No contacts yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "After adding a contact with Name \"Bob Smith\", Email \"bob@example.com\", and Phone \"555-0102\", clicking the column header \"Name\" in the table sorts rows so \"Ada Lovelace\" appears before \"Bob Smith\"; clicking \"Name\" again reverses the order so \"Bob Smith\" appears first."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose content includes the header row \"Name,Email,Phone,Notes\" and a line containing \"Ada Lovelace,ada@example.com,555-0101,\"."
+    },
+    {
+      "id": "A8",
+      "text": "Filling the field labelled \"Notes\" with \"Met at conference\" for a new contact and saving, then clicking \"Edit\" on that contact, shows \"Met at conference\" in the Notes field."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the contact \"Ada Lovelace\" visible in the table after the page is reloaded."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "08c48a85d455f8640200b4e63299871229c7210400d8f05f47483452a3b41c8a"
+    }
+  ]
+}

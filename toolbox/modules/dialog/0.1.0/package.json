@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/dialog",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Accessible modal dialog that traps focus, closes on Escape, and restores focus to the trigger on close.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Dialog",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "443f0e7797fffa00",
+    "lines": 119,
+    "exports": [
+      "Dialog"
+    ],
+    "types": [
+      "DialogProps"
+    ],
+    "signature": "Dialog({ open, onClose, title, children }: DialogProps)"
+  }
+}

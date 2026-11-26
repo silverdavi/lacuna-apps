@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ad4fdd4534005fab00e378efb134ba1a823e4a27ea68fa4f266d5b196c0ebbba",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Warranty Tracker\" and, with no records, the table area shows the text \"No warranties yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Add warranty\" form, typing \"Laptop\" in the field labelled \"Product name\", \"2024-01-15\" in the field labelled \"Purchase date\", and \"2027-01-15\" in the field labelled \"Warranty end\", then clicking the button \"Save warranty\", adds a row to the table containing \"Laptop\", \"2024-01-15\", \"2027-01-15\" and the status badge \"Active\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second warranty with Product name \"Phone\", Purchase date \"2023-06-01\", Warranty end \"2024-06-01\", the table shows two rows and the \"Phone\" row displays the status badge \"Expired\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the column header \"Product name\" in the table sorts rows alphabetically by product name; with \"Laptop\" and \"Phone\" present, \"Laptop\" appears before \"Phone\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"lap\" in the search box labelled \"Search\" filters the table to show only the row containing \"Laptop\"; the \"Phone\" row is hidden."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose content includes the header row \"Product name,Purchase date,Warranty end,Status\" and a data row containing \"Laptop,2024-01-15,2027-01-15,Active\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Laptop\" on the Laptop row removes that row from the table; the table then shows only the \"Phone\" row and the text \"No warranties yet\" is not displayed."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"Expiring soon\" switches to a second view that lists only warranties whose end date is within 90 days of today; with \"Laptop\" ending 2027-01-15 and \"Phone\" ending 2024-06-01, the \"Expiring soon\" view shows the \"Phone\" row and does not show the \"Laptop\" row."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the warranty record: after adding \"Laptop\" with Purchase date \"2024-01-15\" and Warranty end \"2027-01-15\", reloading the page still shows a table row containing \"Laptop\", \"2024-01-15\" and \"2027-01-15\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9e3b252715ab8175f5abc2f5606e16ace136989401fe753f48ade831601be360"
+    }
+  ]
+}

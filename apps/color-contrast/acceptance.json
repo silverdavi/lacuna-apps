@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "2c02e2b84f87984737d2d9965d6dcafc1c0aad529abd0f58e476a8c84ccb7825",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Color Contrast Checker\" and the text \"No pairs saved yet\" in the Saved Pairs section."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `#FFFFFF` in the field labelled \"Foreground hex\" and `#000000` in the field labelled \"Background hex\" shows \"21.00\" in the field labelled \"Contrast ratio\" and \"AAA\" in the field labelled \"WCAG level\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing `#777777` in the field labelled \"Foreground hex\" and `#FFFFFF` in the field labelled \"Background hex\" shows \"4.48\" in the field labelled \"Contrast ratio\" and \"AA\" in the field labelled \"WCAG level\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing `#AAAAAA` in the field labelled \"Foreground hex\" and `#FFFFFF` in the field labelled \"Background hex\" shows \"2.32\" in the field labelled \"Contrast ratio\" and \"Fail\" in the field labelled \"WCAG level\"."
+    },
+    {
+      "id": "A5",
+      "text": "With Foreground `#FFFFFF` and Background `#000000`, clicking the button \"Save pair\" adds a list item containing \"#FFFFFF on #000000\" and \"21.00\" in the Saved Pairs section, and the text \"No pairs saved yet\" is gone."
+    },
+    {
+      "id": "A6",
+      "text": "After saving the pair `#FFFFFF` on `#000000`, clicking the button \"Delete #FFFFFF on #000000\" removes that list item and the text \"No pairs saved yet\" reappears."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy result\" with Foreground `#FFFFFF` and Background `#000000` shows the toast text \"Copied: #FFFFFF on #000000 \u2014 21.00 (AAA)\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"Palette\" shows the heading \"Generated Palette\" and a list containing the text \"#FFFFFF\" as the first swatch label."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved pair: after saving `#FFFFFF` on `#000000` and reloading the page, the Saved Pairs section still contains the list item with \"#FFFFFF on #000000\" and \"21.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4a594c08863c7b326aa552db33faf95bc01ec8583aa89f54614ed0107ef72ed4"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ec9c2b126be0ca306e4f5cbc62055bdba560423ab175bc865efc0f6a234806ad",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"PDF Toolkit\" and the text \"Drop a PDF file or click to browse\"."
+    },
+    {
+      "id": "A2",
+      "text": "After dropping a file named \"report.pdf\" and clicking the button \"Merge\", the toolbar shows the button \"Download\" and the status text \"Merged 1 file\"."
+    },
+    {
+      "id": "A3",
+      "text": "After dropping a file named \"book.pdf\" and clicking the button \"Split\", the field labelled \"Start page\" shows \"1\" and the field labelled \"End page\" shows \"100\"."
+    },
+    {
+      "id": "A4",
+      "text": "With \"book.pdf\" loaded and the button \"Split\" active, typing \"5\" in the field labelled \"Start page\" and \"10\" in the field labelled \"End page\" then clicking \"Apply\" shows the status text \"Split pages 5-10\"."
+    },
+    {
+      "id": "A5",
+      "text": "After clicking the button \"Reorder\", the list shows the item \"Page 1\" and the button \"Move up\" is disabled for the first item."
+    },
+    {
+      "id": "A6",
+      "text": "After adding a second file \"notes.pdf\" to the merge queue, the list shows two items: \"report.pdf\" and \"notes.pdf\". Clicking the button \"Remove notes.pdf\" removes that item and the list shows only \"report.pdf\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Download\" after a merge operation triggers a file download with the name \"merged.pdf\"."
+    },
+    {
+      "id": "A8",
+      "text": "After performing a merge operation, clicking the tab \"History\" shows a table with the column headers \"File\", \"Operation\", and \"Result\". The first row contains \"report.pdf\", \"Merge\", and \"merged.pdf\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last operation type. After performing a merge and reloading the page, the button \"Merge\" is highlighted as active and the status text shows \"Last operation: Merge\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "6b75edd9ca803deae2fe5b005ae0ca9c6223a394e49413e83d80c4bb880989e6"
+    }
+  ]
+}

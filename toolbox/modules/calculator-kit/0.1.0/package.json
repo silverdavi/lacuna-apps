@@ -1,0 +1,38 @@
+{
+  "name": "@lacuna/calculator-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Inputs panel, result summary, breakdown table, and optional chart for calculator-style apps.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/number-input": "workspace:0.1.0",
+    "@lacuna/record-table": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "CalculatorKit",
+    "kind": "kit",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "6f7b21bd520faa51",
+    "lines": 184,
+    "exports": [
+      "CalculatorKit"
+    ],
+    "types": [
+      "CalculatorKitInput",
+      "CalculatorKitResult",
+      "CalculatorKitProps"
+    ],
+    "signature": ""
+  }
+}

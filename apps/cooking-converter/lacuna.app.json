@@ -1,0 +1,81 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.cooking-converter",
+  "name": "Cooking Unit Converter",
+  "version": "0.1.0",
+  "summary": "Converts cups, grams, ounces and temperatures between common cooking units.",
+  "description": "Type an amount, pick a source unit and a target unit, and the result updates as you type. Supports US dry volume, mass and temperature units used in everyday recipes. Copy the result to the clipboard and keep a capped history of recent conversions on this device.",
+  "category": "productivity",
+  "tags": [
+    "cooking",
+    "units",
+    "converter",
+    "recipes",
+    "measurement"
+  ],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/cooking-converter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/combobox": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "convert:cooking-units"
+  ],
+  "permissions": {
+    "records": [],
+    "platform": [
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "notes": "All conversion math runs locally in the browser; no network."
+}

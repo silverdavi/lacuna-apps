@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "e80b936600c730d55c3a7922d52895615d29695f438b2b7ff59e553e1ff20148",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no records the page shows the heading \"Bug Issue Tracker\", the text \"No issues yet\", and a button labelled \"New issue\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"New issue\" opens a form; filling the field labelled \"Title\" with \"Login crash\", choosing \"Bug\" in the select labelled \"Type\", choosing \"High\" in the select labelled \"Priority\", typing \"Alice\" in the field labelled \"Assignee\", and clicking \"Save\" adds a table row containing \"Login crash\", \"Bug\", \"High\", \"Alice\", and \"Open\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Login crash\" (Bug, High, Alice, Open) and \"Dark mode\" (Feature, Low, Bob, Open), clicking the column header \"Priority\" sorts the table so the row \"Dark mode\" appears before \"Login crash\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"crash\" in the input labelled \"Search\" filters the table to show only the row containing \"Login crash\" and hides the row containing \"Dark mode\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the filter chip labelled \"Bug\" shows only rows where the Type column reads \"Bug\"; clicking the chip again clears the filter and shows both rows."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Edit\" on the row containing \"Login crash\" opens a form with \"Login crash\" pre-filled; changing the field labelled \"Status\" to \"In Progress\" and clicking \"Save\" updates that row's Status cell to \"In Progress\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete\" on the row containing \"Dark mode\" removes that row; the table then shows only \"Login crash\" and the text \"No issues yet\" is not present."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose first line is exactly \"Title,Type,Priority,Assignee,Status\" and whose second line is exactly \"Login crash,Bug,High,Alice,Open\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the record \"Login crash\" with Status \"In Progress\" visible in the table after the page reloads."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ebf4f41bb7a0bef4b8edf379265ca8c0415144f51dd7441bc7c69a1b1eaadfa9"
+    }
+  ]
+}

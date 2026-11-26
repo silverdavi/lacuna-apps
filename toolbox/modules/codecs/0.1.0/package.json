@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/codecs",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure encode/decode functions for Base64, URL encoding, hex, arbitrary number bases, and Roman numerals.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "codecs",
+    "kind": "logic",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "4d66a552a3f8a59e",
+    "lines": 199,
+    "exports": [
+      "base64Encode",
+      "base64Decode",
+      "urlEncode",
+      "urlDecode",
+      "toHex",
+      "fromHex",
+      "toBase",
+      "fromBase",
+      "toRoman",
+      "fromRoman"
+    ],
+    "types": [],
+    "signature": "base64Encode(input: string); base64Decode(input: string); urlEncode(input: string); urlDecode(input: string)"
+  }
+}

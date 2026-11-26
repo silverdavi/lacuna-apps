@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7febb6ffb8f1a8dcb2bfe2d5913de520229b452e33a749cdc072a8b895ff0e81",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Virtual Piano\" and the text \"No notes recorded yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the key labelled \"C4\" adds a list item containing \"C4\" and the text \"No notes recorded yet\" is gone; the summary shows \"Notes: 1\"."
+    },
+    {
+      "id": "A3",
+      "text": "After clicking \"C4\", then \"E4\", then \"G4\", the list shows three items in order: \"C4\", \"E4\", \"G4\", and the summary shows \"Notes: 3\"."
+    },
+    {
+      "id": "A4",
+      "text": "Pressing the keyboard key \"A\" (mapped to note A4) adds a list item containing \"A4\"; the summary shows \"Notes: 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Clear notes\" removes all list items, shows the text \"No notes recorded yet\", and the summary shows \"Notes: 0\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the toggle button \"Metronome\" changes its label to \"Metronome: On\" and the text \"BPM: 120\" appears; clicking it again changes the label back to \"Metronome\" and \"BPM: 120\" disappears."
+    },
+    {
+      "id": "A7",
+      "text": "With the Metronome on, clicking the button \"BPM +\" changes the text from \"BPM: 120\" to \"BPM: 124\"; clicking \"BPM \u2212\" changes it back to \"BPM: 120\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the tab labelled \"History\" shows a table with a column header \"Note\" and a row containing \"C4\" after C4 has been played; clicking the tab labelled \"Play\" returns to the keyboard view."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the note list: after playing \"C4\" and \"E4\", reloading the page still shows list items containing \"C4\" and \"E4\" and the summary \"Notes: 2\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ce2f1f601e0fe463517a5ee96dfc6a8d1d84f3a4571f232f9d6cc012201c1202"
+    }
+  ]
+}

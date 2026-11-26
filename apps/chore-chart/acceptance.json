@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "5e7ce97fcf7893a3ca151c2335b4cc515b2d63f52a98a63db09cbcd607f1bfa1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Chore Chart\" and, in the \"Members\" tab, the text \"No members yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Members\" tab, typing \"Alice\" in the field labelled \"Name\" and clicking the button \"Add member\" adds a list item containing \"Alice\" and the text \"0 chores\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the \"Members\" tab, typing \"Bob\" in the field labelled \"Name\" and clicking the button \"Add member\" adds a list item containing \"Bob\" and the text \"0 chores\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Assign chore\" on the list item for \"Alice\" opens a form. Typing \"Dishes\" in the field labelled \"Chore name\" and clicking \"Save\" adds a row to the \"Chores\" tab table with \"Alice\" in the \"Member\" column and \"Dishes\" in the \"Chore\" column. The \"Members\" tab list item for \"Alice\" now shows \"1 chores\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Chores\" tab, clicking the checkbox in the row for \"Dishes\" changes the \"Status\" column for that row to \"Done\" and displays a progress indicator \"1/1\" for Alice in the \"Members\" tab."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Chores\" tab, clicking the button \"Export CSV\" displays a toast with the text \"CSV copied to clipboard\" and copies the text \"Member,Chore,Status\\nAlice,Dishes,Done\\n\" to the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"Members\" tab, clicking the button \"Remove Alice\" removes the list item for \"Alice\" and all associated chores from the \"Chores\" tab table."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Charlie\" in the \"Name\" field and clicking \"Add member\", then assigning a chore \"Laundry\" to Charlie, results in the \"Chores\" tab table showing a row with \"Charlie\" and \"Laundry\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the member \"Alice\" with the chore \"Dishes\" marked as \"Done\" in the \"Chores\" tab table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "56dbc4c0b2299988c06f22180be4d81c3fe29c71881c23d877c62a3c66e5c995"
+    }
+  ]
+}

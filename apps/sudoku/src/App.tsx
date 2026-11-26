@@ -1,166 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { Body, Button, Card, Stack } from '@lacuna/ui'
 import { host, type Difficulty, type PuzzleRecord } from './host'
+import {
+  SIZE,
+  formatTime,
+  isSolved,
+  conflictSet,
+  makeRecord,
+  placeDigit,
+  elapsedSeconds,
+  type TimerBase,
+} from './engine'
 import './styles.css'
-
-const SIZE = 9
-
-// "Practice" is a fixed board: the solved grid below with exactly four empty
-// cells. Each empty cell's index is row * 9 + (col - 1):
-//   Row 1 Column 2 -> index  1 -> 2
-//   Row 2 Column 5 -> index 13 -> 8
-//   Row 5 Column 5 -> index 40 -> 9
-//   Row 9 Column 9 -> index 80 -> 8
-const PRACTICE_SOLUTION = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9,
-  4, 5, 6, 7, 8, 9, 1, 2, 3,
-  7, 8, 9, 1, 2, 3, 4, 5, 6,
-  2, 3, 4, 5, 6, 7, 8, 9, 1,
-  5, 6, 7, 8, 9, 1, 2, 3, 4,
-  8, 9, 1, 2, 3, 4, 5, 6, 7,
-  3, 4, 5, 6, 7, 8, 9, 1, 2,
-  6, 7, 8, 9, 1, 2, 3, 4, 5,
-  9, 1, 2, 3, 4, 5, 6, 7, 8,
-]
-
-const PRACTICE_EMPTY = new Set<number>([1, 13, 40, 80])
-
-function mulberry32(seed: number) {
-  let a = seed >>> 0
-  return () => {
-    a += 0x6d2b79f5
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-function shuffle<T>(list: T[], rnd: () => number): T[] {
-  const out = [...list]
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i + 1))
-    ;[out[i], out[j]] = [out[j], out[i]]
-  }
-  return out
-}
-
-function canPlace(d: number[], i: number, n: number): boolean {
-  const r = Math.floor(i / SIZE)
-  const c = i % SIZE
-  const br = Math.floor(r / 3)
-  const bc = Math.floor(c / 3)
-  for (let k = 0; k < SIZE; k++) {
-    if (d[r * SIZE + k] === n) return false
-    if (d[k * SIZE + c] === n) return false
-  }
-  for (let k = 0; k < 9; k++) {
-    if (d[(br * 3 + Math.floor(k / 3)) * SIZE + bc * 3 + (k % 3)] === n) return false
-  }
-  return true
-}
-
-function fillGrid(d: number[], rnd: () => number): boolean {
-  const i = d.indexOf(0)
-  if (i === -1) return true
-  for (const n of shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9], rnd)) {
-    if (!canPlace(d, i, n)) continue
-    d[i] = n
-    if (fillGrid(d, rnd)) return true
-    d[i] = 0
-  }
-  return false
-}
-
-// Empty-cell counts per difficulty. Hard leaves at least 30 empty cells.
-const GIVENS: Record<Exclude<Difficulty, 'Practice'>, number> = {
-  Easy: 46,
-  Hard: 42,
-}
-
-function newPuzzle(difficulty: Difficulty): { given: number[]; board: number[] } {
-  if (difficulty === 'Practice') {
-    const given = PRACTICE_SOLUTION.map((v, i) => (PRACTICE_EMPTY.has(i) ? 0 : v))
-    return { given, board: [...given] }
-  }
-  const rnd = mulberry32((Math.random() * 0x7fffffff) | 0)
-  const solved = new Array<number>(SIZE * SIZE).fill(0)
-  if (!fillGrid(solved, rnd)) throw new Error('could not build a board')
-  const keep = GIVENS[difficulty]
-  const keepIndex = new Set(
-    shuffle(Array.from({ length: SIZE * SIZE }, (_, i) => i), rnd).slice(0, keep),
-  )
-  const given = solved.map((v, i) => (keepIndex.has(i) ? v : 0))
-  return { given, board: [...given] }
-}
-
-function makeRecord(difficulty: Difficulty): PuzzleRecord {
-  const { given, board } = newPuzzle(difficulty)
-  return {
-    id: `puzzle-${Date.now().toString(36)}`,
-    kind: 'puzzle',
-    difficulty,
-    given,
-    board,
-    seconds: 0,
-    startedAt: Date.now(),
-    updatedAt: Date.now(),
-  }
-}
-
-function formatTime(total: number): string {
-  const minutes = Math.floor(total / 60)
-  const seconds = total % 60
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-}
-
-function isSolved(board: number[]): boolean {
-  return board.every((v) => v > 0) && hasConflict(board) === -1
-}
-
-// Index of a cell whose value repeats in its row, column or box, or -1.
-function hasConflict(board: number[]): number {
-  for (let i = 0; i < board.length; i++) {
-    const v = board[i]
-    if (v === 0) continue
-    const r = Math.floor(i / SIZE)
-    const c = i % SIZE
-    const br = Math.floor(r / 3)
-    const bc = Math.floor(c / 3)
-    for (let k = 0; k < SIZE; k++) {
-      if (r * SIZE + k !== i && board[r * SIZE + k] === v) return i
-      if (k * SIZE + c !== i && board[k * SIZE + c] === v) return i
-    }
-    for (let k = 0; k < 9; k++) {
-      const bi = (br * 3 + Math.floor(k / 3)) * SIZE + bc * 3 + (k % 3)
-      if (bi !== i && board[bi] === v) return i
-    }
-  }
-  return -1
-}
-
-function conflictSet(board: number[]): Set<number> {
-  const bad = new Set<number>()
-  for (let i = 0; i < board.length; i++) {
-    const v = board[i]
-    if (v === 0) continue
-    const r = Math.floor(i / SIZE)
-    const c = i % SIZE
-    const br = Math.floor(r / 3)
-    const bc = Math.floor(c / 3)
-    for (let k = 0; k < SIZE; k++) {
-      if (r * SIZE + k !== i && board[r * SIZE + k] === v) bad.add(i)
-      if (k * SIZE + c !== i && board[k * SIZE + c] === v) bad.add(i)
-    }
-    for (let k = 0; k < 9; k++) {
-      if ((br * 3 + Math.floor(k / 3)) * SIZE + bc * 3 + (k % 3) !== i) {
-        const bi = (br * 3 + Math.floor(k / 3)) * SIZE + bc * 3 + (k % 3)
-        if (board[bi] === v) bad.add(i)
-      }
-    }
-  }
-  return bad
-}
 
 const cellClass = {
   root: 'sud-cell',
@@ -178,7 +29,7 @@ export function App() {
   // Elapsed seconds are derived from a wall-clock reference rather than an
   // incrementing counter, so the displayed time tracks real elapsed time even
   // when the tick cadence is coarser than one second.
-  const timerBaseRef = useRef<{ at: number; seconds: number } | null>(null)
+  const timerBaseRef = useRef<TimerBase | null>(null)
 
   const solved = record !== null && isSolved(record.board)
   const conflict = record ? conflictSet(record.board) : new Set<number>()
@@ -187,8 +38,7 @@ export function App() {
   const currentSeconds = (rec: PuzzleRecord | null): number => {
     const base = timerBaseRef.current
     if (!rec || !base) return rec ? rec.seconds : 0
-    const elapsed = Math.max(0, Math.floor((Date.now() - base.at) / 1000))
-    return base.seconds + elapsed
+    return elapsedSeconds(base, Date.now())
   }
 
   const displaySeconds = record ? currentSeconds(record) : 0
@@ -207,7 +57,7 @@ export function App() {
         if (!current || isSolved(current.board)) return current
         const base = timerBaseRef.current
         if (!base) return current
-        const seconds = base.seconds + Math.max(0, Math.floor((Date.now() - base.at) / 1000))
+        const seconds = elapsedSeconds(base, Date.now())
         if (seconds === current.seconds) return current
         const next = { ...current, seconds, updatedAt: Date.now() }
         host.savePuzzle(next)
@@ -218,7 +68,7 @@ export function App() {
   }, [record !== null, solved])
 
   const start = (level: Difficulty) => {
-    const next = makeRecord(level)
+    const next = makeRecord(level, Date.now(), `puzzle-${Date.now().toString(36)}`)
     host.savePuzzle(next)
     timerBaseRef.current = null
     setRecord(next)
@@ -228,9 +78,8 @@ export function App() {
 
   const press = (digit: number) => {
     if (!record || selected === null || solved) return
-    if (record.given[selected] !== 0) return
-    const board = [...record.board]
-    board[selected] = digit
+    const board = placeDigit(record.given, record.board, selected, digit)
+    if (board === record.board) return
     const next = { ...record, board, updatedAt: Date.now() }
     host.savePuzzle(next)
     setRecord(next)

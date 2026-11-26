@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.org-chart",
+  "name": "Org Chart",
+  "version": "0.1.0",
+  "summary": "Map your team's reporting lines and see the hierarchy as a tree.",
+  "description": "Add roles, set who reports to whom, and see the reporting lines as a tree. Switch between the outline and the canvas, zoom in and out, and export the structure as JSON. The chart is the record. Nothing leaves the browser.",
+  "category": "business",
+  "tags": ["org-chart", "team", "reporting-lines", "hierarchy"],
+  "icon": "people",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/org-chart"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:role",
+    "edit:role",
+    "export:json"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "role",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the roles and who reports to whom"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "role"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/use-streak",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "React hook that manages daily check-ins with persisted state, computing current and longest streaks via streakCalc.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/streak-calc": "workspace:0.1.0",
+    "@lacuna/use-collection": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useStreak",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "c8686688bd0ac65b",
+    "lines": 80,
+    "exports": [
+      "useStreak"
+    ],
+    "types": [
+      "UseStreakOptions",
+      "UseStreakReturn"
+    ],
+    "signature": "useStreak(options: UseStreakOptions)"
+  }
+}

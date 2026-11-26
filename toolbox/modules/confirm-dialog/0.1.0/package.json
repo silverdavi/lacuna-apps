@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/confirm-dialog",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A modal that asks the person to confirm or cancel a destructive or committing action.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "ConfirmDialog",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "41c6310e0b96fbd3",
+    "lines": 180,
+    "exports": [
+      "ConfirmDialog"
+    ],
+    "types": [
+      "ConfirmDialogProps"
+    ],
+    "signature": "ConfirmDialog(props: ConfirmDialogProps)"
+  }
+}

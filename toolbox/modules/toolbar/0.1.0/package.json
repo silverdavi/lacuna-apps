@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/toolbar",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A horizontal toolbar of tool buttons, toggle buttons, and an overflow menu for items exceeding the visible width.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/use-hotkeys": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Toolbar",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "414cf0ea8d3af913",
+    "lines": 239,
+    "exports": [
+      "Toolbar"
+    ],
+    "types": [
+      "ToolbarItem",
+      "ToolbarProps"
+    ],
+    "signature": ""
+  }
+}
