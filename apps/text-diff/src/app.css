@@ -96,6 +96,12 @@
   color: var(--accent);
 }
 
+.td-line-remove .td-text,
+.td-line-add .td-text {
+  user-select: text;
+  word-break: break-word;
+}
+
 .td-marker {
   width: 1ch;
   flex: 0 0 1ch;
