@@ -49,14 +49,14 @@ function format(n: number): string {
 export type ComputedResult = { kind: 'ok'; values: string[] } | { kind: 'error'; message: string }
 
 export function compute(a: MatrixRecord, b: MatrixRecord, operation: Operation): ComputedResult {
-  if (operation === 'multiply' && (a.rows !== b.cols || b.rows !== a.cols)) {
+  if (operation === 'Multiply' && (a.rows !== b.cols || b.rows !== a.cols)) {
     return { kind: 'error', message: 'Dimensions do not match for multiplication' }
   }
   const values = new Array<string>(a.rows * a.cols)
   for (let r = 0; r < a.rows; r += 1) {
     for (let c = 0; c < a.cols; c += 1) {
       let out: number | null = null
-      if (operation === 'add') {
+      if (operation === 'Add') {
         if (a.rows === b.rows && a.cols === b.cols) {
           const x = parse(a.values[r * a.cols + c])
           const y = parse(b.values[r * b.cols + c])

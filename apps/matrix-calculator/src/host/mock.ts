@@ -3,7 +3,7 @@
 // The real host API will back this in the sandboxed runtime.
 import { createMockValue, type MockValue } from '@lacuna/host-mock'
 
-export type Operation = 'add' | 'multiply'
+export type Operation = 'Add' | 'Multiply'
 
 export type MatrixRecord = {
   rows: number
@@ -20,7 +20,7 @@ export type SessionRecord = {
 const STORAGE_KEY = 'lacuna.matrix-calculator.session'
 
 export const DEFAULT_RECORD: SessionRecord = {
-  operation: 'add',
+  operation: 'Add',
   a: { rows: 2, cols: 2, values: ['1', '2', '3', '4'] },
   b: { rows: 2, cols: 2, values: ['5', '6', '7', '8'] },
 }
@@ -51,7 +51,7 @@ export function isSessionRecord(value: unknown): value is SessionRecord {
   return (
     !!v &&
     typeof v === 'object' &&
-    (v.operation === 'add' || v.operation === 'multiply') &&
+    (v.operation === 'Add' || v.operation === 'Multiply') &&
     isMatrixRecord(v.a) &&
     isMatrixRecord(v.b)
   )

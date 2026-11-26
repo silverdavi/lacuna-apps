@@ -2,18 +2,18 @@
 // Matrix calculator: two matrices up to 5x5, Add or Multiply, an undoable cell editor,
 // and a result table. The session persists on this device via the host adapter.
 import { useEffect, useMemo } from 'react'
-import { AppShell, Board, Button, Card, ErrorState, FormGrid, Kpi, KpiRow, Rail, Select, Stack, TextInput } from '@lacuna/ui'
+import { AppShell, Board, Button, Card, ErrorState, FormGrid, Rail, Stack, Table } from '@lacuna/ui'
 import { useUndoStack } from '@lacuna/use-undo-stack'
 import { useClipboard } from '@lacuna/use-clipboard'
 import { ExportMenu } from '@lacuna/export-menu'
 import type { ExportOption } from '@lacuna/export-menu'
 import { sessionStore } from './host'
-import type { MatrixRecord, Operation, SessionRecord } from './host'
+import type { MatrixRecord, SessionRecord } from './host'
 import { cellIndex, cellName, compute, DEFAULT_A, DEFAULT_B, resize } from './matrix'
 
-const OPERATION_OPTIONS: { value: Operation; label: string }[] = [
-  { value: 'add', label: 'Add' },
-  { value: 'multiply', label: 'Multiply' },
+const OPERATION_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Add', label: 'Add' },
+  { value: 'Multiply', label: 'Multiply' },
 ]
 
 const SIZE_OPTIONS: { value: string; label: string }[] = []
@@ -72,11 +72,11 @@ export function App() {
   }
 
   function setOperation(value: string): void {
-    set((prev) => ({ ...prev, operation: value === 'multiply' ? 'multiply' : 'add' }))
+    set((prev) => ({ ...prev, operation: value === 'Multiply' ? 'Multiply' : 'Add' }))
   }
 
   function resetDefaults(): void {
-    stack.reset({ operation: 'add', a: DEFAULT_A, b: DEFAULT_B })
+    stack.reset({ operation: 'Add', a: DEFAULT_A, b: DEFAULT_B })
   }
 
   const resultText = result.kind === 'ok' ? result.values.join(' ') : ''
@@ -111,11 +111,13 @@ export function App() {
         const value = g.values[r * g.cols + c] ?? '0'
         cells.push(
           <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <TextInput
-              label={name}
-              value={value}
+            <input
+              className="lc-input"
+              type="text"
               inputMode="decimal"
-              onChange={(raw) => setCell(target, name, raw)}
+              aria-label={name}
+              value={value}
+              onChange={(event) => setCell(target, name, event.target.value)}
             />
           </div>,
         )
@@ -123,31 +125,36 @@ export function App() {
     }
     return (
       <Card mono={`Matrix ${target.toUpperCase()}`} title={`Matrix ${target.toUpperCase()}`}>
-        <Board cols={g.cols} rows={g.rows} cell={64} label={`Matrix ${target.toUpperCase()} cells`}>
+        <Board cols={g.cols} rows={g.rows} cell={80} label={`Matrix ${target.toUpperCase()} cells`}>
           {cells}
         </Board>
       </Card>
     )
   }
 
-  const resultBody =
+  const resultColumns =
     result.kind === 'ok'
-      ? Array.from({ length: a.rows }, (_, r) => (
-          <tr key={r}>
-            {Array.from({ length: a.cols }, (_, c) => (
-              <td key={c} className="num">{result.values[r * a.cols + c]}</td>
-            ))}
-          </tr>
-        ))
+      ? Array.from({ length: a.cols }, (_, c) => ({ key: `c${c}`, label: `C${c + 1}`, num: true }))
       : []
+
+  const resultRows =
+    result.kind === 'ok'
+      ? Array.from({ length: a.rows }, (_, r) => ({
+          cells: Object.fromEntries(
+            Array.from({ length: a.cols }, (_, c) => [`c${c}`, result.values[r * a.cols + c]]),
+          ),
+        }))
+      : []
+
+  const operationIsAdd = record.operation === 'Add'
 
   return (
     <AppShell
       name="Matrix Calculator"
       icon="grid"
-      hue="gold"
+      hue="green"
       category="Productivity"
-      meta={`${a.rows}x${a.cols} · ${record.operation === 'add' ? 'Add' : 'Multiply'} · ${b.rows}x${b.cols}`}
+      meta={`${a.rows}x${a.cols} · ${operationIsAdd ? 'Add' : 'Multiply'} · ${b.rows}x${b.cols}`}
       status="Local · saved on this device"
       actions={
         <>
@@ -161,7 +168,7 @@ export function App() {
         </>
       }
       side={
-        <Rail title="Matrix Calculator" note="Add · multiply · up to 5x5" chips={['Undo', 'Local', 'Works offline']}>
+        <Rail title="Matrix Calculator" note="Add · multiply · up to 5x5" chips={['Undo', 'Local', 'Works offline', 'Save on device']}>
           <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
             <Button kind="ghost" onClick={resetDefaults}>
               Reset to defaults
@@ -173,9 +180,42 @@ export function App() {
       <Stack>
         <Card mono="Setup" title="Matrices">
           <FormGrid>
-            <Select label="Operation" value={record.operation} onChange={setOperation} options={OPERATION_OPTIONS} />
-            <Select label="Both sizes" value={`${a.rows}x${a.cols}`} onChange={setBothSizes} options={SIZE_OPTIONS} />
-            <Select label="Size B" value={`${b.rows}x${b.cols}`} onChange={setSizeB} options={SIZE_OPTIONS} />
+            <div className="lc-field">
+              <select
+                className="lc-input"
+                aria-label="Operation"
+                value={record.operation}
+                onChange={(event) => setOperation(event.target.value)}
+              >
+                {OPERATION_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="lc-field">
+              <select
+                className="lc-input"
+                aria-label="Both sizes"
+                value={`${a.rows}x${a.cols}`}
+                onChange={(event) => setBothSizes(event.target.value)}
+              >
+                {SIZE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="lc-field">
+              <select
+                className="lc-input"
+                aria-label="Size B"
+                value={`${b.rows}x${b.cols}`}
+                onChange={(event) => setSizeB(event.target.value)}
+              >
+                {SIZE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
           </FormGrid>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(12px * var(--sf))', marginTop: 'calc(12px * var(--sf))' }}>
             {gridPanel('a')}
@@ -187,19 +227,13 @@ export function App() {
           {result.kind === 'error' ? (
             <ErrorState mono="Blocked" title={result.message} detail="Resize the matrices so the dimensions match, then the result will appear here." />
           ) : (
-            <>
-              <KpiRow>
-                <Kpi value={String(a.rows * a.cols)} label="Result cells" accent />
-                <Kpi value={record.operation === 'add' ? 'a + b' : 'a · b'} label="Operation" />
-                <Kpi value={`${a.rows}x${a.cols}`} label="A" />
-                <Kpi value={`${b.rows}x${b.cols}`} label="B" />
-              </KpiRow>
-              <div style={{ marginTop: 'calc(10px * var(--sf))' }}>
-                <table className="lc-table" aria-label="Result">
-                  <tbody>{resultBody}</tbody>
-                </table>
-              </div>
-            </>
+            <Stack>
+              <Table
+                label="Result"
+                columns={resultColumns}
+                rows={resultRows}
+              />
+            </Stack>
           )}
         </Card>
       </Stack>
