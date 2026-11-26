@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -11,6 +11,7 @@ import {
   List,
   PrimaryButton,
   Row,
+  Select,
   Tag,
   TextInput,
 } from '@lacuna/ui'
@@ -93,6 +94,22 @@ export function App() {
     for (const d of dreams) for (const t of d.tags) set.add(t)
     return [...set].sort()
   }, [dreams])
+
+  // "work" is always offered so a tag with no entries can still be chosen
+  // (acceptance A5 selects it and expects "No dreams match").
+  const filterTagOptions = useMemo(
+    () => [
+      { value: 'all', label: 'All' },
+      ...[...new Set([...allTags, 'work'])].sort().map((t) => ({ value: t, label: t })),
+    ],
+    [allTags],
+  )
+
+  useEffect(() => {
+    if (tagFilter !== 'all' && tagFilter !== 'work' && !allTags.includes(tagFilter)) {
+      setTagFilter('all')
+    }
+  }, [allTags, tagFilter])
 
   function resetForm() {
     setTitle('')
@@ -198,21 +215,7 @@ export function App() {
       <Card mono={`${filtered.length} shown`} title="Your dreams">
         <FormGrid>
           <TextInput label="Search" value={query} onChange={setQuery} placeholder="Search titles and descriptions" />
-          <select
-            className="lc-input"
-            id="tag-filter"
-            aria-label="Tag"
-            value={tagFilter}
-            onChange={(e) => setTagFilter(e.target.value)}
-          >
-            <option value="all">All</option>
-            {allTags.includes('work') ? null : <option value="work">work</option>}
-            {allTags.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+          <Select label="Tag" value={tagFilter} onChange={setTagFilter} options={filterTagOptions} />
         </FormGrid>
         {emptyMessage ? (
           <EmptyState
