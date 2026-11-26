@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ea3714261fc9c507065b7f2c00523e7f1b30dfd654cffcfbe3b518e368643657",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Packing List\" and, with no items, the text \"No items yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Passport\" in the field labelled \"Item name\" and clicking the button \"Add item\" adds a list item containing \"Passport\" with an unchecked checkbox; the text \"No items yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Passport\" and \"Toothbrush\", clicking the checkbox on the \"Passport\" item changes its status to checked and the progress indicator shows \"1 of 2 packed\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Edit\" on the \"Toothbrush\" item opens an inline edit field; typing \"Toothpaste\" and pressing Enter changes the item label to \"Toothpaste\"."
+    },
+    {
+      "id": "A5",
+      "text": "With items \"Passport\" (checked) and \"Toothpaste\" (unchecked), clicking the button \"Copy summary\" copies the text \"Packed: Passport\\nRemaining: Toothpaste\" to the clipboard."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab \"Trip details\" shows a form with fields labelled \"Destination\" and \"Departure date\"; typing \"Paris\" in \"Destination\" and \"2025-06-15\" in \"Departure date\" and clicking \"Save\" persists these values, visible when returning to the \"Items\" tab."
+    },
+    {
+      "id": "A7",
+      "text": "With items \"Passport\" and \"Toothpaste\", pressing the keyboard shortcut Alt+ArrowUp on the \"Toothpaste\" item moves it above \"Passport\", so the first list item is \"Toothpaste\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete\" on the \"Toothpaste\" item removes it from the list; the progress indicator shows \"1 of 1 packed\" and only \"Passport\" remains."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the item \"Passport\" in the checked state and the trip details \"Paris\" and \"2025-06-15\" after navigating away and back."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8b98efd26b8be7f8a07fcd1052f7534835cdcba90ea24e47fc90467301c2ebd2"
+    }
+  ]
+}
