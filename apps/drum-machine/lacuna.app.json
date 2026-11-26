@@ -1,0 +1,93 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.drum-machine",
+  "name": "Drum Machine",
+  "version": "0.1.0",
+  "summary": "Step-sequenced drum machine with Web Audio.",
+  "description": "A small drum machine. Toggle 16 steps, set tempo, and play the loop back with Web Audio. Pattern and tempo persist across reloads.",
+  "category": "personal",
+  "tags": [
+    "audio",
+    "music",
+    "drums",
+    "sequencer",
+    "step-sequencer"
+  ],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/drum-machine",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tone-synth": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:pattern"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "pattern",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Saved drum machine patterns and tempo"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "pattern"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
