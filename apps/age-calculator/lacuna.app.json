@@ -4,7 +4,7 @@
   "name": "Age Calculator",
   "version": "0.1.0",
   "summary": "Work out someone's age in years, months and days.",
-  "description": "Enter a birth date and an optional reference date to see the age in years, months and days, with a breakdown of total days and a small chart. The last calculation is kept on this device.",
+  "description": "Enter a birth date and an optional reference date to see the age in years, months and days, total days lived, and a countdown to the next birthday. Keep a local history of past calculations and export them. Nothing leaves the browser.",
   "category": "productivity",
   "tags": ["age", "date", "calculator"],
   "icon": "docs",
@@ -32,10 +32,11 @@
     "modules": {
       "@lacuna/chart": "0.1.0",
       "@lacuna/date-math": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
       "@lacuna/host-mock": "0.1.0",
-      "@lacuna/record-table": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
     }
   },
   "capabilities": [
