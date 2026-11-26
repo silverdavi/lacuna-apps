@@ -1,0 +1,98 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.guest-list",
+  "name": "Guest List",
+  "version": "0.1.0",
+  "summary": "Track event guest invitations with RSVP status and export to CSV.",
+  "description": "Add, edit, and delete guests. Search by name, sort alphabetically, filter by RSVP, and export your list to CSV.",
+  "category": "personal",
+  "tags": ["guests", "events", "rsvp"],
+  "icon": "people",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/guest-list",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/record-form": "0.1.0",
+      "@lacuna/filter-bar": "0.1.0",
+      "@lacuna/search-box": "0.1.0",
+      "@lacuna/confirm-dialog": "0.2.0",
+      "@lacuna/tag-input": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/fuzzy-search": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:guest-list"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "guest-list",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Guest List records"
+      }
+    ],
+    "platform": [
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "guest-list"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

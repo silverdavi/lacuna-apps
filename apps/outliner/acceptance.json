@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "155cc2d34a5b5b70cd6bc55924bc93f23bd7d794160f061289e235d6989c3ce2",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Outline App\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add item\" adds one tree item named \"New item\"."
+    },
+    {
+      "id": "A3",
+      "text": "With one item \"New item\", clicking the button \"Indent\" changes its level to 1 (`aria-level=\"2\"`; a top-level item has `aria-level=\"1\"`)."
+    },
+    {
+      "id": "A4",
+      "text": "With one item that has been indented to level 1 (aria-level \"2\"), clicking the button \"Outdent\" changes its level back to 0 (`aria-level=\"1\"`)."
+    },
+    {
+      "id": "A5",
+      "text": "With two items \"A\" then \"B\" at level 0 (add two items, then type \"A\" and \"B\" into their text inputs), dragging the handle of \"A\" (button \"Drag A\") below item \"B\" reorders the list so that the tree items in DOM order are \"B\", then \"A\"."
+    },
+    {
+      "id": "A6",
+      "text": "With items \"A\" and \"B\" at level 0, clicking the button \"Export Markdown\" puts exactly the text \"- A\\n- B\" on the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "With \"A\" at level 0 and \"B\" at level 1 (B added second, selected, then Indent), clicking the toggle \"Collapse A\" removes \"B\" from view: no tree item named \"B\" remains while \"A\" stays visible."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Hello\" into the text input of the first item (`fill`) and pressing Enter makes that item's tree item named \"Hello\"."
+    },
+    {
+      "id": "A9",
+      "text": "After clicking \"Add item\" and renaming the item to \"Test\", reloading the page still shows a tree item named \"Test\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0ed749d1b3e503664ce48b98f124f7e3986152edc7361bcacae6169be0599a07"
+    }
+  ]
+}

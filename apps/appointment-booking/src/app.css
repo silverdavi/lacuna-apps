@@ -1,0 +1,286 @@
+.ab-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: calc(16px * var(--sf));
+  align-items: end;
+  margin-bottom: calc(24px * var(--sf));
+}
+
+.ab-nav {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}
+
+.ab-period {
+  font-family: var(--sans);
+  font-size: calc(18px * var(--tf));
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.ab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+  justify-content: flex-end;
+}
+
+.ab-tabs {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(16px * var(--sf));
+}
+
+.ab-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: calc(6px * var(--sf));
+}
+
+.ab-grid-head {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-80);
+  text-align: center;
+  padding-bottom: calc(2px * var(--sf));
+}
+
+.ab-cell {
+  border: calc(1px * var(--sf)) solid var(--line-soft);
+  border-radius: calc(6px * var(--sf));
+  padding: calc(6px * var(--sf));
+  min-height: calc(72px * var(--sf));
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  overflow: hidden;
+}
+
+.ab-cell.off {
+  background: var(--surface-1);
+}
+
+.ab-cell.today {
+  border-color: var(--accent);
+}
+
+.ab-cell-date {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-80);
+}
+
+.ab-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--sf));
+}
+
+.ab-block {
+  font-family: var(--sans);
+  font-size: calc(11px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: none;
+  border-left: calc(2px * var(--sf)) solid var(--accent);
+  border-radius: calc(3px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(4px * var(--sf));
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-block:hover {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.ab-more {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink-80);
+}
+
+.ab-week {
+  display: grid;
+  grid-template-columns: auto repeat(7, 1fr);
+  gap: calc(4px * var(--sf));
+}
+
+.ab-week-gutter {
+  display: flex;
+  flex-direction: column;
+}
+
+.ab-hour {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink-80);
+  height: calc(48px * var(--sf));
+  line-height: calc(48px * var(--sf));
+  text-align: right;
+  padding-right: calc(6px * var(--sf));
+}
+
+.ab-day {
+  border: calc(1px * var(--sf)) solid var(--line-soft);
+  border-radius: calc(6px * var(--sf));
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.ab-day.today {
+  border-color: var(--accent);
+}
+
+.ab-day-head {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-80);
+  text-align: center;
+  padding: calc(6px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--line-soft);
+}
+
+.ab-day-canvas {
+  position: relative;
+  height: calc(576px * var(--sf));
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line-soft) 0,
+    var(--line-soft) calc(1px * var(--sf)),
+    transparent calc(1px * var(--sf)),
+    transparent calc(48px * var(--sf))
+  );
+}
+
+.ab-wblock {
+  position: absolute;
+  left: calc(2px * var(--sf));
+  right: calc(2px * var(--sf));
+  background: color-mix(in srgb, var(--accent) 20%, var(--surface-0));
+  border: calc(1px * var(--sf)) solid color-mix(in srgb, var(--accent) 45%, var(--surface-0));
+  border-radius: calc(4px * var(--sf));
+  padding: calc(3px * var(--sf)) calc(5px * var(--sf));
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ab-wblock:hover {
+  background: color-mix(in srgb, var(--accent) 30%, var(--surface-0));
+}
+
+.ab-wtime {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink-80);
+  display: block;
+}
+
+.ab-wname {
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  font-weight: 700;
+  color: var(--ink);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-wnotes {
+  font-family: var(--sans);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink-80);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-nomatch {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-80);
+  margin-top: calc(12px * var(--sf));
+}
+
+.ab-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: calc(48px * var(--sf));
+  z-index: 100;
+}
+
+.ab-dialog {
+  background: var(--surface-0);
+  border: calc(1px * var(--sf)) solid var(--line-soft);
+  border-radius: calc(10px * var(--sf));
+  box-shadow: var(--shadow);
+  width: min(calc(420px * var(--sf)), 100%);
+  max-height: calc(100dvh - calc(96px * var(--sf)));
+  overflow-y: auto;
+  padding: calc(20px * var(--sf));
+}
+
+.ab-dialog h2 {
+  font-family: var(--sans);
+  font-size: calc(16px * var(--tf));
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 calc(8px * var(--sf));
+}
+
+.ab-detail {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-80);
+  line-height: 1.6;
+  background: var(--surface-1);
+  border-radius: calc(6px * var(--sf));
+  padding: calc(8px * var(--sf));
+  margin: 0 0 calc(12px * var(--sf));
+}
+
+.ab-dl {
+  color: var(--ink-60);
+}
+
+.ab-dialog .ab-actions {
+  margin-top: calc(16px * var(--sf));
+}
+
+.ab-error {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--danger);
+  margin: calc(8px * var(--sf)) 0 0;
+}
+
+.ab-saved {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--good);
+  margin: calc(8px * var(--sf)) 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-block,
+  .ab-wblock {
+    transition: none;
+  }
+}

@@ -53,6 +53,9 @@ for app in $apps; do
   step "$app: acceptance tests (locked, one per check, no fakes) and reference attribution"
   node scripts/acceptance-lint.mjs "$dir" $lint_mode || bad "$app: acceptance lint"
   node scripts/reference-lint.mjs "$dir" $lint_mode || bad "$app: reference lint"
+  node scripts/toolbox-lint.mjs "$dir" $lint_mode || bad "$app: toolbox lint"
+  step "$app: visual language (app shell, tokens, fonts, no color literals)"
+  node scripts/design-lint.mjs "$dir" $lint_mode || bad "$app: design lint"
 
   step "$app: type check"
   pnpm --filter "./$dir" exec tsc --noEmit || bad "$app: tsc"

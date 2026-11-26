@@ -1,0 +1,52 @@
+/* Receipt tracker layout helpers — tokens only, no color literals. */
+
+.rt-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(12px * var(--sf));
+  margin-bottom: calc(16px * var(--sf));
+}
+
+.rt-filter-row > * {
+  flex: 1 1 calc(220px * var(--sf));
+}
+
+.rt-total {
+  margin-top: calc(14px * var(--sf));
+  margin-bottom: 0;
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.rt-catlist {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rt-cat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: calc(12.5px * var(--tf));
+  color: var(--ink);
+  padding: calc(6px * var(--sf)) 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.rt-cat .num {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.rt-muted {
+  color: var(--ink-60);
+  font-size: calc(12px * var(--tf));
+}
+
+.rt-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+}

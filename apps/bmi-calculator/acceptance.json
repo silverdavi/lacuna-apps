@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1ce41dd980b2c1d327a644d15d57cd302f3a1bdffe6a04614ebcde8b74b94fc5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no inputs, the page shows the heading \"BMI Calculator\", the text \"Enter your height and weight to calculate BMI\", and the result area displays \"BMI: \u2014\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 170 in the field labelled \"Height\" and 65 in the field labelled \"Weight\" with the unit select set to \"Metric (cm, kg)\" shows \"BMI: 22.5\" in the result summary and \"Normal weight\" in the category label."
+    },
+    {
+      "id": "A3",
+      "text": "Typing 5 in the field labelled \"Height\" and 10 in the field labelled \"Weight\" with the unit select set to \"Imperial (ft, lbs)\" shows \"BMI: 21.8\" in the result summary and \"Normal weight\" in the category label."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 150 in the field labelled \"Height\" and 80 in the field labelled \"Weight\" with the unit select set to \"Metric (cm, kg)\" shows \"BMI: 35.6\" in the result summary and \"Obese\" in the category label."
+    },
+    {
+      "id": "A5",
+      "text": "Typing 180 in the field labelled \"Height\" and 50 in the field labelled \"Weight\" with the unit select set to \"Metric (cm, kg)\" shows \"BMI: 15.4\" in the result summary and \"Underweight\" in the category label."
+    },
+    {
+      "id": "A6",
+      "text": "Typing 0 in the field labelled \"Weight\" and clicking the button \"Calculate\" shows the message \"Weight must be greater than 0\" and the result area still displays \"BMI: \u2014\"."
+    },
+    {
+      "id": "A7",
+      "text": "The breakdown table shows rows for \"Underweight\", \"Normal weight\", \"Overweight\", and \"Obese\" with their BMI ranges; when BMI is 22.5 the row \"Normal weight\" is highlighted and the others are not."
+    },
+    {
+      "id": "A8",
+      "text": "Typing 175 in the field labelled \"Height\" and 70 in the field labelled \"Weight\" with the unit select set to \"Metric (cm, kg)\" shows \"BMI: 22.9\" in the result summary and the chart bar for \"Normal weight\" is filled to 100% while other bars are at 0%."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last calculation: after entering Height 170, Weight 65 in Metric units and seeing \"BMI: 22.5\", reloading the page still shows \"BMI: 22.5\" and \"Normal weight\" in the result summary."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "defe91a0e97f0695a78dc28b0edb63b9ecd64aaf398bc760e8b92cd62638a31c"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "3432f677bd24490f6606c41a70dff463008ef81c0ae47828d5cc41ff865703e9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no items the page shows the heading \"Grocery List\", the text \"No items yet\", and the progress line \"0 of 0 done\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Milk\" in the field labelled \"Item name\", typing \"2\" in the field labelled \"Quantity\", and clicking the button \"Add item\" adds a list item that contains \"Milk\" and \"\u00d72\"; the progress line reads \"0 of 1 done\" and \"No items yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After also adding \"Bread\" with Quantity \"1\", a list item contains \"Bread\" and \"\u00d71\", and the progress line reads \"0 of 2 done\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add item\" with an empty \"Item name\" adds no list item and shows the message \"Enter an item name\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the checkbox on the list item \"Milk \u00d72\" marks it done and the progress line reads \"1 of 2 done\"; clicking it again returns the progress line to \"0 of 2 done\"."
+    },
+    {
+      "id": "A6",
+      "text": "Every list item has a button named \"Delete <item name>\". With items \"Milk \u00d72\" and \"Bread \u00d71\", clicking \"Delete Bread\" removes that item and the progress line reads \"0 of 1 done\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy list\" copies the text \"Milk \u00d72\\nBread \u00d71\" to the clipboard and shows the message \"Copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" downloads a file whose content is \"name,quantity\\nMilk,2\\nBread,1\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the list: after adding \"Milk\" with Quantity \"2\" and checking it, reloading the page still shows the list item \"Milk \u00d72\" in its checked state and the progress line \"1 of 1 done\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "6bf76454a34a79b6f879fe9b4ced8720b7cfc88fcc310e37f6093c05ab613f48"
+    }
+  ]
+}

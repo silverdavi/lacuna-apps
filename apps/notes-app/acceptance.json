@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "56ea8b8f89472a44e5d82d99b6c1175a384877ff8048d755b063962933e5acc1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Quick Notes\" and, with no notes saved, shows the text \"No notes yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Meeting\" in the field labelled \"Title\" and \"Discuss Q3 roadmap\" in the field labelled \"Content\", then clicking the button \"Save note\", adds a list item containing \"Meeting\" and \"Discuss Q3 roadmap\"; the text \"No notes yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"Grocery list\" in the field labelled \"Title\" and \"Milk, eggs, bread\" in the field labelled \"Content\", then clicking \"Save note\", adds a second list item containing \"Grocery list\" and \"Milk, eggs, bread\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"Meet\" in the field labelled \"Search\" filters the list to show only the item containing \"Meeting\"; the item containing \"Grocery list\" is not visible."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Meeting\" removes the item containing \"Meeting\" from the list; the item containing \"Grocery list\" remains visible."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export JSON\" triggers a file download named \"quick-notes.json\" whose content includes the string \"Grocery list\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab labelled \"All\" shows both notes; clicking the tab labelled \"Archived\" shows the text \"No notes yet\" because no notes are archived."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"Milk\" in the field labelled \"Search\" and pressing the Enter key shows only the item containing \"Grocery list\" in the results list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the note titled \"Grocery list\" with content \"Milk, eggs, bread\" visible in the list."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "3518005b1a4702df3d33934019d8c7bf8d47eb1cb51ad0b17977733033a15f41"
+    }
+  ]
+}

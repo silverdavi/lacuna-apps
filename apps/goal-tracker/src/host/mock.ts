@@ -1,5 +1,6 @@
 // Mock space API. Lacuna spaces are the unit of storage; the mock keeps the
-// goal-tracker's single record in localStorage so the whole app runs offline.
+// goal-tracker's single record in localStorage (via @lacuna/host-mock) so the
+// whole app runs offline.
 import {
   emptyState,
   loadState,
@@ -8,16 +9,7 @@ import {
   type GoalState,
 } from './index'
 
-const KEY = 'lacuna.goal-tracker.state'
-
 export const spaceId = 'mock-goal-tracker'
-
-export function todayKey(date: Date): string {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
 
 export const host = {
   read(): GoalState {
@@ -29,36 +21,27 @@ export const host = {
     return next
   },
 
-  recordCheckIn(count: number, goal: number, date = todayKey(new Date())): GoalState {
+  recordCheckIn(count: number, goal: number, date?: string): GoalState {
     const state = loadState()
-    const existing = state.checkIns.find((c) => c.date === date)
+    const target = date ?? new Date().toISOString().slice(0, 10)
+    const existing = state.checkIns.find((c) => c.date === target)
     if (existing) {
       existing.count = count
       existing.goal = goal
     } else {
-      state.checkIns.push({ date, count, goal, createdAt: Date.now() })
+      state.checkIns.push({ date: target, count, goal, createdAt: Date.now() })
     }
     return host.write(state)
   },
 
   clear(): GoalState {
-    const fresh = emptyState()
-    try {
-      window.localStorage.removeItem(KEY)
-    } catch {
-      // ignore
-    }
-    return host.write(fresh)
+    return host.write(emptyState())
   },
 
   reset(): void {
-    try {
-      window.localStorage.removeItem(KEY)
-    } catch {
-      // ignore
-    }
+    // persistence lives in @lacuna/host-mock; writing the empty state is enough
+    saveState(emptyState())
   },
 }
 
-export { KEY }
 export type { CheckIn, GoalState }

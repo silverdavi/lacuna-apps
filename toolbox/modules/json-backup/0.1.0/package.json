@@ -1,0 +1,30 @@
+{
+  "name": "@lacuna/json-backup",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Serialises app records into a versioned JSON backup and restores them with schema validation and a migration hook.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "jsonBackup",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "4fca272b5a31e4cf",
+    "lines": 136,
+    "exports": [
+      "exportBackup",
+      "importBackup"
+    ],
+    "types": [
+      "BackupRecord",
+      "BackupFile",
+      "ExportOptions",
+      "ImportOptions",
+      "ImportResult"
+    ],
+    "signature": "exportBackup(options: ExportOptions<T>); importBackup(json: string, options: ImportOptions<T>)"
+  }
+}

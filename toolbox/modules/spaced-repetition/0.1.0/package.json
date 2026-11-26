@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/spaced-repetition",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "SM-2 spaced-repetition scheduling: card state, review grading, due queue, and stats.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "spacedRepetition",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "e7a5c728ad642c43",
+    "lines": 92,
+    "exports": [
+      "newCard",
+      "reviewCard",
+      "getDueQueue",
+      "getStats"
+    ],
+    "types": [
+      "Grade",
+      "CardState",
+      "ReviewResult"
+    ],
+    "signature": "newCard(id: string, today: string); reviewCard(card: CardState, grade: Grade, today: string); getDueQueue(cards: CardState[], today: string); getStats(cards: CardState[], today: string)"
+  }
+}

@@ -33,8 +33,8 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
-      "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ui": "0.9.0"
     }
   },
   "capabilities": [
@@ -75,7 +75,8 @@
   },
   "quality": {
     "tests": [
-      "tests/acceptance.spec.ts"
+      "tests/acceptance.spec.ts",
+      "tests/engine.spec.ts"
     ],
     "themeMatrix": true,
     "keyboardOnly": true,

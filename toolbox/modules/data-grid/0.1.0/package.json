@@ -1,0 +1,37 @@
+{
+  "name": "@lacuna/data-grid",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "An editable spreadsheet grid with typed columns, keyboard navigation, range selection, paste, and undo/redo.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/use-undo-stack": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "DataGrid",
+    "kind": "widget",
+    "commit": "f51540974ef97c51ef50e5190d651f50ffdf2ca4",
+    "source": "ea18fd9f15949370",
+    "lines": 393,
+    "exports": [
+      "DataGrid"
+    ],
+    "types": [
+      "DataGridCellType",
+      "DataGridColumn",
+      "DataGridRow",
+      "DataGridProps"
+    ],
+    "signature": "DataGrid({ columns, rows, label, onCellChange, onSelectionChange, style, }: DataGridProps)"
+  }
+}

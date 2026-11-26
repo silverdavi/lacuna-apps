@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "03d3600e9c7d40ab5d3b785475da1aefe723ad714ef82050414b061871293bed",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Daily Journal App\", a status bar containing \"Saved\", and an empty editor area with the placeholder text \"Write your entry\u2026\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" into the editor area and pressing Ctrl+S shows \"Saved\" in the status bar; the rendered preview pane shows the text \"Buy milk\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"- [ ] Task A\" into the editor area, then clicking the checkbox next to \"Task A\" in the preview pane, changes the editor text to \"- [x] Task A\" and the status bar shows \"Saved\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Lock entry\" opens a dialog with a field labelled \"Passphrase\"; typing \"secret123\" and clicking \"Encrypt\" changes the status bar to \"Encrypted\" and the editor area becomes read-only with the text \"Locked\"."
+    },
+    {
+      "id": "A5",
+      "text": "With the entry locked, clicking the button \"Unlock entry\" opens a dialog with a field labelled \"Passphrase\"; typing \"wrongpass\" and clicking \"Decrypt\" shows the message \"Invalid passphrase\" in the dialog and the status bar remains \"Encrypted\"."
+    },
+    {
+      "id": "A6",
+      "text": "With the entry locked, clicking \"Unlock entry\", typing \"secret123\" in the field labelled \"Passphrase\" and clicking \"Decrypt\" restores the editor text to \"- [x] Task A\", makes the editor editable, and the status bar shows \"Saved\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export backup\" triggers a file download named \"journal-backup.json\" whose content includes the key \"version\" with value 1 and the entry text \"- [x] Task A\"."
+    },
+    {
+      "id": "A8",
+      "text": "After exporting, deleting the entry text, typing \"New day\" into the editor, and clicking the button \"Import backup\" with the previously exported file restores the editor text to \"- [x] Task A\" and the status bar shows \"Saved\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry: after typing \"Buy milk\" and reloading the page, the editor area contains \"Buy milk\" and the status bar shows \"Saved\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "3f0c970755deb327996a13bf4077fcd80ce487f82ea9f0920d3ac2b9682d1292"
+    }
+  ]
+}

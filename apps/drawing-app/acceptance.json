@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "6b9f1d7cd8cecba48df7ae083bd499ef00a24f116c780d3b65aa0fcf49100f40",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Digital Drawing Canvas\" and a toolbar containing buttons labelled \"Brush\", \"Eraser\", \"Rectangle\", and \"Export PNG\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button labelled \"Add Layer\" creates a new layer in the layer list; the new layer is named \"Layer 2\" and is selected by default."
+    },
+    {
+      "id": "A3",
+      "text": "With the \"Brush\" tool selected, clicking the button labelled \"Export PNG\" triggers a file download named \"drawing.png\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button labelled \"Delete Layer\" while \"Layer 2\" is selected removes \"Layer 2\" from the layer list; the layer list now contains only \"Layer 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"Hex\" in the field labelled \"Hex\" and pressing Enter updates the color swatch to display the value \"#ff0000\" when \"ff0000\" is typed."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button labelled \"Undo\" after drawing a stroke removes the most recent stroke from the canvas; the canvas is visually empty if no other strokes exist."
+    },
+    {
+      "id": "A7",
+      "text": "Selecting the \"Eraser\" tool and clicking on a drawn stroke removes that stroke from the canvas."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button labelled \"Zoom In\" increases the zoom level indicator from \"100%\" to \"110%\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the layer named \"Layer 2\" in the layer list and the color value \"#ff0000\" in the field labelled \"Hex\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "17a77027c9b106571aeff99f1c0f277b1241081343f14f18151f7b031f997f1c"
+    }
+  ]
+}

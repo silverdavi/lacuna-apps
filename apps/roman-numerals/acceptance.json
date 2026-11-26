@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "aa5592120ff88a7dfc7fa006b46a0efe89d1564d8cbd25014c7518d28a32658c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Roman Numeral Converter\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 4 in the field labelled \"Number\" shows \"IV\" in the field labelled \"Roman numeral\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing 1994 in the field labelled \"Number\" shows \"MCMXCIV\" in the field labelled \"Roman numeral\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 3999 in the field labelled \"Number\" shows \"MMMCMXCIX\" in the field labelled \"Roman numeral\"."
+    },
+    {
+      "id": "A5",
+      "text": "Typing 0 in the field labelled \"Number\" shows the message \"Enter an integer from 1 to 3999\" and the field labelled \"Roman numeral\" is empty."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Copy\" after converting 2024 places \"MMXXIV\" on the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"History\" shows a list containing the most recent conversion \"2024 \u2192 MMXXIV\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear history\" on the History tab removes all items and shows the text \"No history yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history entry \"2024 \u2192 MMXXIV\" visible on the History tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "3b43429580959a008a059e26b14312a824ec541935aef2cca575460e0a6713c5"
+    }
+  ]
+}

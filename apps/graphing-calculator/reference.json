@@ -1,0 +1,16 @@
+{
+  "repo": "yerich/Graphr",
+  "url": "https://github.com/yerich/Graphr",
+  "sha": "bf919fb540fbafe93c0c77a61c1bc8a072801be3",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (C) 2011-2013 Richard Ye"
+  ],
+  "files": [
+    "calc.js",
+    "jsgui.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "4760f422b7aa3e43716612123119ad73e2e827f14b3aeb3d65285cd3d46f3fc1"
+}

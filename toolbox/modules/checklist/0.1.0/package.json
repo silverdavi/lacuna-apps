@@ -1,0 +1,37 @@
+{
+  "name": "@lacuna/checklist",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Checkable list with inline add, edit, drag and keyboard reorder, progress bar, and per-item completion state.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-drag-reorder": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Checklist",
+    "kind": "widget",
+    "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+    "source": "4ed4c0290954720b",
+    "lines": 295,
+    "exports": [
+      "Checklist",
+      "default"
+    ],
+    "types": [
+      "ChecklistItem",
+      "ChecklistProps"
+    ],
+    "signature": "Checklist({ items, onToggle, onAdd, onEdit, onRemove, onReorder, showProgress = true, allowEdit...)"
+  }
+}

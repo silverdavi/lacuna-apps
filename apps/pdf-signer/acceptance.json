@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "cd70029ff8c44e80f4608fab121bbfa6aaf3172dabbc06af35fbed6ae1dcdc6f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"PDF Document Signer\" and the text \"No documents yet\" in the Documents tab."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the \"Upload PDF\" button opens a file picker; selecting a file named \"contract.pdf\" adds a list item in the Documents tab that contains \"contract.pdf\" and the text \"1 page\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the Sign tab, clicking the \"Draw signature\" button opens the SignaturePad; drawing a line and clicking \"Save signature\" adds a list item in the Signatures tab that contains \"Signature 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the Sign tab, with \"contract.pdf\" selected and \"Signature 1\" selected, clicking the \"Place signature\" button adds a list item in the Annotations tab that contains \"contract.pdf\" and \"Signature 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the Annotations tab, clicking the \"Delete annotation\" button on the item containing \"contract.pdf\" removes that item and the Annotations tab shows \"No annotations yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the Documents tab, clicking the \"Download signed\" button on the item containing \"contract.pdf\" triggers a download of a file named \"contract-signed.pdf\"."
+    },
+    {
+      "id": "A7",
+      "text": "In the Sign tab, changing the select labelled \"Page\" from \"1\" to \"2\" and clicking \"Place signature\" adds an annotation item that contains \"Page 2\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding \"contract.pdf\" and placing \"Signature 1\" on it, reloading the page still shows the list item \"contract.pdf\" in the Documents tab and the annotation item containing \"contract.pdf\" in the Annotations tab."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "28ecdee4f3c2061b4df63b5871b27e0d24f5cb4bf5f02547e9d6e87f168d128d"
+    }
+  ]
+}

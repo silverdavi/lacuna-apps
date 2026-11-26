@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.screenshot-annotator",
+  "name": "Screenshot Annotator",
+  "version": "0.1.0",
+  "summary": "Annotate a screenshot with text labels and shapes.",
+  "description": "Load a screenshot, add text labels and rectangles, rotate or flip the image, and export the result as a PNG. The annotation state persists on this device.",
+  "category": "productivity",
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/screenshot-annotator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/before-after": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/range-slider": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:annotation",
+    "edit:image",
+    "export:png"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "annotation",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the loaded image, layers and image settings"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "annotation"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

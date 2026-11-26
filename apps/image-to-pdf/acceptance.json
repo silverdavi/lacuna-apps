@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "5a684868af6af62f33b33ed912987a9fb510905666904d45443b51cca6be51b1",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Image To PDF\" and the text \"No images yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add image\" adds a list item containing \"Image 1\" and the text \"1280 x 720\"; the text \"No images yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking \"Add image\" a second time adds a list item containing \"Image 2\" and the text \"800 x 600\"; the list now shows two items in order \"Image 1\" then \"Image 2\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Move up\" on the list item \"Image 2\" reorders the list so \"Image 2\" appears before \"Image 1\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Image 1\" removes that item; the list now shows only \"Image 2\" and the summary text \"Pages: 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting \"A4\" in the select labelled \"Page size\" and clicking the button \"Download PDF\" triggers a download of a file named \"images.pdf\" with a size greater than 0 bytes."
+    },
+    {
+      "id": "A7",
+      "text": "Selecting \"Letter\" in the select labelled \"Page size\" and clicking \"Download PDF\" triggers a download of a file named \"images.pdf\"; the file size differs from the A4 download size."
+    },
+    {
+      "id": "A8",
+      "text": "After adding \"Image 1\" and \"Image 2\", reloading the page still shows both list items in the order \"Image 1\" then \"Image 2\" and the summary text \"Pages: 2\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the page size setting: after selecting \"A4\" in the select labelled \"Page size\" and reloading, the select still shows \"A4\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "78a565ccfb29b70d753b6376e0365189a7e4319470907d57607bbe17167ab6ec"
+    }
+  ]
+}

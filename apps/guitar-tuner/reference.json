@@ -1,0 +1,15 @@
+{
+  "repo": "jbergknoff/guitar-tuner",
+  "url": "https://github.com/jbergknoff/guitar-tuner",
+  "sha": "ab22383925407d93d138c26d1eb776d43c23bd5c",
+  "spdx": "MIT",
+  "licence_path": "LICENSE.md",
+  "copyright": [
+    "Copyright (c) 2014 Jonathan Bergknoff"
+  ],
+  "files": [
+    "correlation_worker.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "cdcbe8e5ff260b69732134b776163921696e32813892dfecf45333ec36379f11"
+}

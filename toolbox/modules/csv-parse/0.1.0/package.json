@@ -1,0 +1,29 @@
+{
+  "name": "@lacuna/csv-parse",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Parse and write RFC 4180 CSV text as rows, with header handling, quoting, and error reporting.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "csvParse",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "afb48861689f165b",
+    "lines": 138,
+    "exports": [
+      "parseCsv",
+      "toCsv",
+      "toRecords"
+    ],
+    "types": [
+      "CsvOptions",
+      "CsvResult",
+      "CsvError"
+    ],
+    "signature": "parseCsv(text: string, options: CsvOptions = {}); toCsv(rows: string[][], options: { delimiter?: string } = {}); toRecords(result: CsvResult)"
+  }
+}

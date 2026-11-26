@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "64b40920c772f9e8fb854551241dc81dd43761b4159899fc3353e2d4a0ba9933",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Event Planner\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Events\" tab, clicking the button \"New event\" opens a form. Filling the field labelled \"Title\" with \"Team Sync\", the field labelled \"Date\" with \"2025-03-15\", the field labelled \"Start time\" with \"09:00\", the field labelled \"End time\" with \"10:00\", and clicking \"Save\" adds an event. The month grid for March 2025 shows a chip on the 15th containing \"Team Sync\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the \"Events\" tab, with the event \"Team Sync\" on 2025-03-15 present, clicking the chip \"Team Sync\" opens the event detail. Clicking the button \"Delete\" removes the event, and the month grid for March 2025 no longer shows a chip on the 15th."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Events\" tab, creating an event with Title \"Weekly Standup\", Date \"2025-03-10\", Start time \"09:00\", End time \"09:15\", and selecting \"Weekly\" in the select labelled \"Recurrence\" creates an event. The month grid for March 2025 shows chips containing \"Weekly Standup\" on the 10th, 17th, 24th, and 31st."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Timeline\" tab, clicking the button \"New task\" opens a form. Filling the field labelled \"Name\" with \"Design Phase\", the field labelled \"Start\" with \"2025-03-01\", the field labelled \"End\" with \"2025-03-14\", and clicking \"Save\" adds a Gantt bar. The timeline shows a bar labelled \"Design Phase\" spanning from March 1 to March 14."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Timeline\" tab, with the task \"Design Phase\" present, clicking the button \"Export ICS\" copies an ICS string to the clipboard. The clipboard content contains \"BEGIN:VEVENT\" and \"SUMMARY:Design Phase\"."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"Events\" tab, with the event \"Team Sync\" on 2025-03-15 present, clicking the button \"Export ICS\" copies an ICS string to the clipboard. The clipboard content contains \"BEGIN:VEVENT\" and \"SUMMARY:Team Sync\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Timeline\" tab, with the task \"Design Phase\" from 2025-03-01 to 2025-03-14 present, dragging the right edge of the bar to extend the end date to 2025-03-20 updates the task. The timeline shows a bar labelled \"Design Phase\" spanning from March 1 to March 20."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the event \"Team Sync\" on 2025-03-15 and the task \"Design Phase\" in the timeline."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "669461570b29f3169f2e7038163a4650f04981aa03da0709e3eb0e4d62127cdd"
+    }
+  ]
+}

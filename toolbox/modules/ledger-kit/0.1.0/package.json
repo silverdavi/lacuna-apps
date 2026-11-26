@@ -1,0 +1,40 @@
+{
+  "name": "@lacuna/ledger-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Personal ledger: transaction record table, add-transaction dialog, budget and chart panels.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/combobox": "workspace:0.1.0",
+    "@lacuna/money-input": "workspace:0.1.0",
+    "@lacuna/record-table": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "LedgerKit",
+    "kind": "kit",
+    "commit": "9c2e4b76cabd8df3ca579ecdaa827e41b9ed664e",
+    "source": "8fb54c5c80e1e5cf",
+    "lines": 342,
+    "exports": [
+      "LedgerKit"
+    ],
+    "types": [
+      "Transaction",
+      "Category",
+      "LedgerKitProps"
+    ],
+    "signature": "LedgerKit(props: LedgerKitProps)"
+  }
+}

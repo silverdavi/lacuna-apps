@@ -1,57 +1,53 @@
 // Mock space API. Lacuna spaces are the unit of storage; the mock keeps the
 // sleep-tracker's entries in localStorage so the whole app runs offline.
-import {
-  emptyState,
-  loadState,
-  makeId,
-  saveState,
-  type Quality,
-  type SleepEntry,
-  type SleepState,
-} from './index'
-
-const KEY = 'lacuna.sleep-tracker.state'
+// Backed by @lacuna/host-mock: corrupt or missing storage degrades to empty
+// instead of throwing, and validation lives in src/host/index.ts.
+import { createMockRecordStore } from '@lacuna/host-mock'
+import { KEY, emptyState, isSleepEntry, normalizeEntry, type Quality, type SleepEntry, type SleepState } from './index'
 
 export const spaceId = 'mock-sleep-tracker'
+
+const store = createMockRecordStore<SleepEntry>({
+  key: KEY,
+  validate: isSleepEntry,
+})
 
 function byDate(a: SleepEntry, b: SleepEntry): number {
   const d = a.date.localeCompare(b.date)
   return d !== 0 ? d : a.createdAt - b.createdAt
 }
 
+function read(): SleepState {
+  const entries = store.list().map(normalizeEntry)
+  return { ...emptyState(), entries: [...entries].sort(byDate) }
+}
+
 export const host = {
-  read(): SleepState {
-    const state = loadState()
-    return { ...state, entries: [...state.entries].sort(byDate) }
-  },
+  read,
 
   write(next: SleepState): SleepState {
-    saveState(next)
+    store.replaceAll(next.entries.map(normalizeEntry))
     return next
   },
 
   addEntry(date: string, minutes: number, quality: Quality): SleepState {
-    const state = loadState()
-    state.entries.push({ id: makeId(), date, minutes, quality, createdAt: Date.now() })
-    return host.write(state)
+    const entry = normalizeEntry({ id: '', date, minutes, quality, createdAt: Date.now() })
+    store.add(entry)
+    return read()
   },
 
   deleteEntry(id: string): SleepState {
-    const state = loadState()
-    state.entries = state.entries.filter((e) => e.id !== id)
-    return host.write(state)
+    store.remove(id)
+    return read()
   },
 
   clear(): SleepState {
-    return host.write(emptyState())
+    store.clear()
+    return read()
   },
 
   reset(): void {
-    try {
-      window.localStorage.removeItem(KEY)
-    } catch {
-      // ignore
-    }
+    store.clear()
   },
 }
 

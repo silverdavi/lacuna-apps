@@ -1,0 +1,200 @@
+.dp-task-row {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--sf));
+  padding: calc(8px * var(--sf)) calc(4px * var(--sf));
+}
+
+.dp-task-check {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.dp-task-title {
+  flex: 1;
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink);
+}
+
+.dp-task-due {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+}
+
+.dp-task-row.done {
+  text-decoration-line: line-through;
+}
+
+.dp-task-row.done .dp-task-title {
+  color: var(--ink-60);
+  text-decoration-line: line-through;
+}
+
+.dp-tab {
+  font-family: var(--sans);
+}
+
+.dp-month-label {
+  font-family: var(--mono);
+  font-size: calc(14px * var(--tf));
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: calc(4px * var(--sf));
+}
+
+.cal-dow {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink-60);
+  text-align: center;
+  padding: calc(4px * var(--sf)) 0;
+}
+
+.cal-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(2px * var(--sf));
+  padding: calc(4px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--ui-card);
+  cursor: pointer;
+  min-height: calc(52px * var(--sf));
+}
+
+.cal-cell.out {
+  opacity: 0.45;
+}
+
+.cal-cell.today {
+  border-color: var(--accent);
+}
+
+.cal-cell.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.cal-num {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink);
+}
+
+.cal-event {
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
+  width: 100%;
+  font-size: calc(10px * var(--tf));
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  background: var(--accent-soft);
+  border-radius: calc(2px * var(--sf));
+  padding: calc(1px * var(--sf)) calc(4px * var(--sf));
+  cursor: pointer;
+  text-align: left;
+}
+
+.cal-event-time {
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  flex: 0 0 auto;
+}
+
+.cal-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: calc(4px * var(--sf));
+}
+
+.cal-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  padding: calc(4px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--ui-card);
+  min-height: calc(80px * var(--sf));
+}
+
+.cal-week-col[role='gridcell'] {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  min-height: 0;
+}
+
+.cal-week-head {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--tf));
+  color: var(--ink-60);
+}
+
+.cal-week-date {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink);
+}
+
+.cal-event-btn {
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--sf));
+  font-size: calc(11px * var(--tf));
+  color: var(--ink);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  padding: calc(4px * var(--sf));
+  background: var(--paper);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-event-btn::before {
+  content: attr(data-time);
+  font-family: var(--mono);
+  font-size: calc(9px * var(--tf));
+  flex: 0 0 auto;
+}
+
+.cal-event-btn:hover {
+  border-color: var(--accent);
+}
+
+.cal-task {
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+  border: calc(1px * var(--sf)) dashed var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  padding: calc(4px * var(--sf));
+}
+
+.form-error {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--danger);
+  padding: calc(4px * var(--sf)) 0;
+}

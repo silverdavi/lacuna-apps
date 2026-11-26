@@ -32,13 +32,18 @@
   "requires": {
     "hostApi": "^1.0.0",
     "modules": {
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
       "@lacuna/tokens": "^0.1.0",
-      "@lacuna/ui": "^0.1.0"
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
     }
   },
   "capabilities": [
     "create:barcode",
-    "export:barcode"
+    "export:barcode",
+    "render:barcode"
   ],
   "permissions": {
     "records": [

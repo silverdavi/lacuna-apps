@@ -1,0 +1,94 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.calculator",
+  "name": "Scientific Calculator",
+  "version": "0.1.0",
+  "summary": "Evaluate scientific expressions with trigonometry, logs, and powers.",
+  "description": "Enter an expression, pick an angle mode, and evaluate it. Plot sin(x), copy the result, and keep a history of every evaluation on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/calculator"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/calculator-kit": "0.2.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/money-input": "0.1.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:calculation"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "calculation",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store evaluated expressions and the history of results"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "calculation"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

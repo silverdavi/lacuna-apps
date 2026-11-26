@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/category-picker",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Dropdown picker of categories with color swatches and icons, inline keyboard navigation, and inline creation of a new category.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "CategoryPicker",
+    "kind": "widget",
+    "commit": "27329c567b38ee51f94c3eee413b237ebb05a433",
+    "source": "0501f463da0e6141",
+    "lines": 353,
+    "exports": [
+      "CategoryPicker"
+    ],
+    "types": [
+      "CategoryOption",
+      "CategoryPickerProps"
+    ],
+    "signature": ""
+  }
+}

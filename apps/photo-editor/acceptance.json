@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "87ad280cffe5ecbe59547ad2a3327eaecc56f80441281df8a74d36f4d937756a",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Photo Editor Filters\"."
+    },
+    {
+      "id": "A2",
+      "text": "Dragging a file named \"sample.png\" into the drop zone labelled \"Drop image here or click to browse\" shows a preview and the text \"sample.png\" in the file info area."
+    },
+    {
+      "id": "A3",
+      "text": "Selecting \"Grayscale\" in the select labelled \"Filter\" and clicking the button \"Apply\" changes the preview; the status text shows \"Filter: Grayscale\"."
+    },
+    {
+      "id": "A4",
+      "text": "Selecting \"Rotate 90\u00b0\" in the select labelled \"Transform\" and clicking the button \"Apply\" changes the preview orientation; the status text shows \"Transform: Rotate 90\u00b0\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Reset\" clears the filter and transform selections, sets the select labelled \"Filter\" back to \"None\", the select labelled \"Transform\" back to \"None\", and the status text to \"No edits applied\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export PNG\" triggers a download of a file named \"sample.png\" with the current edits applied."
+    },
+    {
+      "id": "A7",
+      "text": "After applying \"Grayscale\" filter and \"Rotate 90\u00b0\" transform, reloading the page still shows the select labelled \"Filter\" set to \"Grayscale\", the select labelled \"Transform\" set to \"Rotate 90\u00b0\", and the status text \"Filter: Grayscale | Transform: Rotate 90\u00b0\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Clear\" removes the current image, hides the preview, and shows the text \"No image loaded\" in the file info area."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "41f5f79bc4de11f99e95de1d165e69a38bbf3895f1e1810d37204ca2f7442b64"
+    }
+  ]
+}

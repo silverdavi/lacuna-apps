@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.file-converter",
+  "name": "File Converter",
+  "version": "0.1.0",
+  "summary": "Convert documents and media between formats offline.",
+  "description": "Drop a file, pick an output format, and convert it locally in the browser. Converted files are downloaded directly and recent conversions are kept in a history list that survives reloads. Nothing leaves the device.",
+  "category": "productivity",
+  "tags": ["convert", "file", "document", "media", "export"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/file-converter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:file-converter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "file-converter",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store conversion history and the last conversion state so they survive a reload"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "file-converter"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

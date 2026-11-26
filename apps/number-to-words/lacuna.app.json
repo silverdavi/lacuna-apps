@@ -1,0 +1,86 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.number-to-words",
+  "name": "Number to Words",
+  "version": "0.1.0",
+  "summary": "Convert a number into its English words.",
+  "description": "Type a number, choose a locale and case style, and see the English words for it. Copy the result, save it to a history list, and review recent conversions in a table. Nothing leaves the browser.",
+  "category": "productivity",
+  "icon": "sheets",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/number-to-words"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:conversion"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "conversion",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the numbers that were converted to words"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "conversion"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "9a94e46290a40960bb6adedfb754a5c8affc8fd4821672450a570f3efb437065",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"World Clock\"."
+    },
+    {
+      "id": "A2",
+      "text": "With no zones added, the list area shows the text \"No zones yet\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"New York\" in the field labelled \"Zone name\" and clicking the button \"Add zone\" adds a list item that contains \"New York\" and a time display showing the current time in the America/New_York zone; the text \"No zones yet\" is gone."
+    },
+    {
+      "id": "A4",
+      "text": "After adding \"New York\", typing \"Tokyo\" in the field labelled \"Zone name\" and clicking \"Add zone\" adds a second list item containing \"Tokyo\" and a time display showing the current time in the Asia/Tokyo zone."
+    },
+    {
+      "id": "A5",
+      "text": "Every list item has a button named \"Remove <zone name>\". With \"New York\" and \"Tokyo\" added, clicking \"Remove Tokyo\" removes that item, leaving only \"New York\" in the list."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Copy times\" copies a multi-line string to the clipboard where the first line is \"New York: \" followed by the current HH:MM:SS time in America/New_York, and the second line is \"Tokyo: \" followed by the current HH:MM:SS time in Asia/Tokyo."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab labelled \"Offsets\" switches to a second view that shows a table with a column labelled \"Zone\" and a column labelled \"UTC offset\"; the row for \"New York\" shows the offset text \"UTC-05:00\" (or \"UTC-04:00\" depending on DST) and the row for \"Tokyo\" shows \"UTC+09:00\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Offsets\" view, clicking the column header \"Zone\" sorts the table rows alphabetically by zone name, so \"New York\" appears before \"Tokyo\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the added zones: after adding \"New York\" and \"Tokyo\" and reloading the page, the list still shows both \"New York\" and \"Tokyo\" with their live time displays."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "728d11beed1e2203332a67c80bd66774ddfbdc93a2ce43432fb6c38c9566f93d"
+    }
+  ]
+}

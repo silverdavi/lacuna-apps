@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/recurrence",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Expand daily, weekly, monthly and yearly repeat rules into concrete local dates, with interval, end-date and count limits plus basic RRULE round-tripping.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "recurrence",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "8b1ffe7f3695ead8",
+    "lines": 177,
+    "exports": [
+      "parseRule",
+      "nextOccurrences",
+      "isRecurring",
+      "occurrencesBetween",
+      "ruleToRRule",
+      "rruleToRule"
+    ],
+    "types": [
+      "RecurrenceFrequency",
+      "RecurrenceRule"
+    ],
+    "signature": "parseRule(input: string); nextOccurrences(rule: RecurrenceRule, count: number); isRecurring(rule: RecurrenceRule, date: string); occurrencesBetween(rule: RecurrenceRule, from: string, to: string)"
+  }
+}

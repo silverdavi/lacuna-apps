@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "b0943ede13232d02f689ab84279f15ec025a0acdf7fc69cc9e7009b0725546a0",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no goals, the page shows the heading \"Savings Goal Tracker\", the text \"No goals yet\", and the button \"New goal\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"New goal\" opens a form. Filling the field labelled \"Goal name\" with \"Emergency Fund\", the field labelled \"Target amount\" with \"5000\", choosing \"2025-12-31\" in the date picker labelled \"Deadline\", and clicking \"Save goal\" adds a list item containing \"Emergency Fund\", \"$0.00 / $5,000.00\", and \"0%\". The text \"No goals yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the \"Add deposit\" button on the \"Emergency Fund\" list item opens a form. Filling the field labelled \"Amount\" with \"250.75\" and clicking \"Save deposit\" updates the list item to show \"$250.75 / $5,000.00\" and \"5%\"."
+    },
+    {
+      "id": "A4",
+      "text": "After adding a second goal \"Vacation\" with target \"2000\" and deadline \"2025-08-15\", and adding a deposit of \"1000\" to it, the \"Vacation\" list item shows \"$1,000.00 / $2,000.00\" and \"50%\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the \"Delete goal\" button on the \"Vacation\" list item removes that item from the list. The \"Emergency Fund\" item remains with \"$250.75 / $5,000.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the \"Progress\" tab shows a view with a circular progress ring for each goal. For \"Emergency Fund\" with $250.75 saved of $5,000.00, the ring displays \"5%\" and the text \"Emergency Fund\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"History\" tab shows a table with columns \"Date\", \"Goal\", \"Amount\", and \"Running Total\". After adding a deposit of \"250.75\" to \"Emergency Fund\" on 2024-01-15, the table shows a row with \"2024-01-15\", \"Emergency Fund\", \"$250.75\", and \"$250.75\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the \"Export CSV\" button copies a CSV string to the clipboard. The clipboard contains \"Goal,Target,Saved,Percent\\nEmergency Fund,5000.00,250.75,5\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the goal \"Emergency Fund\" with its deposit. After reloading, the list shows \"Emergency Fund\", \"$250.75 / $5,000.00\", and \"5%\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ddaab9a18abf19532fc7b5c2043dd5f0d5d5e474313cc9027cac671f77ec6e4e"
+    }
+  ]
+}

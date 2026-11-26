@@ -1,17 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
-import { Body, Button, Card, Stack } from '@lacuna/ui'
+// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+// Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
+import { useEffect, useState } from 'react'
+import { Actions, AppShell, Body, Button, Card, FormGrid, Stack } from '@lacuna/ui'
+import { saveText } from '@lacuna/file-save-open'
+import { useClipboard } from '@lacuna/use-clipboard'
+import { encodeQr, qrFileName, toSvgMarkup } from './engine'
 import { host } from './host'
 import type { CorrectionLevel } from './host'
-import { encodeQr, toSvgMarkup } from './qr'
 
 const LEVELS: CorrectionLevel[] = ['L', 'M', 'Q', 'H']
-const TOOLTIP_MS = 2000
-const rowStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 'calc(8px * var(--sf))',
-}
 
 interface Generated {
   content: string
@@ -25,8 +22,7 @@ export function App() {
   const [generated, setGenerated] = useState<Generated | null>(null)
   const [error, setError] = useState('')
   const [fieldTouched, setFieldTouched] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const copiedTimer = useRef<number | null>(null)
+  const { copy, copied } = useClipboard({ timeoutMs: 2000 })
 
   useEffect(() => {
     const saved = host.loadState()
@@ -40,12 +36,6 @@ export function App() {
     }
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current)
-    }
-  }, [])
-
   const onGenerate = () => {
     if (content.trim() === '') {
       setGenerated(null)
@@ -56,7 +46,6 @@ export function App() {
       const svg = toSvgMarkup(encodeQr(content, level))
       setGenerated({ content, level, svg })
       setError('')
-      setCopied(false)
       host.saveState({ content, level })
     } catch {
       setGenerated(null)
@@ -66,79 +55,61 @@ export function App() {
 
   const onCopy = () => {
     if (!generated) return
-    const done = () => {
-      setCopied(true)
-      if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current)
-      copiedTimer.current = window.setTimeout(() => setCopied(false), TOOLTIP_MS)
-    }
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(generated.svg).then(done, done)
-    } else {
-      done()
-    }
+    void copy(generated.svg).catch(() => undefined)
   }
 
   const onDownload = () => {
     if (!generated) return
-    const blob = new Blob([generated.svg], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.download = `qr-${generated.content.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'code'}.svg`
-    link.href = url
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    saveText(generated.svg, { filename: qrFileName(generated.content), mimeType: 'image/svg+xml' })
   }
 
   return (
-    <main>
+    <AppShell name="QR Maker" icon="docs" hue="cobalt" category="Apps" status="Local · no network">
       <Card mono="QR">
         <Stack>
-          <h1 className="lc-title lc-title-lg">QR Maker</h1>
           <Body>Enter text or a URL to generate a QR code.</Body>
-          <label className="lc-field">
-            <span className="lc-field-label">Content</span>
-            <input
-              className="lc-input"
-              type="text"
-              value={content}
-              placeholder="Text or a URL"
-              onFocus={() => setFieldTouched(true)}
-              onChange={(event) => {
-                setFieldTouched(true)
-                setContent(event.target.value)
-              }}
-            />
-          </label>
-          <label className="lc-field">
-            <span className="lc-field-label">Error correction</span>
-            <select
-              className="lc-input"
-              value={level}
-              onChange={(event) => setLevel(event.target.value as CorrectionLevel)}
+          <FormGrid>
+            <label className="lc-field">
+              <span className="lc-field-label">Content</span>
+              <input
+                className="lc-input"
+                type="text"
+                value={content}
+                placeholder="Text or a URL"
+                aria-invalid={error ? true : undefined}
+                onFocus={() => setFieldTouched(true)}
+                onChange={(event) => {
+                  setFieldTouched(true)
+                  setContent(event.target.value)
+                }}
+              />
+            </label>
+            <label className="lc-field">
+              <span className="lc-field-label">Error correction</span>
+              <select
+                className="lc-input"
+                value={level}
+                onChange={(event) => setLevel(event.target.value as CorrectionLevel)}
+              >
+                {LEVELS.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </FormGrid>
+          <Actions>
+            <Button
+              kind="primary"
+              onClick={onGenerate}
+              disabled={content.length === 0 && !fieldTouched}
             >
-              {LEVELS.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            className="lc-btn primary"
-            disabled={content.length === 0 && !fieldTouched}
-            onClick={onGenerate}
-          >
-            Generate
-          </button>
-          {error && (
-            <Body sm style={{ color: 'var(--danger)' }}>
-              {error}
-            </Body>
-          )}
-          {generated && (
+              Generate
+            </Button>
+          </Actions>
+          {error ? <Body sm style={{ color: 'var(--danger)' }}>{error}</Body> : null}
+          {generated ? (
             <Stack>
               <div
                 className="lc-qr"
@@ -147,23 +118,23 @@ export function App() {
                 dangerouslySetInnerHTML={{ __html: generated.svg }}
               />
               <Body sm>Error correction: {generated.level}</Body>
-              <div style={rowStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
                 <Button kind="secondary" onClick={onCopy}>
                   Copy
                 </Button>
-                {copied && (
+                {copied ? (
                   <span aria-live="polite" style={{ color: 'var(--accent)' }}>
                     Copied
                   </span>
-                )}
+                ) : null}
                 <Button kind="secondary" onClick={onDownload}>
                   Download
                 </Button>
               </div>
             </Stack>
-          )}
+          ) : null}
         </Stack>
       </Card>
-    </main>
+    </AppShell>
   )
 }

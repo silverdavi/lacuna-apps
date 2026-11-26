@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/range-slider",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A labelled numeric slider with the current value shown next to it; controlled component.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "RangeSlider",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "f8c5c7e28e4c81c8",
+    "lines": 193,
+    "exports": [
+      "RangeSlider"
+    ],
+    "types": [
+      "RangeSliderProps"
+    ],
+    "signature": "RangeSlider(props: RangeSliderProps)"
+  }
+}

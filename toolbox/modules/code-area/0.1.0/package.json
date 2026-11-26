@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/code-area",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Monospace code editor with line numbers, tab-to-spaces, and light regex highlighting.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "CodeArea",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "097ecd308968fb92",
+    "lines": 389,
+    "exports": [
+      "CodeArea"
+    ],
+    "types": [
+      "CodeAreaProps"
+    ],
+    "signature": "CodeArea(props: CodeAreaProps)"
+  }
+}

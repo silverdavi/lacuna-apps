@@ -32,34 +32,33 @@ function parseQuality(value: unknown): Quality | null {
   return QUALITIES.includes(value as Quality) ? (value as Quality) : null
 }
 
-export function loadState(): SleepState {
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return emptyState()
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.entries)) return emptyState()
-    const entries = parsed.entries
-      .filter(
-        (e: unknown) =>
-          e &&
-          typeof e === 'object' &&
-          typeof (e as SleepEntry).date === 'string' &&
-          /^\d{4}-\d{2}-\d{2}$/.test((e as SleepEntry).date) &&
-          Number.isFinite((e as SleepEntry).minutes) &&
-          (e as SleepEntry).minutes > 0 &&
-          parseQuality((e as SleepEntry).quality) !== null,
-      )
-      .map((e: SleepEntry) => ({
-        id: typeof e.id === 'string' && e.id ? e.id : makeId(),
-        date: e.date,
-        minutes: Math.round(e.minutes),
-        quality: parseQuality(e.quality) as Quality,
-        createdAt: Number.isFinite(e.createdAt) ? e.createdAt : 0,
-      }))
-    return { entries }
-  } catch {
-    return emptyState()
+export function isSleepEntry(value: unknown): value is SleepEntry {
+  if (typeof value !== 'object' || value === null) return false
+  const e = value as SleepEntry
+  return (
+    typeof e.date === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(e.date) &&
+    Number.isFinite(e.minutes) &&
+    e.minutes > 0 &&
+    parseQuality(e.quality) !== null
+  )
+}
+
+export function normalizeEntry(e: SleepEntry): SleepEntry {
+  return {
+    id: typeof e.id === 'string' && e.id ? e.id : makeId(),
+    date: e.date,
+    minutes: Math.round(e.minutes),
+    quality: parseQuality(e.quality) as Quality,
+    createdAt: Number.isFinite(e.createdAt) ? e.createdAt : 0,
   }
+}
+
+export function loadEntries(raw: unknown): SleepEntry[] {
+  if (!raw || typeof raw !== 'object' || !Array.isArray((raw as SleepState).entries)) return []
+  return ((raw as SleepState).entries as unknown[])
+    .filter((e) => isSleepEntry(e))
+    .map((e) => normalizeEntry(e as SleepEntry))
 }
 
 export function saveState(state: SleepState): void {
@@ -75,3 +74,5 @@ export function formatDuration(minutes: number): string {
   const m = minutes % 60
   return `${h}h ${`${m}`.padStart(2, '0')}m`
 }
+
+export { KEY }

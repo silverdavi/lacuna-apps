@@ -1,0 +1,37 @@
+{
+  "name": "@lacuna/converter-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Reusable conversion-tool layout: input/output panes, swap, preset combobox, copy, and a capped history list with persisted state.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/combobox": "workspace:0.1.0",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/use-local-record": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "ConverterKit",
+    "kind": "kit",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "6128ff1d75f9eb30",
+    "lines": 285,
+    "exports": [
+      "ConverterKit"
+    ],
+    "types": [
+      "ConverterPreset",
+      "ConverterKitProps"
+    ],
+    "signature": "ConverterKit(props: ConverterKitProps)"
+  }
+}

@@ -1,37 +1,69 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Body, Button, Card, Stack } from '@lacuna/ui'
+import { useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { Chart, type ChartDataPoint } from '@lacuna/chart'
+import { Heatmap } from '@lacuna/heatmap'
+import { addDays } from '@lacuna/date-math'
+import { toCsv } from '@lacuna/csv-parse'
+import { ExportMenu, type ExportOption } from '@lacuna/export-menu'
+import { openFile } from '@lacuna/file-save-open'
+import { exportBackup, importBackup } from '@lacuna/json-backup'
+import { computeStreaks } from '@lacuna/streak-calc'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  MonoLabel,
+  Rail,
+  Select,
+  Stack,
+  Tag,
+  TextInput,
+} from '@lacuna/ui'
 import { dayKey, host, MOODS, type MoodEntry } from './host'
+import { MOOD_COLOR, MOOD_VALUE } from './colors'
 
-const MOOD_VALUE: Record<string, number> = {
-  Anxious: 1,
-  Low: 2,
-  Calm: 3,
-  Good: 4,
-  Great: 5,
+type BackupRecord = {
+  day: string
+  mood: string
+  note: string
+  createdAt: string
 }
 
-const MOOD_COLOR: Record<string, string> = {
-  Anxious: 'hsl(350 65% 55%)',
-  Low: 'hsl(30 80% 55%)',
-  Calm: 'hsl(200 60% 50%)',
-  Good: 'hsl(150 55% 45%)',
-  Great: 'hsl(140 70% 40%)',
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+function moodColor(mood: string): string {
+  return MOOD_COLOR[mood] ?? 'var(--ink-60)'
 }
 
-const EMPTY = 'hsl(220 10% 60%)'
+function backupRecords(entries: MoodEntry[]): Array<{
+  id: string
+  data: BackupRecord
+  createdAt: number
+  updatedAt: number
+}> {
+  return entries.map((entry) => {
+    const at = Date.parse(entry.createdAt)
+    const ts = Number.isNaN(at) ? 0 : at
+    return {
+      id: entry.id,
+      data: { day: entry.day, mood: entry.mood, note: entry.note, createdAt: entry.createdAt },
+      createdAt: ts,
+      updatedAt: ts,
+    }
+  })
+}
 
-function computeStreak(entries: MoodEntry[]): number {
-  const days = new Set(entries.map((entry) => entry.day))
-  let streak = 0
-  const cursor = new Date()
-  if (!days.has(dayKey(cursor))) {
-    cursor.setDate(cursor.getDate() - 1)
-  }
-  while (days.has(dayKey(cursor))) {
-    streak += 1
-    cursor.setDate(cursor.getDate() - 1)
-  }
-  return streak
+function csvRows(entries: MoodEntry[]): string[][] {
+  return [
+    ['id', 'day', 'mood', 'note', 'createdAt'],
+    ...entries.map((entry) => [entry.id, entry.day, entry.mood, entry.note, entry.createdAt]),
+  ]
 }
 
 export function App() {
@@ -39,12 +71,17 @@ export function App() {
   const [mood, setMood] = useState('')
   const [note, setNote] = useState('')
   const [error, setError] = useState('')
+  const [toast, setToast] = useState('')
+  const [importError, setImportError] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    setEntries(host.listMoods())
-  }, [])
+  const today = dayKey()
 
-  const streak = useMemo(() => computeStreak(entries), [entries])
+  const streakDays = useMemo(
+    () => computeStreaks(entries.map((entry) => entry.day)).current,
+    [entries],
+  )
+
   const byDay = useMemo(() => {
     const map = new Map<string, MoodEntry>()
     for (const entry of entries) map.set(entry.day, entry)
@@ -52,145 +89,250 @@ export function App() {
   }, [entries])
 
   const week = useMemo(() => {
-    const days: { key: string; label: string }[] = []
+    const days: { key: string; label: string; color: string; filled: boolean }[] = []
     const cursor = new Date()
     for (let i = 6; i >= 0; i -= 1) {
-      const day = new Date(cursor)
-      day.setDate(cursor.getDate() - i)
-      days.push({ key: dayKey(day), label: day.toLocaleDateString(undefined, { weekday: 'short' }) })
+      const day = addDays(cursor, -i)
+      const key = dayKey(day)
+      const entry = byDay.get(key)
+      days.push({
+        key,
+        label: WEEKDAYS[day.getDay()] ?? 'Day',
+        color: entry ? moodColor(entry.mood) : 'var(--paper-deep)',
+        filled: Boolean(entry),
+      })
     }
     return days
-  }, [])
-
-  const trend = useMemo(() => {
-    const points: { day: string; mood: string; value: number }[] = []
-    for (const [day, entry] of byDay) {
-      points.push({ day, mood: entry.mood, value: MOOD_VALUE[entry.mood] ?? 3 })
-    }
-    points.sort((a, b) => (a.day < b.day ? -1 : 1))
-    return points.slice(-30)
   }, [byDay])
+
+  const trend = useMemo<ChartDataPoint[]>(
+    () =>
+      entries.slice(0, 14).map((entry) => ({
+        label: entry.day.slice(5),
+        value: MOOD_VALUE[entry.mood] ?? 0,
+      })),
+    [entries],
+  )
+
+  const exportOptions = useMemo<ExportOption[]>(
+    () => [
+      {
+        id: 'json',
+        label: 'Backup (JSON)',
+        mimeType: 'application/json',
+        extension: 'json',
+        getData: () =>
+          exportBackup<BackupRecord>({
+            appId: 'mood-tracker',
+            version: 1,
+            records: backupRecords(entries),
+          }),
+      },
+      {
+        id: 'csv',
+        label: 'CSV',
+        mimeType: 'text/csv',
+        extension: 'csv',
+        getData: () => toCsv(csvRows(entries)),
+      },
+    ],
+    [entries],
+  )
 
   const log = () => {
     if (!mood) {
       setError('Select a mood')
+      setToast('')
       return
     }
-    host.addMood(mood, note, dayKey(), new Date().toISOString())
+    host.addMood(mood, note, today, new Date().toISOString())
     setEntries(host.listMoods())
     setNote('')
     setError('')
+    setToast(`Logged ${mood}`)
   }
 
   const remove = (entry: MoodEntry) => {
     host.deleteMood(entry.id)
     setEntries(host.listMoods())
+    setToast(`Deleted ${entry.mood}`)
   }
 
-  const W = 320
-  const H = 160
-  const pad = 24
-  const xFor = (index: number, count: number) =>
-    count <= 1 ? W / 2 : pad + (index * (W - pad * 2)) / (count - 1)
-  const yFor = (value: number) => H - pad - ((value - 1) * (H - pad * 2)) / 4
-  const first = trend[0]
+  const onExport = (id: string) => {
+    setToast(id === 'json' ? 'Backup exported' : 'CSV exported')
+  }
+
+  const pickImport = () => {
+    fileRef.current?.click()
+  }
+
+  const onImportFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const result = await openFile(file, 'json')
+    if (!result.ok) {
+      setImportError(`Could not read ${file.name}: ${result.error}`)
+      return
+    }
+    try {
+      const imported = importBackup<BackupRecord>(JSON.stringify(result.data), {
+        currentVersion: 1,
+        validate: (record) =>
+          typeof record.data.mood === 'string' &&
+          typeof record.data.day === 'string' &&
+          MOODS.some((moodOption) => moodOption === record.data.mood)
+            ? null
+            : 'record is not a mood entry',
+      })
+      if (imported.droppedCount > 0) {
+        setImportError(`Imported ${imported.records.length} entries, dropped ${imported.droppedCount}`)
+      } else {
+        setImportError('')
+        setToast(`Imported ${imported.records.length} entries`)
+      }
+      const fresh = host.listMoods().map((entry) => entry.id)
+      for (const record of imported.records) {
+        if (!fresh.includes(record.id)) {
+          host.addMood(record.data.mood, record.data.note, record.data.day, record.data.createdAt)
+        }
+      }
+      setEntries(host.listMoods())
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Could not import that file')
+    }
+  }
 
   return (
-    <main>
-      <h1 style={{ margin: 'calc(8px * var(--sf))' }}>Mood Tracker</h1>
-      <Card mono="Wellbeing">
+    <AppShell
+      name="Mood Tracker"
+      icon="analytics"
+      hue="green"
+      category="Wellbeing"
+      meta={`${entries.length} ${entries.length === 1 ? 'mood' : 'moods'}`}
+      status="Saved on this device"
+      side={
+        <Rail
+          title="Mood Tracker"
+          note="One mood a day"
+          chips={[`${entries.length} logs`, `Streak ${streakDays}d`]}
+        />
+      }
+    >
+      <Card
+        mono="Log"
+        title="Today"
+        actions={
+          entries.length > 0 ? (
+            <div style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
+              <ExportMenu options={exportOptions} fileName="mood-tracker" ariaLabel="Export" onExport={onExport} />
+              <Button kind="secondary" onClick={pickImport} ariaLabel="Import backup">
+                Import
+              </Button>
+            </div>
+          ) : undefined
+        }
+      >
         <Stack>
-          <Body>{`Streak: ${streak} days`}</Body>
-          <label className="lc-field">
-            <span className="lc-field-label">Mood</span>
-            <select
-              className="lc-input"
+          <div aria-label="Streak">
+            <KpiRow>
+              <Kpi value={streakDays} label={`Streak: ${streakDays} days`} accent />
+              <Kpi value={`${week.filter((day) => day.filled).length}/7`} label="This week" />
+            </KpiRow>
+          </div>
+          <FormGrid>
+            <Select
+              label="Mood"
               value={mood}
-              onChange={(event) => setMood(event.target.value)}
-            >
-              <option value="" disabled>
-                Pick one
-              </option>
-              {MOODS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="lc-field">
-            <span className="lc-field-label">Note</span>
-            <input
-              className="lc-input"
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
+              onChange={setMood}
+              options={[{ value: '', label: 'Pick one' }, ...MOODS]}
+              error={error || null}
             />
-          </label>
-          {error && <Body sm>{error}</Body>}
-          <Button kind="primary" onClick={log}>
-            Log mood
-          </Button>
+            <TextInput label="Note" value={note} onChange={setNote} placeholder="How was it?" />
+          </FormGrid>
+          <Actions>
+            <Button kind="primary" onClick={log}>
+              Log mood
+            </Button>
+          </Actions>
+          {toast ? <Body>{toast}</Body> : null}
         </Stack>
       </Card>
 
       <Card mono="Days" title="Last 7 days">
-        <div role="group" aria-label="Last 7 days" style={{ display: 'flex', gap: 'calc(8px * var(--sf))' }}>
-          {week.map((day) => {
-            const entry = byDay.get(day.key)
-            const filled = entry ? MOOD_COLOR[entry.mood] : undefined
-            return (
+        <div
+          aria-label="Last 7 days"
+          style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}
+        >
+          {week.map((day) => (
+            <div key={day.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'calc(4px * var(--sf))' }}>
               <div
-                key={day.key}
                 role="img"
-                data-filled={entry ? 'true' : 'false'}
-                aria-label={entry ? `${day.label} ${entry.mood}` : day.label}
+                data-filled={day.filled ? 'true' : 'false'}
+                aria-label={day.label}
                 style={{
                   width: 'calc(22px * var(--sf))',
                   height: 'calc(22px * var(--sf))',
                   borderRadius: 'calc(4px * var(--sf))',
-                  background: filled ?? 'var(--mid)',
-                  outline: 'calc(1px * var(--sf)) solid var(--line)',
+                  background: day.color,
+                  outline: 'calc(1px * var(--sf)) solid var(--ui-line2)',
                 }}
               />
-            )
-          })}
+              <MonoLabel>{day.label}</MonoLabel>
+            </div>
+          ))}
         </div>
       </Card>
 
-      <Card mono="Mood" title="Trend">
-        {first ? (
-          <svg
-            width={W}
-            height={H}
-            role="img"
-            aria-label={`Trend, ${first.mood} on ${first.day}`}
-          >
-            <polyline
-              fill="none"
-              stroke="none"
-              points={trend.map((p, i) => `${xFor(i, trend.length)},${yFor(p.value)}`).join(' ')}
-            />
-            {trend.map((p, i) => (
-              <line
-                key={`${p.day}-${i}`}
-                x1={xFor(i, trend.length) - 4}
-                y1={yFor(p.value)}
-                x2={xFor(i, trend.length) + 4}
-                y2={yFor(p.value)}
-                stroke={MOOD_COLOR[p.mood] ?? EMPTY}
-                strokeWidth={8}
-                strokeLinecap="round"
-              />
-            ))}
-          </svg>
+      <Card mono="Trend" title="Mood trend">
+        {entries.length === 0 ? (
+          <Body>Log moods to plot the trend.</Body>
         ) : (
-          <Body>Log a mood to see the trend.</Body>
+          <Chart
+            type="line"
+            data={trend}
+            title="Mood value, last 14 entries"
+            width={560}
+            height={180}
+            ariaLabel="Value trend over the last 14 entries"
+          />
+        )}
+      </Card>
+
+      <Card mono="Year" title="Activity">
+        {entries.length === 0 ? (
+          <Body>Log moods to build the year view.</Body>
+        ) : (
+          <div
+            style={{ display: 'flex', gap: 'calc(8px * var(--sf))', flexWrap: 'wrap' }}
+          >
+            {entries.slice(0, 14).map((entry) => (
+              <div key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 'calc(4px * var(--sf))' }}>
+                <div
+                  role="img"
+                  aria-label={entry.mood}
+                  style={{
+                    width: 'calc(14px * var(--sf))',
+                    height: 'calc(14px * var(--sf))',
+                    borderRadius: 'calc(2px * var(--sf))',
+                    background: moodColor(entry.mood),
+                    outline: 'calc(1px * var(--sf)) solid var(--ui-line2)',
+                  }}
+                />
+                <MonoLabel>{entry.day.slice(5)}</MonoLabel>
+              </div>
+            ))}
+          </div>
         )}
       </Card>
 
       <Card mono="Log" title="Moods">
         {entries.length === 0 ? (
-          <Body>No moods logged yet</Body>
+          <EmptyState
+            mono="Empty"
+            title="No moods logged yet"
+            detail="Pick a mood and press Log mood to start the streak."
+          />
         ) : (
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {entries.map((entry) => (
@@ -202,18 +344,36 @@ export function App() {
                   justifyContent: 'space-between',
                   gap: 'calc(8px * var(--sf))',
                   padding: 'calc(8px * var(--sf)) 0',
+                  borderBottom: 'calc(1px * var(--sf)) solid var(--ui-line2)',
                 }}
               >
-                <span>
-                  {entry.mood}
-                  {entry.note ? ` — ${entry.note}` : ''}
+                <span style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
+                  <Tag accent={entry.day === today}>{entry.day}</Tag>
+                  <span>
+                    {entry.mood}
+                    {entry.note ? ` — ${entry.note}` : ''}
+                  </span>
                 </span>
-                <Button onClick={() => remove(entry)}>Delete {entry.mood}</Button>
+                <Button kind="ghost" onClick={() => remove(entry)}>
+                  Delete {entry.mood}
+                </Button>
               </li>
             ))}
           </ul>
         )}
+        {importError ? (
+          <div style={{ marginTop: 'calc(8px * var(--sf))' }}>
+            <ErrorState title={importError} detail="The log is unchanged. You can keep importing." />
+          </div>
+        ) : null}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json,.json"
+          style={{ display: 'none' }}
+          onChange={onImportFile}
+        />
       </Card>
-    </main>
+    </AppShell>
   )
 }

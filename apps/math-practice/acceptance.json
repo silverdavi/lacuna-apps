@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "222bf583f1c2be25891bb4673b069e7ae2b6e55f1450ebef7862dea60b4a8f34",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Math Practice\"."
+    },
+    {
+      "id": "A2",
+      "text": "In the \"Generate\" tab, setting the \"Operations\" select to \"Addition\", the \"Count\" field to \"5\", and clicking \"Generate\" produces a list of 5 questions where each question text matches the pattern `\\d+ \\+ \\d+ =`."
+    },
+    {
+      "id": "A3",
+      "text": "In the \"Generate\" tab, after generating 5 Addition problems, clicking \"Print Sheet\" opens a print preview or triggers a print dialog, and the printed content contains the text \"Math Practice\" and the 5 generated questions."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Study\" tab, after generating 5 Addition problems, the first question displays an input field labelled \"Answer\". Typing \"10\" into this field and clicking \"Check\" shows the feedback \"Correct\" if the sum of the displayed numbers is 10, or \"Incorrect\" if it is not."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Study\" tab, after answering all 5 questions, the \"Results\" tab becomes active and displays a table with a row for each question, showing the question text, the user's answer, and a status of \"Correct\" or \"Incorrect\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Results\" tab, the summary line displays \"Score: X/5\" where X is the count of correct answers from the previous session."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"History\" tab, after completing a session, a new entry appears in the list with the date, the number of questions, and the score. Clicking the \"Delete\" button on the most recent entry removes it from the list."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Settings\" tab, changing the \"Difficulty\" select from \"Easy\" to \"Hard\" and then generating 5 Addition problems results in questions where the operands are greater than 20, whereas \"Easy\" produces operands less than or equal to 10."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the list of completed sessions in the \"History\" tab, including the exact score and date of the last completed session."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f20716ce7f232270171473324ed2cbecd018dada04c4bfee04491e5c48401103"
+    }
+  ]
+}

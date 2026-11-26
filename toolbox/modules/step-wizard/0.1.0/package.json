@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/step-wizard",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A multi-step flow container with a progress indicator, step content, and Back/Next navigation.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "StepWizard",
+    "kind": "widget",
+    "commit": "f879fb0f4db05aeffb20e458e8871060488e0913",
+    "source": "00956ef249194538",
+    "lines": 127,
+    "exports": [
+      "StepWizard"
+    ],
+    "types": [
+      "StepWizardProps"
+    ],
+    "signature": "StepWizard(props: StepWizardProps)"
+  }
+}

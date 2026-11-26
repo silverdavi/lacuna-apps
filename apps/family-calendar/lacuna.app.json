@@ -1,0 +1,91 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.family-calendar",
+  "name": "Family Calendar",
+  "version": "0.1.0",
+  "summary": "A shared family calendar with a month grid, a week view, recurring events, an ICS export and a task list.",
+  "description": "A month grid for the current month with a week view, a task checklist and ICS export. Events can repeat daily, weekly, monthly or yearly. Records live on this device through the host store; nothing leaves the browser.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/family-calendar",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/recurrence": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:calendar-event"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "family-calendar",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own calendar events and tasks"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "family-calendar"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
