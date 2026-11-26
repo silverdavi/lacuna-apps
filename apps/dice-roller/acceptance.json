@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "5d39b397710f4398522635e238cd298199aecfda469426d22c758ea0bbedbcc9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no input, the page shows the heading \"Dice Roller\", the text \"Enter a dice expression\", and the result area shows \"No rolls yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"2d6+3\" in the field labelled \"Expression\" and clicking the button \"Roll\" shows the text \"Total: 12\" in the result summary, and the breakdown table contains a row with the label \"2d6\" and a value that is an integer between 2 and 12."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"1d20\" in the field labelled \"Expression\" and clicking the button \"Roll\" shows the text \"Total: 15\" in the result summary when the seed is set to 42, and the breakdown table contains a row with the label \"1d20\" and the value \"15\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"3d6\" in the field labelled \"Expression\" and clicking the button \"Roll\" shows the text \"Total: 10\" in the result summary when the seed is set to 7, and the breakdown table contains three rows each with the label \"d6\" and values \"3\", \"4\", and \"3\" respectively."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"2d6+3\" in the field labelled \"Expression\", clicking \"Roll\", then typing \"1d10\" in the field labelled \"Expression\" and clicking \"Roll\" again shows the text \"Total: 7\" in the result summary when the seed is set to 42, and the breakdown table contains only a row with the label \"1d10\" and the value \"7\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"abc\" in the field labelled \"Expression\" and clicking the button \"Roll\" shows the message \"Invalid expression: unknown token 'abc'\" and the result summary still shows \"No rolls yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"2d6+3\" in the field labelled \"Expression\", clicking \"Roll\", then reloading the page still shows the text \"Total: 12\" in the result summary and the breakdown table contains a row with the label \"2d6\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"1d6\" in the field labelled \"Expression\", checking the checkbox labelled \"Crypto\", and clicking the button \"Roll\" shows the text \"Total: 4\" in the result summary when the crypto seed is set to 99, and the breakdown table contains a row with the label \"1d6\" and the value \"4\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0efc66080a781b82cf3952a2a20b394ce2073dfe84037c65683b105d6e0e2e11"
+    }
+  ]
+}
