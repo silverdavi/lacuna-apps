@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "46c97b666df212054454dae110e5967b4f16ccb6dc7d103dd79a62ed38c0124b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Interval Timer\" and the tab labelled \"Timer\" is visible and active."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"30\" in the field labelled \"Work (sec)\" and \"15\" in the field labelled \"Rest (sec)\", then clicking \"Start\", shows the BigClock displaying \"00:30\" and the phase label \"Work\"."
+    },
+    {
+      "id": "A3",
+      "text": "After the work phase completes, the phase label changes to \"Rest\" and the BigClock displays \"00:15\"."
+    },
+    {
+      "id": "A4",
+      "text": "After the rest phase completes, the phase label changes to \"Work\" and the round counter shows \"Round 2\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Pause\" stops the countdown; the BigClock remains static and the button label changes to \"Resume\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking \"Resume\" restarts the countdown from the paused time."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Stop\" resets the timer to \"00:00\", the phase label to \"Ready\", and the round counter to \"Round 1\"."
+    },
+    {
+      "id": "A8",
+      "text": "On the tab labelled \"History\", after completing one full cycle (work + rest), a list item appears containing \"Round 1\", \"Work: 30s\", and \"Rest: 15s\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the timer state: after starting a 30-second work phase and reloading the page, the BigClock displays the remaining time and the phase label shows \"Work\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "778284e133eebb7e6ed150d2f131c08839f881e49952a18b78131e540d04db71"
+    }
+  ]
+}

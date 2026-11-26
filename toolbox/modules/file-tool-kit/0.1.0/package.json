@@ -1,0 +1,37 @@
+{
+  "name": "@lacuna/file-tool-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Drop or pick a local file, preview it, choose options, apply a transform, and export the result.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/before-after": "workspace:0.1.0",
+    "@lacuna/export-menu": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "FileToolKit",
+    "kind": "kit",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "cbabe5bba94419fc",
+    "lines": 322,
+    "exports": [
+      "FileToolKit"
+    ],
+    "types": [
+      "FileToolKitOptions",
+      "FileToolKitProps",
+      "FileDropZoneProps"
+    ],
+    "signature": "FileToolKit(props: FileToolKitProps)"
+  }
+}

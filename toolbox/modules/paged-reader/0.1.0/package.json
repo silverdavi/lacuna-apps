@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/paged-reader",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Paginated text reader with progress indicator, page navigation, and bookmark toggling.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "PagedReader",
+    "kind": "widget",
+    "commit": "8aeeaa85549f99a4effa97da90fc67209d204198",
+    "source": "dd27f9ed3bbce08f",
+    "lines": 153,
+    "exports": [
+      "PagedReader"
+    ],
+    "types": [
+      "PagedReaderProps"
+    ],
+    "signature": "PagedReader({ pages, page, onPageChange, bookmarks, onToggleBookmark, label = 'PagedReader', }: P...)"
+  }
+}

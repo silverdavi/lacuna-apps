@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/color-palette",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pick one color from a grid of swatches, for paint, labels, and charts.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "ColorPalette",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "2e8bfe62f4b7d012",
+    "lines": 169,
+    "exports": [
+      "DEFAULT_SWATCHES",
+      "ColorPalette"
+    ],
+    "types": [
+      "Swatch",
+      "ColorPaletteProps"
+    ],
+    "signature": "ColorPalette({ label, swatches, value, onChange, columns = 8, }: ColorPaletteProps)"
+  }
+}

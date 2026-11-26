@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "363e3679db247c77c55caf62cef49d7a74ea08f73a75175ef15d86c31fd91962",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Compound Interest Calc\" and the default result summary shows \"Final balance: $10,000.00\" and \"Total interest: $0.00\" when all inputs are at their defaults."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 10000 in the field labelled \"Principal\", 5 in the field labelled \"Annual rate %\", 10 in the field labelled \"Years\", and selecting \"Monthly\" in the select labelled \"Compounding\", then clicking \"Calculate\" updates the summary to \"Final balance: $16,470.09\" and \"Total interest: $6,470.09\"."
+    },
+    {
+      "id": "A3",
+      "text": "After the calculation in A2, the breakdown table contains a row for Year 1 with \"Interest earned: $500.00\" and \"Balance: $10,500.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "After the calculation in A2, the chart tab shows an SVG line chart with a tooltip that, when hovered over the point for Year 10, displays \"Year 10: $16,470.09\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Save scenario\" with the default name field empty saves a scenario named \"Scenario 1\" and the list under \"Saved scenarios\" shows an item containing \"Scenario 1\" and \"Final: $16,470.09\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"Retirement\" in the field labelled \"Scenario name\" and clicking \"Save scenario\" adds a list item containing \"Retirement\" and \"Final: $16,470.09\"; clicking \"Delete Retirement\" removes that item from the list."
+    },
+    {
+      "id": "A7",
+      "text": "Changing the select labelled \"Compounding\" to \"Quarterly\" and clicking \"Calculate\" updates the summary to \"Final balance: $16,470.09\" and \"Total interest: $6,470.09\" for the same principal, rate and years as A2."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Copy result\" copies the text \"Final balance: $16,470.09\\nTotal interest: $6,470.09\" to the clipboard and shows the message \"Copied\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved scenario \"Retirement\" in the list under \"Saved scenarios\" with the text \"Final: $16,470.09\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "bea0ae16781cd818956db19fe44518a37b1b4174dc3790a44bb441f9ea8e9221"
+    }
+  ]
+}

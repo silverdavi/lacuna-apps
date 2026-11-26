@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.sleep-tracker",
+  "name": "Sleep Tracker",
+  "version": "0.1.0",
+  "summary": "Log nightly sleep duration and quality to track rest patterns.",
+  "description": "A person logs their nightly sleep duration and quality to track rest patterns over time. They enter a date, sleep duration, and a quality rating, then view a daily log with streaks, a heatmap, and a trend chart. The log persists locally across sessions.",
+  "category": "personal",
+  "tags": [],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/sleep-tracker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:sleep-entry",
+    "edit:sleep-entry"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "sleep-entry",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store dated sleep entries and the patterns they form"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "sleep-entry"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts",
+      "tests/engine.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

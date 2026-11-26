@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/progress-ring",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Circular or linear progress indicator with configurable size, stroke width, accent color, and centered content.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "ProgressRing",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "0f213fbaa3438445",
+    "lines": 147,
+    "exports": [
+      "ProgressRing"
+    ],
+    "types": [
+      "ProgressRingProps"
+    ],
+    "signature": "ProgressRing({ value, max = 100, orientation = 'circular', size = 12, strokeWidth = 2, label, chil...)"
+  }
+}

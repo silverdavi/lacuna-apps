@@ -1,0 +1,77 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.url-encoder",
+  "name": "URL Encoder",
+  "version": "0.1.0",
+  "summary": "Encode and decode text as a URL component, Base64, or hex. Copy or export the result, with conversion history that survives a reload.",
+  "description": "Type a value, pick a codec, and read the result live. Choose how spaces are encoded for URL output, copy the result, export it as a file, and keep a history of past conversions that survives a reload.",
+  "category": "productivity",
+  "tags": ["encoding", "url", "base64", "hex"],
+  "icon": "search",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/url-encoder",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/codecs": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "convert:text"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "conversion",
+        "access": ["read", "write", "create"],
+        "purpose": "Keep a history of past conversions"
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": ["any"]
+    }
+  },
+  "sharing": {
+    "owns": ["conversion"],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

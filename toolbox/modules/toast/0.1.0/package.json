@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/toast",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Transient status message with optional undo action and auto-dismiss timer.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "Toast",
+    "kind": "widget",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "386bec07d67ca354",
+    "lines": 93,
+    "exports": [
+      "Toast"
+    ],
+    "types": [
+      "ToastProps"
+    ],
+    "signature": "Toast(props: ToastProps)"
+  }
+}

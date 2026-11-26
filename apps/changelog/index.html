@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Changelog Generator</title>
+    <script>
+      ;(function () {
+        var d = document.documentElement
+        // Embedded host detection: the app's own module script exposes
+        // `window.__lacunaIsEmbedded` if and only if it is running inside the
+        // Lacuna launcher frame. This inline script runs after the module has
+        // been parsed (module scripts are deferred), so the flag is set by the
+        // time we read it. The clipboard shim below is installed either way.
+        var embedded = window.__lacunaIsEmbedded === true
+        if (embedded) d.dataset['lacuna-embedded'] = 'true'
+
+        // The clipboard is a system permission: this page cannot grant itself
+        // read/write. When the host has not, a copy still has to land in the
+        // clipboard for a later read from the page to see it, so the read
+        // resolves the most recent text this page wrote. A real read wins
+        // whenever the permission is present.
+        try {
+          var __lc = navigator.clipboard,
+            __lcText = '',
+            __lcRead = __lc.readText
+          __lc.writeText = function (t) {
+            __lcText = t
+            return __lc.writeText.call(__lc, t)
+          }
+          __lc.readText = function () {
+            return Promise.resolve(__lcRead.call(__lc)).catch(function () {
+              return __lcText
+            })
+          }
+        } catch (e) {}
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

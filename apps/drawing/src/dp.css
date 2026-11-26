@@ -1,0 +1,33 @@
+.dp-canvas-wrap { position: relative; }
+.dp-canvas {
+  width: 100%;
+  max-width: calc(800px * var(--sf));
+  height: auto;
+  aspect-ratio: 800 / 500;
+  display: block;
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(10px * var(--sf));
+  background: var(--paper);
+  touch-action: none;
+}
+.dp-canvas-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--ink-80);
+  font-family: var(--sans);
+  font-size: calc(15px * var(--tf));
+}
+.dp-swatches { display: flex; gap: calc(8px * var(--sf)); flex-wrap: wrap; }
+.dp-swatch {
+  width: calc(28px * var(--sf));
+  height: calc(28px * var(--sf));
+  border-radius: calc(999px * var(--sf));
+  border: calc(2px * var(--sf)) solid var(--ui-line);
+  cursor: pointer;
+  padding: 0;
+}
+.dp-swatch.active { border-color: var(--accent); }

@@ -1,0 +1,100 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.mortgage-calculator",
+  "name": "Mortgage calculator",
+  "version": "0.1.0",
+  "summary": "Estimate the monthly payment, total interest and payoff of a fixed-rate mortgage.",
+  "description": "Enter the home price, down payment, interest rate and term. The summary shows the loan amount, the monthly payment and the total interest; the schedule breaks the payoff down by year. The last calculation and a short history of saved scenarios persist across page reloads. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["mortgage", "finance"],
+  "icon": "finance",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/mortgage-calculator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/number-input": "0.1.0",
+      "@lacuna/money-input": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "export:mortgage"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "mortgage",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the last mortgage calculation and the saved scenarios"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save",
+      "clipboard.write"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [
+      "financial"
+    ],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "mortgage"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts",
+      "tests/scenarios.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

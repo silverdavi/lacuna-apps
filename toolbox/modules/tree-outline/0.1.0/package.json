@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/tree-outline",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Nested collapsible tree with indent/outdent controls and keyboard-driven reordering.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-drag-reorder": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "TreeOutline",
+    "kind": "widget",
+    "commit": "ecef1e347bbaf912046a57284a88d81fc05d54d7",
+    "source": "7d1fc2f3d20397fa",
+    "lines": 215,
+    "exports": [
+      "TreeOutline"
+    ],
+    "types": [
+      "TreeNode",
+      "TreeOutlineProps"
+    ],
+    "signature": "TreeOutline(props: TreeOutlineProps)"
+  }
+}

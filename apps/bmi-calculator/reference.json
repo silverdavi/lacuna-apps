@@ -1,0 +1,19 @@
+{
+  "repo": "GermaVinsmoke/bmi-calculator",
+  "url": "https://github.com/GermaVinsmoke/bmi-calculator",
+  "sha": "7e4714d6542fe21cb70e5f37d6c55adfaeb538cc",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2019 GermaVinsmoke"
+  ],
+  "files": [
+    "src/components/App/App.jsx",
+    "src/components/Bar/Bar.jsx",
+    "src/components/BmiForm/BmiForm.jsx",
+    "src/components/Info/Info.jsx",
+    "src/helpers/localStorage.js"
+  ],
+  "upstream_notice": false,
+  "notice_sha256": "3b6ee1c4303d73dd8035a3bff97626a1ed9dfdb964e6c3191bf9b6cc673d4920"
+}

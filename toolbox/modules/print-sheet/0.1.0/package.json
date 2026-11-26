@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/print-sheet",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Paper-sized layout container (A4 or Letter) with print-specific CSS for generating printable documents.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "PrintSheet",
+    "kind": "widget",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "e314db790e9342d7",
+    "lines": 148,
+    "exports": [
+      "PrintSheet"
+    ],
+    "types": [
+      "PaperSize",
+      "SheetOrientation",
+      "PrintSheetProps"
+    ],
+    "signature": "PrintSheet(props: PrintSheetProps)"
+  }
+}

@@ -1,0 +1,5 @@
+/* The kit's inactive tab uses --ink-40 (2.5:1 on paper, fails WCAG AA).
+   Bump our own tab class to --ink-60 (4.8:1) so the inactive tab is readable. */
+.rps-tab:not(.active) {
+  color: var(--ink-60);
+}

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "d845f0d4cb62ff724a74234c963ca09342dbcbf966761d0c4654575319d4a89c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"File Converter\" and the drop zone displays the text \"Drop a file or click to browse\"."
+    },
+    {
+      "id": "A2",
+      "text": "After dropping a file named \"report.pdf\", the preview panel shows the filename \"report.pdf\" and the select labelled \"Output format\" contains the options \"PDF\", \"PNG\", and \"JPG\"."
+    },
+    {
+      "id": "A3",
+      "text": "With \"report.pdf\" loaded, selecting \"PNG\" in the select labelled \"Output format\" and clicking the button \"Convert\" shows the status text \"Converted report.pdf to report.png\" and enables the button \"Download\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Download\" after a successful conversion triggers a download of a file named \"report.png\"."
+    },
+    {
+      "id": "A5",
+      "text": "After a successful conversion, the history list contains an item with the text \"report.pdf \u2192 report.png\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Clear history\" removes all items from the history list and shows the text \"No conversions yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "After a successful conversion, reloading the page still shows the history item \"report.pdf \u2192 report.png\" and the status text \"Converted report.pdf to report.png\"."
+    },
+    {
+      "id": "A8",
+      "text": "Dropping a file named \"photo.jpg\", selecting \"PDF\" in the select labelled \"Output format\", and clicking \"Convert\" shows the status text \"Converted photo.jpg to photo.pdf\" and adds a history item \"photo.jpg \u2192 photo.pdf\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "602b0af3c367228b37f6425444a031a56d71dbdb23e9ee33b56027d24ee74271"
+    }
+  ]
+}

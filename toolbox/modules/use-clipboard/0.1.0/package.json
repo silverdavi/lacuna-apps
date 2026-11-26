@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/use-clipboard",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Copies text or an image Blob to the system clipboard and exposes a transient copied flag with timeout, success and error callbacks.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useClipboard",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "b4b7ec336936288f",
+    "lines": 78,
+    "exports": [
+      "useClipboard"
+    ],
+    "types": [
+      "UseClipboardOptions",
+      "UseClipboardReturn"
+    ],
+    "signature": "useClipboard(options?: UseClipboardOptions)"
+  }
+}

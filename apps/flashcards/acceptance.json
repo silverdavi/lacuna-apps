@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "51598bad2b3356dc8626ef9260c40713ecb60f42aa7dc2894dd095f64ad12897",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Spaced Flashcards App\" and, with no decks, the text \"No decks yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"New deck\" opens a form. Typing \"Spanish\" in the field labelled \"Deck name\" and clicking \"Save deck\" adds a list item containing \"Spanish\" and the text \"0 cards\". The text \"No decks yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "With the deck \"Spanish\" selected, clicking \"Add card\" opens a card form. Typing \"gato\" in the field labelled \"Front\" and \"cat\" in the field labelled \"Back\", then clicking \"Save card\", adds a card item showing \"gato\" and the deck card count updates to \"1 cards\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Start study\" on the deck \"Spanish\" opens a study view showing the card front \"gato\". Clicking the button \"Reveal\" shows the card back \"cat\" and four grade buttons: \"Again\", \"Hard\", \"Good\", \"Easy\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the study view for card \"gato\", clicking the button \"Good\" closes the study session and returns to the deck view. The deck \"Spanish\" now shows \"1 due\" and the card \"gato\" is listed in the review queue with a due date of tomorrow."
+    },
+    {
+      "id": "A6",
+      "text": "After grading \"gato\" as \"Good\" and reloading the page, the deck \"Spanish\" still shows \"1 due\" and the card \"gato\" is still in the review queue."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Spanish\" on the deck list item removes the deck \"Spanish\" and its card \"gato\". The page shows \"No decks yet\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding two decks \"Spanish\" and \"French\", clicking the tab \"Stats\" shows a table with a row for \"Spanish\" containing \"1 cards\" and a row for \"French\" containing \"0 cards\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the deck \"Spanish\" with its card \"gato\" and the due status \"1 due\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "9b6531a3385d58996377cefe46365a9e5dbcd0d2388ecbdad8379f1cbc8d50d1"
+    }
+  ]
+}

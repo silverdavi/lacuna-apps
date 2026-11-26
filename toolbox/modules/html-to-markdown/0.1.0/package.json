@@ -1,0 +1,25 @@
+{
+  "name": "@lacuna/html-to-markdown",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Converts a sanitized HTML string into a Markdown string, stripping scripts and unsafe attributes.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "htmlToMarkdown",
+    "kind": "logic",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "391b6a142b6a0d10",
+    "lines": 268,
+    "exports": [
+      "htmlToMarkdown"
+    ],
+    "types": [
+      "HtmlToMarkdownOptions"
+    ],
+    "signature": "htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions)"
+  }
+}

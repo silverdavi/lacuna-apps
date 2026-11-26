@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.home-inventory",
+  "name": "Home Inventory",
+  "version": "0.1.0",
+  "summary": "Keep track of what is at home and what it is worth.",
+  "description": "Add the things in your home with a location and a value, sort them by value, search them, and export the list as CSV. Everything stays on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "home",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/home-inventory",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:home-inventory"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "item",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own home inventory records"
+      }
+    ],
+    "platform": [
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "item"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.car-maintenance-log",
+  "name": "Car Maintenance Log",
+  "version": "0.1.0",
+  "summary": "Log service records and track upcoming work by mileage.",
+  "description": "Record each service with its date, mileage, cost, and type. Search the history, plan upcoming work, and watch what is due against the current odometer.",
+  "category": "personal",
+  "tags": ["car", "maintenance", "mileage", "service"],
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/car-maintenance-log",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:maintenance-record",
+    "create:upcoming-task",
+    "view:records",
+    "export:csv"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "maintenance-record",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store each service with date, mileage, cost, and type"
+      },
+      {
+        "kind": "upcoming-task",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store upcoming work with due mileage and interval"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "maintenance-record",
+      "upcoming-task"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

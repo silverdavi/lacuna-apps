@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "b20464671a54d3f424a637d46c705714c1b704a361fcdd26883e5db82da2c0e5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Guest List\" and the text \"No guests yet\" when no guests exist."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice\" in the field labelled \"Name\", \"alice@example.com\" in the field labelled \"Email\", selecting \"Accepted\" in the select labelled \"RSVP\", and clicking the button \"Add guest\" adds a row to the table containing \"Alice\", \"alice@example.com\", and \"Accepted\"; the text \"No guests yet\" disappears."
+    },
+    {
+      "id": "A3",
+      "text": "After adding Alice, typing \"Bob\" in the field labelled \"Name\", \"bob@example.com\" in the field labelled \"Email\", selecting \"Pending\" in the select labelled \"RSVP\", and clicking \"Add guest\" adds a second row containing \"Bob\", \"bob@example.com\", and \"Pending\"; the summary line shows \"Accepted: 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete Alice\" removes the row containing \"Alice\" from the table; the summary line shows \"Accepted: 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "With Alice (Accepted) and Bob (Pending) in the table, clicking the column header labelled \"Name\" sorts the rows alphabetically by name, so the first row contains \"Alice\" and the second row contains \"Bob\"."
+    },
+    {
+      "id": "A6",
+      "text": "With Alice and Bob in the table, clicking the button \"Export CSV\" shows a toast with the text \"CSV exported\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"ali\" in the search box labelled \"Search\" filters the table to show only the row containing \"Alice\"; the row containing \"Bob\" is hidden."
+    },
+    {
+      "id": "A8",
+      "text": "With Alice in the table, clicking the button \"Edit Alice\" opens a form pre-filled with \"Alice\" in the field labelled \"Name\" and \"alice@example.com\" in the field labelled \"Email\"; changing the field labelled \"RSVP\" to \"Declined\" and clicking \"Save\" updates the table row to show \"Declined\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the guest \"Alice\" with email \"alice@example.com\" and RSVP \"Accepted\" visible in the table."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0634cf9fc329117a77e53fe41455f8faf64c69e223c876b6613f83b54a36440f"
+    }
+  ]
+}

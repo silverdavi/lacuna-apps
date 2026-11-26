@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "13509a3c01444a2fe0105ad914acca68881ca288290a2886d0d095066f8c07fa",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Sticky Notes\" and, with no notes present, the text \"No notes yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" in the field labelled \"Note text\" and clicking the button \"Add note\" adds a list item containing \"Buy milk\" and removes the text \"No notes yet\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a note with text \"Buy milk\", clicking the button \"Delete Buy milk\" removes that list item and the text \"No notes yet\" reappears."
+    },
+    {
+      "id": "A4",
+      "text": "With two notes \"Alpha\" and \"Beta\", typing \"Al\" in the field labelled \"Search\" filters the list to show only the item containing \"Alpha\"."
+    },
+    {
+      "id": "A5",
+      "text": "With two notes \"Alpha\" and \"Beta\", clicking the button \"Export JSON\" copies a JSON string to the clipboard that contains the text \"Alpha\"."
+    },
+    {
+      "id": "A6",
+      "text": "After adding a note with text \"Test\", clicking the button \"Edit Test\" opens a form where the field labelled \"Note text\" contains \"Test\"; changing it to \"Updated\" and clicking \"Save\" updates the list item to contain \"Updated\"."
+    },
+    {
+      "id": "A7",
+      "text": "With two notes \"First\" and \"Second\", pressing the key \"ArrowDown\" while focused on the \"Move down\" control for \"First\" reorders the list so \"Second\" appears before \"First\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding a note with text \"Persist me\", reloading the page still shows the list item containing \"Persist me\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "174761b7c1df28a2fa43c5a0e2712df9c11fb832eb768185a435bf00fc74bf8b"
+    }
+  ]
+}

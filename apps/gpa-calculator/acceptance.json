@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ffef6e6aea3eea476302f4bbc47dfb2a9f9499d467fd5424693e04b912bab0f9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"GPA Calculator\" and, with no courses added, shows the text \"No courses yet\" and the summary line \"GPA: 0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Entering \"Math 101\" in the field labelled \"Course Name\", \"4\" in the field labelled \"Credits\", and \"A\" in the select labelled \"Grade\" then clicking \"Add Course\" adds a row to the table containing \"Math 101\", \"4\", \"A\", and \"4.00\"; the summary updates to \"GPA: 4.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Physics 201\" with \"3\" credits and grade \"B\", the table shows a row for \"Physics 201\" with \"3\", \"B\", and \"3.00\"; the summary updates to \"GPA: 3.70\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add Course\" with an empty \"Course Name\" field displays the error message \"Course name is required\" and does not add a row to the table."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button labelled \"Delete Math 101\" removes that row from the table; the summary updates to \"GPA: 3.00\" and the table now only contains \"Physics 201\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Chart\" switches the view to show a bar chart where the bar for \"Math 101\" has a height corresponding to 4.00 and the bar for \"Physics 201\" has a height corresponding to 3.00."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Copy GPA\" copies the text \"GPA: 3.70\" to the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting \"4.0\" in the select labelled \"Scale\" changes the grade point for \"A\" to 4.0 and \"B\" to 3.0, keeping the GPA at \"3.70\"; selecting \"5.0\" changes the grade point for \"A\" to 5.0 and \"B\" to 4.0, updating the summary to \"GPA: 4.25\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the added courses: after adding \"Math 101\" and \"Physics 201\", reloading the page still shows both rows in the table and the summary \"GPA: 3.70\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ce05dc2c17f454e0c96a63b6111557fc59587e4366d25f953090d2980104e67b"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+/* App-specific layout. The kit owns the visual language; this file only adds
+   structure that the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+.ft-tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: calc(10px * var(--sf));
+  letter-spacing: calc(0.8px * var(--sf));
+  text-transform: uppercase;
+  color: var(--ink-60);
+  padding: calc(6px * var(--sf)) calc(10px * var(--sf));
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.ft-tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+
+.ft-age {
+  font-family: var(--mono);
+  font-size: calc(9px * var(--sf));
+  letter-spacing: calc(0.5px * var(--sf));
+  color: var(--ink-60);
+}
+
+.ft-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ft-tree-item {
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.ft-tree-line {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gap) / 2);
+  padding: calc(8px * var(--sf)) calc(16px * var(--sf));
+  flex-wrap: wrap;
+}
+
+.ft-tree-name {
+  font-weight: 600;
+  min-width: 0;
+}
+
+.ft-tree-actions {
+  margin-left: auto;
+  display: flex;
+  gap: calc(var(--gap) / 4);
+  flex-wrap: wrap;
+}
+
+.ft-graph-scroll {
+  overflow: auto;
+  padding: calc(12px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.ft-graph {
+  display: block;
+}

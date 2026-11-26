@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/money-input",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Currency amount input that formats with the money module and emits integer minor units.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/money": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "MoneyInput",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "3f460adba0c09a65",
+    "lines": 162,
+    "exports": [
+      "MoneyInput"
+    ],
+    "types": [
+      "MoneyInputProps"
+    ],
+    "signature": "MoneyInput({ value, onChange, currency, locale = 'en-US', min, max, step = 1, placeholder, disab...)"
+  }
+}

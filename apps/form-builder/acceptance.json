@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "efe90cad0ab18c3f10bacfea275d432022a0ae0f25aee641fc73647d2ac5217d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Dynamic Form Builder\" and a list area that initially contains the text \"No forms yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Contact Us\" in the field labelled \"Form name\" and clicking the button \"Create form\" adds a list item containing \"Contact Us\" and removes the text \"No forms yet\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Edit\" on the \"Contact Us\" list item opens a form designer view. Typing \"Email\" in the field labelled \"Label\", selecting \"text\" in the select labelled \"Type\", checking the checkbox labelled \"Required\", and clicking the button \"Add field\" adds a row to the field list containing \"Email\" and \"text\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the field list for \"Contact Us\", clicking the button \"Delete\" next to the \"Email\" row removes that row from the list."
+    },
+    {
+      "id": "A5",
+      "text": "With the \"Email\" field present, clicking the button \"Preview\" switches to a fill view. Leaving the field labelled \"Email\" empty and clicking the button \"Submit\" displays the error message \"Email is required\" and does not show a success message."
+    },
+    {
+      "id": "A6",
+      "text": "In the fill view for \"Contact Us\", typing \"test@example.com\" in the field labelled \"Email\" and clicking the button \"Submit\" displays the success message \"Form submitted successfully\" and hides the error message."
+    },
+    {
+      "id": "A7",
+      "text": "After a successful submission, clicking the button \"Export JSON\" copies a string to the clipboard that contains the key \"email\" and the value \"test@example.com\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Save form\" in the designer view returns to the list view, and the list item for \"Contact Us\" now displays the text \"1 field\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the form \"Contact Us\" in the list with the text \"1 field\" visible."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "43e55f1339453ff4d326e274b64a900d0b394e36068e5ca04362f75ff6ec2021"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@lacuna/line-items",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions that compute subtotals, discounts, tax, and grand totals for line items in integer minor units.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/money": "workspace:0.1.0"
+  },
+  "lacunaBridge": {
+    "component": "lineItems",
+    "kind": "logic",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "c077225018184c76",
+    "lines": 94,
+    "exports": [
+      "computeLineItem",
+      "computeOrderTotals",
+      "formatMinorUnits"
+    ],
+    "types": [
+      "LineItem",
+      "LineItemResult",
+      "OrderTotals"
+    ],
+    "signature": "computeLineItem(item: LineItem); computeOrderTotals(items: readonly LineItem[]); formatMinorUnits(amount: number, currency: string)"
+  }
+}

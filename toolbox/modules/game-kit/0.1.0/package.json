@@ -1,0 +1,39 @@
+{
+  "name": "@lacuna/game-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Game board with score tracking, best-score persistence, and a restart control for board and puzzle games.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/board-grid": "workspace:0.1.0",
+    "@lacuna/use-hotkeys": "workspace:0.1.0",
+    "@lacuna/use-local-record": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "GameKit",
+    "kind": "kit",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "ab40c8de51c7de97",
+    "lines": 215,
+    "exports": [
+      "GameKit"
+    ],
+    "types": [
+      "GameKitProps",
+      "GameKitScore",
+      "GameKitState",
+      "HotkeyMap"
+    ],
+    "signature": "GameKit(props: GameKitProps)"
+  }
+}

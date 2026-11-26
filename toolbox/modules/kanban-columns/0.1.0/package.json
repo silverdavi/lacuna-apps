@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/kanban-columns",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Multi-column Kanban board with keyboard card dragging, cross-column moves, and live per-column WIP counts.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/use-drag-reorder": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "KanbanColumns",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "69f3a2e788d02704",
+    "lines": 227,
+    "exports": [
+      "KanbanColumns"
+    ],
+    "types": [
+      "KanbanCard",
+      "KanbanColumnData",
+      "KanbanColumnsProps"
+    ],
+    "signature": "KanbanColumns(props: KanbanColumnsProps)"
+  }
+}

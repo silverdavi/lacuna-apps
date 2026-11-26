@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "ac4cfbbdeb7a7d78b860f6770a857c43036fd4663bf71343007296c32d026aea",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Changelog Generator\" and the text \"No commits yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"feat: add login\" in the field labelled \"Commit message\" and clicking the button \"Add commit\" adds a list item containing \"feat: add login\"; the text \"No commits yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"fix: null pointer\" and \"docs: update readme\", the list shows three items in the order \"feat: add login\", \"fix: null pointer\", \"docs: update readme\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete fix: null pointer\" removes that item; the list now shows only \"feat: add login\" and \"docs: update readme\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Generate changelog\" with commits \"feat: add login\" and \"docs: update readme\" shows a Markdown preview containing the heading \"## Features\" with the item \"add login\" and the heading \"## Documentation\" with the item \"update readme\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the Markdown preview, clicking the checkbox next to \"add login\" toggles it to checked; the rendered HTML contains `<input type=\"checkbox\" checked>`."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy Markdown\" copies the exact text \"## Features\\n- [ ] add login\\n\\n## Documentation\\n- [ ] update readme\" to the clipboard."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export\" opens a menu; clicking \"JSON\" downloads a file named \"changelog.json\" containing the JSON array `[{\"message\":\"feat: add login\",\"section\":\"Features\"},{\"message\":\"docs: update readme\",\"section\":\"Documentation\"}]`."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the commit list: after adding \"feat: add login\" and reloading, the list still shows \"feat: add login\" and the button \"Generate changelog\" is present."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "52221b19e16d255de9e7e82b3193bb1411c6b2b1ceb03f6309335393e4225d0d"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.inventory-management",
+  "name": "Stock Inventory Manager",
+  "version": "0.1.0",
+  "summary": "Track stock items and their movements.",
+  "description": "Manage a stock list: add items with a name, quantity, and category; record movements in and out; search, filter by category, and sort by quantity. The list and the movement history are saved in this browser and survive a reload. Export the stock table as CSV any time.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "storefront",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/inventory-management"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:item",
+    "edit:item",
+    "export:item"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "inventory-item",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the name, quantity, and category of each stock item"
+      },
+      {
+        "kind": "inventory-movement",
+        "access": [
+          "read",
+          "create"
+        ],
+        "purpose": "Record the in and out movements applied to each stock item"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "inventory-item",
+      "inventory-movement"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

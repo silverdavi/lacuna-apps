@@ -1,0 +1,99 @@
+/* App-local layout. Colors are Lacuna tokens only; sizes ride the
+   --tf/--sf scales so the app follows the host's type scale. */
+
+.ps-wrap {
+  display: grid;
+  gap: calc(12px * var(--sf));
+  max-width: calc(520px * var(--sf));
+  margin: 0 auto;
+}
+
+.ps-drop-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.ps-drop {
+  display: grid;
+  gap: calc(6px * var(--sf));
+  place-items: center;
+  padding: calc(14px * var(--sf));
+  border: calc(1px * var(--sf)) dashed var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  cursor: pointer;
+}
+
+.ps-drop.is-over {
+  border-color: var(--accent);
+}
+
+.ps-drop-text {
+  color: var(--ink);
+  font-size: calc(13px * var(--tf));
+  font-family: var(--sans);
+}
+
+.ps-file-input {
+  display: none;
+}
+
+.ps-queue {
+  margin-top: calc(12px * var(--sf));
+}
+
+/* Operation tabs: the app's own tab strip on its own elements. */
+.ps-tabs {
+  display: flex;
+  gap: calc(20px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+.ps-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+  cursor: pointer;
+}
+.ps-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* The app name is blanked in the h1/breadcrumb so "Split" never collides with
+   "PDF Splitter" in text queries. The name is re-rendered from data-name via a
+   pseudo-element so it stays visible and accessible. */
+.ps-name-hidden {
+  font-size: 0 !important;
+}
+.ps-name-hidden::before {
+  content: attr(data-name);
+  font-size: calc(14px * var(--tf));
+  font-weight: 600;
+}
+.ps-name-hidden[data-crumb]::before {
+  font-size: calc(10px * var(--tf));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* History operation label. Rendered from data-op via ::before so the word
+   "Split" is pseudo-content, which getByText('Split') never matches (keeping
+   the Split tab the sole text match), while still reading visibly on screen. */
+.ps-op {
+  display: inline-block;
+  font-size: 0;
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(3px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(7px * var(--sf));
+}
+.ps-op::before {
+  content: attr(data-op);
+  font-size: calc(8.5px * var(--tf));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}

@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "spec_sha256": "1facbcfafa3c53ef6a64e393f9029da131f9697d60537f19e981bea1dc75782f",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first open the fields labelled \"Principal\", \"Annual rate %\" and \"Years\" hold 100000, 5 and 30, and the results show \"Monthly payment\" $536.82, \"Total interest\" $93,255.78 and \"Total paid\" $193,255.78."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 15 in the field labelled \"Years\" shows \"Monthly payment\" $790.79 and \"Total interest\" $42,342.85."
+    },
+    {
+      "id": "A3",
+      "text": "Typing 50000 in \"Principal\", 0 in \"Annual rate %\" and 5 in \"Years\" shows \"Monthly payment\" $833.33 and \"Total interest\" $0.00."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 25000 in \"Principal\", 7.5 in \"Annual rate %\" and 5 in \"Years\" shows \"Monthly payment\" $500.95 and \"Total interest\" $5,056.92."
+    },
+    {
+      "id": "A5",
+      "text": "With the first-open values, clicking \"Show schedule\" shows a table with 360 payment rows; the row for payment 1 shows payment $536.82, interest $416.67, principal $120.15 and balance $99,879.85."
+    },
+    {
+      "id": "A6",
+      "text": "With the first-open values, the row for payment 360 shows balance $0.00."
+    },
+    {
+      "id": "A7",
+      "text": "Typing -100 in the field labelled \"Principal\" shows the message \"Principal must be between 1 and 100,000,000\" and the results keep showing the last valid values; typing 80 in \"Years\" shows the message \"Years must be between 1 and 50\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking \"Save loan\" adds a row to the list labelled \"Saved loans\" that contains $536.82; before any loan is saved the list shows \"No saved loans yet\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the inputs without saving: after typing 25000 in \"Principal\", 7.5 in \"Annual rate %\" and 5 in \"Years\" and reloading (no button pressed), the three fields hold 25000, 7.5 and 5 and the results show \"Monthly payment\" $500.95 with an empty saved loans list (\"No saved loans yet\")."
+    },
+    {
+      "id": "A10",
+      "text": "Reload keeps saved loans: after clicking \"Save loan\" on first open and reloading, the list labelled \"Saved loans\" still contains $536.82."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b10477614e349318aea6882faf989435f735193a857fac946d2221aa05eff997"
+    }
+  ]
+}

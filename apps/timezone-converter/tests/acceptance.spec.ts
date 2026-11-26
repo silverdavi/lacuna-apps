@@ -1,0 +1,105 @@
+import { expect, test } from '@playwright/test'
+
+const source = page => page.getByLabel('Source timezone', { exact: true })
+const target = page => page.getByLabel('Target timezone', { exact: true })
+const date = page => page.getByLabel('Date', { exact: true })
+const time = page => page.getByLabel('Time', { exact: true })
+const result = page => page.getByLabel('Result time', { exact: true })
+
+test('[A1] page heading is "Timezone Converter"', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Timezone Converter' })).toBeVisible()
+})
+
+test('[A2] UTC 2024-01-15 14:30 to New York shows 09:30', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('New York')
+  await date(page).fill('2024-01-15')
+  await time(page).fill('14:30')
+  await expect(result(page)).toHaveValue('09:30')
+})
+
+test('[A3] New York 2024-07-15 10:00 to Tokyo shows 23:00', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('New York')
+  await target(page).selectOption('Tokyo')
+  await date(page).fill('2024-07-15')
+  await time(page).fill('10:00')
+  await expect(result(page)).toHaveValue('23:00')
+})
+
+test('[A4] saving a conversion adds a row to the history table', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('London')
+  await date(page).fill('2024-03-10')
+  await time(page).fill('12:00')
+  await expect(result(page)).toHaveValue('12:00')
+  await page.getByRole('button', { name: 'Save conversion' }).click()
+  const row = page.locator('table tr').filter({ hasText: '2024-03-10' }).filter({ hasText: '12:00' })
+  await expect(row).toContainText('UTC')
+  await expect(row).toContainText('London')
+  await expect(row).toContainText('2024-03-10')
+  await expect(row).toContainText('12:00')
+})
+
+test('[A5] the History tab shows a table with a Source header and the saved row', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('London')
+  await date(page).fill('2024-03-10')
+  await time(page).fill('12:00')
+  await page.getByRole('button', { name: 'Save conversion' }).click()
+  await page.getByRole('tab', { name: 'History' }).click()
+  await expect(page.getByRole('columnheader', { name: 'Source' })).toBeVisible()
+  const row = page.locator('table tr').filter({ hasText: '2024-03-10' }).filter({ hasText: '12:00' })
+  await expect(row).toContainText('UTC')
+  await expect(row).toContainText('London')
+})
+
+test('[A6] Copy result copies 12:00 to the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('London')
+  await date(page).fill('2024-03-10')
+  await time(page).fill('12:00')
+  await expect(result(page)).toHaveValue('12:00')
+  await page.getByRole('button', { name: 'Copy result' }).click()
+  await expect.poll(async () => (await page.evaluate(() => navigator.clipboard.readText()))).toBe('12:00')
+})
+
+test('[A7] UTC 2024-01-15 00:00 to Sydney shows 11:00', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('Sydney')
+  await date(page).fill('2024-01-15')
+  await time(page).fill('00:00')
+  await expect(result(page)).toHaveValue('11:00')
+})
+
+test('[A8] Swap exchanges the source and target timezones', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('New York')
+  await page.getByRole('button', { name: 'Swap' }).click()
+  await expect(source(page)).toHaveValue('New York')
+  await expect(target(page)).toHaveValue('UTC')
+})
+
+test('[A9] a saved conversion survives a reload', async ({ page }) => {
+  await page.goto('/')
+  await source(page).selectOption('UTC')
+  await target(page).selectOption('London')
+  await date(page).fill('2024-03-10')
+  await time(page).fill('12:00')
+  await page.getByRole('button', { name: 'Save conversion' }).click()
+  await page.reload()
+  await page.getByRole('tab', { name: 'History' }).click()
+  const row = page.locator('table tr').filter({ hasText: '2024-03-10' }).filter({ hasText: '12:00' })
+  await expect(row).toContainText('UTC')
+  await expect(row).toContainText('London')
+  await expect(row).toContainText('2024-03-10')
+  await expect(row).toContainText('12:00')
+})

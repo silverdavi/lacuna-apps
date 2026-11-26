@@ -1,0 +1,127 @@
+/* ASCII Art Generator. Reads tokens only; prefixes aa- so it never touches the kit. */
+
+/* Source tabs (Text / Image). */
+.aa-tabs {
+  display: flex;
+  gap: calc(4px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
+}
+
+.aa-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-80);
+  padding: 0 calc(4px * var(--sf)) calc(9px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.aa-tab.on {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* Empty hint in the rail. */
+.aa-rail-hint {
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}
+
+/* Card header actions live on the right. */
+.aa-card-actions {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+/* Recent-history rail. */
+.aa-rail-history {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.aa-rail-history-row {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--sf));
+  padding: calc(6px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--ui-card);
+  cursor: pointer;
+  text-align: left;
+}
+
+.aa-rail-history-row:hover {
+  border-color: var(--hair-strong);
+}
+
+.aa-rail-history-meta {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+}
+
+.aa-rail-history-set {
+  font-family: var(--sans);
+  font-size: calc(13px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.aa-rail-clear {
+  margin-top: calc(4px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+  background: none;
+  border: none;
+  padding: calc(2px * var(--sf)) 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.aa-rail-clear:hover {
+  color: var(--ink);
+}
+
+/* File note under the upload input. */
+.aa-file-note {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}
+
+/* Output block. */
+.aa-output {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  line-height: calc(18px * var(--tf));
+  color: var(--ink);
+  background: var(--ui-field);
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  padding: calc(10px * var(--sf));
+  margin: 0;
+  overflow: auto;
+  max-height: calc(420px * var(--sf));
+  white-space: pre;
+}
+
+/* Generate row. */
+.aa-run-row {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--sf));
+}
+
+.aa-run-hint {
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}

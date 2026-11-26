@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/query-spec",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions for multi-key sorting, predicate filtering, and group-by aggregation over arrays of records.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "querySpec",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "09542eb0e6765652",
+    "lines": 64,
+    "exports": [
+      "sortRecords",
+      "filterRecords",
+      "groupRecords"
+    ],
+    "types": [
+      "SortDirection",
+      "SortKey",
+      "FilterPredicate",
+      "GroupKey",
+      "GroupResult"
+    ],
+    "signature": "sortRecords( records: T[], keys: SortKey<T>[] ); filterRecords( records: T[], predicate: FilterPredicate<T> ); groupRecords( records: T[], key: GroupKey<T> )"
+  }
+}
