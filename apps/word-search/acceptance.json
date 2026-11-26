@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "464a97c0468c20116bf60ccb5f01cad37d6687bb531acbaa4f7a36c78b03c363",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Word Search\" and the text \"No puzzle loaded\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"CAT,DOG\" in the field labelled \"Words\" and clicking the button \"Generate\" creates a 10x10 grid where the letters \"C\", \"A\", \"T\" appear consecutively in a row, column, or diagonal, and the text \"No puzzle loaded\" is replaced by \"Find 2 words\"."
+    },
+    {
+      "id": "A3",
+      "text": "After generating a puzzle with \"CAT,DOG\", clicking the cell containing \"C\" and then the cell containing \"T\" (the end of the word) highlights the path and adds \"CAT\" to the list of found words; the score display shows \"Score: 10\"."
+    },
+    {
+      "id": "A4",
+      "text": "With a puzzle containing \"CAT,DOG\", if \"CAT\" is found, clicking the button \"Restart\" clears the found words list, resets the score to \"Score: 0\", and regenerates a new puzzle with the same words."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"Stats\" shows a table with the header \"Best Score\" and a value that is at least as high as the current \"Score\" value from the \"Play\" tab."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"CAT,DOG\" in \"Words\", clicking \"Generate\", finding \"CAT\", then reloading the page still shows \"CAT\" in the found words list and \"Score: 10\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Copy Puzzle\" copies the grid letters to the clipboard, and the text \"Copied\" appears briefly."
+    },
+    {
+      "id": "A8",
+      "text": "Changing the field labelled \"Size\" to \"15\" and clicking \"Generate\" creates a 15x15 grid."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "59b8c94a9b8bef7683352e51d970a71a05839aaae71ea5019051f4ba58089182"
+    }
+  ]
+}

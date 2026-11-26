@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/file-save-open",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Save a Blob, text, or JSON value as a named browser download, and read a user-selected file as text, bytes, or parsed JSON.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "fileSaveOpen",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "f5f18b31f796b876",
+    "lines": 107,
+    "exports": [
+      "saveBlob",
+      "saveText",
+      "saveJSON",
+      "openFile"
+    ],
+    "types": [
+      "SaveOptions",
+      "FileReadMode",
+      "OpenResult",
+      "OpenError"
+    ],
+    "signature": "saveBlob(blob: Blob, options: SaveOptions); saveText(text: string, options: SaveOptions); saveJSON(data: unknown, options: SaveOptions); openFile( file: File, mode: FileReadMode, )"
+  }
+}

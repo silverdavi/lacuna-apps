@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.certificate-generator",
+  "name": "Certificate Generator",
+  "version": "0.1.0",
+  "summary": "Create and download completion certificates.",
+  "description": "Fill in a recipient, course, date and issuer to generate a completion certificate. Generated certificates are listed with a download button, and a history table keeps every certificate on this device.",
+  "category": "productivity",
+  "tags": [],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/certificate-generator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/text-transforms": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:certificate-generator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "certificate-generator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Certificate Generator records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "certificate-generator"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

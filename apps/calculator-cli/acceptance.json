@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4a601f3b019b4b9a3b6431b334c8da82eaedb128e5e72a30894ad2b8d580944d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Expression Calculator\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"2+3*4\" into the expression field and clicking the button \"Evaluate\" shows \"14\" in the result summary."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the tab \"Function\" and entering \"x^2\" in the field labelled \"Function\", setting \"Start\" to \"0\", \"End\" to \"5\", and \"Steps\" to \"5\", then clicking \"Sample\" displays a table with 6 rows where the last row shows \"x: 5.00\" and \"y: 25.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the \"Function\" tab, after sampling \"x^2\" from 0 to 5 with 5 steps, the chart area displays a line graph with a point at coordinates (5, 25)."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Copy result\" after evaluating \"2+3*4\" copies the text \"14\" to the clipboard."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"History\" tab, after evaluating \"2+3*4\" and then \"10/2\", the list shows two items: the first containing \"10/2 = 5\" and the second containing \"2+3*4 = 14\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Clear history\" in the \"History\" tab removes all items and displays the text \"No history\"."
+    },
+    {
+      "id": "A8",
+      "text": "Setting the \"Precision\" select to \"2\" and evaluating \"1/3\" shows \"0.33\" in the result summary."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last evaluated expression \"2+3*4\" and its result \"14\" in the main view."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a40e502ad6249037cd9f74ed4c3d1d0225a252eb386243af64841226ab07a034"
+    }
+  ]
+}

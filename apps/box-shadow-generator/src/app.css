@@ -1,0 +1,5 @@
+/* Box Shadow Generator app-local styles.
+   Contrast overrides for kit elements at their default --ink-40, which fails
+   WCAG AA on the window paper. Own classes only otherwise. */
+.lk-main .lc-tab:not(.active) { color: var(--ink-80); }
+.lk-field-hint { color: var(--ink-80); }

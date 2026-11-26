@@ -1,0 +1,2 @@
+# Exceptions to scripts/toolbox-lint.mjs: "<app slug> <rule> <reason>", one per line.
+# Kept in the factory source and copied into scripts/ on agent/shelf; a build cannot change it.

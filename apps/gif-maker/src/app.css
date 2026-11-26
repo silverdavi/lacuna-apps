@@ -1,0 +1,4 @@
+/* GIF Maker: keep the inactive tab legible (the kit default, --ink-40, fails WCAG). */
+.lk-main .lc-tab[aria-selected='false'] { color: var(--ink-80); }
+
+.gf-frame { font-family: var(--mono); font-size: calc(13px * var(--tf)); }

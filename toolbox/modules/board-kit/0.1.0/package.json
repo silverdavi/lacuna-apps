@@ -1,0 +1,37 @@
+{
+  "name": "@lacuna/board-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Kanban board with tag chips, detail side panel, and persisted create/edit/delete cards via the board record form.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/tag-input": "workspace:0.1.0",
+    "@lacuna/use-collection": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "BoardKit",
+    "kind": "kit",
+    "commit": "c16104ed71038f0946f1626fadb6487313514027",
+    "source": "77e7c350efc51b2a",
+    "lines": 275,
+    "exports": [
+      "BoardKit"
+    ],
+    "types": [
+      "BoardCard",
+      "BoardColumn",
+      "BoardKitProps"
+    ],
+    "signature": ""
+  }
+}

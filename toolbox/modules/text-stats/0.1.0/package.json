@@ -1,0 +1,25 @@
+{
+  "name": "@lacuna/text-stats",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Computes word, character, sentence, paragraph counts and estimated reading time from a text string.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "textStats",
+    "kind": "logic",
+    "commit": "6188248d5110081f0bef893a249e8fb76cad24bc",
+    "source": "edf5253e9db3b5ba",
+    "lines": 44,
+    "exports": [
+      "textStats"
+    ],
+    "types": [
+      "TextStats"
+    ],
+    "signature": "textStats(text: string, wpm: number = DEFAULT_WPM)"
+  }
+}

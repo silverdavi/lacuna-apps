@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/pdf-ops",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions to merge, split, reorder, and extract PDF pages and convert images into PDF documents.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "pdfOps",
+    "kind": "logic",
+    "commit": "6e674355303e3e25385687e9978dcee8a5b9f4c7",
+    "source": "e2303b4072932513",
+    "lines": 143,
+    "exports": [
+      "mergePdfs",
+      "splitPdf",
+      "extractPages",
+      "reorderPages",
+      "imageToPdf",
+      "imagesToPdf"
+    ],
+    "types": [
+      "PdfPage",
+      "PdfDocument",
+      "MergeOptions",
+      "SplitResult"
+    ],
+    "signature": "mergePdfs(docs: PdfDocument[], options?: MergeOptions); splitPdf(doc: PdfDocument); extractPages(doc: PdfDocument, start: number, end: number); reorderPages(doc: PdfDocument, order: number[])"
+  }
+}

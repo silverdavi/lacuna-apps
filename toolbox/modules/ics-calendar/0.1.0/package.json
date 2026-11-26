@@ -1,0 +1,30 @@
+{
+  "name": "@lacuna/ics-calendar",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Serialize events (with optional recurrence) to an iCalendar .ics string, parse .ics back to events, validate .ics text, and round-trip recurrence rules to and from RRULE.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "icsCalendar",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "30b41f2dfb1872e1",
+    "lines": 270,
+    "exports": [
+      "toIcs",
+      "fromIcs",
+      "validateIcs",
+      "icsToRRule",
+      "rruleToIcsRec"
+    ],
+    "types": [
+      "IcsEvent",
+      "IcsEventList"
+    ],
+    "signature": "toIcs(events: IcsEvent[]); fromIcs(text: string); validateIcs(text: string); icsToRRule(rec: IcsRecurrence)"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.meme-generator",
+  "name": "Meme Maker",
+  "version": "0.1.0",
+  "summary": "Add top and bottom text to an image, rotate, flip and filter it, then export it as a PNG.",
+  "description": "Load an image from disk, add classic top and bottom meme captions, rotate or flip the image, and apply a filter. Export the finished meme as a PNG or copy it. The last image, its captions and its adjustments are kept on this device, and every exported meme is saved to a local history. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["image", "meme", "text", "edit", "export"],
+  "icon": "paint",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/meme-generator",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/image-ops": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:meme",
+    "edit:meme",
+    "export:meme"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "meme",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the current meme and its export history on this device"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "meme"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

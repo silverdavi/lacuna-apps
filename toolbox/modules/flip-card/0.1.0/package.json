@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/flip-card",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A two-sided card that flips between front and back on click or Enter, with optional 0\u20135 grade buttons on the back.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "FlipCard",
+    "kind": "widget",
+    "commit": "f879fb0f4db05aeffb20e458e8871060488e0913",
+    "source": "200eccd5d978ef3f",
+    "lines": 92,
+    "exports": [
+      "FlipCard"
+    ],
+    "types": [
+      "FlipCardProps"
+    ],
+    "signature": "FlipCard({ front, back, onGrade, disabled = false }: FlipCardProps)"
+  }
+}

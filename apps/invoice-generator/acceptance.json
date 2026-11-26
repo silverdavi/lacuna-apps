@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "25debed3022563935c2eafa9a982c78b04e5df8e4509adedf6f8b08147691170",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Invoice Generator\" and the status bar shows \"Ready\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Acme Corp\" in the field labelled \"Client name\", \"INV-001\" in the field labelled \"Invoice number\", and \"2024-06-15\" in the field labelled \"Issue date\" updates the document preview header to show \"Acme Corp\", \"INV-001\", and \"June 15, 2024\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the line items table, clicking \"Add line item\" adds a new row. Typing \"Consulting\" in the Description field, \"10\" in Quantity, \"150\" in Unit price, \"0\" in Discount, and \"8\" in Tax rate for that row shows a Subtotal of \"$1,500.00\", Tax of \"$120.00\", and the document total updates to \"$1,620.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Adding a second line item with Description \"Travel\", Quantity \"2\", Unit price \"75\", Discount \"10\", and Tax rate \"8\" shows a Subtotal of \"$135.00\" for that row (2 \u00d7 75 \u00d7 0.90) and the document total updates to \"$1,755.00\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the \"Delete\" button on the Travel row removes that row and the document total reverts to \"$1,620.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the \"Export PDF\" button in the toolbar opens a print dialog with the invoice laid out on an A4 sheet showing \"Acme Corp\", \"INV-001\", the line items table, and the total \"$1,620.00\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"Copy to clipboard\" button copies the invoice text to the clipboard, and the status bar briefly shows \"Copied\"."
+    },
+    {
+      "id": "A8",
+      "text": "Changing the Tax rate on the Consulting row from \"8\" to \"0\" updates the Tax for that row to \"$0.00\" and the document total to \"$1,500.00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the invoice: after reloading, the fields still show \"Acme Corp\", \"INV-001\", \"2024-06-15\", the Consulting line item with Quantity \"10\" and Unit price \"150\", and the document total \"$1,500.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ce1c182932045e7e625d90a32dfaaaa34640722d2d3dbcb0837876d387f4a5e3"
+    }
+  ]
+}

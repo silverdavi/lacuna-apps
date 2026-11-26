@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "7caca970af9f727fe538a8a3345d97bbbc806e6aab49860e7cdaaff75f277c94",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On a fresh load, the page shows the heading \"Hangman Game\", the text \"Best: 0\", the text \"Score: 0\", and the button \"Start Game\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Start Game\" reveals a row of six empty slots (each displaying \"_\"), the text \"Lives: 6\", and a keyboard with buttons labelled \"A\" through \"Z\"."
+    },
+    {
+      "id": "A3",
+      "text": "With the hidden word \"CAT\", clicking the button \"C\" changes the first slot to \"C\", keeps the other two slots as \"_\", and updates the text to \"Lives: 6\"."
+    },
+    {
+      "id": "A4",
+      "text": "With the hidden word \"CAT\", clicking the button \"X\" updates the text to \"Lives: 5\" and adds \"X\" to the list of missed letters."
+    },
+    {
+      "id": "A5",
+      "text": "With the hidden word \"CAT\", after clicking \"C\", \"A\", and \"T\", the slots display \"C\", \"A\", \"T\", the text \"You win!\" appears, and the text \"Score: 1\" is shown."
+    },
+    {
+      "id": "A6",
+      "text": "With the hidden word \"CAT\", after clicking \"X\", \"Y\", \"Z\", \"Q\", \"W\", and \"E\", the text \"You lose!\" appears, the text \"The word was CAT\" is shown, and the text \"Score: 0\" is shown."
+    },
+    {
+      "id": "A7",
+      "text": "After winning a round with the word \"CAT\", clicking \"Restart\" reveals a new row of empty slots, the text \"Lives: 6\", and the text \"Score: 1\"."
+    },
+    {
+      "id": "A8",
+      "text": "After winning a round with the word \"CAT\", reloading the page still shows the text \"Score: 1\" and the text \"Best: 1\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score: after winning a round, reloading the page shows the text \"Best: 1\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "6933f72d1e9e098654aa689b4831da1b9c06753a3dea0e05c93a7cbcc4eb2b9b"
+    }
+  ]
+}

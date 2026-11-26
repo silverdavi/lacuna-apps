@@ -1,0 +1,27 @@
+/* The .lk-board class draws the frame, grid lines and sizing. App cells only
+   set their background inline; this tunes the letter presentation. */
+.ws-cell {
+  font-family: var(--mono) !important;
+  font-size: calc(14px * var(--sf)) !important;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.ws-cell.on {
+  color: var(--accent);
+}
+
+/* Found-words list sits under the board inside the board card. */
+.ws-found {
+  margin: calc(10px * var(--sf)) 0 0;
+  padding: calc(8px * var(--sf)) calc(10px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--ui-bg);
+}
+
+/* The kit's inactive tab uses --ink-40 (2.5:1 on paper, fails WCAG AA).
+   Bump our own tab class to --ink-60 (4.8:1) so the inactive tab is readable. */
+.ws-tab:not(.active) {
+  color: var(--ink-60);
+}

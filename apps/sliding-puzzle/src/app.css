@@ -1,0 +1,129 @@
+.sp-board {
+  display: grid;
+  grid-template-columns: repeat(4, calc(56px * var(--sf)));
+  grid-template-rows: repeat(4, calc(56px * var(--sf)));
+  gap: calc(4px * var(--sf));
+  width: max-content;
+}
+
+.sp-row {
+  display: contents;
+}
+
+.sp-tile,
+.sp-empty {
+  width: calc(56px * var(--sf));
+  height: calc(56px * var(--sf));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(8px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(18px * var(--tf));
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.sp-controls {
+  display: flex;
+  gap: calc(16px * var(--sf));
+  align-items: flex-end;
+  margin-top: calc(16px * var(--sf));
+  flex-wrap: wrap;
+}
+
+.sp-field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+}
+
+.sp-label {
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}
+
+.sp-input {
+  font: inherit;
+  padding: calc(6px * var(--sf)) calc(10px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(6px * var(--sf));
+  background: var(--ui-card);
+  color: var(--ink);
+  width: calc(140px * var(--sf));
+}
+
+.sp-actions {
+  display: flex;
+  gap: calc(8px * var(--sf));
+}
+
+.sp-tabs {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+}
+
+.sp-tabs button {
+  font: inherit;
+  padding: calc(6px * var(--sf)) calc(14px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  border-radius: calc(6px * var(--sf));
+  background: var(--ui-card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sp-tabs button.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.sp-tablewrap {
+  overflow-x: auto;
+}
+
+.sp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sp-table th,
+.sp-table td {
+  padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  text-align: left;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.sp-table .num {
+  text-align: right;
+  font-family: var(--mono);
+}
+
+.sp-hint {
+  color: var(--ink-60);
+  font-size: calc(14px * var(--tf));
+}
+
+.sp-counters {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--sf));
+  font-family: var(--mono);
+  font-size: calc(16px * var(--tf));
+}
+
+.sp-counter {
+  color: var(--ink);
+}
+
+.sp-toast {
+  position: fixed;
+  bottom: calc(24px * var(--sf));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--paper);
+  padding: calc(8px * var(--sf)) calc(16px * var(--sf));
+  border-radius: calc(8px * var(--sf));
+  font-size: calc(14px * var(--tf));
+}

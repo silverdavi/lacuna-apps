@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "972172256dadec51c7759351249880dcddc0a5a049ea9717e7e8d846ad6e82ed",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no image loaded, the page shows the heading \"Image Cropper\", the text \"No image loaded\", and a button labelled \"Load image\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Load image\" opens a file picker; selecting a 400x300 PNG file named \"test.png\" displays the image on the canvas and shows the text \"400 x 300 px\" in the dimensions label."
+    },
+    {
+      "id": "A3",
+      "text": "After loading a 400x300 image, dragging the bottom-right handle of the crop box to create a 200x150 crop region and clicking the button \"Apply crop\" results in the canvas displaying an image with dimensions \"200 x 150 px\" in the dimensions label."
+    },
+    {
+      "id": "A4",
+      "text": "After loading a 400x300 image, typing \"100\" in the field labelled \"Width\" and \"75\" in the field labelled \"Height\" and clicking the button \"Resize\" results in the dimensions label showing \"100 x 75 px\"."
+    },
+    {
+      "id": "A5",
+      "text": "After loading a 400x300 image, clicking the button \"Rotate 90\" changes the dimensions label to \"300 x 400 px\"."
+    },
+    {
+      "id": "A6",
+      "text": "After loading a 400x300 image, clicking the button \"Flip horizontal\" does not change the dimensions label, which remains \"400 x 300 px\", but the image content is mirrored."
+    },
+    {
+      "id": "A7",
+      "text": "After loading a 400x300 image, selecting \"Grayscale\" in the select labelled \"Filter\" applies the filter and the select shows \"Grayscale\" as the selected value."
+    },
+    {
+      "id": "A8",
+      "text": "After loading a 400x300 image, clicking the button \"Export PNG\" triggers a download of a file named \"cropped.png\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the loaded image and its current dimensions; after reloading the page with a previously loaded 400x300 image, the dimensions label still shows \"400 x 300 px\" and the canvas displays the image."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "a5362906dd2649f324576573c8ed1c01fe4afe1de1039d68ec084462f1ead8dd"
+    }
+  ]
+}

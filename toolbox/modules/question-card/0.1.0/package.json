@@ -1,0 +1,31 @@
+{
+  "name": "@lacuna/question-card",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Shows one quiz question as choice buttons or a text/number input, with submit, correct/incorrect feedback, and a next button.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "QuestionCard",
+    "kind": "widget",
+    "commit": "27329c567b38ee51f94c3eee413b237ebb05a433",
+    "source": "001ffc757c40f1e5",
+    "lines": 191,
+    "exports": [
+      "QuestionCard"
+    ],
+    "types": [
+      "QuestionCardProps"
+    ],
+    "signature": "QuestionCard({ prompt, type, options, correctAnswer, correctValue, tolerance, caseSensitive, onNex...)"
+  }
+}

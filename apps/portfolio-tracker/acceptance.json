@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1df6d734765452a6d63bd936d120a5ace01680ae47d3bfc4d1a20baca971a923",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no holdings the page shows the heading \"Stock Portfolio\", the text \"No holdings yet\", and the summary lines \"Total Cost: $0.00\", \"Total Value: $0.00\" and \"Gain/Loss: $0.00\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Symbol\" with \"AAPL\", the field labelled \"Shares\" with \"10\", the field labelled \"Purchase Price\" with \"150.25\" and clicking the button \"Add holding\" adds a row in the holdings table containing \"AAPL\", \"10\" and \"$1,502.50\"; the summary shows \"Total Cost: $1,502.50\" and \"No holdings yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After also adding a holding with Symbol \"MSFT\", Shares \"5\" and Purchase Price \"300.00\", the table shows a row with \"MSFT\" and \"$1,500.00\", and the summary shows \"Total Cost: $3,002.50\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add holding\" with an empty Symbol, or with Shares that is empty, 0 or negative, adds no row and shows the message \"Enter a symbol and a share count greater than 0\"."
+    },
+    {
+      "id": "A5",
+      "text": "Every row in the holdings table has a button named \"Delete <symbol>\". With holdings AAPL and MSFT, clicking \"Delete MSFT\" removes that row and the summary shows \"Total Cost: $1,502.50\"."
+    },
+    {
+      "id": "A6",
+      "text": "Selecting \"AAPL\" in the select labelled \"Holding\" and typing \"160.00\" in the field labelled \"Current Price\", then clicking \"Log price\", updates the AAPL row to show \"Value: $1,600.00\" and \"Gain/Loss: +$97.50\"; the summary shows \"Total Value: $1,600.00\" and \"Gain/Loss: +$97.50\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"History\" shows a line chart with the tooltip \"AAPL: $160.00\" visible on the last data point, and the text \"2 snapshots\" below the chart."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" copies the text \"Symbol,Shares,Cost,Value,Gain/Loss\\nAAPL,10,1502.50,1600.00,97.50\" to the clipboard and shows the message \"Copied to clipboard\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the holding AAPL with Shares 10 and the logged price snapshot of $160.00; the summary still shows \"Total Cost: $1,502.50\" and \"Total Value: $1,600.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "cface54d350ff90a08312f4c4847de805ea62e266f5bf27f8ee45a7409d1dbca"
+    }
+  ]
+}

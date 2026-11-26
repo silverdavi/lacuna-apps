@@ -1,0 +1,19 @@
+/* App-level styles. The Edit tab strip uses this app's own classes because the
+   kit's inactive-tab color sits below the WCAG AA contrast floor. */
+
+.ann-tab {
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+  font-family: var(--sans);
+}
+
+.ann-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}

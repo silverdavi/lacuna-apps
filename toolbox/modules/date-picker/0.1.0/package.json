@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/date-picker",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Keyboard-navigable calendar grid for single-date and date-range selection.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-math": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "DatePicker",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "5a26b102ad7ef82f",
+    "lines": 333,
+    "exports": [
+      "DatePicker"
+    ],
+    "types": [
+      "DatePickerProps"
+    ],
+    "signature": ""
+  }
+}

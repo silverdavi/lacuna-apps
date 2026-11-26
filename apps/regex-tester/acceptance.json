@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "3a85c563ccc79a3e00c8a22134eceff1c28f32743b01576216afad9bbad38309",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Regex Tester\" and the tab labels \"Test\" and \"History\"."
+    },
+    {
+      "id": "A2",
+      "text": "On the Test tab, typing `hello` in the field labelled \"Pattern\" and `hello world` in the field labelled \"Sample text\" shows a match list containing the text \"hello\" and the line \"Matches: 1\"."
+    },
+    {
+      "id": "A3",
+      "text": "With Pattern `(\\d+)` and Sample text `a1 b22 c333`, the match list contains three items showing \"1\", \"22\" and \"333\", and the line \"Matches: 3\"."
+    },
+    {
+      "id": "A4",
+      "text": "With Pattern `(\\d+)` and Sample text `a1 b22 c333`, the match list item for \"22\" shows the capture group text \"Group 1: 22\"."
+    },
+    {
+      "id": "A5",
+      "text": "With Pattern `(\\d+)` and Sample text `a1 b22 c333`, clicking the button \"Copy result\" copies the text \"1\\n22\\n333\" to the clipboard and shows the message \"Copied\"."
+    },
+    {
+      "id": "A6",
+      "text": "With Pattern `(\\d+)` and Sample text `a1 b22 c333`, clicking the button \"Save pattern\" adds a row to the History tab containing \"(\\d+)\" and \"3\"."
+    },
+    {
+      "id": "A7",
+      "text": "On the History tab, with the saved pattern \"(\\d+)\" present, clicking the button \"Delete (\\d+)\" removes that row and the History tab shows \"No saved patterns\"."
+    },
+    {
+      "id": "A8",
+      "text": "With Pattern `(\\d+)` and Sample text `a1 b22 c333`, checking the checkbox labelled \"Case insensitive\" and then changing Sample text to `A1 B22 C333` still shows \"Matches: 3\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the saved pattern \"(\\d+)\" in the History tab and the current Pattern field value \"(\\d+)\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "e1f08a819819cac0104628aa9244b83b974d3fbe911cbde2cfd2010aaefb3a10"
+    }
+  ]
+}

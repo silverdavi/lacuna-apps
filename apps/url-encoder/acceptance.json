@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "4bc9f32f648cb95b304d79c5c0db71c21788d7789b7210085be5f26761373661",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"URL Encoder\"."
+    },
+    {
+      "id": "A2",
+      "text": "With the \"Codec\" select set to \"URL encode\", typing \"hello world\" in the \"Input\" field shows \"hello%20world\" in the \"Output\" field."
+    },
+    {
+      "id": "A3",
+      "text": "With the \"Codec\" select set to \"URL encode\", typing \"a/b?c=d&e\" in the \"Input\" field shows \"a%2Fb%3Fc%3Dd%26e\" in the \"Output\" field."
+    },
+    {
+      "id": "A4",
+      "text": "With the \"Codec\" select set to \"URL decode\", typing \"hello%20world\" in the \"Input\" field shows \"hello world\" in the \"Output\" field."
+    },
+    {
+      "id": "A5",
+      "text": "With the \"Codec\" select set to \"Base64\", typing \"abc\" in the \"Input\" field shows \"YWJj\" in the \"Output\" field."
+    },
+    {
+      "id": "A6",
+      "text": "With the \"Codec\" select set to \"Hex\", typing \"abc\" in the \"Input\" field shows \"616263\" in the \"Output\" field."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the \"Copy\" button shows a toast with the text \"Copied to clipboard\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the \"Add to history\" button adds a row to the \"History\" table containing \"hello world\" and \"hello%20world\". Clicking the \"Remove\" button on that row removes it."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the history row containing \"hello world\" and \"hello%20world\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "0c52148a83a8d51823468b147a250ce6186997faac6a9ac4aefec57f22fad749"
+    }
+  ]
+}

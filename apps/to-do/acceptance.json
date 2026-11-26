@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "6be87f409493c54bc2f1b8db33b19739294c34058ca0cdb030424316c8e08dfc",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no tasks, the page shows the heading \"Task List\", the text \"No tasks yet\", and the progress bar \"Progress\" with `aria-valuenow=\"0\"`."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Buy milk\" in \"New task\" and pressing Enter adds one listitem containing \"Buy milk\" with the checkbox \"Buy milk\" not checked; progress stays \"0\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Buy milk\" and \"Walk dog\", checking \"Buy milk\" gives the text \"Buy milk\" `text-decoration-line: line-through` and progress \"50\"."
+    },
+    {
+      "id": "A4",
+      "text": "Pressing Enter in the empty \"New task\" field adds no listitem and shows the text \"Task text cannot be empty\"."
+    },
+    {
+      "id": "A5",
+      "text": "After adding \"Buy milk\", clicking \"Edit Buy milk\" shows the field \"Edit Buy milk\" with the value \"Buy milk\"; filling it with \"Buy oat milk\" and pressing Enter shows the checkbox \"Buy oat milk\" and no checkbox \"Buy milk\"."
+    },
+    {
+      "id": "A6",
+      "text": "After adding \"Buy milk\" and \"Walk dog\", clicking \"Delete Buy milk\" leaves one listitem and shows \"Task deleted\"; clicking \"Undo\" makes the first listitem contain \"Buy milk\" again and the second \"Walk dog\"."
+    },
+    {
+      "id": "A7",
+      "text": "After adding \"Buy milk\" and \"Walk dog\", focusing the checkbox \"Walk dog\" and pressing Alt+ArrowUp makes the first listitem contain \"Walk dog\" and the second \"Buy milk\"."
+    },
+    {
+      "id": "A8",
+      "text": "Reload keeps the list: after adding \"Buy milk\" and \"Walk dog\" and reloading, the first listitem contains \"Buy milk\", the second \"Walk dog\", and progress is \"0\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c6489c904a7d6007959fcb276eaf90a25c43ad835795968cbe835bbb190b31bf"
+    }
+  ]
+}

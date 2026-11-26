@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "fb1aac5967b8a9403ec7123807e9d57459c2d64576f14808cb079bf056a83452",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Attendance Tracker\" and the table shows the text \"No entries yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice\" in the field labelled \"Name\", \"2024-01-15\" in the field labelled \"Date\", and selecting \"Present\" in the select labelled \"Status\", then clicking \"Add entry\" adds a row containing \"Alice\", \"2024-01-15\", and \"Present\"; the text \"No entries yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding Alice (Present, 2024-01-15), typing \"Bob\" in \"Name\", \"2024-01-15\" in \"Date\", selecting \"Absent\" in \"Status\", and clicking \"Add entry\" adds a row containing \"Bob\", \"2024-01-15\", and \"Absent\"; the table now has two rows."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking \"Add entry\" with an empty \"Name\" field adds no row and shows the message \"Name is required\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Delete Alice\" removes the Alice row; the table now shows only the Bob row and the summary \"Total: 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing \"Alice\" in the search box labelled \"Search\" filters the table to show only the row containing \"Alice\"; the Bob row is hidden."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the column header \"Date\" sorts the table by date ascending; the first row shows the earliest date among visible entries."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Export CSV\" copies a CSV string to the clipboard that starts with \"Name,Date,Status\" and contains a line \"Alice,2024-01-15,Present\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the entry for Alice: after reloading, the table still shows a row containing \"Alice\", \"2024-01-15\", and \"Present\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8d1983be75854637e6d0c0b54d63f8cceb25e4045a4c611cdbe10ad99d292516"
+    }
+  ]
+}

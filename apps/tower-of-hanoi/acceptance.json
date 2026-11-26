@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "0484c8388cd1576c5c20dbb14ab9c06ac06d6eb445fe34a50eab98ba86aef7ca",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Tower of Hanoi\", the text \"Moves: 0\", the text \"Best: 0\", and the three pegs labelled \"Peg A\", \"Peg B\" and \"Peg C\" with Peg A holding the disks \"3\", \"2\" and \"1\" from bottom to top."
+    },
+    {
+      "id": "A2",
+      "text": "With the default 3-disk board, clicking the button \"Move 1 A\u2192C\" moves disk 1 from Peg A to Peg C; the text \"Moves: 1\" appears, Peg A now holds disks \"3\" and \"2\", and Peg C holds disk \"1\"."
+    },
+    {
+      "id": "A3",
+      "text": "Continuing from A2, clicking \"Move 2 A\u2192B\" then \"Move 1 C\u2192B\" then \"Move 3 A\u2192C\" then \"Move 1 B\u2192A\" then \"Move 2 B\u2192C\" then \"Move 1 A\u2192C\" completes the puzzle; the text \"Moves: 7\" appears, the text \"Best: 7\" appears, and the text \"Solved in 7 moves\" is shown."
+    },
+    {
+      "id": "A4",
+      "text": "After solving, clicking the button \"Restart\" resets the board to the initial 3-disk state, the text \"Moves: 0\" appears, the text \"Solved in 7 moves\" is gone, and the text \"Best: 7\" remains."
+    },
+    {
+      "id": "A5",
+      "text": "Changing the field labelled \"Disks\" to \"4\" and clicking the button \"Apply\" resets the board to a 4-disk puzzle; the text \"Moves: 0\" appears, Peg A holds disks \"4\", \"3\", \"2\" and \"1\", and the text \"Solved in 7 moves\" is gone."
+    },
+    {
+      "id": "A6",
+      "text": "With the 4-disk board, clicking the button \"Move 1 A\u2192B\" moves disk 1 from Peg A to Peg B; the text \"Moves: 1\" appears, Peg A holds disks \"4\", \"3\" and \"2\", and Peg B holds disk \"1\"."
+    },
+    {
+      "id": "A7",
+      "text": "With the 4-disk board, clicking the button \"Move 2 A\u2192C\" is disabled and shows the message \"Illegal move: disk 2 cannot go on disk 1\"; the text \"Moves: 0\" remains unchanged."
+    },
+    {
+      "id": "A8",
+      "text": "The tab labelled \"History\" shows a table with the header \"Move\" and \"Action\". After making the single legal move \"Move 1 A\u2192B\" on the 4-disk board, the table contains the row \"1\" and \"1 A\u2192B\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the best score and disk count: after solving the 3-disk puzzle (Best: 7) and reloading, the page shows the text \"Best: 7\" and the field labelled \"Disks\" still contains \"3\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "f454e3e1e69f2cb8853df3087764b0a457eeff84d658750727211523f2900183"
+    }
+  ]
+}

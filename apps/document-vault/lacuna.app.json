@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.document-vault",
+  "name": "Document Vault",
+  "version": "0.1.0",
+  "summary": "Keep a small library of documents, searchable, exportable, and importable.",
+  "description": "Add files, search them, and view their contents. Export and import a versioned backup. Nothing leaves the browser.",
+  "category": "productivity",
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/document-vault",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/fuzzy-search": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:document-vault"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "document-vault",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own document vault records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "document-vault"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

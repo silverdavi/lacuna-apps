@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "bb247017cf5462dbd94a7c86efcea1bb2968f5d12d6e81e6600de0d025accfe8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no input, the page shows the heading \"Barcode Generator\", a select labelled \"Barcode type\" with options \"Code 128\", \"EAN-13\", and \"QR Code\", a text field labelled \"Data\", and a button \"Generate\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"HELLO\" in the field labelled \"Data\", selecting \"Code 128\" in the select labelled \"Barcode type\", and clicking \"Generate\" shows a preview area containing a barcode image and the text \"Code 128: HELLO\"."
+    },
+    {
+      "id": "A3",
+      "text": "Typing \"123456789012\" in the field labelled \"Data\", selecting \"EAN-13\" in the select labelled \"Barcode type\", and clicking \"Generate\" shows a preview area containing a barcode image and the text \"EAN-13: 1234567890123\" where the last digit is the computed check digit."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"1234567890123\" in the field labelled \"Data\", selecting \"EAN-13\" in the select labelled \"Barcode type\", and clicking \"Generate\" shows the message \"EAN-13 requires exactly 12 digits\" and no barcode image."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"Hello World\" in the field labelled \"Data\", selecting \"QR Code\" in the select labelled \"Barcode type\", and clicking \"Generate\" shows a preview area containing a QR code image and the text \"QR Code: Hello World\"."
+    },
+    {
+      "id": "A6",
+      "text": "After generating a Code 128 barcode for \"HELLO\", clicking the button \"Download PNG\" triggers a file download with a filename ending in \".png\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing an empty string in the field labelled \"Data\" and clicking \"Generate\" shows the message \"Enter data to generate a barcode\" and no barcode image."
+    },
+    {
+      "id": "A8",
+      "text": "After generating a Code 128 barcode for \"HELLO\", reloading the page still shows the text \"Code 128: HELLO\" in the preview area."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "7a3b849e5069bf1f2f3bba29b8b0c70d70e31745524524d8698843fe78f05916"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "manifestVersion": 1,
+  "id": "com.lacuna.contact-book",
+  "name": "Contact Book",
+  "version": "0.1.0",
+  "summary": "Manage your personal contacts with fuzzy search and CSV export.",
+  "description": "Add, edit, and delete contacts. Search with fuzzy matching, sort by name, and export your list to CSV.",
+  "category": "personal",
+  "tags": ["contacts", "personal"],
+  "icon": "people",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/contact-book",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/record-form": "0.1.0",
+      "@lacuna/filter-bar": "0.1.0",
+      "@lacuna/search-box": "0.1.0",
+      "@lacuna/confirm-dialog": "0.1.0",
+      "@lacuna/tag-input": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/fuzzy-search": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:contact-book"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "contact-book",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Contact Book records"
+      }
+    ],
+    "platform": [
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "contact-book"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

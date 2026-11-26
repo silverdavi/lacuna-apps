@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/export-menu",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A dropdown menu that exports content as CSV, JSON, PNG or PDF, or prints it, via fileSaveOpen.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/file-save-open": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "ExportMenu",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "df3b5f263b718669",
+    "lines": 211,
+    "exports": [
+      "ExportMenu"
+    ],
+    "types": [
+      "ExportMenuProps",
+      "ExportOption"
+    ],
+    "signature": "ExportMenu({ options, fileName = 'export', ariaLabel = 'Export', disabled = false, onExport, onE...)"
+  }
+}

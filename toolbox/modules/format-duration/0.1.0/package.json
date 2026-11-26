@@ -1,0 +1,28 @@
+{
+  "name": "@lacuna/format-duration",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Formats millisecond durations as h:mm:ss or human phrases, and parses phrases back.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "formatDuration",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "fa8fbfda613bc75e",
+    "lines": 50,
+    "exports": [
+      "toParts",
+      "formatDuration",
+      "humanizeDuration",
+      "parseDuration"
+    ],
+    "types": [
+      "DurationParts"
+    ],
+    "signature": "toParts(ms: number); formatDuration(ms: number); humanizeDuration(ms: number); parseDuration(input: string)"
+  }
+}

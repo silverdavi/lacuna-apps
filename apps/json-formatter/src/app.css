@@ -1,0 +1,13 @@
+/* App-level layout for json-formatter. */
+
+/* The kit's inactive tab sits at --ink-40, below the 4.5:1 contrast floor.
+   Lift our own tabs (via a non-kit class) to --ink-80 so they stay legible. */
+.jf-tab {
+  color: var(--ink-80);
+}
+
+.jf-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}

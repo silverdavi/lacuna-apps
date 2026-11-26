@@ -1,0 +1,38 @@
+{
+  "name": "@lacuna/canvas-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A drawing application shell that composes a drawing surface, tool palette, color picker, brush-size slider, and PNG export menu into a ready-to-use layout.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/export-menu": "workspace:0.1.0",
+    "@lacuna/range-slider": "workspace:0.1.0",
+    "@lacuna/toolbar": "workspace:0.1.0",
+    "@lacuna/use-pointer-draw": "workspace:0.1.0",
+    "@lacuna/use-undo-stack": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "CanvasKit",
+    "kind": "kit",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "36bfb2c5f69f6bad",
+    "lines": 399,
+    "exports": [
+      "CanvasKit"
+    ],
+    "types": [
+      "CanvasKitProps"
+    ],
+    "signature": "CanvasKit({ swatches, showLayers = false, showZoom = false, defaultBrushSize = 5, onCommit, }: ...)"
+  }
+}

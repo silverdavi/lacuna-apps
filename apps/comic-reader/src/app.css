@@ -1,0 +1,144 @@
+/* Comic Book Reader. Reads tokens only; prefixes cr- so it never touches the kit. */
+
+.cr-stack {
+  display: flex;
+  flex-direction: column;
+  gap: calc(14px * var(--sf));
+}
+
+/* Tabs */
+.cr-tabs {
+  display: flex;
+  gap: calc(4px * var(--sf));
+  margin-bottom: calc(12px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--hair-strong);
+}
+
+.cr-tab {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-80);
+  padding: 0 calc(4px * var(--sf)) calc(9px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.cr-tab.on {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* Drop zone */
+.cr-drop {
+  position: relative;
+  display: block;
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  color: var(--ink-80);
+  text-align: center;
+  padding: calc(28px * var(--sf)) calc(12px * var(--sf));
+  border: calc(1px * var(--sf)) dashed var(--hair-strong);
+  border-radius: calc(2px * var(--sf));
+  background: var(--paper-deep);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.cr-drop:hover {
+  border-color: var(--accent);
+}
+
+.cr-drop-hot {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.cr-drop-file {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Rail empty note */
+.cr-rail-empty {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--mid);
+  padding: calc(4px * var(--sf)) calc(2px * var(--sf));
+}
+
+/* Error */
+.cr-error {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  color: var(--danger);
+  margin-bottom: calc(8px * var(--sf));
+}
+
+/* Reader heading */
+.cr-reader-heading {
+  font-family: var(--sans);
+  font-size: calc(15px * var(--tf));
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 calc(10px * var(--sf));
+}
+
+/* Reader stage */
+.cr-stage {
+  display: flex;
+  flex-direction: column;
+  gap: calc(10px * var(--sf));
+}
+
+.cr-progress {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--paper-deep);
+  border: calc(1px * var(--sf)) solid var(--hair-strong);
+  border-radius: calc(2px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(10px * var(--sf));
+}
+
+.cr-page {
+  display: block;
+  border-radius: calc(2px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--hair-strong);
+  background: var(--paper);
+  box-sizing: border-box;
+}
+
+.cr-page.fit-width {
+  width: 100%;
+  height: auto;
+}
+
+.cr-page.fit-page {
+  max-width: 100%;
+  max-height: 55vh;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Controls */
+.cr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+}
+
+/* Page size select */
+.cr-setting {
+  display: flex;
+  justify-content: flex-end;
+}

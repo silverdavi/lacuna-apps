@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1ca9f0daa10bc9d089efd88cd1fa0b274bdba61bf8380d076d27b81ac8ac00a8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Checklist App\"."
+    },
+    {
+      "id": "A2",
+      "text": "From the empty page, typing \"Buy milk\" in the field labelled \"Task\" and clicking the button \"Add task\" adds a list item containing \"Buy milk\"; the progress text reads \"0 of 1 done\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Buy milk\", ticking its checkbox (accessible name \"Buy milk\") changes the progress text to \"1 of 1 done\"."
+    },
+    {
+      "id": "A4",
+      "text": "After adding \"Buy milk\" and ticking it, typing \"Walk dog\" in \"Task\" and clicking \"Add task\" adds a second list item containing \"Walk dog\" (new tasks are always unchecked); the progress text reads \"1 of 2 done\"."
+    },
+    {
+      "id": "A5",
+      "text": "After A4's steps, clicking the button \"Delete Walk dog\" removes the \"Walk dog\" item and the progress text reads \"1 of 1 done\"."
+    },
+    {
+      "id": "A6",
+      "text": "After adding \"Buy milk\" and \"Walk dog\" and ticking only \"Walk dog\", clicking the button \"Copy as Markdown\" puts exactly the text \"- [ ] Buy milk\\n- [x] Walk dog\" (two lines joined by one newline) on the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "After adding \"Buy milk\", clicking the tab \"History\" shows the text \"No history yet\". Clicking the tab \"Tasks\", ticking \"Buy milk\", then clicking the tab \"History\" again shows no \"No history yet\" text and shows a list item containing \"Buy milk\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding \"Buy milk\" then \"Walk dog\", focusing the button \"Reorder Buy milk\" and pressing the key \"ArrowDown\" moves \"Buy milk\" below \"Walk dog\": the first list item of the task list contains \"Walk dog\"."
+    },
+    {
+      "id": "A9",
+      "text": "After adding \"Buy milk\" and ticking it, reloading the page keeps the task \"Buy milk\" ticked and the progress text reads \"1 of 1 done\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ee56cbadbb1eb8165e47f97c446c7dbc5f343678714b0842e88db6680960eb46"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "eebd5a3dae3280c9e0f646facf02adc640eaf0196289986f13b1a678cfe3381b",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "Typing 1 in the field labelled \"Min\" and 10 in the field labelled \"Max\", then clicking the button \"Generate\", displays a result in the field labelled \"Result\" that is an integer between 1 and 10 inclusive."
+    },
+    {
+      "id": "A2",
+      "text": "Typing 2 in the field labelled \"Min\" and 5 in the field labelled \"Max\", then clicking the button \"Generate\", displays a result in the field labelled \"Result\" that is an integer between 2 and 5 inclusive."
+    },
+    {
+      "id": "A3",
+      "text": "Typing 10 in the field labelled \"Min\" and 1 in the field labelled \"Max\", then clicking the button \"Generate\", displays the error message \"Min must be less than Max\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing 2d6 in the field labelled \"Dice Notation\", then clicking the button \"Generate\", displays a result in the field labelled \"Result\" that is an integer between 2 and 12 inclusive."
+    },
+    {
+      "id": "A5",
+      "text": "Typing 1d4 in the field labelled \"Dice Notation\", then clicking the button \"Generate\", displays a result in the field labelled \"Result\" that is an integer between 1 and 4 inclusive."
+    },
+    {
+      "id": "A6",
+      "text": "Typing 1 in the field labelled \"Min\", 10 in the field labelled \"Max\", and 5 in the field labelled \"Count\", then clicking the button \"Generate\", displays 5 rows in the table labelled \"History\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing 1 in the field labelled \"Min\" and 10 in the field labelled \"Max\", then clicking the button \"Generate\" twice, displays 2 rows in the table labelled \"History\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing 1 in the field labelled \"Min\" and 10 in the field labelled \"Max\", then clicking the button \"Generate\", displays a non-empty string in the field labelled \"Seed\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last generated result, so after typing 1 in \"Min\", 10 in \"Max\", clicking \"Generate\", and reloading the page, the field labelled \"Result\" still contains the same integer value."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "ee85c1a11250c7fa0e33fbc4dd53e5bdb711856bf8e493be72e5f9e36b34ff39"
+    }
+  ]
+}

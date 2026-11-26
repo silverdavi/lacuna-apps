@@ -1,0 +1,92 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.bill-splitter",
+  "name": "Bill Splitter",
+  "version": "0.1.0",
+  "summary": "Split expenses across people, see who owes whom.",
+  "description": "Add expenses with a description, an amount and the people who share them. Split each expense evenly or by percentage, watch the share chart, and get the minimal set of transfers on the Settle up tab. Everything stays on this device.",
+  "category": "personal",
+  "tags": [],
+  "icon": "bills",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/bill-splitter"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/money": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:interval",
+    "edit:bill-splitter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "expense",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the shared expenses and their splits"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "expense"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

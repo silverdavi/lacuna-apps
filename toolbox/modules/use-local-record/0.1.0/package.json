@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/use-local-record",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Persist a typed, versioned record to localStorage with automatic schema migrations between versions.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useLocalRecord",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "e1b260088ca68f80",
+    "lines": 131,
+    "exports": [
+      "useLocalRecord"
+    ],
+    "types": [
+      "Migration",
+      "UseLocalRecordOptions",
+      "UseLocalRecordReturn"
+    ],
+    "signature": "useLocalRecord( options: UseLocalRecordOptions<T>, )"
+  }
+}

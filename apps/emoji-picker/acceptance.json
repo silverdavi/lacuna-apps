@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "948e0d3d80ce714ea21eab53c6d3f86401edc1fbd38232b381c52c6d15f2f88c",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Emoji Picker\" and the text \"No favorites yet\" in the Favorites tab."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"smile\" in the search field labelled \"Search\" shows a result list containing the item with the label \"Smiling face\" and the emoji \"\ud83d\ude00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Copy\" on the result item labelled \"Smiling face\" copies \"\ud83d\ude00\" to the clipboard and shows the text \"Copied\" next to that item."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"heart\" in the search field labelled \"Search\" shows a result list containing the item with the label \"Red heart\" and the emoji \"\u2764\ufe0f\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Add to favorites\" on the result item labelled \"Red heart\" moves that item to the Favorites tab, and the Favorites tab shows a list item containing \"Red heart\" and \"\u2764\ufe0f\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the Favorites tab, clicking the button \"Remove\" on the list item labelled \"Red heart\" removes that item, and the text \"No favorites yet\" reappears."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"smile\" in the search field labelled \"Search\" and pressing the key \"Enter\" copies \"\ud83d\ude00\" to the clipboard and shows the text \"Copied\" next to the first result item."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Copy all\" in the Favorites tab after adding \"Red heart\" and \"Smiling face\" copies \"\u2764\ufe0f\ud83d\ude00\" to the clipboard and shows the text \"Copied all\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the favorite \"Red heart\" in the Favorites tab with the emoji \"\u2764\ufe0f\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "8ba32e410d7bcacbb99e8a3e323227bb2d5e6a6eb429e9df72411dedc1d1fad6"
+    }
+  ]
+}

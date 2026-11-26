@@ -1,0 +1,78 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.calculator-cli",
+  "name": "Expression Calculator",
+  "version": "0.1.0",
+  "summary": "Evaluate arithmetic expressions, sample functions into a table and a line graph, with history and precision control.",
+  "description": "An expression calculator. Type an arithmetic expression and evaluate it with a chosen precision. Sample a function of x across a range into a table and a line graph. Keep a history of what you have evaluated. State stays in the browser.",
+  "category": "productivity",
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/calculator-cli"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:calculator"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "calculator",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the last evaluated expression and its history"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "calculator"
+    ],
+    "reads": [],
+    "handoffs": []
+  }
+}

@@ -1,3 +1,5 @@
+import { createMockValue } from '@lacuna/host-mock'
+
 export type CorrectionLevel = 'L' | 'M' | 'Q' | 'H'
 
 export interface QrState {
@@ -13,26 +15,23 @@ export interface Host {
 const KEY = 'lacuna.qr-generator.state'
 const LEVELS: CorrectionLevel[] = ['L', 'M', 'Q', 'H']
 
+const store = createMockValue<QrState | null>({
+  key: KEY,
+  fallback: null,
+  validate: (v): v is QrState => {
+    if (typeof v !== 'object' || v === null) return false
+    const s = v as Record<string, unknown>
+    return typeof s.content === 'string' && (s.content as string).length > 0 && LEVELS.includes(s.level as CorrectionLevel)
+  },
+})
+
 export const mockHost: Host = {
   loadState() {
-    try {
-      const raw = window.localStorage.getItem(KEY)
-      if (!raw) return null
-      const data = JSON.parse(raw) as Partial<QrState>
-      if (typeof data.content !== 'string' || data.content.length === 0) return null
-      const level = LEVELS.includes(data.level as CorrectionLevel)
-        ? (data.level as CorrectionLevel)
-        : 'L'
-      return { content: data.content, level }
-    } catch {
-      return null
-    }
+    const data = store.get()
+    if (!data) return null
+    return { content: data.content, level: data.level }
   },
-  saveState(state: QrState) {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(state))
-    } catch {
-      // storage unavailable; state stays in memory only
-    }
+  saveState(state) {
+    store.set(state)
   },
 }
