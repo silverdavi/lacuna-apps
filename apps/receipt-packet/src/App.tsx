@@ -13,34 +13,9 @@ import {
   PrimaryButton,
   TextInput,
 } from '@lacuna/ui'
-import { createMockRecordStore } from '@lacuna/host-mock'
-
 import { saveBlob } from '@lacuna/file-save-open'
 import { buildPacketPdf } from './pdf'
-
-type Receipt = {
-  id: string
-  label: string
-  date: string
-  amount: string
-  mime: string
-  base64: string
-  rotation: number
-}
-
-const receiptStore = createMockRecordStore<Receipt>({
-  key: 'receipt-packet.receipts.v1',
-  validate: (v: unknown): v is Receipt =>
-    typeof v === 'object' &&
-    v !== null &&
-    typeof (v as Receipt).id === 'string' &&
-    typeof (v as Receipt).label === 'string' &&
-    typeof (v as Receipt).date === 'string' &&
-    typeof (v as Receipt).amount === 'string' &&
-    typeof (v as Receipt).mime === 'string' &&
-    typeof (v as Receipt).base64 === 'string' &&
-    typeof (v as Receipt).rotation === 'number',
-})
+import { receiptStore, type Receipt } from './host'
 
 function base64FromDataUrl(url: string): string {
   return url.split(',')[1] ?? ''
