@@ -5033,7 +5033,7 @@ importers:
         specifier: workspace:0.1.0
         version: link:../../toolbox/modules/random/0.1.0
       '@lacuna/ui':
-        specifier: workspace:*
+        specifier: workspace:0.1.0
         version: link:../../toolbox
       '@lacuna/use-clipboard':
         specifier: workspace:0.1.0

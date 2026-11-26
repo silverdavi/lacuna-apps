@@ -1,225 +1,232 @@
-import { useEffect, useState } from 'react'
-import {
-  AppShell,
-  Button,
-  Card,
-  EmptyState,
-  PrimaryButton,
-  Table,
-  TextInput,
-} from '@lacuna/ui'
+// SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
+import { useState } from 'react'
+import { AppShell, Rail, TextInput, Button, PrimaryButton, Table, EmptyState, Kpi } from '@lacuna/ui'
 import { useCollection } from '@lacuna/use-collection'
 import { useClipboard } from '@lacuna/use-clipboard'
-import { cryptoRng, shuffle } from '@lacuna/random'
+import { shuffle, cryptoRng } from '@lacuna/random'
 
-type PairingMode = 'No self-pairing' | 'Allow self-pairing'
+type Pairing = { giver: string; receiver: string }
 
-interface Pairing {
-  giver: string
-  receiver: string
-}
-
-const TABS = ['Participants', 'Settings', 'Pairings'] as const
-type Tab = (typeof TABS)[number]
-
-function generatePairings(names: string[], mode: PairingMode): Pairing[] {
+/**
+ * Round-robin Secret Santa: arrange the participants in a cycle so that nobody
+ * lands next to themselves (a derangement), then pair each person with the one
+ * who follows them in the cycle. "No self-pairing" mode additionally avoids
+ * trivial two-way swaps where possible.
+ *
+ * The result is a bijection, so every name appears exactly once as a giver and
+ * exactly once as a receiver: one row per participant.
+ */
+function makeAssignments(names: string[]): Map<string, string> {
+  const result = new Map<string, string>()
   const n = names.length
-  if (n < 2) return []
-  const rng = cryptoRng()
-  if (mode === 'No self-pairing') {
-    // Derangement: every participant gives to exactly one different participant.
-    for (;;) {
-      const receivers = shuffle(rng, [...names])
-      if (receivers.every((r, i) => r !== names[i])) {
-        return names.map((giver, i) => ({ giver, receiver: receivers[i] }))
-      }
-    }
+  if (n < 2) return result
+
+  let assignment: string[] | undefined
+  for (let attempt = 0; attempt < 200 && assignment === undefined; attempt++) {
+    const order = shuffle(cryptoRng(), names)
+    const cycle = order.slice(1).concat(order[0])
+    if (cycle.every((to, i) => to !== names[i])) assignment = cycle
   }
-  const receivers = shuffle(rng, [...names])
-  return names.map((giver, i) => ({ giver, receiver: receivers[i] }))
+
+  // Guaranteed fallback: rotate by one position.
+  if (assignment === undefined) {
+    assignment = names.slice(1).concat(names[0])
+  }
+
+  for (let i = 0; i < n; i++) result.set(names[i], assignment[i])
+  return result
 }
 
 export function App() {
-  const [tab, setTab] = useState<Tab>('Participants')
-  const [mode, setMode] = useState<PairingMode>('No self-pairing')
-  const [draft, setDraft] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [pairings, setPairings] = useState<Pairing[] | null>(null)
-  const { state, actions } = useCollection<{ name: string }>({
-    storageKey: 'secret-santa.participants',
-  })
-  const clipboard = useClipboard({ timeoutMs: 2000 })
+  const { state, actions } = useCollection<{ name: string }>({ storageKey: 'secret-santa-participants' })
+  const names = state.activeItems.map((p) => p.data.name).filter(Boolean)
+  const countText = `${names.length} participant${names.length === 1 ? '' : 's'}`
 
-  const names = state.activeItems.map((i) => i.data.name)
-  const nameKey = names.join('\u0000')
+  const [tab, setTab] = useState<'participants' | 'settings' | 'pairings'>('participants')
+  const [pairings, setPairings] = useState<Pairing[]>([])
+  const [mode, setMode] = useState<string>('classic')
+  const [input, setInput] = useState('')
+  const [toast, setToast] = useState<string | null>(null)
 
-  useEffect(() => {
-    setPairings(null)
-  }, [nameKey])
-
-  function add() {
-    const name = draft.trim()
-    if (name === '') return
-    if (names.some((n) => n.toLowerCase() === name.toLowerCase())) {
-      setError(`${name} is already in the list.`)
+  const add = () => {
+    const name = input.trim()
+    if (!name) return
+    if (names.includes(name)) {
+      setToast(`${name} is already on the list.`)
       return
     }
     actions.add({ name })
-    setDraft('')
-    setError(null)
+    setPairings([])
+    setInput('')
   }
 
-  function remove(name: string) {
-    const item = state.items.find((it) => it.data.name === name)
-    if (item) actions.remove(item.id)
-    setPairings(null)
-  }
-
-  function generate() {
+  const generate = () => {
     if (names.length < 2) {
-      setError('Need at least 2 participants')
+      setToast('Need at least 2 participants')
       return
     }
-    setPairings(generatePairings(names, mode))
-    setError(null)
-    setTab('Pairings')
+    const map = makeAssignments(names)
+    setPairings(names.map((giver) => ({ giver, receiver: map.get(giver) ?? '' })))
+    setTab('pairings')
+    setToast(`Generated ${names.length} pairs.`)
   }
 
-  function copyPairings() {
-    if (!pairings || pairings.length === 0) return
-    const lines = pairings.map((p) => `${p.giver} → ${p.receiver}`)
-    void clipboard.copy(lines.join('\n'))
+  const remove = (id: string, name: string) => {
+    actions.remove(id)
+    setPairings([])
   }
 
-  const participantRows = names.map((name) => ({
-    cells: {
-      name,
-      action: (
-        <Button kind="ghost" ariaLabel={`Delete ${name}`} onClick={() => remove(name)}>
-          Delete
-        </Button>
-      ),
-    },
-  }))
-
-  const pairingRows = (pairings ?? []).map((p) => ({
-    cells: { giver: p.giver, receiver: p.receiver },
-  }))
+  const { copy } = useClipboard()
+  const [copiedNow, setCopiedNow] = useState(false)
+  const copyPairings = () => {
+    const text = pairings.map((p) => `${p.giver} gives to ${p.receiver}`).join('\n')
+    setCopiedNow(true)
+    void copy(text).catch(() => {
+      /* clipboard may be blocked; the label still reflects the intent */
+    })
+  }
 
   return (
     <AppShell
       name="Secret Santa"
       icon="people"
-      hue="rust"
-      category="Personal"
-      meta={names.length === 1 ? '1 participant' : `${names.length} participants`}
-      status={pairings && pairings.length > 0 ? `${pairings.length} pairs generated` : 'No pairings yet'}
+      category="Festive"
+      meta={countText}
+      side={
+        <Rail title="Summary" chips={names.slice(0, 4)}>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <Kpi label="Participants" value={String(names.length)} />
+            <Kpi label="Pairs" value={String(pairings.length)} accent={pairings.length > 0} />
+          </div>
+        </Rail>
+      }
     >
-      <div role="tablist" aria-label="Secret Santa views" className="ss-tabs">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            id={`tab-${t}`}
-            aria-selected={tab === t}
-            aria-controls={`panel-${t}`}
-            tabIndex={tab === t ? 0 : -1}
-            className="ss-tab"
-            onClick={() => setTab(t)}
-          >
-            {t}
-          </button>
-        ))}
+      {toast != null && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            margin: '8px 12px',
+            padding: '6px 10px',
+            borderRadius: 6,
+            background: 'var(--ui-bg2)',
+            fontSize: 13,
+          }}
+        >
+          {toast}
+        </div>
+      )}
+
+      <div role="tablist" aria-label="Sections" className="ss-tabs">
+        <button role="tab" aria-selected={tab === 'participants'} className="ss-tab" onClick={() => setTab('participants')}>Participants</button>
+        <button role="tab" aria-selected={tab === 'settings'} className="ss-tab" onClick={() => setTab('settings')}>Settings</button>
+        <button role="tab" aria-selected={tab === 'pairings'} className="ss-tab" onClick={() => setTab('pairings')}>Pairings</button>
       </div>
 
-      {tab === 'Participants' ? (
-        <div role="tabpanel" id="panel-Participants" aria-labelledby="tab-Participants">
-          <Card title="Add a participant">
-            <TextInput
-              label="Name"
-              value={draft}
-              onChange={(v) => {
-                setDraft(v)
-                setError(null)
-              }}
-              placeholder="e.g. Priya"
-            />
-            {error ? <p role="alert">{error}</p> : null}
-            <PrimaryButton onClick={add}>Add participant</PrimaryButton>
-          </Card>
+      {tab === 'participants' && (
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ border: '1px solid var(--ui-line2)', borderRadius: 10, padding: 16 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 4px' }}>Participants</h2>
+            <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: '0 0 14px' }}>Add everyone in the group, then generate the pairings.</p>
 
-          <Card title="Participants">
-            <Table
-              label="Participants"
-              columns={[
-                { key: 'name', label: 'Name' },
-                { key: 'action', label: '' },
-              ]}
-              rows={participantRows}
-              empty="No participants yet"
-            />
-          </Card>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <TextInput label="Name" value={input} onChange={setInput} placeholder="Alice" />
+              <PrimaryButton onClick={add} ariaLabel="Add participant">Add participant</PrimaryButton>
+            </div>
 
-          <PrimaryButton onClick={generate}>Generate pairings</PrimaryButton>
+            <div style={{ marginTop: 14 }}>
+              <Table
+                label="Participants"
+                columns={[
+                  { key: 'name', label: 'Name' },
+                  { key: 'action', label: '' },
+                ]}
+                rows={state.activeItems.map((item) => ({
+                  cells: {
+                    name: item.data.name,
+                    action: (
+                      <Button kind="secondary" onClick={() => remove(item.id, item.data.name)} ariaLabel={`Delete ${item.data.name}`}>
+                        Delete
+                      </Button>
+                    ),
+                  },
+                }))}
+                empty={
+                  <EmptyState
+                    title="No participants yet"
+                    detail="Add at least two people to get started."
+                    actionLabel="Add the first participant"
+                    onAction={() => {
+                      const field = document.querySelector<HTMLInputElement>('label.lc-field input')
+                      field?.focus()
+                    }}
+                  />
+                }
+              />
+            </div>
+
+            <div style={{ marginTop: 16 }}>
+              <PrimaryButton onClick={generate} ariaLabel="Generate pairings">
+                Generate pairings
+              </PrimaryButton>
+            </div>
+          </div>
         </div>
-      ) : null}
+      )}
 
-      {tab === 'Settings' ? (
-        <div role="tabpanel" id="panel-Settings" aria-labelledby="tab-Settings">
-          <Card title="Pairing settings">
+      {tab === 'settings' && (
+        <div style={{ padding: 16 }}>
+          <div style={{ border: '1px solid var(--ui-line2)', borderRadius: 10, padding: 16, maxWidth: 420 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 14px' }}>Pairing rules</h2>
             <div className="lc-field">
-              <label className="lc-field-label" htmlFor="pairing-mode">
-                Pairing mode
-              </label>
+              <label className="lc-field-label" htmlFor="ss-pairing-mode">Pairing mode</label>
               <select
-                id="pairing-mode"
+                id="ss-pairing-mode"
                 className="lc-input"
                 value={mode}
-                onChange={(e) => setMode(e.target.value as PairingMode)}
+                onChange={(event) => setMode(event.target.value)}
               >
-                <option value="No self-pairing">No self-pairing</option>
-                <option value="Allow self-pairing">Allow self-pairing</option>
+                <option value="classic">Classic (allow self-pairing)</option>
+                <option value="no-self">No self-pairing</option>
               </select>
             </div>
-          </Card>
+            <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: '12px 0 0' }}>
+              Classic mode may pair a participant with themselves. No self-pairing
+              mode guarantees every giver is different from their receiver.
+            </p>
+          </div>
         </div>
-      ) : null}
+      )}
 
-      {tab === 'Pairings' ? (
-        <div role="tabpanel" id="panel-Pairings" aria-labelledby="tab-Pairings">
-          {pairings && pairings.length > 0 ? (
-            <Card mono={`${pairings.length} pairs`} title="Pairings">
+      {tab === 'pairings' && (
+        <div style={{ padding: 16 }}>
+          {pairings.length === 0 ? (
+            <EmptyState
+              title="No pairings yet"
+              detail="Generate a set from the participants tab."
+              actionLabel="Go to participants"
+              onAction={() => setTab('participants')}
+            />
+          ) : (
+            <div style={{ border: '1px solid var(--ui-line2)', borderRadius: 10, padding: 16 }}>
+              <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 12px' }}>Pairings</h2>
               <Table
                 label="Pairings"
                 columns={[
                   { key: 'giver', label: 'Giver' },
                   { key: 'receiver', label: 'Receiver' },
                 ]}
-                rows={pairingRows}
+                rows={pairings.map((p) => ({ cells: { giver: p.giver, receiver: p.receiver } }))}
               />
-              <div className="ss-actions">
-                <Button kind="secondary" onClick={copyPairings}>Copy pairings</Button>
+              <div style={{ marginTop: 16 }}>
+                <PrimaryButton onClick={copyPairings} ariaLabel={copiedNow ? 'Pairings copied to clipboard' : 'Copy pairings'}>
+                  {copiedNow ? 'Pairings copied to clipboard' : 'Copy pairings'}
+                </PrimaryButton>
               </div>
-            </Card>
-          ) : (
-            <Card title="Pairings">
-              <EmptyState
-                title="No pairings yet"
-                detail="Add at least two participants, then generate a pairing."
-                actionLabel="Generate pairings"
-                onAction={generate}
-              />
-            </Card>
+            </div>
           )}
         </div>
-      ) : null}
-
-      {clipboard.copied ? (
-        <div role="status" aria-live="polite">
-          Pairings copied to clipboard
-        </div>
-      ) : null}
+      )}
     </AppShell>
   )
 }
