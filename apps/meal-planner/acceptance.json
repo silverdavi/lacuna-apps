@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "0305ea4af0d1fe18858fe6c18cf7e063e6ae3ceb59cc685cc958cf1f55af69e8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Meal Planner\" and the tab labels \"Week View\" and \"Shopping List\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add Meal\" opens a form. Filling the field labelled \"Meal Name\" with \"Pasta\", the field labelled \"Day\" with \"Monday\", and the field labelled \"Ingredients\" with \"Spaghetti, Tomato sauce\", then clicking \"Save\" adds a row to the week view containing \"Pasta\" and \"Monday\"."
+    },
+    {
+      "id": "A3",
+      "text": "After adding \"Pasta\" on Monday with ingredients \"Spaghetti, Tomato sauce\", clicking the tab \"Shopping List\" shows a list item containing \"Spaghetti\" and a list item containing \"Tomato sauce\"."
+    },
+    {
+      "id": "A4",
+      "text": "Adding a second meal \"Salad\" on Tuesday with ingredients \"Lettuce, Tomato sauce\" causes the \"Shopping List\" tab to show \"Tomato sauce\" only once, with a quantity of 2."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Week View\" tab, clicking the button \"Delete Pasta\" removes the \"Pasta\" row. The \"Shopping List\" tab no longer shows \"Spaghetti\", but still shows \"Tomato sauce\" with a quantity of 1."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Shopping List\" tab, clicking the button \"Copy List\" copies the text \"Spaghetti: 1\\nTomato sauce: 1\" to the clipboard."
+    },
+    {
+      "id": "A7",
+      "text": "In the \"Week View\" tab, clicking the button \"Export ICS\" downloads a file named \"meal-plan.ics\" containing the text \"SUMMARY:Pasta\"."
+    },
+    {
+      "id": "A8",
+      "text": "With no meals added, the \"Week View\" tab shows the text \"No meals planned\" and the \"Shopping List\" tab shows the text \"No items to buy\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the meal \"Pasta\" on Monday; the \"Week View\" tab still shows the row containing \"Pasta\" and \"Monday\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "835276e244fdd88f7cf1cd5a010fa25cf3b77c1a2e50b8d038b3f331b7ce8a26"
+    }
+  ]
+}
