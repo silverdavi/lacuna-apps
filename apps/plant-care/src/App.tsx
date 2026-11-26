@@ -315,7 +315,7 @@ export function App() {
               <div
                 role="grid"
                 aria-label="Watering activity, last 7 days"
-                aria-rowcount={1}
+                aria-rowcount={7}
                 aria-colcount={7}
                 style={{
                   display: 'grid',
@@ -330,7 +330,7 @@ export function App() {
                     role="gridcell"
                     aria-label={`${d.date}: ${d.filled ? 'watered' : 'no data'}`}
                     aria-rowindex={1}
-                    className={`pc-cell${d.filled ? ' filled' : ''}`}
+                    className={d.filled ? 'pc-cell filled' : 'pc-cell'}
                     style={{
                       aspectRatio: '1',
                       borderRadius: 'calc(4px * var(--sf))',
