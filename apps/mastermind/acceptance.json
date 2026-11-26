@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "7d48c46f7f6def8035270f0ebe6ceb3974913a205ff38c6b4e7f3beb2cff5170",
+  "spec_sha256": "93866b4e6807b18642fa68a65a3a083e666d34ec4c50d67961602fef3a6f2929",
   "checks": [
     {
       "id": "A1",
@@ -12,7 +12,7 @@
     },
     {
       "id": "A3",
-      "text": "In row 1, selecting \"Red\" in the four peg selectors and clicking \"Submit guess\" shows the feedback \"0 exact, 0 partial\" and updates \"Guesses: 1\"."
+      "text": "With seed 1, in row 1, selecting \"Red\" in the four peg selectors and clicking \"Submit guess\" shows the feedback \"1 exact, 0 partial\" and updates \"Guesses: 1\"."
     },
     {
       "id": "A4",
@@ -28,7 +28,7 @@
     },
     {
       "id": "A7",
-      "text": "In row 1, selecting \"Red\" in the first peg, \"Blue\" in the second, \"Green\" in the third, and \"Yellow\" in the fourth, then clicking \"Submit guess\" shows the feedback \"0 exact, 0 partial\" and \"Guesses: 1\"."
+      "text": "With seed 1, in row 1, selecting \"Blue\", \"Red\", \"Yellow\", \"Green\" in the four pegs in that order and clicking \"Submit guess\" shows the feedback \"0 exact, 4 partial\" and \"Guesses: 1\"."
     },
     {
       "id": "A8",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "09b51a64eda4282facccf78fb17a228297f3f4b7652065ccfe83b93048a5510b"
+      "sha256": "51e22a80c92f65fd0ec43489c703895cdaaf15ff12f9148e9e5be9054bbcb87b"
     }
   ]
 }

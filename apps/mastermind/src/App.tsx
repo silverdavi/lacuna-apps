@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   AppShell,
   Button,
@@ -10,6 +10,7 @@ import {
   Rail,
   Stack,
   Tag,
+  TextInput,
 } from '@lacuna/ui'
 import { mulberry32 } from '@lacuna/random'
 import { useClipboard } from '@lacuna/use-clipboard'
@@ -78,6 +79,11 @@ function initialState(seed: number): GameState {
   }
 }
 
+const PEG_OPTIONS: (string | { value: string; label: string })[] = [
+  { value: '', label: '—' },
+  ...PEGS.map((color) => ({ value: color, label: color })),
+]
+
 export function App() {
   const [best, setBest] = useState(() => host.readBest())
   const [finished, setFinished] = useState<null | { won: boolean; guesses: number }>(null)
@@ -86,35 +92,21 @@ export function App() {
   const stack = useUndoStack<GameState>(initialState(1))
   const { value, set, undo, redo, reset, canUndo, canRedo } = stack
 
-  const valueRef = useRef(value)
-  useEffect(() => {
-    valueRef.current = value
-  }, [value])
-
-  const finishedRef = useRef(finished)
-  useEffect(() => {
-    finishedRef.current = finished
-  }, [finished])
-
-  const bestRef = useRef(best)
-  useEffect(() => {
-    bestRef.current = best
-  }, [best])
-
   const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+
+  const [draft, setDraft] = useState<Peg[]>(() => Array<Peg>(COLS).fill(''))
 
   const startGame = useCallback(
     (nextSeed: number) => {
-      const b = host.readBest()
-      setBest(b)
+      setBest(host.readBest())
+      setDraft(Array<Peg>(COLS).fill(''))
       reset(initialState(nextSeed))
       setFinished(null)
     },
     [reset],
   )
 
-  const onNewGame = (e: React.FormEvent) => {
-    e.preventDefault()
+  const onNewGame = () => {
     const trimmed = seedInput.trim()
     if (trimmed === '') {
       startGame(1)
@@ -122,58 +114,63 @@ export function App() {
       return
     }
     const n = Number(trimmed)
-    if (!Number.isInteger(n) || n < 0) {
-      setSeedInput('')
-      return
-    }
+    if (!Number.isInteger(n) || n < 0) return
     startGame(n)
     setSeedInput('')
   }
 
   const onPegChange = useCallback(
     (rowIdx: number, colIdx: number, newPeg: Peg) => {
-      const v = valueRef.current
-      const next = v.rows.map((line, ri) =>
-        ri === rowIdx ? line.map((p, ci) => (ci === colIdx ? newPeg : p)) : line,
-      )
-      set({ ...v, rows: next })
+      if (finished) return
+      if (rowIdx !== value.markers.length) return
+      setDraft((prev) => {
+        const next = prev.slice()
+        next[colIdx] = newPeg
+        return next
+      })
     },
-    [set],
+    [finished, value.markers.length],
   )
 
   const submitGuess = useCallback(() => {
-    const v = valueRef.current
-    const f = finishedRef.current
-    if (f) return
-    const rowIdx = v.markers.length
+    if (finished) return
+    const rowIdx = value.markers.length
     if (rowIdx >= ROWS) return
+    if (draft.some((p) => p === '')) return
 
-    const row = v.rows[rowIdx]
-    if (row.some((p) => p === '')) return
-
-    const markers = scoreGuess(v.secret, row)
-    const nextRows = v.rows.map((line, ri) => (ri === rowIdx ? row.slice() : line.slice()))
-    const nextMarkers = [...v.markers, markers]
+    const markers = scoreGuess(value.secret, draft)
+    set((prev) => ({
+      ...prev,
+      rows: prev.rows.map((line, ri) => (ri === rowIdx ? draft.slice() : line)),
+      markers: [...prev.markers, markers],
+    }))
+    setDraft(Array<Peg>(COLS).fill(''))
 
     const won = markers.exact === COLS
-    const exhausted = nextMarkers.length === ROWS && !won
-
-    set({
-      ...v,
-      rows: nextRows,
-      markers: nextMarkers,
-    })
+    const exhausted = markers.exact < COLS && rowIdx + 1 === ROWS
 
     if (won) {
-      const prev = bestRef.current
-      const b = prev === 0 ? rowIdx + 1 : Math.min(prev, rowIdx + 1)
-      setBest(b)
-      host.writeBest(b)
-      setFinished({ won: true, guesses: rowIdx + 1 })
+      const guesses = rowIdx + 1
+      setBest((prev) => {
+        const b = prev === 0 ? guesses : Math.min(prev, guesses)
+        host.writeBest(b)
+        return b
+      })
+      setFinished({ won: true, guesses })
     } else if (exhausted) {
       setFinished({ won: false, guesses: ROWS })
     }
-  }, [set])
+  }, [finished, value.secret, value.markers.length, draft, set, setBest])
+
+  const undoGuess = useCallback(() => {
+    if (finished) return
+    undo()
+  }, [finished, undo])
+
+  const redoGuess = useCallback(() => {
+    if (finished) return
+    redo()
+  }, [finished, redo])
 
   const copyText = useMemo(() => {
     const code = value.secret.join(', ')
@@ -211,7 +208,7 @@ export function App() {
           {finished ? (
             <EmptyState
               mono="Result"
-              title={finished.won ? `Cracked it in ${finished.guesses}` : 'The code got away'}
+              title={finished.won ? `You win in ${finished.guesses} guesses` : 'The code got away'}
               detail={
                 finished.won
                   ? `Seed ${value.seed} broke. Press New game for a fresh seed or Undo to replay.`
@@ -224,7 +221,7 @@ export function App() {
               mono="In play"
               title="Pick four pegs"
               detail="Choose one color per peg, then submit. Black marks an exact hit, gold a color in the wrong slot."
-              actionLabel="Submit"
+              actionLabel="Submit guess"
             />
           )}
           <Divider />
@@ -243,10 +240,10 @@ export function App() {
             <Button kind="primary" onClick={submitGuess} disabled={finished !== null}>
               Submit guess
             </Button>
-            <Button onClick={undo} disabled={!canUndo}>
+            <Button onClick={undoGuess} disabled={!canUndo || finished !== null}>
               Undo
             </Button>
-            <Button onClick={redo} disabled={!canRedo}>
+            <Button onClick={redoGuess} disabled={!canRedo || finished !== null}>
               Redo
             </Button>
             <Button onClick={onCopy}>
@@ -261,43 +258,20 @@ export function App() {
             <Tag>{`Seed ${value.seed}`}</Tag>
           </div>
 
-          <form
-            onSubmit={onNewGame}
-            style={{ display: 'flex', gap: 8, alignItems: 'flex-end', maxWidth: 320 }}
-          >
-            <label
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                flex: 1,
-                fontSize: '0.8rem',
-                opacity: 0.85,
-              }}
-            >
-              Seed
-              <input
-                type="number"
-                min={0}
-                value={seedInput}
-                onChange={(e) => setSeedInput(e.target.value)}
-                placeholder="1"
-                style={{
-                  width: '100%',
-                  padding: 'calc(6px * var(--sf)) calc(8px * var(--sf))',
-                  borderRadius: 6,
-                  border: 'calc(1px * var(--sf)) solid var(--line)',
-                  background: 'var(--paper)',
-                  color: 'inherit',
-                }}
-              />
-            </label>
-            <Button type="submit">New game</Button>
-          </form>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', maxWidth: 320 }}>
+            <TextInput
+              label="Seed"
+              value={seedInput}
+              onChange={setSeedInput}
+              inputMode="numeric"
+              placeholder="1"
+            />
+            <Button onClick={onNewGame}>New game</Button>
+          </div>
 
           <div className="mm-secret" role="group" aria-label="Secret code">
             {value.secret.map((c, i) => (
-              <div key={i} className="mm-cell">
+              <div key={i} className="mm-cell mm-cell-secret">
                 <div
                   className="mm-peg"
                   role="img"
@@ -309,24 +283,29 @@ export function App() {
           </div>
 
           <div className="mm-board" aria-label="Guess board">
-            {value.rows.map((row, r) =>
-              row.map((peg, c) => (
-                <div key={`${r}-${c}`} className="mm-cell">
+            {value.rows.map((row, r) => {
+              const isDraftRow = r === value.markers.length && finished === null
+              const activeRow: Peg[] = isDraftRow ? draft : row
+              return activeRow.map((peg, c) => (
+                <div key={`${r}-${c}`} className="mm-cell mm-cell-input">
                   <select
-                    aria-label={`row ${r + 1} peg ${c + 1}`}
+                    className="lc-input mm-peg-select"
+                    aria-label={`Peg ${c + 1} row ${r + 1}`}
                     value={peg}
                     onChange={(e) => onPegChange(r, c, e.target.value as Peg)}
                   >
-                    <option value="">—</option>
-                    {PEGS.map((color) => (
-                      <option key={color} value={color}>
-                        {color}
-                      </option>
-                    ))}
+                    {PEG_OPTIONS.map((o) => {
+                      const opt = typeof o === 'string' ? { value: o, label: o } : o
+                      return (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      )
+                    })}
                   </select>
                 </div>
-              )),
-            )}
+              ))
+            })}
           </div>
 
           {value.markers.map((m, i) => (
@@ -353,22 +332,13 @@ export function App() {
             </div>
           ))}
 
-          {finished ? (
-            <EmptyState
-              mono="Result"
-              title={
-                finished.won
-                  ? `You win in ${finished.guesses} guesses`
-                  : 'No break in four rows'
-              }
-              detail={
-                finished.won
-                  ? `The code was ${value.secret.join(', ')}. Copy the result or start a new seed.`
-                  : `Four rows and no break. The code was ${value.secret.join(', ')}. Start a new seed.`
-              }
-              actionLabel="Copy result"
-            />
-          ) : null}
+          <p style={{ margin: 0, fontSize: '0.8em', opacity: 0.7 }}>
+            {finished?.won
+              ? `Solved. The code was ${value.secret.join(', ')}.`
+              : finished
+                ? `No break. The code was ${value.secret.join(', ')}.`
+                : `Code: ${value.secret.join(', ')}`}
+          </p>
         </Stack>
       </Card>
     </AppShell>

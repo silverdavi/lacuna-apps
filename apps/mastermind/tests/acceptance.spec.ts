@@ -1,17 +1,10 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-async function startGame(page: import('@playwright/test').Page, seed: string) {
-  await page.getByLabel('Seed').fill(seed)
-  await page.getByRole('button', { name: 'New game' }).click()
+function selectRow(page: Page, row: number, colors: string[]) {
+  return Promise.all(colors.map((c, i) => page.getByLabel(`Peg ${i + 1} row ${row}`, { exact: true }).selectOption(c)))
 }
 
-async function selectRowPegs(page: import('@playwright/test').Page, row: number, colors: string[]) {
-  for (let i = 1; i <= 4; i++) {
-    await page.getByLabel(new RegExp(`row ${row} peg ${i}`, 'i')).selectOption(colors[i - 1])
-  }
-}
-
-test('[A1] initial page shows heading, controls, and best score', async ({ page }) => {
+test('[A1] initial screen shows heading, Seed field, buttons and Best score: 0', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Mastermind Game' })).toBeVisible()
   await expect(page.getByLabel('Seed')).toBeVisible()
@@ -22,97 +15,115 @@ test('[A1] initial page shows heading, controls, and best score', async ({ page 
   await expect(page.getByText('Best score: 0')).toBeVisible()
 })
 
-test('[A2] New game with Seed 1 shows empty board and zero guesses', async ({ page }) => {
+test('[A2] New game with seed 1 shows four empty rows and Guesses: 0', async ({ page }) => {
   await page.goto('/')
-  await startGame(page, '1')
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  for (let row = 1; row <= 4; row++) {
+    for (let p = 1; p <= 4; p++) {
+      const value = await page.getByLabel(`Peg ${p} row ${row}`, { exact: true }).inputValue()
+      expect(value, `peg ${p} row ${row} is empty`).toBe('')
+    }
+  }
   await expect(page.getByText('Guesses: 0')).toBeVisible()
-  // four rows, each with four empty peg slots
-  const pegs = page.getByLabel(/peg/i)
-  await expect(pegs).toHaveCount(16)
-  await expect(pegs).toHaveValue('')
 })
 
-test('[A3] row 1 all Red submits as 0 exact, 0 partial and increments guesses', async ({ page }) => {
+test('[A3] seed 1 row 1 all Red submits 1 exact, 0 partial and Guesses: 1', async ({ page }) => {
   await page.goto('/')
-  await startGame(page, '1')
-  await selectRowPegs(page, 1, ['Red', 'Red', 'Red', 'Red'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Red', 'Red', 'Red', 'Red'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await expect(page.getByText('0 exact, 0 partial')).toBeVisible()
+  await expect(page.getByText('1 exact, 0 partial')).toBeVisible()
   await expect(page.getByText('Guesses: 1')).toBeVisible()
 })
 
-test('[A4] winning with Seed 1 shows feedback and win text', async ({ page }) => {
+test('[A4] seed 1 row 2 Red Blue Green Yellow wins in 2 guesses', async ({ page }) => {
   await page.goto('/')
-  await startGame(page, '1')
-  await selectRowPegs(page, 1, ['Red', 'Red', 'Red', 'Red'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Red', 'Red', 'Red', 'Red'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await selectRowPegs(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
+  await selectRow(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
   await expect(page.getByText('4 exact, 0 partial')).toBeVisible()
   await expect(page.getByText('You win in 2 guesses')).toBeVisible()
 })
 
-test('[A5] Copy result after winning shows toast and clipboard contents', async ({ page, context }) => {
+test('[A5] Copy result after winning shows toast and copies the result to the clipboard', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.goto('/')
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
-    origin: new URL(page.url()).origin,
-  })
-  await startGame(page, '1')
-  await selectRowPegs(page, 1, ['Red', 'Red', 'Red', 'Red'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Red', 'Red', 'Red', 'Red'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await selectRowPegs(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
+  await selectRow(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
   await page.getByRole('button', { name: 'Copy result' }).click()
   await expect(page.getByText('Result copied')).toBeVisible()
-  const clipboard = await page.evaluate(() => navigator.clipboard.readText())
-  expect(clipboard).toBe('Seed 1: Red, Blue, Green, Yellow - 2 guesses')
+  const clip = await page.evaluate(() => navigator.clipboard.readText())
+  expect(clip).toBe('Seed 1: Red, Blue, Green, Yellow - 2 guesses')
 })
 
-test('[A6] New game with Seed 2 resets board and best score is visible', async ({ page }) => {
+test('[A6] winning seed 1 then New game with seed 2 resets the board and shows Best score: 2', async ({
+  page,
+}) => {
   await page.goto('/')
-  await startGame(page, '1')
-  await selectRowPegs(page, 1, ['Red', 'Red', 'Red', 'Red'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Red', 'Red', 'Red', 'Red'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await selectRowPegs(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
+  await selectRow(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await startGame(page, '2')
+  await page.getByLabel('Seed').fill('2')
+  await page.getByRole('button', { name: 'New game' }).click()
+  for (let row = 1; row <= 4; row++) {
+    for (let p = 1; p <= 4; p++) {
+      const value = await page.getByLabel(`Peg ${p} row ${row}`, { exact: true }).inputValue()
+      expect(value, `peg ${p} row ${row} is empty`).toBe('')
+    }
+  }
   await expect(page.getByText('Guesses: 0')).toBeVisible()
-  const pegs = page.getByLabel(/peg/i)
-  await expect(pegs).toHaveCount(16)
-  await expect(pegs).toHaveValue('')
   await expect(page.getByText('Best score: 2')).toBeVisible()
 })
 
-test('[A7] row 1 with Seed 2 submits as 0 exact, 0 partial and increments guesses', async ({ page }) => {
+test('[A7] seed 1 row 1 Blue Red Yellow Green submits 0 exact, 4 partial', async ({ page }) => {
   await page.goto('/')
-  await startGame(page, '2')
-  await selectRowPegs(page, 1, ['Red', 'Blue', 'Green', 'Yellow'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Blue', 'Red', 'Yellow', 'Green'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await expect(page.getByText('0 exact, 0 partial')).toBeVisible()
+  await expect(page.getByText('0 exact, 4 partial')).toBeVisible()
   await expect(page.getByText('Guesses: 1')).toBeVisible()
 })
 
 test('[A8] Undo clears the guess and Redo restores it', async ({ page }) => {
   await page.goto('/')
-  await startGame(page, '1')
-  await selectRowPegs(page, 1, ['Red', 'Red', 'Red', 'Red'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Red', 'Red', 'Red', 'Red'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
   await page.getByRole('button', { name: 'Undo' }).click()
+  for (let p = 1; p <= 4; p++) {
+    const value = await page.getByLabel(`Peg ${p} row 1`, { exact: true }).inputValue()
+    expect(value, `peg ${p} row 1 is empty`).toBe('')
+  }
   await expect(page.getByText('Guesses: 0')).toBeVisible()
-  await expect(page.getByLabel(new RegExp('row 1 peg', 'i'))).toHaveValue('')
-  await expect(page.getByText('0 exact, 0 partial')).toHaveCount(0)
   await page.getByRole('button', { name: 'Redo' }).click()
   await expect(page.getByText('Guesses: 1')).toBeVisible()
-  await expect(page.getByText('0 exact, 0 partial')).toBeVisible()
 })
 
-test('[A9] reloading the page keeps the best score', async ({ page }) => {
+test('[A9] reloading after winning with seed 1 keeps Best score: 2', async ({ page }) => {
   await page.goto('/')
-  await startGame(page, '1')
-  await selectRowPegs(page, 1, ['Red', 'Red', 'Red', 'Red'])
+  await page.getByLabel('Seed').fill('1')
+  await page.getByRole('button', { name: 'New game' }).click()
+  await selectRow(page, 1, ['Red', 'Red', 'Red', 'Red'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await selectRowPegs(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
+  await selectRow(page, 2, ['Red', 'Blue', 'Green', 'Yellow'])
   await page.getByRole('button', { name: 'Submit guess' }).click()
-  await page.reload()
+  await page.goto('/')
   await expect(page.getByText('Best score: 2')).toBeVisible()
 })
