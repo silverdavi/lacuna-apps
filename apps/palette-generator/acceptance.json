@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "e596ea6a02ad28a68f26e2c2aaf9e09b5bd820811fe3268ca85a286e0dc4a0de",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no palette generated, the page shows the heading \"Color Palette\", the text \"No palette yet\", and the button \"Generate palette\" is visible."
+    },
+    {
+      "id": "A2",
+      "text": "Typing `#FF0000` in the field labelled \"Hex\" and clicking the button \"Generate palette\" adds five swatches to the grid; the first swatch displays the text \"#FF0000\" and the second swatch displays the text \"#00FF00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After generating a palette from `#FF0000`, the field labelled \"Hue\" shows `0`, the field labelled \"Saturation\" shows `100`, and the field labelled \"Lightness\" shows `50`."
+    },
+    {
+      "id": "A4",
+      "text": "With a palette generated from `#FF0000`, clicking the button \"Copy hex\" on the first swatch changes that button's text to \"Copied\" for 2 seconds, and the clipboard contains `#FF0000`."
+    },
+    {
+      "id": "A5",
+      "text": "With a palette generated from `#FF0000`, clicking the button \"Remove\" on the swatch displaying `#00FF00` removes that swatch from the grid, leaving four swatches."
+    },
+    {
+      "id": "A6",
+      "text": "With a palette generated from `#FF0000`, the text \"Contrast: 21.0\" is displayed below the first swatch, indicating the WCAG contrast ratio against white."
+    },
+    {
+      "id": "A7",
+      "text": "Selecting \"Analogous\" in the select labelled \"Scheme\" and clicking \"Generate palette\" with the base color `#0000FF` adds five swatches; the first swatch displays `#0000FF` and the second swatch displays `#0080FF`."
+    },
+    {
+      "id": "A8",
+      "text": "Typing `128` in the field labelled \"Hue\", `100` in the field labelled \"Saturation\", and `50` in the field labelled \"Lightness\" updates the field labelled \"Hex\" to `#800080`."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the palette generated from `#FF0000`; after reloading, the grid still shows the swatch with the text \"#FF0000\" and the field labelled \"Hex\" contains `#FF0000`."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "73d70dff6cfb32c525edabd7b0f5cf3deca8a33a247deba8d0650847ae91dd5c"
+    }
+  ]
+}

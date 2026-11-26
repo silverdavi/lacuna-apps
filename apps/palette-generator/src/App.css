@@ -1,0 +1,40 @@
+.swatch {
+  border-radius: 2px;
+  padding: calc(8px * var(--sf, 1));
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf, 1));
+  font-family: var(--mono);
+}
+
+.swatch + .swatch {
+  margin-top: calc(8px * var(--sf, 1));
+}
+
+.swatch-inner {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf, 1));
+  flex: 1;
+}
+
+.swatch-hex {
+  font-size: calc(13px * var(--tf, 1));
+  font-weight: 600;
+}
+
+.swatch-hsl {
+  font-size: calc(11px * var(--tf, 1));
+  opacity: 0.85;
+}
+
+.swatch-contrast {
+  font-size: calc(11px * var(--tf, 1));
+  opacity: 0.85;
+  margin-left: auto;
+}
+
+.swatch-actions {
+  display: flex;
+  gap: calc(4px * var(--sf, 1));
+}
