@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "359f30544939f62f703c996a099e34a1b8bda1729f1c0d49cf76e3a025a9d1f9",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "With no inputs, the page shows the heading \"Salary Calculator\", the result summary line \"Net Pay: $0.00\", and the breakdown table header row containing \"Deduction\" and \"Amount\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"50000\" in the field labelled \"Gross Annual Salary\" and clicking the button \"Calculate\" updates the result summary to show \"Net Pay: $37,500.00\" and adds a row in the breakdown table with \"Federal Tax\" and \"$12,500.00\"."
+    },
+    {
+      "id": "A3",
+      "text": "After setting \"Gross Annual Salary\" to \"50000\" and \"State Tax\" to \"5000\", clicking \"Calculate\" shows \"Net Pay: $32,500.00\" in the result summary and a breakdown row for \"State Tax\" with \"$5,000.00\"."
+    },
+    {
+      "id": "A4",
+      "text": "Setting \"Gross Annual Salary\" to \"100000\", \"Federal Tax\" to \"20000\", \"State Tax\" to \"10000\", and \"Other Deductions\" to \"5000\", then clicking \"Calculate\" shows \"Net Pay: $65,000.00\" and the breakdown table contains rows for \"Federal Tax\" ($20,000.00), \"State Tax\" ($10,000.00), and \"Other Deductions\" ($5,000.00)."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking \"Calculate\" with \"Gross Annual Salary\" set to \"0\" shows the message \"Gross salary must be greater than 0\" and the result summary remains \"Net Pay: $0.00\"."
+    },
+    {
+      "id": "A6",
+      "text": "After entering \"Gross Annual Salary\" as \"42000\" and clicking \"Calculate\", the chart area displays a segment labelled \"Net Pay\" with a value of \"$31,500.00\" and a segment labelled \"Federal Tax\" with a value of \"$10,500.00\"."
+    },
+    {
+      "id": "A7",
+      "text": "Typing \"abc\" in the field labelled \"Gross Annual Salary\" and clicking \"Calculate\" shows the message \"Enter a valid number\" and the result summary remains \"Net Pay: $0.00\"."
+    },
+    {
+      "id": "A8",
+      "text": "After setting \"Gross Annual Salary\" to \"60000\" and \"Federal Tax\" to \"15000\", clicking \"Calculate\" shows \"Net Pay: $45,000.00\" and the breakdown table row for \"Federal Tax\" displays \"$15,000.00\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last calculated values: after entering \"Gross Annual Salary\" as \"50000\" and clicking \"Calculate\", reloading the page still shows \"Net Pay: $37,500.00\" in the result summary and the breakdown row \"Federal Tax\" with \"$12,500.00\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "2887f18060cc38c82de11e5cdaee36fe14a3848d4018423287b41bb6bd554514"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+/* App-local styles for Weekly Planner. */
+.wp-task {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+  cursor: pointer;
+}
+
+.wp-task input[type='checkbox'] {
+  margin: 0;
+  accent-color: var(--accent);
+  width: calc(14px * var(--sf));
+  height: calc(14px * var(--sf));
+}
+
+.wp-task-label {
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+  color: var(--ink);
+}
+
+.wp-task.done .wp-task-label {
+  text-decoration: line-through;
+  color: var(--ink-60);
+}
+
+/* Hide the bar-chart axis labels so they do not collide with getByText('Mon') etc. */
+.wp-chart svg text {
+  display: none;
+}

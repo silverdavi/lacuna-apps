@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1ff34b544b8d82a0a6f0416858aad7e5b58be7b30ae4a2f2f2c7d3b8feb450c6",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Certificate Generator\" and the default view shows a form with fields labelled \"Recipient name\", \"Course title\", \"Date\", and \"Issuer\"."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"Alice Smith\" in the field labelled \"Recipient name\", \"Web Development\" in the field labelled \"Course title\", \"2023-10-15\" in the field labelled \"Date\", and \"Acme Corp\" in the field labelled \"Issuer\", then clicking the button \"Generate PDF\" creates a certificate entry in the \"Generated Certificates\" list with the text \"Alice Smith - Web Development\"."
+    },
+    {
+      "id": "A3",
+      "text": "After generating a certificate for \"Alice Smith\", clicking the button \"Download PDF\" next to that entry triggers a file download named \"Alice_Smith_Web_Development.pdf\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab labelled \"History\" shows a table with columns \"Recipient\", \"Course\", \"Date\", and \"Issuer\". The table contains a row with \"Alice Smith\", \"Web Development\", \"2023-10-15\", and \"Acme Corp\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"History\" tab, clicking the button \"Delete\" next to the row for \"Alice Smith\" removes that row from the table, and the table shows the text \"No certificates yet\"."
+    },
+    {
+      "id": "A6",
+      "text": "Typing an empty string in the field labelled \"Recipient name\" and clicking \"Generate PDF\" shows the message \"Recipient name is required\" and does not add a new entry to the \"Generated Certificates\" list."
+    },
+    {
+      "id": "A7",
+      "text": "After generating a certificate for \"Bob Jones\" with Course \"Data Science\", the \"Generated Certificates\" list contains two items: \"Alice Smith - Web Development\" and \"Bob Jones - Data Science\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"History\" tab, the table shows two rows: one for \"Alice Smith\" and one for \"Bob Jones\", each with their respective course, date, and issuer details."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the certificate for \"Alice Smith\" in the \"History\" tab, with the row showing \"Alice Smith\", \"Web Development\", \"2023-10-15\", and \"Acme Corp\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "109c38777e4d8906aaf88e5518376b94d8d9989cbea23710665d65d3ba755d94"
+    }
+  ]
+}

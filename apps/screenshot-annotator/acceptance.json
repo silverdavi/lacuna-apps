@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "d2682bb8d33ff979685f79e9f61a6a3d9e0f4655c9a426375d74fec4b4adbb85",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Screenshot Annotator\" and a button labelled \"Load image\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking \"Load image\" loads a default test image named \"sample.png\" and the status text shows \"Loaded: sample.png\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the tab labelled \"Tools\" shows a button labelled \"Add text\". Clicking \"Add text\" adds a text element with the content \"Label 1\" to the canvas, and the layer list shows an item \"Text: Label 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the tab labelled \"Image\" shows a button labelled \"Rotate 90\u00b0\". Clicking \"Rotate 90\u00b0\" changes the status text to \"Rotated: 90\u00b0\"."
+    },
+    {
+      "id": "A5",
+      "text": "In the \"Tools\" tab, clicking the button labelled \"Add rectangle\" adds a shape element, and the layer list shows an item \"Shape: Rectangle\"."
+    },
+    {
+      "id": "A6",
+      "text": "In the \"Image\" tab, clicking the button labelled \"Flip horizontal\" changes the status text to \"Flipped: horizontal\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button labelled \"Export PNG\" triggers a file download with the name \"annotated.png\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the \"Tools\" tab, clicking the button labelled \"Delete last\" removes the most recently added layer item from the layer list."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the annotation state: after adding a text element \"Label 1\" and a shape \"Rectangle\", reloading the page still shows the layer list items \"Text: Label 1\" and \"Shape: Rectangle\", and the status text \"Loaded: sample.png\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "176fc155a358282436f667ffc2c49d6fb65a400a720639275123e20330b55147"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "859707ee0617051bfd5eff3350b602db203668c54a035c0af47b23ac68db50e0",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"Guitar Tuner\"."
+    },
+    {
+      "id": "A2",
+      "text": "Selecting \"E2\" in the select labelled \"String\" and clicking the button \"Play reference\" causes the status text to read \"Playing E2 at 82.41 Hz\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Record sample\" starts recording; after 2 seconds the button label changes to \"Stop recording\" and the elapsed time display shows \"0:02\"."
+    },
+    {
+      "id": "A4",
+      "text": "After stopping the recording, the field labelled \"Detected frequency\" shows a value between 80 and 85 Hz, and the field labelled \"Cent offset\" shows a value between -50 and 50."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Save to log\" adds a row to the table labelled \"Tuning log\" that contains \"E2\", \"82.41\", and the detected frequency value from the previous step."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Delete\" on the last row of the \"Tuning log\" table removes that row, and if it was the only row the table shows \"No entries yet\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the tab \"History\" shows a table labelled \"Session history\" with columns \"Date\", \"String\", \"Target Hz\", \"Detected Hz\", and \"Cents\"."
+    },
+    {
+      "id": "A8",
+      "text": "Selecting \"A4\" in the select labelled \"String\" changes the status text to \"Selected A4 at 440.00 Hz\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the row in the \"Tuning log\" table that contains \"E2\" and \"82.41\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "70cfaf171078391155424f8ffafd13d207959b1c0ae6144cbceb0969d9503c89"
+    }
+  ]
+}

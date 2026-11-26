@@ -1,0 +1,81 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.weekly-planner",
+  "name": "Weekly Planner",
+  "version": "0.1.0",
+  "summary": "Plan your week: add events to a day column, track tasks, view a month grid, and export to ICS.",
+  "description": "A weekly planner. Add events to a day, check off tasks, switch to a month view, and copy an ICS string for any event. Your week stays on this device.",
+  "category": "productivity",
+  "tags": ["week", "planner", "events", "tasks", "ics", "calendar"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/weekly-planner",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/chart": "0.1.0",
+      "@lacuna/date-math": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/use-undo-stack": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:event",
+    "edit:task",
+    "export:ics"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "week-plan",
+        "access": ["read", "write", "create"],
+        "purpose": "Own Weekly Planner events and tasks"
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": ["any"]
+    }
+  },
+  "sharing": {
+    "owns": ["weekly-planner"],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "@lacuna/timer-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A complete timer composition: big clock, progress ring, phase cycling, alarm tone, and screen wake lock.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/big-clock": "workspace:0.1.0",
+    "@lacuna/progress-ring": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-timer": "workspace:0.1.0",
+    "@lacuna/use-wake-lock": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "TimerKit",
+    "kind": "kit",
+    "commit": "971986c1de3634fd593390ae3732d4d90d57da93",
+    "source": "d513bc9079bae405",
+    "lines": 255,
+    "exports": [
+      "TimerKit",
+      "playAlarm",
+      "setTone",
+      "resetTone"
+    ],
+    "types": [
+      "TimerPhase",
+      "TimerKitProps",
+      "ToneFn"
+    ],
+    "signature": "TimerKit(props: TimerKitProps); setTone(fn: ToneFn); resetTone(); playAlarm()"
+  }
+}

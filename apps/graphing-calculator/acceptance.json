@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "bc0d90c9b78ce22f12c7f3357ed66652f544f23e2484a504a7766d6480ad5aa8",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page displays the heading \"Graphing Calculator\" and the text \"No functions plotted yet\" in the empty state area."
+    },
+    {
+      "id": "A2",
+      "text": "Typing \"x^2\" in the field labelled \"Function expression\", clicking the button \"Plot function\", adds a list item containing \"x^2\" and the text \"No functions plotted yet\" is removed."
+    },
+    {
+      "id": "A3",
+      "text": "With \"x^2\" plotted, the tab labelled \"Table\" shows a table where the row for x = 2 contains the value \"4\" in the column labelled \"y\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the button \"Delete x^2\" removes the function from the list and the text \"No functions plotted yet\" reappears."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"2x + 1\" in the field labelled \"Function expression\" and clicking \"Plot function\" adds a list item containing \"2x + 1\"; the tab labelled \"Table\" shows the row for x = 0 contains the value \"1\" in the column labelled \"y\"."
+    },
+    {
+      "id": "A6",
+      "text": "With \"x^2\" plotted, changing the field labelled \"X min\" to \"-5\" and the field labelled \"X max\" to \"5\", the tab labelled \"Table\" shows rows for x = -5 and x = 5, with y values \"25\" and \"25\" respectively."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Export PNG\" triggers a file download named \"graph.png\"."
+    },
+    {
+      "id": "A8",
+      "text": "Typing \"log(x)\" in the field labelled \"Function expression\" and clicking \"Plot function\" adds a list item containing \"log(x)\"; the tab labelled \"Table\" shows the row for x = 1 contains the value \"0\" in the column labelled \"y\"."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the function \"x^2\" in the list and the table row for x = 2 showing the value \"4\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "b49d37393d1d1ec6d5750359a14916f2db9315af16b281d08159a0c77be3e9c3"
+    }
+  ]
+}

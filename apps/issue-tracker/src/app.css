@@ -1,0 +1,62 @@
+/* App-specific layout. The kit owns the visual language; this file only adds
+   structure that the kit does not provide. No .lc-* / .lk-* / body / :root selectors. */
+.it-toolbar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gap) / 2);
+}
+
+.it-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--gap) / 2);
+}
+
+
+
+.it-rowbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--gap) / 2);
+  padding: calc(10px * var(--sf)) calc(16px * var(--sf));
+  border-top: calc(1px * var(--sf)) solid var(--ui-line);
+}
+
+.it-rowbar-btns {
+  display: flex;
+  gap: calc(var(--gap) / 4);
+}
+
+.it-empty-actions {
+  display: flex;
+  justify-content: center;
+  padding: calc(var(--gap) / 2);
+}
+
+.it-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap) / 2);
+  padding: calc(10px * var(--sf)) calc(16px * var(--sf)) 0;
+}
+
+.it-exports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap) / 2);
+}
+
+.it-sort {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.it-sort:hover {
+  color: var(--ink);
+}

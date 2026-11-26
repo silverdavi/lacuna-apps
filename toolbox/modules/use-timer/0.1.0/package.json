@@ -1,0 +1,33 @@
+{
+  "name": "@lacuna/use-timer",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Drift-free countdown and stopwatch hook with pause, laps, and localStorage persistence.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "useTimer",
+    "kind": "hook",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "b1956c2162a837a1",
+    "lines": 226,
+    "exports": [
+      "useTimer"
+    ],
+    "types": [
+      "TimerOptions",
+      "TimerState",
+      "TimerControls"
+    ],
+    "signature": "useTimer(options?: TimerOptions)"
+  }
+}

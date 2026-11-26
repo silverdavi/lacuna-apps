@@ -1,0 +1,84 @@
+{
+  "manifestVersion": 1,
+  "id": "com.example.emoji-picker",
+  "name": "Emoji Picker",
+  "version": "0.1.0",
+  "summary": "Search, copy and favorite emoji.",
+  "description": "Search a built-in emoji catalog, copy any emoji to the clipboard, and keep a favorites list that survives reloads. Enter copies the top result; Copy all joins every favorite in order.",
+  "category": "productivity",
+  "tags": ["emoji", "clipboard", "favorites"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Your name",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/emoji-picker",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:emoji-picker"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "emoji-picker",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own Emoji Picker favorite records in this space's mock store."
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "emoji-picker"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

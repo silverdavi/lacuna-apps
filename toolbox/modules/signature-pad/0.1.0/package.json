@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/signature-pad",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Freehand signature pad that captures pointer strokes on an SVG surface and exports the result as an SVG string or a PNG data URL.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-pointer-draw": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "SignaturePad",
+    "kind": "widget",
+    "commit": "5271c526eafc0fb0ba81567f2c0e1b753a142caf",
+    "source": "d366b6b0de673735",
+    "lines": 205,
+    "exports": [
+      "SignaturePad"
+    ],
+    "types": [
+      "SignaturePadProps",
+      "SignatureExportFormat"
+    ],
+    "signature": "SignaturePad({ onClear, onExport, width = 400, height = 200, disabled = false, ariaHidden = false,...)"
+  }
+}

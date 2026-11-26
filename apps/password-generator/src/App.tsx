@@ -1,10 +1,34 @@
-import { useEffect, useState } from 'react'
-import { Body, Button, Card, MonoLabel, Stack } from '@lacuna/ui'
+import { useState } from 'react'
+import {
+  Actions,
+  AppShell,
+  Body,
+  Button,
+  Card,
+  Checkbox,
+  EmptyState,
+  ErrorState,
+  FormGrid,
+  Kpi,
+  KpiRow,
+  List,
+  MonoLabel,
+  Rail,
+  Row,
+  SectionLabel,
+  Stack,
+  Tag,
+  Table,
+  TextInput,
+} from '@lacuna/ui'
+import { saveText } from '@lacuna/file-save-open'
+import { useClipboard } from '@lacuna/use-clipboard'
 import { DEFAULT_SETTINGS, host } from './host'
 import type { Settings } from './host'
 
 const MIN_LENGTH = 4
 const MAX_LENGTH = 64
+const HISTORY_LIMIT = 8
 
 const SETS = [
   { key: 'lowercase', label: 'Lowercase', chars: 'abcdefghijklmnopqrstuvwxyz' },
@@ -15,15 +39,6 @@ const SETS = [
 
 type SetKey = (typeof SETS)[number]['key']
 
-function generatePassword(length: number, sets: SetKey[]): string {
-  const pool = SETS.filter((set) => sets.includes(set.key)).flatMap((set) => [...set.chars])
-  const out: string[] = []
-  for (let i = 0; i < length; i += 1) {
-    out.push(pool[Math.floor(Math.random() * pool.length)])
-  }
-  return out.join('')
-}
-
 function strengthOf(length: number, sets: SetKey[]): 'Weak' | 'Fair' | 'Good' | 'Strong' {
   const poolSize = SETS.filter((set) => sets.includes(set.key)).reduce((n, set) => n + [...set.chars].length, 0)
   const bits = length * Math.log2(poolSize)
@@ -33,19 +48,53 @@ function strengthOf(length: number, sets: SetKey[]): 'Weak' | 'Fair' | 'Good' | 
   return 'Strong'
 }
 
-export function App() {
-  const [settings, setSettings] = useState<Settings>(() => host.loadSettings() ?? DEFAULT_SETTINGS)
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [strength, setStrength] = useState<'' | 'Weak' | 'Fair' | 'Good' | 'Strong'>('')
-  const [lengthText, setLengthText] = useState(String(settings.length))
+function generatePassword(length: number, sets: SetKey[]): string {
+  const pool = SETS.filter((set) => sets.includes(set.key)).flatMap((set) => [...set.chars])
+  const out: string[] = []
+  for (let i = 0; i < length; i += 1) {
+    out.push(pool[Math.floor(Math.random() * pool.length)])
+  }
+  return out.join('')
+}
 
-  useEffect(() => {
-    host.saveSettings(settings)
-  }, [settings])
+const TIER_ROWS = [
+  { tier: 'Weak', bits: 'Under 50 bits', note: 'Guessable quickly. Fine for throwaway codes, not for accounts.' },
+  { tier: 'Fair', bits: '50 to 79 bits', note: 'Ok for a local app. Keep it short-lived.' },
+  { tier: 'Good', bits: '80 to 109 bits', note: 'Solid for most personal accounts.' },
+  { tier: 'Strong', bits: '110 bits and up', note: 'Holds up against serious offline attacks.' },
+]
+
+interface HistoryEntry {
+  value: string
+  length: number
+  tier: string
+  bits: number
+}
+
+const INITIAL = host.loadSettings() ?? DEFAULT_SETTINGS
+
+export function App() {
+  const [settings, setSettings] = useState<Settings>(INITIAL)
+  const [lengthText, setLengthText] = useState(String(INITIAL.length))
+  const [password, setPassword] = useState('')
+  const [strength, setStrength] = useState('')
+  const [bits, setBits] = useState(0)
+  const [error, setError] = useState('')
+  const [history, setHistory] = useState<HistoryEntry[]>([])
+  const { copied, copy } = useClipboard({ timeoutMs: 1500 })
+
+  const applySettings = (next: Settings, length?: number) => {
+    setSettings(next)
+    host.saveSettings(next)
+    if (length != null) setLengthText(String(length))
+  }
 
   const toggle = (key: SetKey) => {
-    setSettings((current) => ({ ...current, [key]: !current[key] }))
+    setSettings((current) => {
+      const next = { ...current, [key]: !current[key] }
+      host.saveSettings(next)
+      return next
+    })
   }
 
   const selected = SETS.filter((set) => settings[set.key]).map((set) => set.key)
@@ -55,74 +104,161 @@ export function App() {
     if (!Number.isInteger(length) || length < MIN_LENGTH || length > MAX_LENGTH) {
       setPassword('')
       setStrength('')
+      setBits(0)
       setError('Length must be between 4 and 64')
       return
     }
     if (selected.length === 0) {
       setPassword('')
       setStrength('')
+      setBits(0)
       setError('Choose at least one character set')
       return
     }
     setError('')
     const value = generatePassword(length, selected)
+    const tier = strengthOf(length, selected)
+    const poolSize = SETS.filter((set) => selected.includes(set.key)).reduce((n, set) => n + [...set.chars].length, 0)
     setPassword(value)
-    setStrength(strengthOf(length, selected))
+    setStrength(tier)
+    setBits(Math.round(length * Math.log2(poolSize)))
+    host.saveSettings({ ...settings, length })
+    setHistory((current) => [{ value, length, tier, bits: Math.round(length * Math.log2(poolSize)) }, ...current].slice(0, HISTORY_LIMIT))
   }
 
+  const onCopy = () => {
+    if (password) void copy(password)
+  }
+
+  const onSave = () => {
+    if (password) saveText(password, { filename: 'password.txt', mimeType: 'text/plain' })
+  }
+
+  const onReset = () => {
+    setLengthText(String(DEFAULT_SETTINGS.length))
+    setSettings(DEFAULT_SETTINGS)
+    host.saveSettings(DEFAULT_SETTINGS)
+  }
+
+  const meta = strength ? `Length ${lengthText} · ${strength}` : `Length ${lengthText} · ${selected.length} of 4 sets`
+  const status = copied ? 'Copied to clipboard' : strength ? `Strength ${strength} · ${bits} bits · local` : 'Local · settings saved on this device'
+
   return (
-    <main>
-      <Card mono="Generator">
+    <AppShell
+      name="Password Generator"
+      icon="grid"
+      hue="blue"
+      category="Productivity"
+      meta={meta}
+      status={status}
+      side={
+        <Rail title="Password Generator" note="One page · local" chips={['Copy', 'Save as file', 'Settings persist']}>
+          <Body sm>
+            Passwords are mixed from the character sets you pick and never leave this device. Settings
+            and the recent list are stored on this machine only.
+          </Body>
+        </Rail>
+      }
+    >
+      <Card mono="Setup" title="Character mix">
+        <FormGrid>
+          <TextInput
+            label="Length"
+            type="number"
+            value={lengthText}
+            onChange={(value) => {
+              setLengthText(value)
+              const length = Number(value)
+              if (Number.isInteger(length) && length >= MIN_LENGTH && length <= MAX_LENGTH) {
+                const next = { ...settings, length }
+                setSettings(next)
+                host.saveSettings(next)
+              }
+            }}
+          />
+        </FormGrid>
+        <SectionLabel>Include</SectionLabel>
         <Stack>
-          <h1 className="lc-title lc-title-lg">Password Generator</h1>
-          <Body>Choose a length and the kinds of characters to use, then press Generate. The settings stay on this device.</Body>
-          <label className="lc-field">
-            <span className="lc-field-label">Length</span>
-            <input
-              className="lc-input"
-              type="number"
-              min={MIN_LENGTH}
-              max={MAX_LENGTH}
-              value={lengthText}
-              onChange={(event) => {
-                setLengthText(event.target.value)
-                setSettings((current) => {
-                  const length = Number(event.target.value)
-                  if (Number.isInteger(length) && length >= MIN_LENGTH && length <= MAX_LENGTH) {
-                    return { ...current, length }
-                  }
-                  return current
-                })
-              }}
-            />
-          </label>
-          <Stack>
-            {SETS.map((set) => (
-              <label key={set.key} style={{ display: 'flex', alignItems: 'center', gap: 'calc(8px * var(--sf))' }}>
-                <input
-                  type="checkbox"
-                  checked={settings[set.key]}
-                  onChange={() => toggle(set.key)}
-                />
-                <span>{set.label}</span>
-              </label>
-            ))}
-          </Stack>
-          <Button kind="primary" onClick={onGenerate}>
-            Generate
-          </Button>
+          {SETS.map((set) => (
+            <Checkbox key={set.key} label={set.label} checked={settings[set.key]} onChange={() => toggle(set.key)} />
+          ))}
+        </Stack>
+        <Actions>
+          <Button kind="primary" onClick={onGenerate}>Generate</Button>
+          <Button kind="secondary" onClick={onReset}>Reset to defaults</Button>
+        </Actions>
+        {error && <ErrorState title={error} detail="Fix the highlighted field, then press Generate again." />}
+      </Card>
+
+      <Card mono="Result" title="Password">
+        <Stack>
           <label className="lc-field">
             <span className="lc-field-label">Password</span>
-            <input className="lc-input filled" readOnly value={password} />
+            <input
+              className={`lc-input${password ? ' filled' : ''}`}
+              type="text"
+              value={password}
+              readOnly
+              aria-readonly="true"
+              aria-invalid={error ? true : undefined}
+            />
           </label>
-          {error && (
-            <MonoLabel accent>{error}</MonoLabel>
+          {password ? (
+            <>
+              <KpiRow>
+                <Kpi value={password.length} label="Characters" />
+                <Kpi value={bits} label="Entropy bits" accent />
+              </KpiRow>
+              <MonoLabel>Strength: {strength}</MonoLabel>
+              <div data-testid="tier-chip">
+                <Tag accent>{strength}</Tag>
+              </div>
+            </>
+          ) : (
+            <EmptyState
+              mono="Empty"
+              title="No password yet"
+              detail="Pick a length and at least one character set, then press Generate."
+            />
           )}
-          {strength && (
-            <MonoLabel>Strength: {strength}</MonoLabel>
-          )}
+          <Actions>
+            <Button kind="secondary" onClick={onCopy} disabled={!password}>{copied ? 'Copied' : 'Copy'}</Button>
+            <Button kind="ghost" onClick={onSave} disabled={!password}>Save as file</Button>
+          </Actions>
         </Stack>
       </Card>
-    </main>
+
+      <Card mono={`${history.length} kept`} title="Recent passwords">
+        {history.length === 0 ? (
+          <EmptyState mono="Empty" title="Nothing generated yet" detail="Your last eight passwords appear here, newest first." />
+        ) : (
+          <List>
+            {history.map((entry) => (
+              <Row
+                key={entry.value + String(entry.length)}
+                title={entry.value}
+                meta={`${entry.length} chars · ${entry.tier}`}
+                value={`${entry.bits} bits`}
+              />
+            ))}
+          </List>
+        )}
+      </Card>
+
+      <Card mono="Reference" title="What strength means">
+        <Table
+          label="Strength tiers"
+          columns={[
+            { key: 'tier', label: 'Tier' },
+            { key: 'bits', label: 'Entropy' },
+            { key: 'note', label: 'What it holds up to' },
+          ]}
+          rows={TIER_ROWS.map((row) => ({
+            cells: { tier: row.tier, bits: row.bits, note: row.note },
+            hot: row.tier === strength,
+          }))}
+        />
+      </Card>
+    </AppShell>
   )
 }

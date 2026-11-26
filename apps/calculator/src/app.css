@@ -1,0 +1,18 @@
+/* App-level styles for the calculator. */
+
+.calc-f30 {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--tf));
+}
+
+.calc-tabbar {
+  display: inline-flex;
+  gap: calc(4px * var(--sf));
+  padding: calc(4px * var(--sf));
+  border-radius: calc(10px * var(--sf));
+}
+
+
+
+

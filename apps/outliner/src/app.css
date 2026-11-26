@@ -1,0 +1,109 @@
+.ol-tree {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2px * var(--sf));
+}
+
+.ol-row {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  padding: calc(6px * var(--sf)) calc(8px * var(--sf));
+  border-radius: calc(6px * var(--sf));
+}
+
+.ol-row.editing {
+  background: var(--ui-bg);
+}
+
+.ol-row.selected {
+  background: var(--ui-bg);
+  box-shadow: inset 0 0 0 0.08em var(--accent);
+}
+
+.ol-row.drag-over {
+  box-shadow: 0 0 0 0.14em var(--accent);
+}
+
+.ol-row.dragging {
+  opacity: 0.4;
+}
+
+.ol-drag {
+  border: none;
+  background: transparent;
+  cursor: grab;
+  color: var(--ink-60);
+  font-size: calc(14px * var(--tf));
+  line-height: 1;
+  padding: calc(2px * var(--sf)) calc(4px * var(--sf));
+  border-radius: calc(4px * var(--sf));
+}
+
+.ol-drag:hover {
+  color: var(--ink);
+  background: var(--ui-bg);
+}
+
+.ol-toggle,
+.ol-toggle-spacer {
+  width: calc(20px * var(--sf));
+  flex: 0 0 calc(20px * var(--sf));
+  border: none;
+  background: transparent;
+  color: var(--ink-60);
+  font-size: calc(14px * var(--tf));
+  line-height: 1;
+  padding: calc(2px * var(--sf)) calc(4px * var(--sf));
+  border-radius: calc(4px * var(--sf));
+}
+
+.ol-toggle:hover {
+  color: var(--ink);
+  background: var(--ui-bg);
+}
+
+.ol-text {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.ol-label {
+  display: block;
+  padding: calc(4px * var(--sf)) calc(6px * var(--sf));
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: text;
+}
+
+.ol-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  padding: calc(4px * var(--sf)) calc(6px * var(--sf));
+  border-radius: calc(4px * var(--sf));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ol-row.editing .ol-input {
+  opacity: 1;
+  pointer-events: auto;
+  background: var(--ui-bg);
+}
+
+.ol-input:focus {
+  box-shadow: 0 0 0 0.14em var(--accent);
+}
+
+.ol-actions {
+  display: flex;
+  gap: calc(4px * var(--sf));
+}

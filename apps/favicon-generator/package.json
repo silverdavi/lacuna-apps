@@ -1,0 +1,28 @@
+{
+  "name": "@lacuna/app-favicon-generator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5183",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@lacuna/file-save-open": "workspace:0.1.0",
+    "@lacuna/host-mock": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:0.1.0",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/use-local-record": "workspace:0.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  }
+}

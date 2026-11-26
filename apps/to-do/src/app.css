@@ -1,0 +1,30 @@
+/* Search input in the top-bar actions slot */
+.to-do-search {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+  min-height: calc(26px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(6px * var(--sf));
+  background: var(--ui-card);
+}
+
+.to-do-search svg {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.to-do-filter {
+  width: calc(132px * var(--sf));
+  min-height: calc(22px * var(--sf));
+  padding: calc(2px * var(--sf)) calc(6px * var(--sf));
+  border: 0;
+  background: transparent;
+  color: var(--ink-80);
+  font: inherit;
+}
+
+.to-do-filter:focus {
+  outline: none;
+}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "1c22d2b736339f09c080c7f5e861c4954195240511994809b763d815836dcefc",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading reads \"Code Snippet Manager\" and the list area shows the text \"No snippets yet\"."
+    },
+    {
+      "id": "A2",
+      "text": "Filling the field labelled \"Title\" with \"Hello World\", the field labelled \"Language\" with \"JavaScript\", the CodeArea with \"console.log('hi')\", adding the tag \"demo\" via the TagInput, and clicking the button \"Save snippet\" adds a list item containing \"Hello World\" and \"JavaScript\"; the text \"No snippets yet\" is gone."
+    },
+    {
+      "id": "A3",
+      "text": "After adding a second snippet with Title \"Sort Array\", Language \"Python\", CodeArea content \"def sort(a): return sorted(a)\", and tag \"utils\", the list shows two items: one containing \"Hello World\" and one containing \"Sort Array\"."
+    },
+    {
+      "id": "A4",
+      "text": "Typing \"hello\" in the search box labelled \"Search snippets\" filters the list to show only the item containing \"Hello World\"; the item containing \"Sort Array\" is not visible."
+    },
+    {
+      "id": "A5",
+      "text": "Typing \"xyz\" in the search box labelled \"Search snippets\" shows the text \"No snippets match\" and no list items."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tag \"demo\" in the filter bar filters the list to show only the item containing \"Hello World\"; the item containing \"Sort Array\" is not visible."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Hello World\" removes that item from the list; the list now shows only the item containing \"Sort Array\"."
+    },
+    {
+      "id": "A8",
+      "text": "After adding a snippet with Title \"Copy Test\", Language \"TypeScript\", CodeArea content \"const x = 1\", and tag \"test\", clicking the button \"Copy code\" on that item places \"const x = 1\" on the clipboard."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the snippet with Title \"Hello World\": after reloading, the list still shows an item containing \"Hello World\" and \"JavaScript\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "23d6dc02bf2a0e692ee1f4024580cd300acf4b946fb741e22f472eb57e27daff"
+    }
+  ]
+}

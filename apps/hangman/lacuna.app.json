@@ -1,0 +1,85 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.hangman",
+  "name": "Hangman Game",
+  "version": "0.1.0",
+  "summary": "Guess a hidden word letter by letter before you run out of lives.",
+  "description": "A hidden word, six lives, and the alphabet. Start a round, guess letters, and watch the word appear one letter at a time. The score and best survive a reload.",
+  "category": "personal",
+  "icon": "whiteboard",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/hangman"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:game"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "game",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep the score and the best score between rounds"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "game"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

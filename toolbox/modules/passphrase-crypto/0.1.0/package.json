@@ -1,0 +1,30 @@
+{
+  "name": "@lacuna/passphrase-crypto",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "AES-GCM encryption and decryption with PBKDF2-derived keys for passphrase-protected local data.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "passphraseCrypto",
+    "kind": "logic",
+    "commit": "d422a73c10eea8ac786df98dbd93d0f978c6072a",
+    "source": "09ffa3a5fcb5061c",
+    "lines": 105,
+    "exports": [
+      "encrypt",
+      "decrypt",
+      "verifyPassphrase",
+      "generateSalt",
+      "generateIv"
+    ],
+    "types": [
+      "EncryptedPayload",
+      "CryptoOptions"
+    ],
+    "signature": "encrypt(plaintext: string, passphrase: string, options?: CryptoOptions); decrypt(payload: EncryptedPayload, passphrase: string); verifyPassphrase(payload: EncryptedPayload, passphrase: string); generateSalt(length?: number)"
+  }
+}

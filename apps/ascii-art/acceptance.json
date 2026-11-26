@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "cfcadd1a84ef13886748e5e088bc86abb82c125fb73a68c927f7d2d91e96b304",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page heading is \"ASCII Art Generator\" and the tab labelled \"Text\" is selected by default."
+    },
+    {
+      "id": "A2",
+      "text": "In the Text tab, typing \"Hello\" in the field labelled \"Input text\" and clicking the button \"Generate\" shows the text \"H e l l o\" in the output area labelled \"ASCII output\"."
+    },
+    {
+      "id": "A3",
+      "text": "In the Text tab, typing \"Hello\" in the field labelled \"Input text\", selecting \"Block\" in the select labelled \"Character set\", and clicking \"Generate\" shows a block character in the output area labelled \"ASCII output\"."
+    },
+    {
+      "id": "A4",
+      "text": "In the Text tab, typing \"Hello\" in the field labelled \"Input text\", setting the field labelled \"Width\" to \"10\", and clicking \"Generate\" shows exactly 10 characters per line in the output area labelled \"ASCII output\"."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the button \"Copy\" in the Text tab copies the current ASCII output to the clipboard and shows the message \"Copied to clipboard\"."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the tab labelled \"Image\" shows the file input labelled \"Upload image\" and the button \"Generate\"."
+    },
+    {
+      "id": "A7",
+      "text": "In the Image tab, uploading a 100x100 pixel image, setting the field labelled \"Width\" to \"50\", and clicking \"Generate\" shows ASCII art with exactly 50 characters per line in the output area labelled \"ASCII output\"."
+    },
+    {
+      "id": "A8",
+      "text": "In the Image tab, uploading an image, clicking \"Generate\", then clicking the button \"Download\" saves a file named \"ascii-art.txt\" containing the current ASCII output."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the last generated ASCII art: after generating \"Hello\" in the Text tab, reloading the page still shows \"H e l l o\" in the output area labelled \"ASCII output\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "d63eae800236920120831d3d048946413967e609f3bbd23fb28cbb1388c3000c"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.snippet-manager",
+  "name": "Code Snippet Manager",
+  "version": "0.1.0",
+  "summary": "Save, search, tag, and copy code snippets.",
+  "description": "A small shelf app for keeping code snippets. Add a snippet with a title, language, code, and tags; search and filter; copy to the clipboard. Data lives in the browser via the host mock.",
+  "category": "productivity",
+  "tags": ["code", "snippets", "clipboard"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "contact": "you@example.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/snippet-manager",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/use-collection": "0.1.0",
+      "@lacuna/search-box": "0.1.0",
+      "@lacuna/filter-bar": "0.1.0",
+      "@lacuna/tag-input": "0.1.0",
+      "@lacuna/code-area": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/json-backup": "0.1.0",
+      "@lacuna/export-menu": "0.1.0",
+      "@lacuna/record-form": "0.1.0",
+      "@lacuna/record-table": "0.1.0",
+      "@lacuna/host-mock": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "edit:snippet-manager"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "snippet-manager",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Own snippet records"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "snippet-manager"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

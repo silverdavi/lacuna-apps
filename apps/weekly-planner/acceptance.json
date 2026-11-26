@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "spec_sha256": "064a4a4d761b78eb5b60af7c2837a7ae68eb85a1b83a9a88693b85754edd928d",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "The page shows the heading \"Weekly Planner\" and a week view displaying the days \"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the button \"Add event\" opens a dialog. Filling the field labelled \"Title\" with \"Team Sync\", the field labelled \"Day\" with \"Tue\", and the field labelled \"Time\" with \"10:00\", then clicking \"Save\" adds an event card on the Tue column containing \"Team Sync\" and \"10:00\"."
+    },
+    {
+      "id": "A3",
+      "text": "Clicking the button \"Add task\" in the checklist panel, typing \"Review PR\" in the input labelled \"New task\", and pressing Enter adds a checkable item \"Review PR\" to the checklist. The progress indicator shows \"1 of 1\"."
+    },
+    {
+      "id": "A4",
+      "text": "Clicking the checkbox next to \"Review PR\" marks it complete. The progress indicator updates to \"1 of 1 done\" and the item text is struck through."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the tab \"Month\" switches the view to a month grid. The current month name is displayed, and the event \"Team Sync\" appears in the cell for the correct date."
+    },
+    {
+      "id": "A6",
+      "text": "Clicking the button \"Export ICS\" copies an ICS string to the clipboard. The string contains \"BEGIN:VEVENT\", \"SUMMARY:Team Sync\", and \"END:VEVENT\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking the button \"Delete Team Sync\" on the event card removes it from the Tue column. The week view no longer shows \"Team Sync\"."
+    },
+    {
+      "id": "A8",
+      "text": "Clicking the button \"Delete Review PR\" on the checklist item removes it. The checklist shows \"No tasks yet\" and the progress indicator is hidden."
+    },
+    {
+      "id": "A9",
+      "text": "Reload keeps the event \"Team Sync\" on Tue at 10:00 and the checklist item \"Review PR\" in its unchecked state."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "672c1a40e763d526d23a6e3cd0f83c4f4bc0ccbfd4e457abd28079aa2639c426"
+    }
+  ]
+}

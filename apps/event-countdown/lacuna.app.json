@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.event-countdown",
+  "name": "Event Countdown",
+  "version": "0.1.0",
+  "summary": "Plan upcoming events and watch a live countdown to each one.",
+  "description": "Add events with a name, a date and a time, and see a live countdown to each. Events live in Upcoming and Past tabs, survive reload, and can be exported as a backup. Nothing leaves the browser.",
+  "category": "productivity",
+  "tags": ["countdown", "planning", "events"],
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/event-countdown"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/json-backup": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:event",
+    "edit:event"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "event",
+        "access": [
+          "read",
+          "write",
+          "create",
+          "delete"
+        ],
+        "purpose": "Store the events the user plans to count down to"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "event"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

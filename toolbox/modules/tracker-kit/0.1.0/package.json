@@ -1,0 +1,40 @@
+{
+  "name": "@lacuna/tracker-kit",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Value + date entry form, streak counter, heatmap, trend chart, and entry list for daily tracking apps.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/chart": "workspace:0.1.0",
+    "@lacuna/date-math": "workspace:0.1.0",
+    "@lacuna/date-picker": "workspace:0.1.0",
+    "@lacuna/heatmap": "workspace:0.1.0",
+    "@lacuna/use-collection": "workspace:0.1.0",
+    "@lacuna/use-streak": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "TrackerKit",
+    "kind": "kit",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "8a23f5ae0f1f5bfd",
+    "lines": 397,
+    "exports": [
+      "TrackerKit"
+    ],
+    "types": [
+      "TrackerEntry",
+      "TrackerKitProps"
+    ],
+    "signature": ""
+  }
+}

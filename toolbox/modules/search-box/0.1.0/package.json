@@ -1,0 +1,35 @@
+{
+  "name": "@lacuna/search-box",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Search input with ranked fuzzy-match results, keyboard navigation, and highlighted match ranges.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/fuzzy-search": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "SearchBox",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "13ec0f29e6344dcd",
+    "lines": 234,
+    "exports": [
+      "SearchBox"
+    ],
+    "types": [
+      "SearchBoxField",
+      "SearchBoxProps"
+    ],
+    "signature": "SearchBox({ records, fields, placeholder, maxResults = 10, onSelect, onQueryChange, renderResul...)"
+  }
+}

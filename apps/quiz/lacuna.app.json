@@ -1,0 +1,102 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.quiz",
+  "name": "Quiz Maker",
+  "version": "0.1.0",
+  "summary": "Build multiple-choice question banks and run shuffled study sessions.",
+  "description": "Add multiple-choice questions with a correct answer and two wrong answers, review the bank, then start a shuffled study session. Answer each question, follow the score, and review which ones were right. Export your bank to a JSON file or copy it to the clipboard, import a bank from another device, and keep a rolling history of your session scores. Everything stays on this device.",
+  "category": "productivity",
+  "tags": [
+    "quiz",
+    "study",
+    "flashcards"
+  ],
+  "icon": "school",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/quiz"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/quiz-engine": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:quiz-question",
+    "edit:quiz-question",
+    "export:quiz-bank"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "quiz-question",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store the multiple-choice questions the user builds"
+      },
+      {
+        "kind": "quiz-session",
+        "access": [
+          "read",
+          "create"
+        ],
+        "purpose": "Keep a rolling history of study session scores"
+      }
+    ],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "quiz-question",
+      "quiz-session"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

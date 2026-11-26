@@ -1,0 +1,34 @@
+{
+  "name": "@lacuna/grid-utils",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Pure functions for a 2D grid model: neighbor lookup, flood fill, rotation, and line detection.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lacunaBridge": {
+    "component": "gridUtils",
+    "kind": "logic",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "d905d568c67e0c02",
+    "lines": 174,
+    "exports": [
+      "createGrid",
+      "getNeighbors",
+      "floodFill",
+      "rotateGrid",
+      "findLines"
+    ],
+    "types": [
+      "Cell",
+      "Grid",
+      "Direction",
+      "Diagonal",
+      "Neighbor",
+      "CellPos"
+    ],
+    "signature": "createGrid(rows: number, cols: number, fill: Cell = 0); getNeighbors( grid: Grid, row: number, col: number, includeDiagonals: boolean = false ); floodFill( grid: Grid, startRow: number, startCol: number, target: Cell, replacement: Cell ); r"
+  }
+}

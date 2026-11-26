@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "e2bcc1f64eceaa1b804d116b97648cda12f770fef4522237be3e1764b293a2af",
+  "spec_sha256": "f7e7b9aa4ed90470d3281c61e8c5fe45727a870785661c8ae68fb970b12257f2",
   "checks": [
     {
       "id": "A1",
@@ -12,37 +12,49 @@
     },
     {
       "id": "A3",
-      "text": "After clicking cell (1,1) for X and cell (2,2) for O, clicking cell (3,3) places an \"X\" in that cell, displays the text \"Player X wins\", and updates the score line to \"X: 1, O: 0, Draws: 0\"."
+      "text": "Playing X (1,1), O (2,1), X (1,2), O (2,2), X (1,3) completes the top row: the page displays \"Player X wins\" and the score line \"X: 1, O: 0, Draws: 0\"."
     },
     {
       "id": "A4",
-      "text": "After a win, clicking any empty cell does not change the board or the turn indicator, and the text \"Player X wins\" remains visible."
+      "text": "After that win, clicking the empty cell (3,3) does not change the board, and the text \"Player X wins\" remains visible."
     },
     {
       "id": "A5",
-      "text": "Clicking the button \"Restart\" after a win clears the board, resets the turn indicator to \"Player X's turn\", and keeps the score line as \"X: 1, O: 0, Draws: 0\"."
+      "text": "Clicking the button \"Restart\" after that win clears the board, resets the turn indicator to \"Player X's turn\", and keeps the score line as \"X: 1, O: 0, Draws: 0\"."
     },
     {
       "id": "A6",
-      "text": "Playing a draw by filling cells (1,1) X, (1,2) O, (1,3) X, (2,1) O, (2,2) X, (2,3) O, (3,1) X, (3,2) O, (3,3) X displays the text \"Draw\" and updates the score line to \"X: 0, O: 0, Draws: 1\"."
+      "text": "Playing X (1,1), O (1,2), X (1,3), O (2,2), X (2,1), O (2,3), X (3,2), O (3,1), X (3,3) fills the board with no line of three: the page displays \"Draw\" and the score line \"X: 0, O: 0, Draws: 1\"."
     },
     {
       "id": "A7",
-      "text": "After a draw, clicking the button \"Reset Scores\" clears the score line to \"X: 0, O: 0, Draws: 0\" and clears the board."
+      "text": "After that draw, clicking the button \"Reset Scores\" sets the score line to \"X: 0, O: 0, Draws: 0\" and clears the board."
     },
     {
       "id": "A8",
-      "text": "Pressing the key \"1\" while the board has focus places an \"X\" in cell (1,1), and pressing \"5\" places an \"O\" in cell (2,2)."
+      "text": "Pressing the key \"1\" while the board has focus places an \"X\" in cell (1,1), and pressing \"5\" then places an \"O\" in cell (2,2)."
     },
     {
       "id": "A9",
       "text": "Reload keeps the score and board state: after playing X at (1,1) and O at (1,2), reloading the page still shows \"X\" in cell (1,1), \"O\" in cell (1,2), the turn indicator \"Player X's turn\", and the score line \"X: 0, O: 0, Draws: 0\"."
+    },
+    {
+      "id": "A10",
+      "text": "Playing X (1,1), O (2,2), X (3,3) does not end the round: no \"wins\" text is shown and the turn indicator reads \"Player O's turn\"."
+    },
+    {
+      "id": "A11",
+      "text": "Playing X (1,1), O (1,3), X (1,2), O (2,2), X (3,3), O (3,1) completes a diagonal for O: the page displays \"Player O wins\" and the score line \"X: 0, O: 1, Draws: 0\"."
+    },
+    {
+      "id": "A12",
+      "text": "Playing X (1,1), O (1,2), X (2,1), O (2,2), X (3,1) completes the first column: the page displays \"Player X wins\"."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "fe6282bb9cccb41dd82aa2a218e74c3cf7b105a4d9d72469e53bc8a0b4106769"
+      "sha256": "bfd6c0cfb851f309c85e5e8ebfd6e7511196bf0cea88f9bf5a31e43234a757f9"
     }
   ]
 }

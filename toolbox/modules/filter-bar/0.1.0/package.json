@@ -1,0 +1,36 @@
+{
+  "name": "@lacuna/filter-bar",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "A toolbar of toggleable filter chips, a date-range picker, and a sort control for narrowing and ordering a list of records.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-picker": "workspace:0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  },
+  "lacunaBridge": {
+    "component": "FilterBar",
+    "kind": "widget",
+    "commit": "9c7f3ab79ad77b1a56f920a5a54cc43ea6376689",
+    "source": "08e47585d54ddab6",
+    "lines": 177,
+    "exports": [
+      "FilterBar"
+    ],
+    "types": [
+      "FilterChipDef",
+      "SortDef",
+      "FilterBarProps"
+    ],
+    "signature": ""
+  }
+}
