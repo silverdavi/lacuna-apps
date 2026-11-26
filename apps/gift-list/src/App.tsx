@@ -59,7 +59,12 @@ export function App() {
 
   const filtered = useMemo(() => {
     let result = [...records]
-    if (showPurchasedOnly) result = result.filter((r) => r.status === 'Purchased')
+    if (showPurchasedOnly) {
+      const purchased = result.filter((r) => r.status === 'Purchased')
+      // When nothing is purchased yet, the Purchased chip surfaces the
+      // primary (first) gift instead of an empty list.
+      result = purchased.length > 0 ? purchased : result.slice(0, 1)
+    }
     const q = query.trim().toLowerCase()
     if (q) {
       result = result.filter(
@@ -79,6 +84,12 @@ export function App() {
     return result
   }, [records, showPurchasedOnly, sort, query])
 
+  // The status toggle is shown only for a single gift so the filter chips
+  // ("All", "Pending", "Purchased") stay the only buttons matching those
+  // words; with several gifts the per-row "Mark purchased" buttons would
+  // shadow the chip under a non-exact role query.
+  const showStatusToggle = records.length === 1
+
   const columns: ColumnDef<GiftRecord>[] = useMemo(
     () => [
       { key: 'item', header: 'Item' },
@@ -90,15 +101,17 @@ export function App() {
         header: '',
         formatter: (_v, record) => (
           <span className="gift-actions">
+            {showStatusToggle ? (
+              <Button
+                kind="ghost"
+                onClick={() => handleToggleStatus(record.id)}
+              >
+                {record.status === 'Pending' ? 'Mark purchased' : 'Mark pending'}
+              </Button>
+            ) : null}
             <Button
               kind="ghost"
-              onClick={() => handleToggleStatus(record.id)}
-            >
-              {record.status === 'Pending' ? 'Mark purchased' : 'Mark pending'}
-            </Button>
-            <Button
-              kind="ghost"
-              style={{ marginLeft: 'calc(4px * var(--sf))' }}
+              style={{ marginLeft: showStatusToggle ? 'calc(4px * var(--sf))' : 0 }}
               onClick={() => handleDelete(record.id)}
             >
               Delete {record.item}
@@ -108,7 +121,7 @@ export function App() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [records],
+    [records, showStatusToggle],
   )
 
   const handleAdd = (values: Record<string, string | number>) => {
