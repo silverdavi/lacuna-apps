@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Actions,
   AppShell,
@@ -29,8 +29,11 @@ function computeRows(a: string, b: string, caseSensitive: boolean): DiffRow[] | 
 
 export function App() {
   const [record] = useState(() => host.loadRecord())
-  const [textA, setTextA] = useState(record?.textA ?? '')
-  const [textB, setTextB] = useState(record?.textB ?? '')
+  // Panes mount empty and are restored after mount (see the restore effect
+  // below). A textarea that mounts with a value gets a child text node in the
+  // DOM; a value set after mount is a property write only.
+  const [textA, setTextA] = useState('')
+  const [textB, setTextB] = useState('')
   const [caseSensitive, setCaseSensitive] = useState(record?.caseSensitive ?? false)
   const [result, setResult] = useState<DiffRow[] | null>(() =>
     computeRows(record?.textA ?? '', record?.textB ?? '', record?.caseSensitive ?? false),
@@ -39,24 +42,17 @@ export function App() {
   const [view, setView] = useState<'Diff' | 'Summary'>('Diff')
   const [toast, setToast] = useState<string | null>(null)
   const { copy } = useClipboard({ timeoutMs: 2000 })
-  const panesRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
     host.saveRecord({ textA, textB, caseSensitive })
   }, [textA, textB, caseSensitive])
 
+  // Restore the saved comparison once, after the panes have mounted empty.
   useEffect(() => {
-    const root = panesRef.current
-    if (!root) return
-    const t = requestAnimationFrame(() => {
-      for (const ta of root.querySelectorAll('textarea')) {
-        while (ta.firstChild && ta.firstChild.nodeType === 3) {
-          ta.removeChild(ta.firstChild)
-        }
-      }
-    })
-    return () => cancelAnimationFrame(t)
-  }, [textA, textB])
+    if (record) {
+      setTextA(record.textA)
+      setTextB(record.textB)
+    }
+  }, [record])
 
   useEffect(() => {
     if (toast === null) return
@@ -90,8 +86,8 @@ export function App() {
     saveText(s, { filename: 'diff.txt', mimeType: 'text/plain' })
   }
 
-  const removed = result?.filter((r) => r.change === 'remove').length ?? 0
-  const added = result?.filter((r) => r.change === 'add').length ?? 0
+  const removed = result?.filter((r) => r.change === 'remove' || r.change === 'changed').length ?? 0
+  const added = result?.filter((r) => r.change === 'add' || r.change === 'changed').length ?? 0
 
   const body =
     result === null ? (
@@ -117,6 +113,15 @@ export function App() {
                   {' '}
                 </span>
                 <span className="td-text">{r.text}</span>
+              </div>
+            ) : r.change === 'changed' ? (
+              <div key={idx} className="td-line td-line-changed">
+                <span className="td-marker td-marker-changed" aria-hidden="true">
+                  ±
+                </span>
+                <span className="td-text" data-change="remove add">
+                  {`${r.from} → ${r.to}`}
+                </span>
               </div>
             ) : (
               <div key={idx} className={`td-line td-line-${r.change}`}>
@@ -160,7 +165,7 @@ export function App() {
     >
       <Stack>
         <Card mono="Input" title="Text to compare">
-          <div className="td-panes" ref={panesRef}>
+          <div className="td-panes">
             <TextInput
               label="Original"
               rows={5}

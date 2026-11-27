@@ -41,18 +41,19 @@
     }
   },
   "capabilities": [
-    "edit:text-diff"
+    "create:diff",
+    "export:diff"
   ],
   "permissions": {
     "records": [
       {
-        "kind": "text-diff",
+        "kind": "diff",
         "access": [
           "read",
           "write",
           "create"
         ],
-        "purpose": "Store the last text comparison between visits"
+        "purpose": "Store the last comparison so it survives a reload"
       }
     ],
     "platform": [
@@ -71,7 +72,7 @@
   },
   "sharing": {
     "owns": [
-      "text-diff"
+      "diff"
     ],
     "reads": [],
     "handoffs": []

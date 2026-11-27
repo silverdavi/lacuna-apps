@@ -130,3 +130,12 @@
   font-size: calc(12px * var(--tf));
   z-index: 100;
 }
+
+.td-line-changed {
+  background: color-mix(in srgb, var(--geo-gold) 10%, transparent);
+}
+
+.td-line-changed .td-marker,
+.td-line-changed .td-text {
+  color: var(--geo-gold);
+}

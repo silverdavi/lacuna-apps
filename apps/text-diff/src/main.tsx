@@ -6,17 +6,6 @@ import { createRoot } from 'react-dom/client'
 import '@lacuna/ui/base.css'
 import { App } from './App'
 
-const observer = new MutationObserver((mutations) => {
-  for (const m of mutations) {
-    for (const node of m.addedNodes) {
-      if (node.nodeType === 3 && node.parentElement?.tagName === 'TEXTAREA') {
-        node.parentElement.removeChild(node)
-      }
-    }
-  }
-})
-observer.observe(document.body, { childList: true, subtree: true })
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
