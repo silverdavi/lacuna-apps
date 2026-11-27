@@ -223,22 +223,24 @@ export function App() {
             )
           ) : (
             <div role="list" aria-label="Medications" className="mr-meds-list">
-              {filtered.map((m) => (
-                <div key={m.id} role="listitem" className="mr-med-item">
-                  <div>
-                    <div className="mr-med-name">{m.name}</div>
-                    <div className="mr-med-meta">{m.dose} at {m.time}</div>
+              <div role="listitem" className="mr-med-items">
+                {filtered.map((m) => (
+                  <div key={m.id} className="mr-med-item">
+                    <div>
+                      <div className="mr-med-name">{m.name}</div>
+                      <div className="mr-med-meta">{m.dose} at {m.time}</div>
+                    </div>
+                    <div className="mr-med-actions">
+                      <Button kind="secondary" onClick={() => logDose(m)}>
+                        Log dose
+                      </Button>
+                      <Button kind="ghost" onClick={() => deleteMedication(m)}>
+                        Delete {m.name}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="mr-med-actions">
-                    <Button kind="secondary" onClick={() => logDose(m)}>
-                      Log dose
-                    </Button>
-                    <Button kind="ghost" onClick={() => deleteMedication(m)}>
-                      Delete {m.name}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </Card>
