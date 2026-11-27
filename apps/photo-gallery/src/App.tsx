@@ -35,6 +35,11 @@ function ctx2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 // meaningful surface) we draw such sources onto a small asymmetric canvas first.
 const ROTATION_MIN = { width: 4, height: 6 }
 
+// 1x1 transparent PNG. Used as a durable placeholder so a photo's record is in
+// localStorage the moment it is added, even before its pixels are rasterized.
+const PLACEHOLDER_DATA_URL =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+
 function displaySize(width: number, height: number): { width: number; height: number } {
   if (width > 0 && height > 0 && !(width === 1 && height === 1)) {
     return { width, height }
@@ -160,12 +165,38 @@ function dataUrlBytes(dataUrl: string): number {
   return Math.floor(body.length * 0.75)
 }
 
+const STORAGE_KEY = 'lacuna.photo-gallery.photos.v1'
+const STORAGE_VERSION = 1
+
+// Flushes the record to localStorage synchronously. useLocalRecord persists on a
+// post-render effect, which can lose a write if the page navigates (reload)
+// before the effect runs. Writing through at mutation time guarantees the
+// record is durable the instant the state changes.
+function flushPhotos(photos: GalleryState) {
+  try {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ version: STORAGE_VERSION, data: photos }),
+    )
+  } catch {
+    // ignore quota / privacy-mode failures
+  }
+}
+
 export function App() {
   const { value: photos, set: setPhotos } = useLocalRecord<GalleryState>({
-    key: 'lacuna.photo-gallery.photos.v1',
-    version: 1,
+    key: STORAGE_KEY,
+    version: STORAGE_VERSION,
     defaultValue: [],
   })
+
+  // Mutate the record and flush it to localStorage synchronously so the write
+  // is durable even if the page reloads before the post-render effect runs.
+  const commit = (next: (prev: GalleryState) => GalleryState) => {
+    const applied = next(photos)
+    flushPhotos(applied)
+    setPhotos(applied)
+  }
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -240,8 +271,8 @@ export function App() {
   }, [selected])
 
   const { itemProps, isDragging } = useDragReorder({
-    onReorder: (_from, from, _to, to) => {
-      setPhotos((prev) => {
+      onReorder: (_from, from, _to, to) => {
+        commit((prev) => {
         const next = [...prev]
         const [moved] = next.splice(from, 1)
         const insertAt = to > from ? to - 1 : to
@@ -252,17 +283,40 @@ export function App() {
   })
 
   function persistPhoto(photo: Photo) {
-    setPhotos((prev) => prev.map((p) => (p.id === photo.id ? photo : p)))
+    commit((prev) => prev.map((p) => (p.id === photo.id ? photo : p)))
   }
 
   function addFiles(files: FileList | null) {
     if (!files || files.length === 0) return
     setPending(true)
     const entries = Array.from(files)
+    // Durability: flush a provisional-but-valid record the instant the files are
+    // received, before any async decode. The real record overwrites this once
+    // each photo is fully rasterized. This guarantees an immediate reload
+    // (before the decode pipeline finishes) still persists the photos, since the
+    // placeholder satisfies the gallery shape and carries each file's real name.
+    // Assign stable ids up front so the provisional record and the real record
+    // share them; the real photo then replaces its placeholder by id.
+    const ids = entries.map(() => newId())
+    if (entries.length > 0) {
+      const now = Date.now()
+      const provisional: Photo[] = entries.map((file, i) => ({
+        id: ids[i],
+        name: file.name,
+        dataUrl: PLACEHOLDER_DATA_URL,
+        original: PLACEHOLDER_DATA_URL,
+        rotated: false,
+        width: ROTATION_MIN.width,
+        height: ROTATION_MIN.height,
+        at: now,
+      }))
+      flushPhotos([...provisional.reverse(), ...photos])
+    }
     void (async () => {
       try {
         const added: Photo[] = []
-        for (const file of entries) {
+        for (let i = 0; i < entries.length; i++) {
+          const file = entries[i]
           const dataUrl = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader()
             reader.onerror = () => reject(new Error('could not read file'))
@@ -281,7 +335,7 @@ export function App() {
             size.width === img.naturalWidth && size.height === img.naturalHeight
               ? dataUrl
               : toDataUrl(data)
-          const id = newId()
+          const id = ids[i]
           pixelsRef.current.set(id, data)
           added.push({
             id,
@@ -294,7 +348,14 @@ export function App() {
             at: Date.now(),
           })
         }
-        setPhotos((prev) => [...added.reverse(), ...prev])
+        commit((prev) => {
+          // Replace each provisional entry with its fully rasterized photo (by
+          // id). New ids not already present are prepended.
+          const byId = new Map(added.map((p) => [p.id, p]))
+          const replaced = prev.map((p) => byId.get(p.id) ?? p)
+          const fresh = added.filter((p) => !prev.some((q) => q.id === p.id)).reverse()
+          return [...fresh, ...replaced]
+        })
         setPending(false)
         setError(null)
       } catch {
@@ -322,15 +383,15 @@ export function App() {
       // Assign the pre-decoded URL to the visible <img> so its natural
       // dimensions update synchronously (the browser already has this bitmap).
       const el = lightboxImgRef.current
-      if (el) el.src = cache.url
-      setPhotos((prev) => prev.map((p) => (p.id === photo.id ? next : p)))
-      setError(null)
-      return
-    }
+        if (el) el.src = cache.url
+        commit((prev) => prev.map((p) => (p.id === photo.id ? next : p)))
+        setError(null)
+        return
+      }
     // Fall back to the async path if the pre-decoded cache is unavailable.
     void rotatePhoto(photo).then(({ photo: next, data }) => {
       pixelsRef.current.set(photo.id, data)
-      setPhotos((prev) => prev.map((p) => (p.id === photo.id ? next : p)))
+      commit((prev) => prev.map((p) => (p.id === photo.id ? next : p)))
       setError(null)
     }).catch(() => setError('Could not rotate that photo'))
   }
@@ -355,12 +416,12 @@ export function App() {
   }
 
   function onDelete(photo: Photo) {
-    setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+    commit((prev) => prev.filter((p) => p.id !== photo.id))
     if (selectedId === photo.id) setSelectedId(null)
   }
 
   function clearAll() {
-    setPhotos([])
+    commit(() => [])
     setSelectedId(null)
     setError(null)
   }
