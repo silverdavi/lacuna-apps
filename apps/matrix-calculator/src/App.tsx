@@ -26,6 +26,37 @@ function parseSize(value: string): { rows: number; cols: number } {
   return { rows, cols }
 }
 
+function OperationSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  options: { value: string; label: string }[]
+}) {
+  return (
+    <label className="lc-field">
+      <span className="lc-field-label">{label}</span>
+      <select
+        className="lc-input"
+        role="select"
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
 export function App() {
   const stack = useUndoStack<SessionRecord>(sessionStore.get(), { limit: 50 })
   const record = stack.value
@@ -180,42 +211,24 @@ export function App() {
       <Stack>
         <Card mono="Setup" title="Matrices">
           <FormGrid>
-            <div className="lc-field">
-              <select
-                className="lc-input"
-                aria-label="Operation"
-                value={record.operation}
-                onChange={(event) => setOperation(event.target.value)}
-              >
-                {OPERATION_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="lc-field">
-              <select
-                className="lc-input"
-                aria-label="Both sizes"
-                value={`${a.rows}x${a.cols}`}
-                onChange={(event) => setBothSizes(event.target.value)}
-              >
-                {SIZE_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="lc-field">
-              <select
-                className="lc-input"
-                aria-label="Size B"
-                value={`${b.rows}x${b.cols}`}
-                onChange={(event) => setSizeB(event.target.value)}
-              >
-                {SIZE_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
+            <OperationSelect
+              label="Operation"
+              value={record.operation}
+              onChange={(value) => setOperation(value)}
+              options={OPERATION_OPTIONS}
+            />
+            <OperationSelect
+              label="Both sizes"
+              value={`${a.rows}x${a.cols}`}
+              onChange={(value) => setBothSizes(value)}
+              options={SIZE_OPTIONS}
+            />
+            <OperationSelect
+              label="Size B"
+              value={`${b.rows}x${b.cols}`}
+              onChange={(value) => setSizeB(value)}
+              options={SIZE_OPTIONS}
+            />
           </FormGrid>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(12px * var(--sf))', marginTop: 'calc(12px * var(--sf))' }}>
             {gridPanel('a')}
