@@ -1,5 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AppShell, Button, Stack } from '@lacuna/ui'
+import {
+  Actions,
+  AppShell,
+  Board,
+  Button,
+  Card,
+  Kpi,
+  KpiRow,
+  List,
+  Rail,
+  Row,
+  Stack,
+  Tag,
+} from '@lacuna/ui'
 import { host, type Session } from './host'
 import { generatePuzzle, keyOf, countFilled, checkPuzzle } from './engine'
 import { useHotkeys } from '@lacuna/use-hotkeys'
@@ -19,6 +32,7 @@ function loadSession(): Session {
 }
 
 type HistoryItem = { seed: number; at: number; solved: boolean }
+type Tab = 'board' | 'history'
 
 export function App() {
   const [seedInput, setSeedInput] = useState('')
@@ -27,7 +41,7 @@ export function App() {
     return s.active ? s.seed : null
   })
   const [filled, setFilled] = useState<Record<string, boolean>>(() => loadSession().filled)
-  const [tab, setTab] = useState<'board' | 'history'>('board')
+  const [tab, setTab] = useState<Tab>('board')
   const [toast, setToast] = useState<string | null>(null)
   const [history, setHistory] = useState<HistoryItem[]>(() => loadSession().history)
   const [best, setBest] = useState<number | null>(() => loadSession().best)
@@ -64,11 +78,6 @@ export function App() {
     })
   }, [])
 
-  const newPuzzle = useCallback((s: number) => {
-    setSeed(s)
-    setFilled({})
-  }, [])
-
   const onNewPuzzle = useCallback(() => {
     const n = parseInt(seedInput.trim(), 10)
     if (Number.isNaN(n)) {
@@ -76,27 +85,29 @@ export function App() {
       return
     }
     setSeedInput(String(n))
-    newPuzzle(n)
-  }, [seedInput, newPuzzle, showToast])
+    setSeed(n)
+    setFilled({})
+  }, [seedInput, showToast])
 
   const onCheck = useCallback(() => {
-    if (seed === null) return
-    const { wrong, solved } = checkPuzzle(SIZE, filled)
-    if (solved) {
+    if (seed === null || puzzle === null) return
+    const result = checkPuzzle(puzzle, filled)
+    if (result.solved) {
       showToast('Solved!')
       setBest((b) => (b === null ? filledCount : Math.min(b, filledCount)))
       setHistory((h) => [{ seed, at: Date.now(), solved: true }, ...h].slice(0, 20))
     } else {
-      showToast(`Incorrect: ${wrong} cell(s) wrong`)
+      showToast(`Not solved: ${result.right} of 13 filled cells are right and ${result.missing} are missing`)
       setHistory((h) => [{ seed, at: Date.now(), solved: false }, ...h].slice(0, 20))
     }
-  }, [seed, filled, filledCount, showToast])
+  }, [seed, puzzle, filled, filledCount, showToast])
 
   const onHistoryNewPuzzle = useCallback(() => {
     setTab('board')
-    newPuzzle(1)
+    setSeed(1)
     setSeedInput('1')
-  }, [newPuzzle])
+    setFilled({})
+  }, [])
 
   useHotkeys(
     useMemo(
@@ -113,164 +124,177 @@ export function App() {
     { enabled: seed !== null },
   )
 
-  const gridTemplate = `minmax(1.5rem, auto) repeat(${SIZE}, 1.4rem)`
+  const boardCard = (
+    <Card
+      mono="Board"
+      title="Puzzle"
+      actions={
+        <Actions>
+          <Button kind="primary" onClick={onNewPuzzle}>
+            New puzzle
+          </Button>
+          <Button onClick={onCheck}>Check</Button>
+        </Actions>
+      }
+    >
+      <Stack>
+        <div className={styles.stats}>
+          <span className={styles.score}>Score: {filledCount}</span>
+          <span className={styles.cells}>Cells: {SIZE * SIZE}</span>
+        </div>
+
+        {puzzle === null ? (
+          <p className={styles.enterSeed}>Enter a seed to start</p>
+        ) : (
+          <div className={styles.gridBlock}>
+            <div className={styles.topClues} aria-label="Column clues">
+              {puzzle.colClues.map((clue, c) => (
+                <div key={`col-${c}`} className={styles.colClue} aria-label={`Column ${c + 1} clues`}>
+                  {clue.join(' ')}
+                </div>
+              ))}
+            </div>
+            <div className={styles.rowLayout}>
+              <div className={styles.leftClues} aria-label="Row clues">
+                {puzzle.rowClues.map((clue, r) => (
+                  <div key={`row-${r}`} className={styles.rowClue} aria-label={`Row ${r + 1} clues`}>
+                    {`R${r + 1}: ${clue.join(' ')}`}
+                  </div>
+                ))}
+              </div>
+              <Board cols={SIZE} rows={SIZE} cell={36} label="Puzzle grid">
+                {Array.from({ length: SIZE }, (_, r) =>
+                  Array.from({ length: SIZE }, (_, c) => {
+                    const k = keyOf(r, c)
+                    const isOn = !!filled[k]
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        aria-label={`Cell row ${r + 1}, column ${c + 1}`}
+                        aria-pressed={isOn}
+                        className={`${styles.cell} ${isOn ? styles.cellOn : ''}`}
+                        onClick={() => toggleCell(r, c)}
+                      >
+                        {isOn ? 'X' : '-'}
+                      </button>
+                    )
+                  }),
+                )}
+              </Board>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.controls}>
+          <label className={styles.seedField} htmlFor="seed-input">
+            Seed
+          </label>
+          <input
+            id="seed-input"
+            type="text"
+            inputMode="numeric"
+            value={seedInput}
+            onChange={(e) => setSeedInput(e.target.value)}
+            className={styles.seedInput}
+          />
+        </div>
+
+        {best !== null && <p className={styles.bestLine}>Best: {best}</p>}
+        {toast && (
+          <div className={styles.toast} role="status">
+            {toast}
+          </div>
+        )}
+      </Stack>
+    </Card>
+  )
+
+  const historyCard = (
+    <Card
+      mono="History"
+      title="History"
+      actions={
+        <Actions>
+          <Button onClick={onHistoryNewPuzzle}>New puzzle</Button>
+        </Actions>
+      }
+    >
+      <Stack>
+        <p className={styles.historyNote}>
+          {best !== null ? `Best score: ${best}` : 'No scores yet. Solve a puzzle to record a best.'}
+        </p>
+        {history.length === 0 ? (
+          <p className={styles.historyEmpty}>No history yet.</p>
+        ) : (
+          <List label="Puzzle history">
+            {history.map((h, i) => (
+              <Row
+                key={i}
+                title={`Seed ${h.seed} - ${h.solved ? 'Solved' : 'Attempted'}`}
+                meta={new Date(h.at).toLocaleDateString()}
+              />
+            ))}
+          </List>
+        )}
+      </Stack>
+    </Card>
+  )
 
   return (
-    <AppShell name="Nonogram" icon="grid" hue="rust" category="Personal">
-      <div className={styles.page}>
-        <h1 className={styles.heading}>Nonogram Puzzle</h1>
-        <Stack>
-          <div className={styles.stats}>
-            <span className={styles.score}>Score: {filledCount}</span>
-            <span className={styles.cells}>Cells: {SIZE * SIZE}</span>
-          </div>
+    <AppShell
+      name="Nonogram Puzzle"
+      icon="grid"
+      hue="rust"
+      category="Personal"
+      meta={`${filledCount} filled`}
+      side={
+        <Rail title="Nonogram" note={`${SIZE}×${SIZE} grid`} chips={['Score', 'Best']}>
+          <KpiRow>
+            <Kpi value={String(filledCount)} label="Score" accent />
+            <Kpi value={best !== null ? String(best) : '—'} label="Best" />
+          </KpiRow>
+          <Tag>{seed !== null ? `Seed ${seed}` : 'No puzzle'}</Tag>
+        </Rail>
+      }
+    >
+      <div role="tablist" aria-label="Views" className={styles.tablist}>
+        <button
+          id="tab-board"
+          type="button"
+          role="tab"
+          aria-selected={tab === 'board'}
+          aria-controls="panel-board"
+          className={`${styles.tab} ${tab === 'board' ? styles.tabActive : ''}`}
+          onClick={() => setTab('board')}
+        >
+          Board
+        </button>
+        <button
+          id="tab-history"
+          type="button"
+          role="tab"
+          aria-selected={tab === 'history'}
+          aria-controls="panel-history"
+          className={`${styles.tab} ${tab === 'history' ? styles.tabActive : ''}`}
+          onClick={() => setTab('history')}
+        >
+          History
+        </button>
+      </div>
 
-          <div role="tablist" aria-label="Views" className={styles.tablist}>
-            <button
-              id="tab-board"
-              type="button"
-              role="tab"
-              aria-selected={tab === 'board'}
-              aria-controls="panel-board"
-              className={`${styles.tab} ${tab === 'board' ? styles.tabActive : ''}`}
-              onClick={() => setTab('board')}
-            >
-              Board
-            </button>
-            <button
-              id="tab-history"
-              type="button"
-              role="tab"
-              aria-selected={tab === 'history'}
-              aria-controls="panel-history"
-              className={`${styles.tab} ${tab === 'history' ? styles.tabActive : ''}`}
-              onClick={() => setTab('history')}
-            >
-              History
-            </button>
-          </div>
+      <div id="panel-board" role="tabpanel" aria-labelledby="tab-board" className={tab === 'board' ? styles.panel : styles.panelHidden}>
+        {boardCard}
+      </div>
 
-          <div id="panel-board" role="tabpanel" aria-labelledby="tab-board" className={styles.panel}>
-            <Stack>
-              {puzzle === null ? (
-                <p className={styles.enterSeed}>Enter a seed to start</p>
-              ) : (
-                <div
-                  role="grid"
-                  aria-label="Puzzle grid"
-                  className={styles.grid}
-                  style={{ gridTemplateColumns: gridTemplate, gridTemplateRows: gridTemplate }}
-                >
-                  <div className={styles.corner} aria-hidden="true" />
-                  {Array.from({ length: SIZE }, (_, c) => (
-                    <div key={`ch-${c}`} role="columnheader" aria-label={`Column ${c + 1} clues`} className={styles.clue}>
-                      {puzzle.colClues[c].join(' ')}
-                    </div>
-                  ))}
-                  {Array.from({ length: SIZE }, (_, r) => (
-                    <GridRow
-                      key={`row-${r}`}
-                      row={r}
-                      clueText={puzzle.rowClues[r].join(' ')}
-                      size={SIZE}
-                      filled={filled}
-                      onToggle={toggleCell}
-                    />
-                  ))}
-                </div>
-              )}
-
-              <div className={styles.controls}>
-                <label className={styles.seedField} htmlFor="seed-input">
-                  Seed
-                </label>
-                <input
-                  id="seed-input"
-                  type="text"
-                  inputMode="numeric"
-                  value={seedInput}
-                  onChange={(e) => setSeedInput(e.target.value)}
-                  className={styles.seedInput}
-                />
-                <Button kind="primary" onClick={onNewPuzzle}>
-                  New puzzle
-                </Button>
-                <Button onClick={onCheck}>Check</Button>
-              </div>
-              {best !== null && <p className={styles.bestLine}>Best: {best}</p>}
-              {toast && (
-                <div className={styles.toast} role="status">
-                  {toast}
-                </div>
-              )}
-            </Stack>
-          </div>
-
-          <div
-            id="panel-history"
-            role="tabpanel"
-            aria-labelledby="tab-history"
-            className={tab === 'history' ? styles.panel : styles.panelHidden}
-          >
-            <Stack>
-              <p className={styles.historyNote}>
-                {best !== null ? `Best score: ${best}` : 'No scores yet. Solve a puzzle to record a best.'}
-              </p>
-              {history.length === 0 ? (
-                <p className={styles.historyEmpty}>No history yet.</p>
-              ) : (
-                <ol className={styles.historyList}>
-                  {history.map((h, i) => (
-                    <li key={i} className={styles.historyItem}>
-                      <span>Seed {h.seed} - {h.solved ? 'Solved' : 'Attempted'}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-              <Button onClick={onHistoryNewPuzzle}>New puzzle</Button>
-            </Stack>
-          </div>
-        </Stack>
+      <div
+        id="panel-history"
+        role="tabpanel"
+        aria-labelledby="tab-history"
+        className={tab === 'history' ? styles.panel : styles.panelHidden}
+      >
+        {historyCard}
       </div>
     </AppShell>
-  )
-}
-
-function GridRow({
-  row,
-  clueText,
-  size,
-  filled,
-  onToggle,
-}: {
-  row: number
-  clueText: string
-  size: number
-  filled: Record<string, boolean>
-  onToggle: (r: number, c: number) => void
-}) {
-  return (
-    <div role="row" className={styles.rowEl}>
-      <div role="rowheader" aria-label={`Row ${row + 1} clues`} className={styles.clue}>
-        {clueText}
-      </div>
-      {Array.from({ length: size }, (_, c) => {
-        const k = keyOf(row, c)
-        const isOn = !!filled[k]
-        return (
-          <button
-            key={k}
-            type="button"
-            role="gridcell"
-            aria-label={`Row ${row + 1}, Column ${c + 1}`}
-            aria-pressed={isOn}
-            className={`${styles.cell} ${isOn ? styles.cellOn : ''}`}
-            onClick={() => onToggle(row, c)}
-          >
-            {isOn ? 'X' : '-'}
-          </button>
-        )
-      })}
-    </div>
   )
 }

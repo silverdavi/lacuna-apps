@@ -1,94 +1,98 @@
 import { expect, test, type Page } from '@playwright/test'
 
 // Cells are addressed (row, column), both counted from 1, row 1 at the top.
-// Cells are found as gridcells named "Row R, Column C" (the spec's cell naming).
-const cell = (page: Page, r: number, c: number) => page.getByRole('gridcell', { name: `Row ${r}, Column ${c}`, exact: true })
+// Cells are buttons named "Cell row R, column C" (exact, per the spec).
+const cell = (page: Page, r: number, c: number) => page.getByRole('button', { name: `Cell row ${r}, column ${c}`, exact: true })
 
-async function loadSeed(page: Page, seed: string) {
+// Seed 1 solution, rows top to bottom: XXX..; X.X..; X.XX.; ...X.; .XXXX.
+const SOLUTION: [number, number][] = [
+  [1, 1], [1, 2], [1, 3],
+  [2, 1], [2, 3],
+  [3, 1], [3, 3], [3, 4],
+  [4, 4],
+  [5, 2], [5, 3], [5, 4], [5, 5],
+]
+
+async function start(page: Page, seed = '1') {
+  await page.goto('/')
   await page.getByLabel('Seed', { exact: true }).fill(seed)
   await page.getByRole('button', { name: 'New puzzle', exact: true }).click()
 }
 
-test('[A1] on first load the heading and "Enter a seed to start" are shown', async ({ page }) => {
+async function fillAll(page: Page) {
+  for (const [r, c] of SOLUTION) await cell(page, r, c).click()
+}
+
+test('[A1] on first load the heading is shown and the page says to enter a seed', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Nonogram Puzzle', exact: true })).toBeVisible()
-  await expect(page.getByText('Enter a seed to start')).toBeVisible()
+  await expect(page.getByText('Enter a seed to start', { exact: true })).toBeVisible()
 })
 
-test('[A2] loading seed 1 shows a 5x5 grid with row 1 clue 3 and column 1 clue 3', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
-  const grid = page.getByRole('grid')
-  await expect(grid.getByRole('gridcell')).toHaveCount(25)
-  await expect(grid.getByRole('row')).toHaveCount(5)
-  await expect(grid.getByRole('columnheader').first()).toContainText('3')
-  await expect(grid.getByRole('row').first().getByRole('rowheader')).toContainText('3')
+test('[A2] seed 1 loads a 5x5 grid with row clue 3 for row 1 and column clue 3 for column 1', async ({ page }) => {
+  await start(page)
+  for (let r = 1; r <= 5; r++) {
+    for (let c = 1; c <= 5; c++) {
+      await expect(cell(page, r, c)).toBeVisible()
+    }
+  }
+  await expect(page.getByRole('button', { name: `Cell row 6, column 1`, exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: `Cell row 1, column 6`, exact: true })).toHaveCount(0)
+  await expect(page.getByText('3', { exact: true })).toHaveCount(2)
 })
 
-test('[A3] filling row 1 column 1 shows X and Score: 1', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
+test('[A3] clicking cell row 1 column 1 fills it and the score becomes 1', async ({ page }) => {
+  await start(page)
   await cell(page, 1, 1).click()
-  await expect(cell(page, 1, 1)).toContainText('X')
-  await expect(page.getByText('Score: 1')).toBeVisible()
+  await expect(cell(page, 1, 1)).toHaveText('X')
+  await expect(page.getByText('Score: 1', { exact: true })).toBeVisible()
 })
 
-test('[A4] filling row 1 column 1 then row 1 column 2 shows Score: 2', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
+test('[A4] clicking cell row 1 column 2 after row 1 column 1 gives two filled cells', async ({ page }) => {
+  await start(page)
   await cell(page, 1, 1).click()
   await cell(page, 1, 2).click()
-  await expect(cell(page, 1, 2)).toContainText('X')
-  await expect(page.getByText('Score: 2')).toBeVisible()
+  await expect(cell(page, 1, 2)).toHaveText('X')
+  await expect(page.getByText('Score: 2', { exact: true })).toBeVisible()
 })
 
-test('[A5] clicking a filled cell toggles it empty and shows Score: 0', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
+test('[A5] clicking a filled cell again empties it and the score goes back to 0', async ({ page }) => {
+  await start(page)
   await cell(page, 1, 1).click()
   await cell(page, 1, 1).click()
-  await expect(cell(page, 1, 1)).toContainText('-')
-  await expect(page.getByText('Score: 0')).toBeVisible()
+  await expect(cell(page, 1, 1)).toHaveText('-')
+  await expect(page.getByText('Score: 0', { exact: true })).toBeVisible()
 })
 
-test('[A6] checking with row 1 column 1 filled reports Incorrect: 1 cell(s) wrong', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
+test('[A6] checking with one wrong fill reports 1 right and 12 missing', async ({ page }) => {
+  await start(page)
   await cell(page, 1, 1).click()
   await page.getByRole('button', { name: 'Check', exact: true }).click()
-  await expect(page.getByText('Incorrect: 1 cell(s) wrong')).toBeVisible()
+  await expect(page.getByText('Not solved: 1 of 13 filled cells are right and 12 are missing', { exact: true })).toBeVisible()
 })
 
-// The spec's solution for seed 1 is not given and the clues do not determine it, so filling every
-// cell is the one pattern that makes "Check" show Solved! with Best: 25.
-test('[A7] filling every cell and checking shows Solved! and Best: 25', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
-  for (let r = 1; r <= 5; r++) {
-    for (let c = 1; c <= 5; c++) await cell(page, r, c).click()
-  }
+test('[A7] filling the 13 solution cells and checking shows Solved! and Best: 13', async ({ page }) => {
+  await start(page)
+  await fillAll(page)
   await page.getByRole('button', { name: 'Check', exact: true }).click()
-  await expect(page.getByText('Solved!')).toBeVisible()
-  await expect(page.getByText('Best: 25')).toBeVisible()
+  await expect(page.getByText('Solved!', { exact: true })).toBeVisible()
+  await expect(page.getByText('Best: 13', { exact: true })).toBeVisible()
 })
 
 test('[A8] after solving seed 1 the History tab lists Seed 1 - Solved', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
-  for (let r = 1; r <= 5; r++) {
-    for (let c = 1; c <= 5; c++) await cell(page, r, c).click()
-  }
+  await start(page)
+  await fillAll(page)
   await page.getByRole('button', { name: 'Check', exact: true }).click()
-  await expect(page.getByText('Solved!')).toBeVisible()
+  await expect(page.getByText('Solved!', { exact: true })).toBeVisible()
   await page.getByRole('tab', { name: 'History', exact: true }).click()
-  await expect(page.getByText('Seed 1 - Solved')).toBeVisible()
+  await expect(page.getByText('Seed 1 - Solved', { exact: true })).toBeVisible()
 })
 
 test('[A9] a reload keeps the filled cell and the score', async ({ page }) => {
-  await page.goto('/')
-  await loadSeed(page, '1')
+  await start(page)
   await cell(page, 1, 1).click()
+  await expect(page.getByText('Score: 1', { exact: true })).toBeVisible()
   await page.reload()
-  await expect(cell(page, 1, 1)).toContainText('X')
-  await expect(page.getByText('Score: 1')).toBeVisible()
+  await expect(cell(page, 1, 1)).toHaveText('X')
+  await expect(page.getByText('Score: 1', { exact: true })).toBeVisible()
 })

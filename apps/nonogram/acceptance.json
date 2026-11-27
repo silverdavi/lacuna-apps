@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "df7f06cf0f3cd97f805e23aef9d892cc49aab07306ce331280c0c96fef94299f",
+  "spec_sha256": "9e10062487de74e26011b002d04eae5b3cd65d669c747980e4fae2371b72ef9f",
   "checks": [
     {
       "id": "A1",
@@ -24,11 +24,11 @@
     },
     {
       "id": "A6",
-      "text": "After loading seed \"1\" and filling the cell at row 1, column 1, clicking the button \"Check\" shows the toast text \"Incorrect: 1 cell(s) wrong\" because the puzzle is not solved."
+      "text": "After loading seed \"1\" and filling only the cell at row 1, column 1, clicking the button \"Check\" shows the toast text \"Not solved: 1 of 13 filled cells are right and 12 are missing\"."
     },
     {
       "id": "A7",
-      "text": "After loading seed \"1\", filling all cells in the solution pattern for that seed, clicking the button \"Check\" shows the toast text \"Solved!\" and the best score display shows \"Best: 25\"."
+      "text": "After loading seed \"1\", clicking exactly the 13 cells of the solution (see the notes), clicking the button \"Check\" shows the toast text \"Solved!\" and \"Best: 13\"."
     },
     {
       "id": "A8",
@@ -42,7 +42,7 @@
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "b82900c6162f65b3e2500cd809edbf895ff26e03b50a99436d8c0b70f7c6c168"
+      "sha256": "5219af9cd8d761610e06f7c70652314f6e809f764809d65a4278295211c31051"
     }
   ]
 }

@@ -62,26 +62,46 @@
   color: var(--mid);
 }
 
-.grid {
-  display: grid;
-  gap: calc(3px * var(--sf));
+.gridBlock {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--sf));
   width: max-content;
 }
 
-.corner {
-  background: none;
+.topClues {
+  display: flex;
+  align-items: flex-end;
 }
 
-.rowEl {
-  display: contents;
-}
-
-.clue {
+.colClue {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.5rem;
-  min-height: 1.4rem;
+  width: calc(22px * var(--sf));
+  min-height: calc(20px * var(--sf));
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--mid);
+}
+
+.rowLayout {
+  display: flex;
+  align-items: flex-start;
+}
+
+.leftClues {
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(1px * var(--sf));
+}
+
+.rowClue {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: calc(3.2rem * var(--sf));
+  min-height: calc(22px * var(--sf));
   font-family: var(--mono);
   font-size: 0.8rem;
   color: var(--mid);
