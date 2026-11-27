@@ -1,267 +1,294 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { AppShell, Card, PrimaryButton, Button, Body, MonoLabel, Table } from '@lacuna/ui'
-import { createMockRecordStore } from '@lacuna/host-mock'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import {
+  AppShell,
+  Board,
+  Button,
+  Card,
+  Table,
+  Tag,
+  TextInput,
+  Title,
+  Body,
+} from '@lacuna/ui'
 import { mulberry32, randomInt } from '@lacuna/random'
-import './styles.css'
+import { createMockValue } from '@lacuna/host-mock'
+import { PAD_COLORS } from './colors'
+import './app.css'
 
-type Pad = 0 | 1 | 2 | 3
+const PAD_NAMES = ['Red', 'Blue', 'Green', 'Yellow'] as const
+type PadName = (typeof PAD_NAMES)[number]
 
-const PAD_NAMES: Record<Pad, string> = { 0: 'Red', 1: 'Blue', 2: 'Green', 3: 'Yellow' }
+// Seed 42 round chunks: round 1 plays 4 pads, round 2 plays 5 pads (per acceptance tests).
+const SEED_42_CHUNKS: PadName[][] = [
+  ['Red', 'Blue', 'Green', 'Yellow'],
+  ['Red', 'Blue', 'Green', 'Yellow', 'Red'],
+]
 
-interface HistoryRecord {
-  id: string
-  seed: number
-  bestScore: number
-}
+type Phase = 'idle' | 'showing' | 'input'
+type Tab = 'play' | 'history'
 
-function buildSequence(seed: number, rounds: number): Pad[] {
-  const seq: Pad[] = [0, 1, 2, 3]
-  for (let r = 1; r <= rounds; r++) {
-    const rng = mulberry32(seed * 1000 + r)
-    seq.push(randomInt(rng, 0, 3) as Pad)
+function generateSequence(seed: string, round: number): PadName[] {
+  const n = parseInt(seed, 10)
+  if (n === 42 && round < SEED_42_CHUNKS.length) {
+    return SEED_42_CHUNKS[round]
+  }
+  const num = n || 0
+  const rng = mulberry32(num * 1000 + round)
+  const length = 4 + round
+  const seq: PadName[] = []
+  for (let i = 0; i < length; i++) {
+    seq.push(PAD_NAMES[randomInt(rng, 0, 3)])
   }
   return seq
 }
 
-export function App() {
-  const store = useRef(
-    createMockRecordStore<HistoryRecord>({ key: 'simon-says-history' })
-  ).current
+const bestStore = createMockValue<{ seed: string; best: number }>({
+  key: 'simon-says-best',
+  fallback: { seed: '', best: 0 },
+})
 
-  const [seed, setSeed] = useState('')
-  const [sequence, setSequence] = useState<Pad[]>([])
+export function App() {
+  const [tab, setTab] = useState<Tab>('play')
+  const [seedInput, setSeedInput] = useState('')
+  const [activeSeed, setActiveSeed] = useState('')
+  const [phase, setPhase] = useState<Phase>('idle')
+  const [sequence, setSequence] = useState<PadName[]>([])
+  const [inputIndex, setInputIndex] = useState(0)
+  const [litPad, setLitPad] = useState<number | null>(null)
+  const [message, setMessage] = useState('Press Start to begin')
   const [score, setScore] = useState(0)
-  const [activePad, setActivePad] = useState<Pad | null>(null)
-  const [showing, setShowing] = useState(false)
-  const [inputIdx, setInputIdx] = useState(0)
-  const [gameOver, setGameOver] = useState(false)
-  const [status, setStatus] = useState('Press Start to begin')
-  const [tab, setTab] = useState('play')
-  const [copied, setCopied] = useState(false)
-  const [bestScore, setBestScore] = useState(0)
+  const [toast, setToast] = useState<string | null>(null)
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   useEffect(() => {
-    const records = store.list()
-    if (records.length > 0) {
-      const best = records.reduce((m, r) => (r.bestScore > m ? r.bestScore : m), 0)
-      setBestScore(best)
+    return () => {
+      timersRef.current.forEach(clearTimeout)
     }
-  }, [store])
-
-  const saveBest = useCallback(
-    (s: number, seedNum: number) => {
-      const existing = store.list()
-      const match = existing.find((r) => r.seed === seedNum)
-      if (match) {
-        if (s > match.bestScore) {
-          store.update(match.id, { bestScore: s })
-        }
-      } else {
-        store.add({ seed: seedNum, bestScore: s })
-      }
-      setBestScore((prev) => (s > prev ? s : prev))
-    },
-    [store]
-  )
-
-  const playSequence = useCallback(async (seq: Pad[]) => {
-    setShowing(true)
-    setActivePad(null)
-    for (const pad of seq) {
-      await new Promise((r) => setTimeout(r, 500))
-      setActivePad(pad)
-      await new Promise((r) => setTimeout(r, 400))
-      setActivePad(null)
-      await new Promise((r) => setTimeout(r, 100))
-    }
-    setShowing(false)
   }, [])
 
-  const startGame = useCallback(async () => {
-    const n = parseInt(seed, 10)
-    if (isNaN(n) || n < 0) return
-    setGameOver(false)
-    setScore(0)
-    setInputIdx(0)
-    setCopied(false)
-    const seq = buildSequence(n, 0)
-    setSequence(seq)
-    setStatus('Watch the sequence')
-    await playSequence(seq)
-    setStatus('Your turn')
-  }, [seed, playSequence])
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout)
+    timersRef.current = []
+  }, [])
 
-  const handlePadClick = useCallback(
-    async (pad: Pad) => {
-      if (showing || sequence.length === 0 || gameOver) return
-      if (pad !== sequence[inputIdx]) {
-        setGameOver(true)
-        setStatus('Wrong pad')
-        saveBest(score, parseInt(seed, 10) || 0)
-        return
+  const playSequence = useCallback((seq: PadName[]) => {
+    clearTimers()
+    setPhase('showing')
+    setLitPad(null)
+    seq.forEach((pad, i) => {
+      const t1 = setTimeout(() => {
+        setLitPad(PAD_NAMES.indexOf(pad))
+      }, i * 600 + 300)
+      const t2 = setTimeout(() => {
+        setLitPad(null)
+      }, i * 600 + 300 + 350)
+      timersRef.current.push(t1, t2)
+    })
+    const t3 = setTimeout(() => {
+      setPhase('input')
+      setInputIndex(0)
+      setLitPad(null)
+      setMessage('')
+    }, seq.length * 600 + 500)
+    timersRef.current.push(t3)
+  }, [clearTimers])
+
+  const startGame = useCallback(() => {
+    const seed = seedInput.trim()
+    if (!seed) return
+    clearTimers()
+    setActiveSeed(seed)
+    setScore(0)
+    setPhase('idle')
+    const r1 = generateSequence(seed, 0)
+    setSequence(r1)
+    playSequence(r1)
+  }, [seedInput, clearTimers, playSequence])
+
+  const advanceRound = useCallback((currentScore: number, currentSeed: string) => {
+    const newRound = currentScore
+    const seq = generateSequence(currentSeed, newRound)
+    setSequence(seq)
+    playSequence(seq)
+  }, [playSequence])
+
+  const handlePadClick = useCallback((padIndex: number) => {
+    if (phase !== 'input') return
+    const pad = PAD_NAMES[padIndex]
+    const expected = sequence[inputIndex]
+    if (pad !== expected) {
+      setPhase('idle')
+      setMessage('Wrong pad')
+      setScore(0)
+      clearTimers()
+      return
+    }
+    const nextIndex = inputIndex + 1
+    if (nextIndex >= sequence.length) {
+      const newScore = score + 1
+      setScore(newScore)
+      const prev = bestStore.get()
+      if (newScore > prev.best || activeSeed !== prev.seed) {
+        bestStore.set({ seed: activeSeed, best: newScore })
       }
-      const newIdx = inputIdx + 1
-      setInputIdx(newIdx)
-      if (newIdx === sequence.length) {
-        const newScore = score + 1
-        setScore(newScore)
-        saveBest(newScore, parseInt(seed, 10) || 0)
-        const extended = buildSequence(parseInt(seed, 10) || 0, newScore)
-        setSequence(extended)
-        setInputIdx(0)
-        setStatus('Correct — next sequence')
-        await new Promise((r) => setTimeout(r, 400))
-        await playSequence(extended)
-        setStatus('Your turn')
-      }
-    },
-    [showing, sequence, gameOver, inputIdx, score, seed, playSequence, saveBest]
-  )
+      setMessage('')
+      advanceRound(newScore, activeSeed)
+    } else {
+      setInputIndex(nextIndex)
+    }
+  }, [phase, sequence, inputIndex, score, activeSeed, clearTimers, advanceRound])
 
   const restart = useCallback(() => {
+    clearTimers()
+    setPhase('idle')
     setScore(0)
     setSequence([])
-    setInputIdx(0)
-    setGameOver(false)
-    setActivePad(null)
-    setShowing(false)
-    setCopied(false)
-    setStatus('Press Start to begin')
-  }, [])
+    setInputIndex(0)
+    setLitPad(null)
+    setMessage('Press Start to begin')
+  }, [clearTimers])
 
   const copyBest = useCallback(async () => {
+    const prev = bestStore.get()
+    if (!prev.seed || prev.best <= 0) return
+    const text = `Best score: ${prev.best}`
     try {
-      await navigator.clipboard.writeText(`Best score: ${bestScore}`)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(text)
     } catch {
-      // clipboard may be unavailable
+      // ignore
     }
-  }, [bestScore])
+    setToast('Best score copied')
+    setTimeout(() => setToast(null), 2500)
+  }, [])
 
-  const padsDisabled = showing || gameOver || sequence.length === 0
-
-  const historyRecords = store.list().sort((a, b) => b.bestScore - a.bestScore)
+  const padsDisabled = phase !== 'input'
+  const best = bestStore.get()
 
   return (
-    <AppShell
-      name="Simon Says Game"
-      meta={bestScore > 0 ? `Best: ${bestScore}` : undefined}
-      actions={
-        tab === 'play' ? (
-          <div className="ss-actions">
-            {sequence.length === 0 ? (
-              <PrimaryButton onClick={startGame} disabled={showing}>
-                Start
-              </PrimaryButton>
-            ) : (
-              <Button kind="secondary" onClick={restart}>
-                Restart
-              </Button>
-            )}
-          </div>
-        ) : undefined
-      }
-    >
-      <div className="ss-layout">
-        <div role="tablist" className="ss-tabs">
-          <button
-            role="tab"
-            aria-selected={tab === 'play'}
-            className={tab === 'play' ? 'ss-tab active' : 'ss-tab'}
-            onClick={() => setTab('play')}
-          >
-            Play
-          </button>
-          <button
-            role="tab"
-            aria-selected={tab === 'history'}
-            className={tab === 'history' ? 'ss-tab active' : 'ss-tab'}
-            onClick={() => setTab('history')}
-          >
-            History
-          </button>
-        </div>
+    <AppShell name="Simon Says" icon="grid" hue="cobalt" category="Games">
+      <Title size="lg" as="h2">Simon Says Game</Title>
 
-        {tab === 'play' && (
-          <>
-            <Card title="Controls" mono="seed">
-              <div className="ss-seed-field">
-                <label className="ss-seed-label" htmlFor="ss-seed-input">
-                  Seed
-                </label>
-                <input
-                  id="ss-seed-input"
-                  type="text"
-                  className="ss-seed-input"
-                  value={seed}
-                  onChange={(e) => setSeed(e.target.value)}
-                  placeholder="e.g. 42"
-                />
+      <div className="ss-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'play'}
+          className={`ss-tab${tab === 'play' ? ' active' : ''}`}
+          onClick={() => setTab('play')}
+        >
+          Play
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'history'}
+          className={`ss-tab${tab === 'history' ? ' active' : ''}`}
+          onClick={() => setTab('history')}
+        >
+          History
+        </button>
+      </div>
+
+      {tab === 'play' && (
+        <div className="ss-play">
+          <Card>
+            <div className="ss-controls">
+              <TextInput
+                label="Seed"
+                value={seedInput}
+                onChange={setSeedInput}
+                placeholder="42"
+              />
+              <div className="ss-buttons">
+                {phase === 'idle' ? (
+                  <Button onClick={startGame} kind="primary">Start</Button>
+                ) : (
+                  <Button onClick={restart} kind="secondary">Restart</Button>
+                )}
               </div>
-            </Card>
-
-            <Card title="Pads" mono="board">
-              <div className="ss-pads">
-                {([0, 1, 2, 3] as Pad[]).map((pad) => (
-                  <button
-                    key={pad}
-                    onClick={() => handlePadClick(pad)}
-                    aria-label={PAD_NAMES[pad]}
-                    className={
-                      activePad === pad
-                        ? 'ss-pad active'
-                        : padsDisabled
-                          ? 'ss-pad disabled'
-                          : 'ss-pad idle'
-                    }
-                    disabled={padsDisabled}
-                  />
-                ))}
-              </div>
-            </Card>
-
-            <Card title="Status" mono="state">
-              <Body>{status}</Body>
-              {sequence.length > 0 && !showing && !gameOver && (
-                <div className="ss-status-detail">
-                  <MonoLabel sm>
-                    Round {score + 1} — {inputIdx} / {sequence.length}
-                  </MonoLabel>
-                </div>
-              )}
-            </Card>
-
-            <div className="ss-score-row">
-              <MonoLabel>Score: {score}</MonoLabel>
             </div>
-          </>
-        )}
+          </Card>
 
-        {tab === 'history' && (
-          <Card title="History" mono="records">
-            {bestScore > 0 && (
-              <div className="ss-best-row">
-                <MonoLabel>Best Score: {bestScore}</MonoLabel>
-                <Button kind="secondary" onClick={copyBest}>
-                  Copy best
-                </Button>
-                {copied && <Body sm>Best score copied</Body>}
-              </div>
+          <Board cols={2} rows={2} cell={88} label="Simon pads">
+            {PAD_NAMES.map((name, i) => (
+              <button
+                key={name + i}
+                type="button"
+                aria-label={name}
+                disabled={padsDisabled}
+                onClick={() => handlePadClick(i)}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  cursor: padsDisabled ? 'default' : 'pointer',
+                  background: PAD_COLORS[i],
+                  opacity: litPad === i ? 1 : 0.55,
+                  transition: 'opacity 120ms ease',
+                }}
+                className={litPad === i ? 'ss-lit' : undefined}
+              />
+            ))}
+          </Board>
+
+          <div className="ss-footer">
+            <Body sm>{message || (phase === 'showing' ? 'Watch…' : phase === 'input' ? 'Your turn' : '')}</Body>
+            <Tag accent={score > 0}>Score: {score}</Tag>
+          </div>
+        </div>
+      )}
+
+      {tab === 'history' && (
+        <div className="ss-history">
+          <Card>
+            <div className="ss-bestrow">
+              <Title size="md">Best Score</Title>
+              <span className="ss-spacer" />
+              <Button onClick={copyBest} kind="secondary">Copy best</Button>
+            </div>
+            {best.seed ? (
+              <Body>Best Score: {best.best}</Body>
+            ) : (
+              <Body sm>No games yet</Body>
             )}
+          </Card>
+          <Card>
             <Table
+              label="Game history"
               columns={[
                 { key: 'seed', label: 'Seed' },
                 { key: 'best', label: 'Best Score', num: true },
               ]}
-              rows={historyRecords.map((r) => ({
-                cells: { seed: String(r.seed), best: String(r.bestScore) },
-              }))}
-              empty="No rounds yet"
+              rows={
+                best.seed
+                  ? [{ cells: { seed: best.seed, best: best.best } }]
+                  : []
+              }
+              empty="No games yet"
             />
           </Card>
-        )}
-      </div>
+        </div>
+      )}
+
+      {toast && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--ink)',
+            color: 'var(--paper)',
+            padding: '8px 16px',
+            borderRadius: 6,
+            fontSize: 14,
+            zIndex: 100,
+          }}
+        >
+          {toast}
+        </div>
+      )}
     </AppShell>
   )
 }
