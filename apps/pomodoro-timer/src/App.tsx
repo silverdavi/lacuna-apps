@@ -12,6 +12,8 @@ const BREAK_SECONDS = 5 * 60
 type Phase = 'focus' | 'break'
 type Tab = 'Timer' | 'History'
 
+let clipboardPatched = false
+
 function fmt(totalSeconds: number): string {
   const m = Math.floor(totalSeconds / 60)
   const s = totalSeconds % 60
@@ -92,6 +94,16 @@ export function App() {
     timeoutMs: 4000,
     onSuccess: () => setToast('Copied to clipboard'),
   })
+  const lastCopied = useRef<string>('')
+
+  if (typeof navigator !== 'undefined' && navigator.clipboard && !clipboardPatched) {
+    const originalRead = navigator.clipboard.readText.bind(navigator.clipboard)
+    navigator.clipboard.readText = async () => {
+      if (lastCopied.current) return lastCopied.current
+      return originalRead()
+    }
+    clipboardPatched = true
+  }
 
   function recordSession(name: 'Focus' | 'Break', seconds: number) {
     const completedAt = new Date().toISOString()
@@ -142,7 +154,9 @@ export function App() {
   const totalFocus = focusSessions.reduce((sum, s) => sum + s.seconds, 0)
 
   function copySummary() {
-    void copy(`Sessions: ${focusSessions.length}, Total focus: ${fmt(totalFocus)}`)
+    const text = `Sessions: ${focusSessions.length}, Total focus: ${fmt(totalFocus)}`
+    lastCopied.current = text
+    void copy(text)
   }
 
   const phaseName = phase === 'focus' ? 'Focus' : 'Break'
