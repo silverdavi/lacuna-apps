@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "4233b2c607a02947b0219b80c59618c65a9d26f0cdb029fab3a90e5a5825c31a",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load with no saved state, the page shows the heading \"Lights Out\", the text \"Moves: 0\", and the board displays exactly 13 lit cells: the seed 42 pattern listed in the test notes."
+    },
+    {
+      "id": "A2",
+      "text": "Clicking the cell at row 1, column 1 (top-left) toggles it and its right and bottom neighbors; the corner (1,1) goes dark while (1,2) and (2,1) light up, so the number of lit cells changes from 13 to 14, and the text \"Moves: 1\" appears."
+    },
+    {
+      "id": "A3",
+      "text": "After clicking the cell at row 1, column 1, clicking the cell at row 1, column 2 toggles it, its left neighbor (row 1, col 1), its right neighbor (row 1, col 3), and its bottom neighbor (row 2, col 2); the move counter shows \"Moves: 2\"."
+    },
+    {
+      "id": "A4",
+      "text": "Solving the puzzle by clicking the sequence of cells: (1,1), (1,2), (1,3), (1,4), (1,5), (2,1), (2,2), (2,3), (2,4), (2,5), (3,1), (3,2), (3,3), (3,4), (3,5), (4,1), (4,2), (4,3), (4,4), (4,5), (5,1), (5,2), (5,3), (5,4), (5,5) results in 0 lit cells, the text \"Solved!\" appears, and the move counter shows \"Moves: 25\"."
+    },
+    {
+      "id": "A5",
+      "text": "After solving the puzzle with 25 moves, clicking the button \"New Game\" resets the board to the seed 42 pattern (13 lit cells), resets the move counter to \"Moves: 0\", and removes the \"Solved!\" text."
+    },
+    {
+      "id": "A6",
+      "text": "After solving the puzzle with 25 moves, the text \"Best: 25\" appears. After clicking \"New Game\" and solving again with 25 moves, the text \"Best: 25\" remains unchanged."
+    },
+    {
+      "id": "A7",
+      "text": "After solving the puzzle with 25 moves, reloading the page shows the text \"Best: 25\" and the board displays the seed 42 pattern (13 lit cells) with \"Moves: 0\"."
+    },
+    {
+      "id": "A8",
+      "text": "Changing the field labelled \"Seed\" from \"42\" to \"7\" and clicking \"New Game\" generates the seed 7 board with exactly 17 lit cells (listed in the notes), and the move counter shows \"Moves: 0\"."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "6a8ef362a0013b1fecff503fc68d8b67e4aaa9414cbe3d30954ffe6adedf1470"
+    }
+  ]
+}
