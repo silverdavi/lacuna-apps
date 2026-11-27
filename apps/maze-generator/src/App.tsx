@@ -315,13 +315,11 @@ export function App() {
               label="History"
               columns={[
                 { key: 'best', label: 'Best Score', num: true },
-                { key: 'solved', label: 'Mazes solved', num: true },
               ]}
               rows={[
                 {
                   cells: {
                     best: String(stats.best),
-                    solved: String(stats.solved),
                   },
                 },
               ]}
