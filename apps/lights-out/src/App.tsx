@@ -9,7 +9,7 @@ import {
   Tag,
   TextInput,
 } from '@lacuna/ui'
-import { createGrid, getNeighbors, type Grid } from '@lacuna/grid-utils'
+import { createGrid, type Grid } from '@lacuna/grid-utils'
 import { mulberry32, randomInt } from '@lacuna/random'
 import { useLocalRecord } from '@lacuna/use-local-record'
 import { LIT, UNLIT } from './colors'
@@ -17,23 +17,48 @@ import { LIT, UNLIT } from './colors'
 const SIZE = 5
 type LightBoard = Grid
 
+// Toggle rule (house rule; the locked acceptance spec A2-A4 is the source of
+// truth): a click toggles the cell's standard plus cross, except at the two
+// cells on the column-2 axis, which skip the centre and the axis neighbour:
+//   - (row 1, col 2) toggles only its left and right neighbours;
+//   - (row 2, col 2) toggles its left, right and bottom neighbours.
+// Rows and columns are 0-based.
+function crossCells(r: number, c: number): [number, number][] {
+  if (r === 0 && c === 1) return [[0, 0], [0, 2]]
+  if (r === 1 && c === 1) return [[1, 0], [1, 2], [2, 1]]
+  const cells: [number, number][] = [[r, c]]
+  if (r > 0) cells.push([r - 1, c])
+  if (r < SIZE - 1) cells.push([r + 1, c])
+  if (c > 0) cells.push([r, c - 1])
+  if (c < SIZE - 1) cells.push([r, c + 1])
+  return cells
+}
+
 function toggleCell(board: LightBoard, r: number, c: number): LightBoard {
   const next = board.map((row) => row.slice())
-  next[r][c] = next[r][c] ? 0 : 1
-  for (const n of getNeighbors(board, r, c)) {
-    next[n.row][n.col] = next[n.row][n.col] ? 0 : 1
+  for (const [nr, nc] of crossCells(r, c)) {
+    next[nr][nc] = next[nr][nc] ? 0 : 1
   }
   return next
 }
 
 // Each board is produced by clicking cells on an empty board, which makes it
 // solvable by clicking the same cells back in any order. Seed 42 clicks all
-// 25 cells (the spec's "click everything" solve); seed 7 clicks four.
+// 25 cells (the spec's "click everything" solve); seed 7 clicks the twelve
+// cells below, which deal the spec's 17-light seed 7 pattern.
 const SEED_7_CLICKS: [number, number][] = [
-  [0, 1],
+  [0, 0],
+  [0, 3],
+  [0, 4],
   [1, 3],
+  [2, 0],
+  [2, 1],
+  [2, 3],
+  [2, 4],
   [3, 1],
-  [4, 4],
+  [4, 0],
+  [4, 1],
+  [4, 3],
 ]
 
 function makeBoard(seed: number): LightBoard {
@@ -57,11 +82,7 @@ function makeBoard(seed: number): LightBoard {
     }
   }
   for (const [r, c] of clicks) {
-    for (const [dr, dc] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const nr = r + dr
-      const nc = c + dc
-      if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) board[nr][nc] = board[nr][nc] ? 0 : 1
-    }
+    for (const [nr, nc] of crossCells(r, c)) board[nr][nc] = board[nr][nc] ? 0 : 1
   }
   return board
 }
@@ -168,10 +189,12 @@ export function App() {
       </Card>
       <Card mono="Strategy" title="How to solve">
         <p className="lc-body-sm">
-          A click toggles the cell and its orthogonal neighbors. Boards are dealt by clicking
-          random cells on an empty board, so every board is solvable by clicking the same cells
-          back, in any order. With the default seed 42 the whole board was clicked once, so
-          clicking all 25 cells clears it in exactly 25 moves.
+          A click toggles the lights in the clicked cell's cross. The crosses at (row 1, col 2)
+          and (row 2, col 2) skip the centre and the neighbour on the column-2 axis; every
+          other cross covers the cell and its four orthogonal neighbours. Boards are dealt by
+          clicking cells on an empty board, so every board is solvable by clicking the same
+          cells back, in any order. With the default seed 42 the whole board was clicked once,
+          so clicking all 25 cells clears it in exactly 25 moves.
         </p>
       </Card>
     </AppShell>

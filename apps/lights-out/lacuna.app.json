@@ -4,7 +4,7 @@
   "name": "Lights Out",
   "version": "0.1.0",
   "summary": "Solve the 5x5 Lights Out puzzle.",
-  "description": "Click cells to toggle them and their orthogonal neighbors. Turn off every light. A deterministic seed generates each board, the move count is tracked, and the best score is saved locally.",
+  "description": "Click cells to toggle the lights in their cross neighborhood. Turn off every light. A deterministic seed generates each board, the move count is tracked, and the best score is saved locally.",
   "category": "personal",
   "tags": [],
   "icon": "grid",
