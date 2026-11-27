@@ -1,0 +1,36 @@
+.mm-secret {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: calc(4px * var(--sf));
+  width: 100%;
+  max-width: calc(320px * var(--sf));
+}
+
+.mm-cell-secret {
+  display: grid;
+  place-items: center;
+  min-height: calc(30px * var(--sf));
+  border-radius: calc(6px * var(--sf));
+  background: var(--ui-card);
+}
+
+.mm-peg {
+  width: 72%;
+  height: 72%;
+  min-width: calc(20px * var(--sf));
+  min-height: calc(20px * var(--sf));
+  border-radius: 50%;
+}
+
+.mm-markers {
+  display: flex;
+  gap: calc(8px * var(--sf));
+  align-items: center;
+}
+
+.mm-marker {
+  display: inline-block;
+  width: calc(10px * var(--sf));
+  height: calc(10px * var(--sf));
+  border-radius: 50%;
+}
