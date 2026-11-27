@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "spec_sha256": "5a28b6024783fe4af31dab2476c8f84ae9484832c75853eb8e447b1f1f099c9e",
+  "spec_sha256": "468bad59019c35d3a82b46b464a6a74bfb76639215c040862bfe89a107284020",
   "checks": [
     {
       "id": "A1",
@@ -37,12 +37,20 @@
     {
       "id": "A9",
       "text": "Reload keeps tasks and their state: after adding \"Buy milk\" and \"Call mom\", checking \"Buy milk\" and reloading, checkbox \"Buy milk\" is checked, checkbox \"Call mom\" is not, and progress is \"50\"."
+    },
+    {
+      "id": "A10",
+      "text": "The page has tabs \"Tasks\", \"Done\" and \"Settings\"; checking \"Buy milk\" and clicking the tab \"Done\" shows a list containing \"Buy milk\" and not \"Call mom\"; clicking \"Settings\" shows a button \"Clear completed\"."
+    },
+    {
+      "id": "A11",
+      "text": "After adding \"Buy milk\" and \"Call mom\", the titlebar button \"Export CSV\" downloads \"tasks.csv\" whose first line is \"title,due,done\" and which has 2 data rows."
     }
   ],
   "locked": [
     {
       "path": "tests/acceptance.spec.ts",
-      "sha256": "a0d67279fcecc44b6f3f9deac3da7d52e1303bb356bcb06d54ef7105e54b912b"
+      "sha256": "44c94ada303493003199f6649f474214312f376b3354d67b918f0d6c3eadfd99"
     }
   ]
 }

@@ -1,0 +1,4 @@
+/* Task list layout. The kit's <ul> has default browser spacing; reset it here. */
+.task-list { list-style: none; padding: 0; margin: calc(8px * var(--sf)) 0 0; }
+.task-row { display: flex; align-items: center; gap: calc(12px * var(--sf)); padding: calc(8px * var(--sf)) 0; }
+.task-due { margin-left: calc(8px * var(--sf)); font-size: 0.85em; color: var(--mid); }

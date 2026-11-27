@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. See LICENSE at the repository root.
 // Kept by the Lacuna app factory and scanned with the toolbox sync rules before landing; edit the source, not this copy.
 import { useState } from 'react'
+import { toCsv } from '@lacuna/csv-parse'
+import { saveText } from '@lacuna/file-save-open'
 import { useCollection } from '@lacuna/use-collection'
 import { useDragReorder } from '@lacuna/use-drag-reorder'
 import {
@@ -19,6 +21,10 @@ type Task = {
   due: string | null
 }
 
+type Tab = 'Tasks' | 'Done' | 'Settings'
+
+const TABS: Tab[] = ['Tasks', 'Done', 'Settings']
+
 function formatDue(due: string | null): string | null {
   if (!due) return null
   const [y, m, d] = due.split('-')
@@ -34,17 +40,20 @@ export function App() {
   const [title, setTitle] = useState('')
   const [due, setDue] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [tab, setTab] = useState<Tab>('Tasks')
 
-  const tasks = state.activeItems
+  const allTasks = state.activeItems
+  const total = allTasks.length
+  const doneCount = allTasks.filter((t) => t.data.done).length
+  const progress = total === 0 ? 0 : Math.round((doneCount / total) * 100)
+
+  const shownTasks = tab === 'Done' ? allTasks.filter((t) => t.data.done) : allTasks
 
   const { itemProps, listProps } = useDragReorder({
     listCount: 1,
-    onReorder: (_fromList, fromIndex, _toList, toIndex) => actions.reorder(fromIndex, toIndex),
+    onReorder: (_fromList, fromIndex, _toList, toIndex) =>
+      actions.reorder(fromIndex, toIndex),
   })
-
-  const total = tasks.length
-  const done = tasks.filter((t) => t.data.done).length
-  const progress = total === 0 ? 0 : Math.round((done / total) * 100)
 
   const addTask = () => {
     const t = title.trim()
@@ -52,7 +61,7 @@ export function App() {
       setError('Enter a task title')
       return
     }
-    if (tasks.some((task) => task.data.title.toLowerCase() === t.toLowerCase())) {
+    if (allTasks.some((task) => task.data.title.toLowerCase() === t.toLowerCase())) {
       setError('Task already exists')
       return
     }
@@ -62,13 +71,37 @@ export function App() {
     setError(null)
   }
 
+  const clearCompleted = () => {
+    for (const task of allTasks) {
+      if (task.data.done) actions.remove(task.id)
+    }
+    setTab('Tasks')
+  }
+
+  const exportCsv = () => {
+    const rows = [
+      ['title', 'due', 'done'],
+      ...allTasks.map((task) => [
+        task.data.title,
+        task.data.due ?? '',
+        String(task.data.done),
+      ]),
+    ]
+    saveText(toCsv(rows), { filename: 'tasks.csv', mimeType: 'text/csv' })
+  }
+
   return (
     <AppShell
       name="Simple Todo List"
       icon="tasks"
       hue="gold"
       category="Productivity"
-      meta={total === 0 ? 'Empty' : `${done} of ${total} done`}
+      meta={total === 0 ? 'Empty' : `${doneCount} of ${total} done`}
+      actions={
+        <Button ariaLabel="Export CSV" onClick={exportCsv}>
+          Export CSV
+        </Button>
+      }
     >
       <div
         role="progressbar"
@@ -77,6 +110,13 @@ export function App() {
         aria-valuemax={100}
         aria-valuenow={progress}
         aria-valuetext={`${progress}% complete`}
+        style={{
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: 'var(--surface)',
+          overflow: 'hidden',
+          marginBottom: 16,
+        }}
       />
       <Stack>
         <Card mono="New" title="Add a task">
@@ -99,55 +139,91 @@ export function App() {
         </Card>
 
         <Card mono={`${total} saved`} title="Tasks">
-          {total === 0 ? (
-            <EmptyState
-              mono="Empty"
-              title="No tasks yet"
-              detail="Add the first one above."
-              actionLabel="Add a task"
-              onAction={addTask}
-            />
+          {tab === 'Settings' ? (
+            <Stack>
+              <p style={{ margin: 0 }}>
+                Remove every finished task from the list. Unfinished tasks stay
+                in place.
+              </p>
+              <Button kind="danger" ariaLabel="Clear completed" onClick={clearCompleted}>
+                Clear completed
+              </Button>
+            </Stack>
           ) : (
-            <ul aria-label="Tasks" {...listProps(0)} style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {tasks.map((task, index) => {
-                const drag = itemProps(0, index)
-                const dueText = formatDue(task.data.due)
-                return (
-                  <li key={task.id} {...drag} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <input
-                      type="checkbox"
-                      aria-label={task.data.title}
-                      checked={task.data.done}
-                      onChange={(e) => actions.update(task.id, { done: e.target.checked })}
-                    />
-                    <span style={{ flex: 1 }}>
-                      <span style={{ textDecoration: task.data.done ? 'line-through' : undefined }}>
-                        {task.data.title}
-                      </span>
-                      {dueText !== null && (
-                        <span style={{ marginLeft: 8, fontSize: '0.85em', opacity: 0.7 }}>
-                          {dueText}
+            <>
+              <div role="tablist" aria-label="Views" className="lc-tabs">
+                {TABS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t}
+                    className={tab === t ? 'lc-tab active' : 'lc-tab'}
+                    style={tab === t ? undefined : { color: 'var(--mid)' }}
+                    onClick={() => setTab(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+              {shownTasks.length === 0 ? (
+                <EmptyState
+                  mono="Empty"
+                  title="No tasks yet"
+                  detail="Add the first one above."
+                  actionLabel="Add a task"
+                  onAction={addTask}
+                />
+              ) : (
+                <ul
+                  aria-label="Tasks"
+                  className="task-list"
+                  {...listProps(0)}
+                >
+                  {shownTasks.map((task, index) => {
+                    const drag = itemProps(0, index)
+                    const dueText = formatDue(task.data.due)
+                    return (
+                        <li
+                          key={task.id}
+                          className="task-row"
+                          {...drag}
+                        >
+                        <input
+                          type="checkbox"
+                          aria-label={task.data.title}
+                          checked={task.data.done}
+                          onChange={(e) => actions.update(task.id, { done: e.target.checked })}
+                        />
+                        <span
+                          style={{
+                            flex: 1,
+                            textDecoration: task.data.done ? 'line-through' : undefined,
+                          }}
+                        >
+                          {task.data.title}
+                          {dueText !== null && (
+                            <span className="task-due">
+                              {dueText}
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                    <Button
-                      kind="ghost"
-                      ariaLabel={`Drag ${task.data.title}`}
-                      title={`Drag ${task.data.title}`}
-                    >
-                      Drag
-                    </Button>
-                    <Button
-                      kind="ghost"
-                      ariaLabel={`Delete ${task.data.title}`}
-                      onClick={() => actions.remove(task.id)}
-                    >
-                      Delete {task.data.title}
-                    </Button>
-                  </li>
-                )
-              })}
-            </ul>
+                        <Button kind="ghost" ariaLabel={`Drag ${task.data.title}`}>
+                          Drag
+                        </Button>
+                        <Button
+                          kind="ghost"
+                          ariaLabel={`Delete ${task.data.title}`}
+                          onClick={() => actions.remove(task.id)}
+                        >
+                          Delete {task.data.title}
+                        </Button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </>
           )}
         </Card>
       </Stack>
