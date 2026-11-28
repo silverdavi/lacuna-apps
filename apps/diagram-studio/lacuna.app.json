@@ -1,0 +1,98 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.diagram-studio",
+  "name": "Diagram Studio",
+  "version": "0.1.0",
+  "summary": "Build flowcharts and architecture diagrams with drag-and-drop nodes, connectors, auto-layout, and Mermaid export.",
+  "description": "An offline vector diagramming workspace for flowcharts and system architecture. Place typed nodes (process, decision, terminal, database, note), drag with grid snap, connect edges with labels, run automatic layout, import or export Mermaid syntax, and export SVG or JSON.",
+  "category": "productivity",
+  "icon": "design",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/diagram-studio",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-undo-stack": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:diagram",
+    "edit:diagram",
+    "export:mermaid"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "diagram",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store diagram nodes, connectors, layout settings, and templates"
+      }
+    ],
+    "platform": [
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "diagram"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "tags": [
+    "diagram",
+    "flowchart",
+    "architecture",
+    "mermaid",
+    "svg"
+  ]
+}

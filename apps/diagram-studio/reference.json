@@ -1,0 +1,14 @@
+{
+  "repo": "excalidraw/excalidraw",
+  "url": "https://github.com/excalidraw/excalidraw",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2020 Excalidraw"
+  ],
+  "files": [
+    "packages/excalidraw/element/binding.ts",
+    "packages/excalidraw/scene/export.ts"
+  ],
+  "upstream_notice": false
+}
