@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "com.example.image-to-pdf",
+  "id": "lacuna.image-to-pdf",
   "name": "Image To PDF",
   "version": "0.1.0",
   "summary": "Order a set of images and download them as one PDF.",
@@ -12,9 +12,9 @@
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",

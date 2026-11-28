@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "The page reloads itself with a meta refresh. Axe also reports it, so a11y fails too.",
+  "expect": [
+    "a11y",
+    "bundle-scan"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Does not type-check.",
+  "expect": [
+    "types"
+  ]
+}

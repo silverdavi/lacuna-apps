@@ -1,0 +1,11 @@
+{
+  "extends": "good",
+  "about": "Signed off by someone other than the author.",
+  "expect": [
+    "dco"
+  ],
+  "signoffAs": {
+    "name": "Someone Else",
+    "email": "someone@example.org"
+  }
+}

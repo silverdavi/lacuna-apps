@@ -1,0 +1,32 @@
+{
+  "$comment": "What an app may depend on. Changed by maintainers only. Toolbox modules are taken from this repository with the workspace: protocol; everything else must be named here.",
+  "version": 1,
+  "packages": [
+    "react",
+    "react-dom",
+    "vite",
+    "@vitejs/plugin-react",
+    "typescript",
+    "@types/react",
+    "@types/react-dom"
+  ],
+  "workspaceScope": "@lacuna/",
+  "licences": ["MIT", "BSD-2-Clause", "BSD-3-Clause", "Apache-2.0", "ISC", "0BSD", "CC0-1.0", "OFL-1.1"],
+  "lifecycleScripts": [
+    "preinstall", "install", "postinstall",
+    "preuninstall", "uninstall", "postuninstall",
+    "prepublish", "preprepare", "prepare", "postprepare",
+    "prepublishOnly", "prepack", "postpack", "publish", "postpublish",
+    "preversion", "version", "postversion",
+    "dependencies"
+  ],
+  "urlPrefixes": [
+    "https://react.dev/errors/",
+    "https://reactjs.org/docs/error-decoder.html",
+    "http://www.w3.org/",
+    "https://www.w3.org/"
+  ],
+  "urlExact": [
+    "https://lacunaos.com/"
+  ]
+}

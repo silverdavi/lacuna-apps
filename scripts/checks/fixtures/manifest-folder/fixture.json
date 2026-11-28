@@ -1,0 +1,10 @@
+{
+  "extends": "good",
+  "about": "The folder is not one the launcher has.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "folder": "Nowhere/Else"
+  }
+}

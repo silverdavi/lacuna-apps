@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "The page asks the browser to connect ahead of time.",
+  "expect": [
+    "bundle-scan"
+  ]
+}

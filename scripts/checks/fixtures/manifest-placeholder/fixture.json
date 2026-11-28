@@ -1,0 +1,13 @@
+{
+  "extends": "good",
+  "about": "The starter's name and address are still in the manifest.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "maintainer": {
+      "name": "Your name",
+      "contact": "you@example.com"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Builds an address at run time and loads it, which the scans cannot see.",
+  "expect": [
+    "browser"
+  ]
+}

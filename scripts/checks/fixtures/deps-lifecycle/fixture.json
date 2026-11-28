@@ -1,0 +1,12 @@
+{
+  "extends": "good",
+  "about": "Has an install-time script.",
+  "expect": [
+    "deps"
+  ],
+  "package": {
+    "scripts": {
+      "postinstall": "node steal.js"
+    }
+  }
+}

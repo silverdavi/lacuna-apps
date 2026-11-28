@@ -1,0 +1,15 @@
+{
+  "extends": "good",
+  "about": "Asks for file access, outside the envelope.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "permissions": {
+      "platform": [
+        "identity.profile.read",
+        "files.pick"
+      ]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Uses a hex color and a raw pixel size.",
+  "expect": [
+    "tokens"
+  ]
+}

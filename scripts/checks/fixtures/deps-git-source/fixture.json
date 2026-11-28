@@ -1,0 +1,12 @@
+{
+  "extends": "good",
+  "about": "Takes an allowed package from a git URL.",
+  "expect": [
+    "deps"
+  ],
+  "package": {
+    "dependencies": {
+      "react": "github:someone/react"
+    }
+  }
+}

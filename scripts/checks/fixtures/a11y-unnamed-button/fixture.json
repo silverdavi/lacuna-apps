@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "A button with no name.",
+  "expect": [
+    "a11y"
+  ]
+}

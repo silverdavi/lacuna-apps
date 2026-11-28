@@ -1,0 +1,97 @@
+{
+  "$comment": "Generated from the program sources. Do not edit by hand. An app's folder is \"<top>/<subfolder>\"; the top may be its label or one of its verbs.",
+  "version": 1,
+  "folders": [
+    {
+      "id": "work",
+      "label": "Work",
+      "verbs": [
+        "work"
+      ],
+      "subs": [
+        "Office",
+        "Design",
+        "Accounting"
+      ]
+    },
+    {
+      "id": "games",
+      "label": "Games",
+      "verbs": [
+        "play"
+      ],
+      "subs": [
+        "Arcade",
+        "Puzzle",
+        "Word",
+        "Card & board"
+      ]
+    },
+    {
+      "id": "calculate",
+      "label": "Calculate",
+      "verbs": [
+        "calculate"
+      ],
+      "subs": [
+        "Money",
+        "Units",
+        "Time & Dates",
+        "Body",
+        "Math & Science"
+      ]
+    },
+    {
+      "id": "track",
+      "label": "Track",
+      "verbs": [
+        "track"
+      ],
+      "subs": [
+        "Habits",
+        "Health",
+        "Money",
+        "Time",
+        "Lists"
+      ]
+    },
+    {
+      "id": "generate",
+      "label": "Generate",
+      "verbs": [
+        "generate"
+      ],
+      "subs": [
+        "Words & Names",
+        "Color & Image",
+        "Random & Decide",
+        "Text"
+      ]
+    },
+    {
+      "id": "create",
+      "label": "Create",
+      "verbs": [
+        "create"
+      ],
+      "subs": [
+        "Draw & Photo",
+        "Sound & Video",
+        "Write"
+      ]
+    },
+    {
+      "id": "files",
+      "label": "Files",
+      "verbs": [
+        "files"
+      ],
+      "subs": [
+        "Convert",
+        "PDF",
+        "Developer",
+        "Vault"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "good",
+  "about": "The id is still in the starter's com.example namespace.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "id": "com.example.packing-list"
+  }
+}

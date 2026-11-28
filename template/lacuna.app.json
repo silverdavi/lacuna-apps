@@ -1,11 +1,12 @@
 {
   "manifestVersion": 1,
-  "id": "com.example.community-app",
+  "id": "io.github.maker-username.community-app",
   "name": "Community app",
   "version": "0.1.0",
   "summary": "A small shelf app.",
-  "description": "A small shelf app. One list of items. Shared buttons and cards. Token colors and type. Copy this starter, rename the id, and keep the manifest valid.",
+  "description": "A small shelf app. One list of items. Shared buttons and cards. Token colors and type. Copy this starter, set your name, username and id, and keep the manifest valid.",
   "category": "productivity",
+  "folder": "Track/Lists",
   "tags": [],
   "icon": "docs",
   "relationship": {
@@ -13,8 +14,8 @@
   },
   "maintainer": {
     "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "name": "Maker name",
+    "github": "maker-username"
   },
   "pricing": {
     "model": "free",
@@ -38,22 +39,8 @@
     "edit:community-app"
   ],
   "permissions": {
-    "records": [
-      {
-        "kind": "community-app",
-        "access": [
-          "read",
-          "write",
-          "create"
-        ],
-        "purpose": "Own Community app records"
-      }
-    ],
-    "platform": [
-      "identity.profile.read",
-      "files.pick",
-      "files.save"
-    ],
+    "records": [],
+    "platform": [],
     "network": {
       "origins": []
     },
@@ -65,9 +52,7 @@
     }
   },
   "sharing": {
-    "owns": [
-      "community-app"
-    ],
+    "owns": [],
     "reads": [],
     "handoffs": []
   },

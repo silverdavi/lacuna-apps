@@ -14,7 +14,7 @@
   "maintainer": {
     "type": "first-party",
     "name": "Lacuna",
-    "contact": "you@example.com"
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",

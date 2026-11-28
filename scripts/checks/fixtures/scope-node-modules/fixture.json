@@ -1,0 +1,13 @@
+{
+  "extends": "good",
+  "about": "The app folder commits its own installed packages.",
+  "expect": [
+    "scope"
+  ],
+  "generate": [
+    {
+      "path": "node_modules/vite/index.js",
+      "bytes": 64
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "The folder name is a reserved slug.",
+  "expect": [
+    "manifest"
+  ],
+  "slug": "settings"
+}

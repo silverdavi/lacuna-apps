@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "com.example.kanban-board",
+  "id": "lacuna.kanban-board",
   "name": "Kanban Board",
   "version": "0.1.0",
   "summary": "A small kanban board with three columns, WIP counts, drag to move, and JSON export.",
@@ -12,9 +12,9 @@
     "kind": "standalone"
   },
   "maintainer": {
-    "type": "third-party",
-    "name": "Your name",
-    "contact": "you@example.com"
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
   },
   "pricing": {
     "model": "free",

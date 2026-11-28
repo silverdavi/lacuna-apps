@@ -1,0 +1,84 @@
+# The gate every pull request must pass. It runs on pull_request (never pull_request_target), with a
+# read-only token and no secrets. Scripts, schema, toolbox and lockfile come from the base branch;
+# only apps/<slug>/ is copied from the pull request, and nothing in it is run except in the browser.
+name: Gate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      AUTHOR: ${{ github.event.pull_request.user.login }}
+    steps:
+      - name: Check out the base branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: The gate's scripts are on the base branch
+        run: |
+          if [ ! -f scripts/checks/run.mjs ]; then
+            echo "::error::The base branch has no gate scripts yet. Only the pull request that adds them should see this."
+            exit 1
+          fi
+
+      - name: Fetch the pull request's commits without checking them out
+        run: |
+          git fetch --no-tags --quiet origin "+refs/pull/${PR_NUMBER}/head:refs/gate/head"
+          git cat-file -e "${HEAD_SHA}^{commit}"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Copy the app folder from the pull request
+        run: node scripts/checks/run.mjs prepare --base "$BASE_SHA" --head "$HEAD_SHA"
+
+      - name: Install with scripts off
+        run: |
+          cp pnpm-lock.yaml "$RUNNER_TEMP/lock-base.yaml"
+          pnpm install --ignore-scripts --no-frozen-lockfile
+
+      - name: The lockfile gained no packages
+        run: node scripts/checks/lockfile.mjs "$RUNNER_TEMP/lock-base.yaml" pnpm-lock.yaml
+
+      - name: Install the browser
+        if: ${{ !cancelled() }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the checks
+        if: ${{ !cancelled() }}
+        run: >-
+          node scripts/checks/run.mjs check
+          --base "$BASE_SHA" --head "$HEAD_SHA" --author "$AUTHOR"
+          --lock-before "$RUNNER_TEMP/lock-base.yaml" --lock-after pnpm-lock.yaml
+          --out artifacts/gate
+
+      - name: Keep the result and screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gate-result
+          path: |
+            artifacts/gate/gate-result.json
+            artifacts/gate/summary.md
+            artifacts/gate/screenshots/
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "Updates an app maintained by someone else and names themselves as its maintainer.",
+  "expect": [
+    "owner"
+  ],
+  "slug": "fixture-existing"
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "good",
+  "about": "The app folder holds a symbolic link to a gate script.",
+  "expect": [
+    "scope"
+  ],
+  "symlinks": [
+    {
+      "path": "src/gate.mjs",
+      "target": "../../../scripts/checks/run.mjs"
+    }
+  ]
+}

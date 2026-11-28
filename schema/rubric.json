@@ -1,0 +1,427 @@
+{
+  "version": 1,
+  "checks": [
+    "scope",
+    "owner",
+    "manifest",
+    "dco",
+    "deps",
+    "types",
+    "tokens",
+    "source-scan",
+    "bundle-scan",
+    "size",
+    "browser",
+    "a11y",
+    "camera"
+  ],
+  "rules": [
+    {
+      "id": "A1",
+      "group": "A",
+      "title": "No clipped text",
+      "text": "Nothing a person needs to read ends in an ellipsis: names, panel titles, file names, button labels. Wrap to two lines or widen the container.",
+      "threshold": "0 clipped labels at 1440 by 900",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A2",
+      "group": "A",
+      "title": "No clipped controls",
+      "text": "No button, field or panel is cut by its container at any width from 360 to 1920 px. Panels scroll inside themselves before they overflow.",
+      "threshold": "0 clipped controls from 360 to 1920 px",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A3",
+      "group": "A",
+      "title": "No browser-default controls",
+      "text": "Selects, checkboxes, radios, ranges, number, date and file inputs, and text areas are styled by the kit, with a visible focus ring.",
+      "threshold": "0 unstyled controls",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A4",
+      "group": "A",
+      "title": "Fields have a sensible width",
+      "text": "A text field is never wider than 480 px, except one search or formula bar. A form is one column, at most 640 px wide.",
+      "threshold": "field at most 480 px; form at most 640 px",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A5",
+      "group": "A",
+      "title": "Content does not float in a void",
+      "text": "A screen that fills under half the window centres a reading column, fills the window, or shows an empty state with one action.",
+      "threshold": "judged by a reviewer",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A6",
+      "group": "A",
+      "title": "One type scale",
+      "text": "Sizes come from the tokens only. Mono is for labels and status, never for a sentence.",
+      "threshold": "0 sizes outside the tokens",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ],
+      "advisoryFor": [
+        "outside"
+      ]
+    },
+    {
+      "id": "A7",
+      "group": "A",
+      "title": "Spacing on the 4 px grid",
+      "text": "Spacing comes from the spacing tokens, so every gap and padding is a multiple of 4 px.",
+      "threshold": "multiples of 4 px",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ],
+      "advisoryFor": [
+        "outside"
+      ]
+    },
+    {
+      "id": "A8",
+      "group": "A",
+      "title": "Targets are big enough",
+      "text": "Every pointer target is at least 28 px, and at least 40 px on a phone. Tab order follows reading order and Esc closes the top layer.",
+      "threshold": "28 px desktop; 40 px phone",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A9",
+      "group": "A",
+      "title": "Every state is designed",
+      "text": "Loading, empty, error and denied each have a designed state. A blank rectangle is never one of them.",
+      "threshold": "judged by a reviewer",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "A10",
+      "group": "A",
+      "title": "Light and dark, phone and desktop",
+      "text": "Each screen works in both themes and at 390 by 844. On a phone, side panels become sheets or tabs.",
+      "threshold": "2 themes; 4 sizes",
+      "how": "auto",
+      "check": "browser",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "B1",
+      "group": "B",
+      "title": "Plain words on screen",
+      "text": "Copy is plain sentence case and says what a person cares about. It never talks about how the app is built.",
+      "threshold": "0 banned words",
+      "how": "auto",
+      "check": "camera",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ],
+      "advisoryFor": [
+        "outside"
+      ]
+    },
+    {
+      "id": "B2",
+      "group": "B",
+      "title": "Every control does something",
+      "text": "A button that does nothing is removed or made to work. A disabled control looks disabled and says why.",
+      "threshold": "judged by a reviewer",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C1",
+      "group": "C",
+      "title": "Types pass",
+      "text": "The app type-checks with no errors.",
+      "threshold": "0 type errors",
+      "how": "auto",
+      "check": "types",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C2",
+      "group": "C",
+      "title": "Tokens only",
+      "text": "Colours, sizes and spacing come from the kit tokens, never literal values.",
+      "threshold": "0 literal values",
+      "how": "auto",
+      "check": "tokens",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C3",
+      "group": "C",
+      "title": "Only allowed dependencies",
+      "text": "Dependencies and their licences are on the allowlist. An outside pull request never changes the lockfile.",
+      "threshold": "0 dependencies off the list",
+      "how": "auto",
+      "check": "deps",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C4",
+      "group": "C",
+      "title": "No network or eval in source",
+      "text": "The source makes no network calls and uses no eval or dynamic code.",
+      "threshold": "0 matches",
+      "how": "auto",
+      "check": "source-scan",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C5",
+      "group": "C",
+      "title": "No network or eval in the build",
+      "text": "The built bundle makes no network calls and uses no eval or dynamic code.",
+      "threshold": "0 matches",
+      "how": "auto",
+      "check": "bundle-scan",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C6",
+      "group": "C",
+      "title": "Within the size limit",
+      "text": "The app and its assets stay within the published size limit.",
+      "threshold": "per the size policy",
+      "how": "auto",
+      "check": "size",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C7",
+      "group": "C",
+      "title": "Opens cleanly in a browser",
+      "text": "The app opens at four sizes in light and dark, and any request to another origin fails the check.",
+      "threshold": "0 errors; 0 off-origin requests",
+      "how": "auto",
+      "check": "browser",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C8",
+      "group": "C",
+      "title": "Accessible",
+      "text": "No serious or critical accessibility problems.",
+      "threshold": "0 serious or critical",
+      "how": "auto",
+      "check": "a11y",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "C9",
+      "group": "C",
+      "title": "One app folder only",
+      "text": "A pull request changes only the folder of its own app.",
+      "threshold": "0 files outside the app folder",
+      "how": "auto",
+      "check": "scope",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "D1",
+      "group": "D",
+      "title": "Permissions stay inside the envelope",
+      "text": "The manifest asks only for permissions the program allows.",
+      "threshold": "0 permissions outside the envelope",
+      "how": "auto",
+      "check": "manifest",
+      "severity": "blocking",
+      "appliesTo": [
+        "first-party",
+        "outside"
+      ]
+    },
+    {
+      "id": "D2",
+      "group": "D",
+      "title": "Every declared permission is used",
+      "text": "A reviewer confirms each declared permission is needed for the app's one job.",
+      "threshold": "judged by a reviewer",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "E1",
+      "group": "E",
+      "title": "Manifest is complete and valid",
+      "text": "No placeholders, no reserved slugs, an id in the right namespace, a folder that matches, and a slug that is a valid DNS label.",
+      "threshold": "0 manifest errors",
+      "how": "auto",
+      "check": "manifest",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "E2",
+      "group": "E",
+      "title": "Owner matches the author",
+      "text": "The GitHub id in the manifest is the id of the person who opened the pull request.",
+      "threshold": "ids equal",
+      "how": "auto",
+      "check": "owner",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "E3",
+      "group": "E",
+      "title": "Commits are signed off",
+      "text": "Every commit carries a Signed-off-by line (DCO 1.1). A GitHub noreply address is fine.",
+      "threshold": "every commit signed off",
+      "how": "auto",
+      "check": "dco",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "F1",
+      "group": "F",
+      "title": "One clear job",
+      "text": "The app does one thing, and does what its summary says.",
+      "threshold": "judged by the owner",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "F2",
+      "group": "F",
+      "title": "Works with made-up data and is not a duplicate",
+      "text": "The app is useful with made-up data and does not repeat an app that is already listed.",
+      "threshold": "judged by the owner",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    },
+    {
+      "id": "F3",
+      "group": "F",
+      "title": "Content limits and no dark patterns",
+      "text": "Content stays within the published limits and nothing in the app pushes people into choices they did not mean to make.",
+      "threshold": "judged by the owner",
+      "how": "human",
+      "severity": "blocking",
+      "appliesTo": [
+        "outside"
+      ]
+    }
+  ],
+  "camera": {
+    "fieldMaxPx": 480,
+    "formMaxPx": 640,
+    "targetPx": 28,
+    "targetPhonePx": 40,
+    "gridPx": 4
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Also edits a gate script.",
+  "expect": [
+    "scope"
+  ]
+}

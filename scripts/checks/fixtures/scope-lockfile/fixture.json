@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Edits the lockfile.",
+  "expect": [
+    "scope"
+  ]
+}

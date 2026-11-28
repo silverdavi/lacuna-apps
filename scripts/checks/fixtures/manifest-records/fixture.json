@@ -1,0 +1,21 @@
+{
+  "extends": "good",
+  "about": "Declares records.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "permissions": {
+      "records": [
+        {
+          "kind": "packing-item",
+          "access": [
+            "read",
+            "write"
+          ],
+          "purpose": "Keep the list of items"
+        }
+      ]
+    }
+  }
+}

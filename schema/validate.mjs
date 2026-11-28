@@ -5,7 +5,9 @@
 //
 // Usage:
 //   node schema/validate.mjs
-//   node schema/validate.mjs path/to/lacuna.app.json
+//   node schema/validate.mjs [--new] path/to/lacuna.app.json
+// --new applies the rules for an app that is not yet in the repository (a folder is required).
+// The gate imports validateManifest() from this file.
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -19,6 +21,10 @@ const schema = JSON.parse(fs.readFileSync(path.join(here, 'app-manifest.schema.j
 const toolbox = JSON.parse(fs.readFileSync(path.join(root, 'toolbox/modules.json'), 'utf8')).modules
 const moduleById = Object.fromEntries(toolbox.map((m) => [m.id, m]))
 const iconsSrc = fs.readFileSync(path.join(root, 'toolbox/ui/icons.tsx'), 'utf8')
+const gateList = (name) => JSON.parse(fs.readFileSync(path.join(here, name), 'utf8'))
+const RESERVED = new Set(gateList('reserved-slugs.json').slugs)
+const FOLDERS = gateList('folders.json').folders
+const ALLOW = gateList('allowlist.json')
 const ICONS = new Set([...iconsSrc.match(/export const ICONS = \{([\s\S]*?)\n\}/)[1].matchAll(/([a-z]+):\s*Icon/g)].map((m) => m[1]))
 
 // ------------------------------------------------------------ schema subset
@@ -103,10 +109,42 @@ function namingProblems(raw) {
   ].filter(([bad]) => bad).map(([, why]) => why)
 }
 
-function storeRules(m, known) {
+// Text left over from the starter. A manifest that still carries it was not filled in.
+function placeholders(m) {
+  const out = []
+  if (/^\s*your name\s*$/i.test(m.maintainer?.name ?? '')) out.push('maintainer.name is "Your name"')
+  if (/you@example\.com/i.test(JSON.stringify(m))) out.push('you@example.com is the starter\'s address')
+  if (/(^|[^a-z0-9])com\.example(\.|$)/i.test(m.id ?? '')) out.push(`id "${m.id}" uses the starter's com.example namespace`)
+  return out
+}
+// The one platform permission an outside app may ask for at launch.
+const THIRD_PARTY_PLATFORM = new Set(['identity.profile.read'])
+const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/
+
+const foldKey = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, '')
+export function knownFolder(value) {
+  if (typeof value !== 'string') return false
+  const parts = value.split('/').map((p) => p.trim())
+  if (parts.length !== 2) return false
+  const top = FOLDERS.find((t) => foldKey(t.label) === foldKey(parts[0]) || t.verbs.some((v) => foldKey(v) === foldKey(parts[0])))
+  return !!top && top.subs.some((sub) => foldKey(sub) === foldKey(parts[1]))
+}
+
+// opts.slug: the app's folder name (absent for the starter). opts.isNew: the app is not yet in the repository.
+function storeRules(m, known, opts = {}) {
   const errors = []
   const warnings = []
   const first = m.maintainer?.type === 'first-party'
+
+  for (const p of placeholders(m)) errors.push(`${p}; fill in your own name, username and id`)
+
+  if (opts.slug !== undefined) {
+    if (!SLUG.test(opts.slug)) errors.push(`slug "${opts.slug}" must be lowercase letters, digits and hyphens, at most 63, not starting or ending with a hyphen`)
+    if (m.entry?.route !== `/app/${opts.slug}`) errors.push(`entry.route must be /app/${opts.slug} (the folder name)`)
+    if (!first && RESERVED.has(opts.slug)) errors.push(`slug "${opts.slug}" is reserved (schema/reserved-slugs.json); pick another folder name`)
+  }
+  if (m.folder !== undefined && !knownFolder(m.folder)) errors.push(`folder "${m.folder}" is not in schema/folders.json; use "<top>/<subfolder>", for example "Games/Arcade"`)
+  if (opts.isNew && m.folder === undefined) errors.push('folder is required for a new app (see schema/folders.json)')
 
   const unpublished = []
   for (const [id] of Object.entries(m.requires?.modules ?? {})) {
@@ -128,14 +166,20 @@ function storeRules(m, known) {
     if (/^[a-z]+:/i.test(m.entry?.bundle ?? '') || (m.entry?.bundle ?? '').startsWith('//')) errors.push('entry.bundle is a path in the build output; Lacuna serves bundles from its own app domain, not a developer-hosted URL')
     const restricted = (m.permissions?.dataClasses ?? []).filter((c) => RESTRICTED_FOR_THIRD_PARTY.includes(c))
     if (restricted.length) errors.push(`third-party apps cannot request ${restricted.join(', ')} in this phase`)
-    if (!m.maintainer?.contact) errors.push('third-party maintainer.contact is required')
+    if (!m.maintainer?.github) errors.push('third-party maintainer.github is required (your GitHub username)')
+    const platform = (m.permissions?.platform ?? []).filter((p) => !THIRD_PARTY_PLATFORM.has(p))
+    if (platform.length) errors.push(`third-party apps may ask only for identity.profile.read; remove ${platform.join(', ')}`)
+    if ((m.permissions?.records ?? []).length) errors.push('third-party apps cannot declare records yet; permissions.records must be empty')
+    if ((m.permissions?.network?.origins ?? []).length) errors.push('third-party apps cannot reach the network; permissions.network.origins must be empty')
+    if (!m.source?.license) errors.push('third-party apps need source.license')
+    else if (!ALLOW.licences.includes(m.source.license)) errors.push(`source.license "${m.source.license}" is not one of ${ALLOW.licences.join(', ')}`)
     const q = m.quality ?? {}
     if (!q.tests?.length) errors.push('third-party submissions must list tests')
     if (q.themeMatrix !== true) errors.push('third-party submissions must pass the theme matrix')
     if (q.keyboardOnly !== true) errors.push('third-party submissions must be keyboard-operable')
     if (!q.accessibilityScan || q.accessibilityScan === 'none') errors.push('third-party submissions must run an accessibility scan')
-    if ((m.permissions?.network?.origins ?? []).length && !m.permissions.network.justification) errors.push('network origins need a justification')
   }
+  if ((m.permissions?.network?.origins ?? []).length && !m.permissions.network.justification) errors.push('network origins need a justification')
 
   const rel = m.relationship ?? {}
   if (rel.parent) {
@@ -172,6 +216,19 @@ function storeRules(m, known) {
 
 // ------------------------------------------------------------ run
 
+// Schema then store rules for one manifest. known: Map of id -> manifest for relationship checks.
+export function validateManifest(manifest, opts = {}, known = new Map()) {
+  const errs = check(schema, manifest, '', [])
+  if (manifest.relationship?.kind === 'suite-member') errs.push('/relationship/kind: "suite-member" was renamed "family-member"')
+  const rules = errs.length ? { errors: [], warnings: [] } : storeRules(manifest, known, opts)
+  return { errors: [...new Set([...errs.map((e) => `schema ${e}`), ...rules.errors.map((e) => `rule   ${e}`)])], warnings: rules.warnings }
+}
+
+function slugOf(file) {
+  const m = path.relative(root, file).split(path.sep)
+  return m.length === 3 && m[0] === 'apps' && m[2] === 'lacuna.app.json' ? m[1] : undefined
+}
+
 function load(file) {
   const text = fs.readFileSync(file, 'utf8')
   if (file.endsWith('.jsonl')) {
@@ -195,36 +252,40 @@ function manifestGlobs() {
   return out
 }
 
-const args = process.argv.slice(2)
-const files = args.length ? args.map((a) => path.resolve(a)) : manifestGlobs()
-const entries = files.flatMap(load)
+function main() {
+  const args = process.argv.slice(2)
+  const isNew = args.includes('--new')
+  const paths = args.filter((a) => !a.startsWith('--'))
+  const files = paths.length ? paths.map((a) => path.resolve(a)) : manifestGlobs()
+  const entries = files.flatMap(load)
 
-const known = new Map()
-const registry = path.join(root, 'registry/apps.jsonl')
-if (fs.existsSync(registry)) {
-  for (const { manifest } of load(registry)) known.set(manifest.id, manifest)
-}
-for (const { manifest } of entries) if (!known.has(manifest.id)) known.set(manifest.id, manifest)
-
-let failed = 0
-let warned = 0
-const seen = new Set()
-for (const { where, manifest } of entries) {
-  const errs = check(schema, manifest, '', [])
-  if (manifest.relationship?.kind === 'suite-member') errs.push('/relationship/kind: "suite-member" was renamed "family-member"')
-  const key = `${manifest.id}@${manifest.version}`
-  if (where.includes('.jsonl') && seen.has(key)) errs.push(`duplicate registry entry ${key}`)
-  seen.add(key)
-  const rules = errs.length ? { errors: [], warnings: [] } : storeRules(manifest, known)
-  const all = [...new Set([...errs.map((e) => `schema ${e}`), ...rules.errors.map((e) => `rule   ${e}`)])]
-  if (all.length) {
-    failed++
-    console.log(`FAIL ${where} ${manifest.id ?? ''}`)
-    for (const e of all) console.log(`     ${e}`)
-  } else if (!where.includes('.jsonl') || rules.warnings.length) {
-    console.log(`ok   ${where} ${manifest.id}`)
+  const known = new Map()
+  const registry = path.join(root, 'registry/apps.jsonl')
+  if (fs.existsSync(registry)) {
+    for (const { manifest } of load(registry)) known.set(manifest.id, manifest)
   }
-  for (const w of rules.warnings) { warned++; console.log(`     warn ${w}`) }
+  for (const { manifest } of entries) if (!known.has(manifest.id)) known.set(manifest.id, manifest)
+
+  let failed = 0
+  let warned = 0
+  const seen = new Set()
+  for (const { where, manifest } of entries) {
+    const key = `${manifest.id}@${manifest.version}`
+    const rules = validateManifest(manifest, { slug: where.includes('.jsonl') ? undefined : slugOf(path.join(root, where)), isNew }, known)
+    const all = [...rules.errors]
+    if (where.includes('.jsonl') && seen.has(key)) all.push(`schema duplicate registry entry ${key}`)
+    seen.add(key)
+    if (all.length) {
+      failed++
+      console.log(`FAIL ${where} ${manifest.id ?? ''}`)
+      for (const e of all) console.log(`     ${e}`)
+    } else if (!where.includes('.jsonl') || rules.warnings.length) {
+      console.log(`ok   ${where} ${manifest.id}`)
+    }
+    for (const w of rules.warnings) { warned++; console.log(`     warn ${w}`) }
+  }
+  console.log(`\n${entries.length} manifests, ${failed} failed, ${warned} warnings`)
+  process.exit(failed ? 1 : 0)
 }
-console.log(`\n${entries.length} manifests, ${failed} failed, ${warned} warnings`)
-process.exit(failed ? 1 : 0)
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main()

@@ -1,0 +1,17 @@
+{
+  "extends": "good",
+  "about": "Declares a network origin.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "permissions": {
+      "network": {
+        "origins": [
+          "https://api.example.org"
+        ],
+        "justification": "Weather for the trip"
+      }
+    }
+  }
+}

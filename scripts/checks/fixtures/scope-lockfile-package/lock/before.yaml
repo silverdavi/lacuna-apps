@@ -1,0 +1,12 @@
+lockfileVersion: '6.0'
+
+importers:
+
+  .:
+    devDependencies: {}
+
+packages:
+
+  /react@19.3.1:
+    resolution: {integrity: sha512-a}
+    dev: false

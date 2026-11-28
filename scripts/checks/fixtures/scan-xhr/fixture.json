@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "Uses XMLHttpRequest in a click handler.",
+  "expect": [
+    "source-scan",
+    "bundle-scan"
+  ]
+}

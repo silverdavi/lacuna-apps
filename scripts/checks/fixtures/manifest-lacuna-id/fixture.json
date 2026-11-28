@@ -1,0 +1,10 @@
+{
+  "extends": "good",
+  "about": "An outside app uses a lacuna.* id.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "id": "lacuna.packing-list"
+  }
+}

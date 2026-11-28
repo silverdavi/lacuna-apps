@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "Uses fetch through a computed name in a click handler.",
+  "expect": [
+    "source-scan",
+    "bundle-scan"
+  ]
+}

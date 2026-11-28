@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "The commit has no sign-off.",
+  "expect": [
+    "dco"
+  ],
+  "signoff": false
+}

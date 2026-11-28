@@ -1,0 +1,10 @@
+{
+  "extends": "good",
+  "about": "A new app without a folder.",
+  "expect": [
+    "manifest"
+  ],
+  "manifest": {
+    "folder": null
+  }
+}

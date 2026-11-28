@@ -1,0 +1,12 @@
+{
+  "extends": "good",
+  "about": "Takes a toolbox name from the registry instead of this repository.",
+  "expect": [
+    "deps"
+  ],
+  "package": {
+    "dependencies": {
+      "@lacuna/ui": "^0.1.0"
+    }
+  }
+}

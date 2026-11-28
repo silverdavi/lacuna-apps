@@ -1,0 +1,8 @@
+{
+  "extends": "good",
+  "about": "Uses document.write in a click handler.",
+  "expect": [
+    "source-scan",
+    "bundle-scan"
+  ]
+}

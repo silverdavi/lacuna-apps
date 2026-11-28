@@ -1,0 +1,16 @@
+lockfileVersion: '6.0'
+
+importers:
+
+  .:
+    devDependencies: {}
+
+packages:
+
+  /left-pad@1.3.0:
+    resolution: {integrity: sha512-b}
+    dev: false
+
+  /react@19.3.1:
+    resolution: {integrity: sha512-a}
+    dev: false

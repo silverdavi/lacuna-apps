@@ -1,0 +1,53 @@
+# Runs the gate against its fixtures whenever the gate, the schema, the toolbox or the starter changes:
+# the good app must pass, and each bad app must fail on its rule and nothing else.
+name: Checks self-test
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'schema/**'
+      - 'toolbox/**'
+      - 'template/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'playwright.config.ts'
+      - '.github/workflows/gate.yml'
+      - '.github/workflows/checks-selftest.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-selftest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks-selftest:
+    name: checks-selftest
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Every manifest is valid
+        run: node schema/validate.mjs
+      - name: Unit tests for the checks
+        run: node --test scripts/checks/*.test.mjs
+      - name: Every fixture gives its expected result
+        run: node scripts/checks/selftest.mjs
+      - name: Keep the fixture results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fixture-results
+          path: artifacts/fixtures/
+          retention-days: 14

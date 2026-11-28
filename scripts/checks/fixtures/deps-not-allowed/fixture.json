@@ -1,0 +1,12 @@
+{
+  "extends": "good",
+  "about": "Depends on a package outside the allowlist.",
+  "expect": [
+    "deps"
+  ],
+  "package": {
+    "dependencies": {
+      "left-pad": "^1.3.0"
+    }
+  }
+}

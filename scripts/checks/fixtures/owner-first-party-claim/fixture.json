@@ -1,0 +1,15 @@
+{
+  "extends": "good",
+  "about": "An outside author claims a first-party app.",
+  "expect": [
+    "owner"
+  ],
+  "manifest": {
+    "id": "lacuna.packing-list",
+    "maintainer": {
+      "type": "first-party",
+      "name": "Lacuna",
+      "github": null
+    }
+  }
+}

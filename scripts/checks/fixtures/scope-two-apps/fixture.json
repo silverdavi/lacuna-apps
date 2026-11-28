@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Changes two app folders.",
+  "expect": [
+    "scope"
+  ]
+}

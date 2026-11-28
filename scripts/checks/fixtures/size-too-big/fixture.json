@@ -1,0 +1,13 @@
+{
+  "extends": "good",
+  "about": "Ships a 2.2 MB file.",
+  "expect": [
+    "size"
+  ],
+  "generate": [
+    {
+      "path": "public/data.bin",
+      "bytes": 2300000
+    }
+  ]
+}

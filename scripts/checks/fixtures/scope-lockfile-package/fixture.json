@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Installing the app adds a package to the lockfile.",
+  "expect": [
+    "scope"
+  ]
+}

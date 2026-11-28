@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Logs an error when it opens.",
+  "expect": [
+    "browser"
+  ]
+}

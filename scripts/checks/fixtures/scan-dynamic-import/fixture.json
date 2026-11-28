@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "Loads code with import(); the build turns it into a local chunk, so only the source scan sees it.",
+  "expect": [
+    "source-scan"
+  ]
+}

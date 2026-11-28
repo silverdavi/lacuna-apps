@@ -38,6 +38,11 @@
       "description": "One of the eight catalog suites in the product thesis.",
       "enum": ["foundation", "communication", "productivity", "personal", "business", "legal-gov", "healthcare", "industry"]
     },
+    "folder": {
+      "description": "Where the launcher files the app: a top folder and a subfolder from schema/folders.json, for example \"Games/Arcade\" or \"play/Arcade\". Required for new apps.",
+      "type": "string",
+      "maxLength": 80
+    },
     "tags": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9-]+$" }, "uniqueItems": true, "maxItems": 12 },
     "icon": {
       "description": "Glyph name from the ICONS family in app/packages/ui/src/icons.tsx. The plate hue comes from the category; apps do not pick colors.",
@@ -83,7 +88,16 @@
       "properties": {
         "type": { "enum": ["first-party", "third-party"] },
         "name": { "type": "string", "minLength": 2, "maxLength": 80 },
-        "contact": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
+        "github": {
+          "description": "GitHub username of the maintainer. Required for third-party apps: a new app is opened by this account, and only it updates the app.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
+        },
+        "contact": {
+          "description": "Optional. A private address for notices about the app; it is never shown in the catalog.",
+          "type": "string",
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+        },
         "url": { "type": "string", "pattern": "^https://" }
       }
     },
