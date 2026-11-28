@@ -7,7 +7,7 @@ import { addedPackages } from './lockfile.mjs'
 export const id = 'scope'
 
 // Files that would change how installs or builds behave if an app folder could carry them.
-const BANNED_NAMES = new Set(['.npmrc', '.pnpmfile.cjs', '.yarnrc', '.yarnrc.yml', 'pnpm-workspace.yaml', 'pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lockb', '.gitmodules'])
+const BANNED_NAMES = new Set(['.npmrc', '.pnpmfile.cjs', '.yarnrc', '.yarnrc.yml', 'pnpm-workspace.yaml', 'pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lockb', '.gitmodules', '.gitattributes'])
 const BANNED_DIRS = new Set(['node_modules', 'dist', '.git'])
 
 // Problems with the app's own tree at the head commit: links, submodules, installed or built output.
@@ -19,7 +19,7 @@ export function appTreeProblems(entries) {
     if (e.mode === '120000') out.push({ file: e.path, message: 'symbolic links are not accepted in an app folder', fix: 'Commit the file itself.' })
     else if (e.mode === '160000') out.push({ file: e.path, message: 'submodules are not accepted in an app folder', fix: 'Commit the source itself.' })
     if (parts.some((p) => BANNED_DIRS.has(p))) out.push({ file: e.path, message: 'installed packages and build output are not committed', fix: 'Remove the folder; the gate installs and builds the app itself.' })
-    else if (BANNED_NAMES.has(parts.at(-1))) out.push({ file: e.path, message: 'install and lockfile settings are not accepted in an app folder', fix: 'Remove the file.' })
+    else if (BANNED_NAMES.has(parts.at(-1))) out.push({ file: e.path, message: 'install, lockfile and repository settings are not accepted in an app folder (a .gitattributes file can hide files from the checks)', fix: 'Remove the file.' })
   }
   return out
 }

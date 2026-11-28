@@ -87,7 +87,7 @@ export function context({ repo = root, base, head, author = '', out, lock = null
   ctx.audience = ctx.owners.includes(author.toLowerCase()) ? 'first-party' : 'outside'
   if (slug) {
     const tree = git(repo, ['ls-tree', '-r', '-z', '--full-tree', headSha, '--', `apps/${slug}`])
-    ctx.headTree = tree.split('\0').filter(Boolean).map((l) => { const [meta, p] = l.split('\t'); const [mode, type] = meta.split(' '); return { mode, type, path: p } })
+    ctx.headTree = tree.split('\0').filter(Boolean).map((l) => { const [meta, p] = l.split('\t'); const [mode, type, sha] = meta.split(' '); return { mode, type, sha, path: p } })
     ctx.headHasManifest = ctx.headTree.some((e) => e.path === `apps/${slug}/lacuna.app.json`)
     ctx.treeProblems = appTreeProblems(ctx.headTree)
     ctx.isNew = git(repo, ['ls-tree', baseSha, '--', `apps/${slug}`]).trim() === ''
@@ -105,10 +105,26 @@ export function context({ repo = root, base, head, author = '', out, lock = null
 export function overlay(ctx) {
   if (!ctx.copyable) return false
   fs.rmSync(ctx.appDir, { recursive: true, force: true })
-  const tar = spawnSync('git', ['archive', '--format=tar', ctx.head, '--', `apps/${ctx.slug}`], { cwd: ctx.repo, maxBuffer: 512 * 1024 * 1024 })
-  if (tar.status !== 0) throw new Error(`git archive failed: ${tar.stderr}`)
-  const x = spawnSync('tar', ['-x', '-f', '-', '-C', root], { input: tar.stdout })
-  if (x.status !== 0) throw new Error(`tar failed: ${x.stderr}`)
+  // Each blob is written straight from the object store. `git archive` would apply export-ignore and
+  // export-subst from the pull request's own .gitattributes and leave files out or change them.
+  for (const e of ctx.headTree) {
+    if (e.type !== 'blob' || (e.mode !== '100644' && e.mode !== '100755')) throw new Error(`unexpected entry in the app folder: ${e.path}`)
+    const dest = path.join(root, e.path)
+    if (path.relative(path.join(root, 'apps', ctx.slug), dest).startsWith('..')) throw new Error(`path escapes the app folder: ${e.path}`)
+    const blob = spawnSync('git', ['cat-file', 'blob', e.sha], { cwd: ctx.repo, maxBuffer: 512 * 1024 * 1024 })
+    if (blob.status !== 0) throw new Error(`git cat-file failed: ${blob.stderr}`)
+    fs.mkdirSync(path.dirname(dest), { recursive: true })
+    fs.writeFileSync(dest, blob.stdout, { mode: e.mode === '100755' ? 0o755 : 0o644 })
+  }
+  // The copy must be exactly the committed tree: same paths, same content.
+  const want = new Map(ctx.headTree.map((e) => [e.path, e.sha]))
+  const have = []
+  const walk = (d) => { for (const n of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, n.name); if (n.isDirectory()) walk(p); else have.push(p) } }
+  walk(ctx.appDir)
+  const rels = have.map((p) => path.relative(root, p).split(path.sep).join('/'))
+  const hashes = spawnSync('git', ['hash-object', '--no-filters', '--stdin-paths'], { cwd: root, input: have.join('\n') + '\n', encoding: 'utf8' }).stdout.trim().split('\n')
+  const bad = rels.filter((p, i) => want.get(p) !== hashes[i]).concat([...want.keys()].filter((p) => !rels.includes(p)))
+  if (bad.length || rels.length !== want.size) throw new Error(`the copied app folder does not match the pull request's commit (${bad.slice(0, 3).join(', ') || 'file count differs'})`)
   return true
 }
 

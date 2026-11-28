@@ -1,0 +1,7 @@
+{
+  "extends": "good",
+  "about": "A .gitattributes file marks a source folder export-ignore so a plain archive would skip it.",
+  "expect": [
+    "scope"
+  ]
+}
