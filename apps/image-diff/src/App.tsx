@@ -289,15 +289,24 @@ export function App() {
   if (prep && heat && overlay) {
     if (tab === 'Heatmap') view = stage(<CanvasView source={heat} zoom={eff} label="Difference heatmap" />)
     else if (tab === 'Overlay') view = stage(<CanvasView source={overlay} zoom={eff} label="A with changed pixels and bounding box" />)
-    else if (tab === 'Swipe') view = stage(
-      <div style={{ width: `${(prep.width * eff) / 100}px` }}>
-        <BeforeAfter
-          ariaLabel="Swipe between A and B"
-          before={<CanvasView source={prep.canvasA} zoom={eff} label="A, before" />}
-          after={<CanvasView source={prep.canvasB} zoom={eff} label="B, after" />}
-        />
-      </div>,
-    )
+    else if (tab === 'Swipe') {
+      const sw = (prep.width * eff) / 100
+      const sh = (prep.height * eff) / 100
+      const pinned = (c: HTMLCanvasElement, label: string) => (
+        <div className="id-swipe-pin" style={{ width: `${sw}px`, height: `${sh}px` }}>
+          <CanvasView source={c} zoom={eff} label={label} />
+        </div>
+      )
+      view = stage(
+        <div className="id-swipe" style={{ '--sw': `${sw}px`, '--sh': `${sh}px` } as React.CSSProperties}>
+          <BeforeAfter
+            ariaLabel="Swipe between A and B"
+            before={pinned(prep.canvasA, 'A, before')}
+            after={pinned(prep.canvasB, 'B, after')}
+          />
+        </div>,
+      )
+    }
     else if (tab === 'Blink') view = stage(<CanvasView source={showB ? prep.canvasB : prep.canvasA} zoom={eff} label={showB ? 'B, after' : 'A, before'} />)
     else view = (
       <div className="id-pair">

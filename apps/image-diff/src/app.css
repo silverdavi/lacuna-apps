@@ -110,8 +110,35 @@
 
 .id-pair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: calc(8px * var(--sf));
+}
+
+.id-pair > div {
+  min-width: 0;
+}
+
+.id-swipe {
+  width: calc(var(--sw) + calc(2px * var(--sf)));
+  height: calc(var(--sh) + calc(2px * var(--sf)));
+  max-width: none;
+}
+
+.id-swipe > div {
+  height: 100%;
+}
+
+.id-swipe > div > div {
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.id-swipe-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  flex: none;
 }
 
 .id-pair-head {
@@ -163,7 +190,7 @@
 @media (max-width: 45em) {
   .id-zones,
   .id-pair {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .id-stage {
     max-height: 60vh;
