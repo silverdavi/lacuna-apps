@@ -1,0 +1,49 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.audio-converter",
+  "name": "Audio Converter",
+  "version": "0.1.0",
+  "summary": "Resample, normalize, mix mono or stereo, and convert audio to WAV or PCM offline.",
+  "description": "Decode local audio files with Web Audio API, resample between 16 kHz and 48 kHz, convert between mono and stereo, normalize peak volume, and encode to 16-bit, 24-bit, or 32-bit float WAV or raw PCM offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "audio", "wav", "pcm", "resample"],
+  "icon": "meeting",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/audio-converter", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:audio->wav", "edit:audio-converter"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "audio-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist audio transcoding presets and conversion history across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["audio-converter"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

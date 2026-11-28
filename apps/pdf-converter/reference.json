@@ -1,0 +1,9 @@
+{
+  "repo": "Hopding/pdf-lib",
+  "url": "https://github.com/Hopding/pdf-lib",
+  "spdx": "MIT",
+  "licence_path": "LICENSE.md",
+  "copyright": ["Copyright (c) 2019 Andrew Dillon"],
+  "files": ["src/core/writers/PDFWriter.ts"],
+  "upstream_notice": false
+}

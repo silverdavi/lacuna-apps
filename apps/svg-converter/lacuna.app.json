@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.svg-converter",
+  "name": "SVG Converter",
+  "version": "0.1.0",
+  "summary": "Optimize SVG markup, rasterize to PNG/JPEG/WebP at 1x–4x, or export Data URI and JSX.",
+  "description": "Paste or open an SVG file offline to minify markup, strip comments and metadata, round coordinates, preview live, export CSS Data URIs or React JSX components, or rasterize to PNG, JPEG, or WebP at custom scale factors.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "svg", "vector", "rasterize", "optimize"],
+  "icon": "design",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/svg-converter", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:vector->raster", "edit:svg-converter"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "svg-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active SVG source and optimization settings across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["svg-converter"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

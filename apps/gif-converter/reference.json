@@ -1,0 +1,9 @@
+{
+  "repo": "mattdesl/gifenc",
+  "url": "https://github.com/mattdesl/gifenc",
+  "spdx": "MIT",
+  "licence_path": "LICENSE.md",
+  "copyright": ["Copyright (c) 2021 Matt DesLauriers"],
+  "files": ["src/gifenc.js", "src/lzwEncode.js"],
+  "upstream_notice": false
+}

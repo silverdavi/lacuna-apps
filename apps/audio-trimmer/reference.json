@@ -1,0 +1,9 @@
+{
+  "repo": "katspaugh/wavesurfer.js",
+  "url": "https://github.com/katspaugh/wavesurfer.js",
+  "spdx": "BSD-3-Clause",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2012-2023, katspaugh and contributors"],
+  "files": ["src/renderer.ts"],
+  "upstream_notice": false
+}

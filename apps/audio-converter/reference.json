@@ -1,0 +1,9 @@
+{
+  "repo": "mattdiamond/Recorderjs",
+  "url": "https://github.com/mattdiamond/Recorderjs",
+  "spdx": "MIT",
+  "licence_path": "LICENSE.md",
+  "copyright": ["Copyright (c) 2013 Matt Diamond"],
+  "files": ["src/recorder.js"],
+  "upstream_notice": false
+}

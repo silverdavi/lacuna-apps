@@ -1,0 +1,9 @@
+{
+  "repo": "Vanilagy/webm-muxer",
+  "url": "https://github.com/Vanilagy/webm-muxer",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2022 Vanilagy"],
+  "files": ["src/index.ts"],
+  "upstream_notice": false
+}

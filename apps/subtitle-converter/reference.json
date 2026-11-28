@@ -1,0 +1,9 @@
+{
+  "repo": "gsantiago/subtitle.js",
+  "url": "https://github.com/gsantiago/subtitle.js",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2016-present Guilherme Santiago"],
+  "files": ["src/parseTimestamp.ts", "src/formatTimestamp.ts"],
+  "upstream_notice": false
+}

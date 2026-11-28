@@ -1,0 +1,9 @@
+{
+  "repo": "svg/svgo",
+  "url": "https://github.com/svg/svgo",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2012-2021 Kir Belevich"],
+  "files": ["plugins/removeComments.js", "plugins/removeMetadata.js"],
+  "upstream_notice": false
+}
