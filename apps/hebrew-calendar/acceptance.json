@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "spec_sha256": "63f101dab5640f6257e333b1472b634f85da660a0884d82eb62190b615861b8e",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On Today the page shows the heading \"Hebrew Calendar\", \"17 Kislev 5787\", \"Friday, 27 November 2026\" and Hanukkah day 1 in 8 days."
+    },
+    {
+      "id": "A2",
+      "text": "On Convert, 27 November 2026 shows 17 Kislev 5787, and ticking After sunset shows 18 Kislev 5787."
+    },
+    {
+      "id": "A3",
+      "text": "Hebrew 1 Tishrei 5787 converts to Saturday, 12 September 2026; 30 Tevet 5787 shows an error that Tevet has 29 days; year 6001 is rejected."
+    },
+    {
+      "id": "A4",
+      "text": "The month list includes Adar I and Adar II only in leap years (5787 yes, 5786 no)."
+    },
+    {
+      "id": "A5",
+      "text": "Calendar shows Kislev 5787 with a Hanukkah day 1 cell, Next moves to Tevet 5787, and the Gregorian month view shows November 2026."
+    },
+    {
+      "id": "A6",
+      "text": "Anniversaries lists three fictional seed records and lets a record be added and deleted."
+    },
+    {
+      "id": "A7",
+      "text": "Year shows Rosh Hashana on Saturday, 12 September 2026 and a leap year for 5787."
+    },
+    {
+      "id": "A8",
+      "text": "The Israel/Diaspora choice persists after reload and changes the Simchat Torah rows."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "44a167f11864645840daafdab791f905ca09761776581e59d2010111c97a4473"
+    }
+  ]
+}
