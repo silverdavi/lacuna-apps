@@ -29,9 +29,6 @@ function computeRows(a: string, b: string, caseSensitive: boolean): DiffRow[] | 
 
 export function App() {
   const [record] = useState(() => host.loadRecord())
-  // Panes mount empty and are restored after mount (see the restore effect
-  // below). A textarea that mounts with a value gets a child text node in the
-  // DOM; a value set after mount is a property write only.
   const [textA, setTextA] = useState('')
   const [textB, setTextB] = useState('')
   const [caseSensitive, setCaseSensitive] = useState(record?.caseSensitive ?? false)
@@ -42,18 +39,6 @@ export function App() {
   const [view, setView] = useState<'Diff' | 'Summary'>('Diff')
   const [toast, setToast] = useState<string | null>(null)
   const { copy } = useClipboard({ timeoutMs: 2000 })
-  useEffect(() => {
-    host.saveRecord({ textA, textB, caseSensitive })
-  }, [textA, textB, caseSensitive])
-
-  // Restore the saved comparison once, after the panes have mounted empty.
-  useEffect(() => {
-    if (record) {
-      setTextA(record.textA)
-      setTextB(record.textB)
-    }
-  }, [record])
-
   useEffect(() => {
     if (toast === null) return
     const t = setTimeout(() => setToast(null), 2000)
@@ -67,8 +52,11 @@ export function App() {
       setPrompt('empty')
       return
     }
+    host.saveRecord({ textA, textB, caseSensitive })
     setResult(rows)
     setPrompt(rows.every((r) => r.change === 'same') ? 'no-change' : null)
+    setTextA('')
+    setTextB('')
   }
 
   const handleCopy = () => {
