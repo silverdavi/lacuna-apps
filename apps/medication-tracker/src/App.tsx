@@ -38,7 +38,9 @@ export function App() {
   const [newName, setNewName] = useState('')
   const [newDose, setNewDose] = useState('')
   const [newTime, setNewTime] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [doseError, setDoseError] = useState<string | null>(null)
+  const [timeError, setTimeError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const clipboard = useClipboard()
 
@@ -52,23 +54,31 @@ export function App() {
     doseStore.replaceAll(next)
   }
 
+  function clearFieldErrors() {
+    if (nameError) setNameError(null)
+    if (doseError) setDoseError(null)
+    if (timeError) setTimeError(null)
+  }
+
   function addMedication() {
     const name = newName.trim()
     const dose = newDose.trim()
     const time = newTime.trim()
+    let ok = true
     if (!name) {
-      setError('Enter a medication name.')
-      return
+      setNameError('Enter a medication name.')
+      ok = false
     }
     if (!dose) {
-      setError('Enter a dose.')
-      return
+      setDoseError('Enter a dose.')
+      ok = false
     }
     if (!time) {
-      setError('Enter a time.')
-      return
+      setTimeError('Enter a scheduled time.')
+      ok = false
     }
-    setError(null)
+    if (!ok) return
+    clearFieldErrors()
     const created = medStore.add({ name, dose, time })
     setMeds([...meds, created])
     setNewName('')
@@ -109,13 +119,23 @@ export function App() {
     setDoses(doseStore.list())
   }, [])
 
+  const lastDose = doses.length > 0 ? doses[doses.length - 1] : null
+  const statusParts: string[] = [
+    `${meds.length} ${meds.length === 1 ? 'medication' : 'medications'}`,
+    `${doses.length} ${doses.length === 1 ? 'dose' : 'doses'} logged`,
+  ]
+  if (lastDose) {
+    statusParts.push(`last dose: ${lastDose.medicationName} ${lastDose.dose} at ${lastDose.time}`)
+  }
+
   return (
     <AppShell
       name="Medication Reminder"
       icon="clinic"
-      hue="teal"
+      hue="rust"
       category="Healthcare"
       meta={meds.length === 1 ? '1 medication' : `${meds.length} medications`}
+      status={statusParts.join(' · ')}
       side={<Rail title="Doses" note={`${doses.length} logged`} chips={['Add a medication', 'Log a dose', 'Search the list', 'Export CSV', 'Dose history']} />}
     >
       <div className="lc-tabs" role="tablist" aria-label="Medication Reminder views">
@@ -125,18 +145,7 @@ export function App() {
             type="button"
             role="tab"
             aria-selected={tab === t}
-            className="lc-tab"
-            style={{
-              fontFamily: 'var(--sans)',
-              fontSize: 'calc(12.5px * var(--tf))',
-              fontWeight: 600,
-              color: tab === t ? 'var(--ink)' : 'var(--ink-80)',
-              padding: '0 calc(2px * var(--sf)) calc(11px * var(--sf))',
-              border: 'none',
-              background: 'none',
-              borderBottom: `calc(2px * var(--sf)) solid ${tab === t ? 'var(--accent)' : 'transparent'}`,
-              cursor: 'pointer',
-            }}
+            className={tab === t ? 'lc-tab mr-tab active' : 'lc-tab mr-tab'}
             onClick={() => setTab(t)}
           >
             {t}
@@ -152,9 +161,9 @@ export function App() {
               value={newName}
               onChange={(v) => {
                 setNewName(v)
-                if (error) setError(null)
+                if (nameError) setNameError(null)
               }}
-              error={error}
+              error={nameError}
               placeholder="e.g. Lisinopril"
             />
             <TextInput
@@ -162,8 +171,9 @@ export function App() {
               value={newDose}
               onChange={(v) => {
                 setNewDose(v)
-                if (error) setError(null)
+                if (doseError) setDoseError(null)
               }}
+              error={doseError}
               placeholder="e.g. 10 mg"
             />
             <TextInput
@@ -172,8 +182,9 @@ export function App() {
               value={newTime}
               onChange={(v) => {
                 setNewTime(v)
-                if (error) setError(null)
+                if (timeError) setTimeError(null)
               }}
+              error={timeError}
             />
             <TextInput
               label="Search"

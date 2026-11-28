@@ -48,3 +48,8 @@
   align-items: center;
   gap: calc(6px * var(--sf));
 }
+/* Inactive kit tabs render at --ink-40, which fails the contrast threshold;
+   keep the kit tab shape, raise the ink a step. */
+.mr-tab {
+  color: var(--ink-60);
+}
