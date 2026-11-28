@@ -1,0 +1,15 @@
+{
+  "repo": "myliang/x-spreadsheet",
+  "url": "https://github.com/myliang/x-spreadsheet",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2017 myliang"
+  ],
+  "files": [
+    "src/core/alphabet.js",
+    "src/core/formula.js",
+    "src/core/data_proxy.js"
+  ],
+  "upstream_notice": false
+}

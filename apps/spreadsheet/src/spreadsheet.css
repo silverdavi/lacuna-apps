@@ -1,0 +1,301 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. */
+
+.ss-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+  padding-bottom: calc(8px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.ss-sep {
+  width: calc(1px * var(--sf));
+  height: calc(18px * var(--sf));
+  background: var(--ui-line2);
+  margin: 0 calc(2px * var(--sf));
+}
+
+.ss-formula-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+  padding: calc(8px * var(--sf)) 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.ss-addr {
+  min-width: calc(64px * var(--sf));
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--paper-deep);
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink);
+}
+
+.ss-fx-badge {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: calc(14px * var(--tf));
+  color: var(--ink-60);
+  padding: 0 calc(4px * var(--sf));
+  user-select: none;
+}
+
+.ss-formula-input {
+  flex: 1;
+  min-width: 0;
+  padding: calc(5px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: calc(12.5px * var(--tf));
+}
+
+.ss-formula-input:focus {
+  outline: calc(2px * var(--sf)) solid var(--accent);
+  outline-offset: 0;
+}
+
+.ss-grid-wrap {
+  overflow: auto;
+  max-height: 62vh;
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--paper);
+  margin-top: calc(8px * var(--sf));
+}
+
+.ss-grid {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+  font-family: var(--sans);
+  font-size: calc(12.5px * var(--tf));
+}
+
+.ss-grid th,
+.ss-grid td {
+  border: calc(1px * var(--sf)) solid var(--ui-line);
+  height: calc(28px * var(--sf));
+  padding: 0;
+  vertical-align: middle;
+}
+
+.ss-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: calc(40px * var(--sf));
+  background: var(--paper-deep);
+}
+
+.ss-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-width: calc(104px * var(--sf));
+  width: calc(112px * var(--sf));
+  background: var(--paper-deep);
+  color: var(--ink-60);
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  font-weight: 600;
+  text-align: center;
+  user-select: none;
+}
+
+.ss-col-head.active,
+.ss-row-head.active {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.ss-row-head {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: calc(40px * var(--sf));
+  background: var(--paper-deep);
+  color: var(--ink-60);
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  font-weight: 500;
+  text-align: center;
+  user-select: none;
+}
+
+.ss-cell {
+  background: var(--paper);
+  color: var(--ink);
+  cursor: cell;
+  position: relative;
+  max-width: calc(160px * var(--sf));
+}
+
+.ss-cell.in-range {
+  background: var(--accent-soft);
+}
+
+.ss-cell.active {
+  box-shadow: inset 0 0 0 calc(2px * var(--sf)) var(--accent);
+  z-index: 1;
+}
+
+.ss-cell-display {
+  display: block;
+  width: 100%;
+  padding: calc(3px * var(--sf)) calc(7px * var(--sf));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+
+.ss-cell.num .ss-cell-display {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  text-align: right;
+}
+
+.ss-cell.align-left .ss-cell-display {
+  text-align: left;
+}
+
+.ss-cell.align-center .ss-cell-display {
+  text-align: center;
+}
+
+.ss-cell.align-right .ss-cell-display {
+  text-align: right;
+}
+
+.ss-cell.bold .ss-cell-display {
+  font-weight: 700;
+}
+
+.ss-cell.err .ss-cell-display {
+  color: var(--danger);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.ss-cell-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  margin: 0;
+  padding: calc(3px * var(--sf)) calc(6px * var(--sf));
+  background: var(--ui-card);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: calc(12px * var(--tf));
+  outline: none;
+}
+
+.ss-sheets-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+  margin-top: calc(10px * var(--sf));
+  padding-top: calc(8px * var(--sf));
+  border-top: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.ss-sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+}
+
+.ss-sheet-tab {
+  padding: calc(5px * var(--sf)) calc(12px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--paper-deep);
+  color: var(--ink-80);
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  cursor: pointer;
+}
+
+.ss-sheet-tab[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  font-weight: 600;
+}
+
+.ss-sheet-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: calc(6px * var(--sf));
+}
+
+.ss-file-hidden {
+  position: absolute;
+  width: calc(1px * var(--sf));
+  height: calc(1px * var(--sf));
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ss-inspector-grid {
+  display: grid;
+  gap: calc(8px * var(--sf));
+}
+
+.ss-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf));
+  font-size: calc(12px * var(--tf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  padding-bottom: calc(4px * var(--sf));
+}
+
+.ss-kv-label {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  color: var(--ink-60);
+}
+
+.ss-kv-val {
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--tf));
+  color: var(--ink);
+  text-align: right;
+  word-break: break-all;
+}
+
+.ss-fn-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(4px * var(--sf));
+}
+
+.ss-fn-chip {
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+  padding: calc(2px * var(--sf)) calc(5px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--paper-deep);
+  color: var(--ink-80);
+}
+
+.ss-rename-row {
+  display: flex;
+  gap: calc(6px * var(--sf));
+  align-items: flex-end;
+}
