@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "spec_sha256": "7f19db30f20fd57919aa2a7e2cf02be684abba64b58a77c4f0c9c7c47ce499af",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Teleprompter\" and the seeded \"Welcome script\" in the script list."
+    },
+    {
+      "id": "A2",
+      "text": "New script then Rehearse shows \"Nothing to read yet\" for the empty script."
+    },
+    {
+      "id": "A3",
+      "text": "Deleting a script offers Undo, and Undo restores it."
+    },
+    {
+      "id": "A4",
+      "text": "Duplicate adds a copy named \"<name> copy\"."
+    },
+    {
+      "id": "A5",
+      "text": "In Step mode the arrow keys move line by line; at the end an \"End\" card offers Restart."
+    },
+    {
+      "id": "A6",
+      "text": "Pressing H hides the controls (clean mode) and H brings them back."
+    },
+    {
+      "id": "A7",
+      "text": "Mirror flips the reading stage horizontally; Escape returns to the editor."
+    },
+    {
+      "id": "A8",
+      "text": "The Keys dialog lists the keyboard map."
+    },
+    {
+      "id": "A9",
+      "text": "Play shows a 3-2-1 countdown, then reads."
+    },
+    {
+      "id": "A10",
+      "text": "Mode, speed and size are remembered per script across reload."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "1ed02bd162ccb9e6eb4a9d596a4ac8dee5ff4c34f462c0f01061c733725ba3b0"
+    }
+  ]
+}

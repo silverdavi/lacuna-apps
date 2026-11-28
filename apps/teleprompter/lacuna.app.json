@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.teleprompter",
+  "name": "Teleprompter",
+  "version": "0.1.0",
+  "summary": "Read a script full-screen at your own pace, with mirror flip and timers.",
+  "description": "Paste or load a script and read it full-screen: smooth scroll or line-by-line stepping at a chosen words-per-minute, adjustable size, mirror flip for beam-splitter glass, a reading anchor line, clean mode, and section timers. Scripts are plain text with ## sections, > cues and [stage directions]. Several scripts are saved on this device.",
+  "category": "productivity",
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/teleprompter"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/dialog": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/range-slider": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:teleprompter-script",
+    "edit:teleprompter-script",
+    "export:teleprompter-script"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "teleprompter-script",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Keep your scripts and where you stopped reading each one"
+      }
+    ],
+    "platform": [
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "teleprompter-script"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "tags": [
+    "teleprompter",
+    "script",
+    "video",
+    "speech"
+  ]
+}
