@@ -1,0 +1,9 @@
+{
+  "repo": "gpac/mp4box.js",
+  "url": "https://github.com/gpac/mp4box.js",
+  "spdx": "BSD-3-Clause",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2012-2024, Telecom ParisTech / GPAC"],
+  "files": ["src/index.js"],
+  "upstream_notice": false
+}

@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.sprite-sheet",
+  "name": "Sprite Sheet Packer",
+  "version": "0.1.0",
+  "summary": "Pack multiple images into a single sprite sheet PNG with JSON atlas and CSS.",
+  "description": "Drop multiple PNG or SVG sprites or generate sample tiles, configure padding, pack them with 2D shelf bin-packing, and export the combined sprite sheet PNG alongside JSON atlas coordinates or CSS sprite classes offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "sprites", "atlas", "css", "gamedev"],
+  "icon": "grid",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/sprite-sheet", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:sprites->atlas", "edit:sprite-sheet"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "sprite-sheet",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist sprite sheet padding and metadata format preferences across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["sprite-sheet"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

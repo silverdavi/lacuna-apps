@@ -1,0 +1,9 @@
+{
+  "repo": "opentypejs/opentype.js",
+  "url": "https://github.com/opentypejs/opentype.js",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2014 Frederik De Bleser"],
+  "files": ["src/opentype.mjs"],
+  "upstream_notice": false
+}

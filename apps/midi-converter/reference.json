@@ -1,0 +1,9 @@
+{
+  "repo": "Tonejs/Midi",
+  "url": "https://github.com/Tonejs/Midi",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2016 Yotam Mann"],
+  "files": ["src/Midi.ts", "src/Note.ts"],
+  "upstream_notice": false
+}

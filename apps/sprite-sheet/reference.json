@@ -1,0 +1,9 @@
+{
+  "repo": "mapbox/potpack",
+  "url": "https://github.com/mapbox/potpack",
+  "spdx": "ISC",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2018, Mapbox"],
+  "files": ["index.mjs"],
+  "upstream_notice": false
+}

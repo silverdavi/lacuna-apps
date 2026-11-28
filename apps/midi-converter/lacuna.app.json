@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.midi-converter",
+  "name": "MIDI Converter",
+  "version": "0.1.0",
+  "summary": "Convert melodies between Standard MIDI (.mid), JSON, ABC notation, and WAV audio.",
+  "description": "Compose or import note sequences offline, adjust tempo BPM, inspect note events, export valid Standard MIDI (.mid), JSON, or ABC notation, or synthesize directly to a playable 16-bit WAV file.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "midi", "music", "wav", "abc"],
+  "icon": "meeting",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/midi-converter", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:midi->audio", "edit:midi-converter"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "midi-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active note sequence and tempo settings across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["midi-converter"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

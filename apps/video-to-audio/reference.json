@@ -1,0 +1,9 @@
+{
+  "repo": "Vanilagy/mp4-muxer",
+  "url": "https://github.com/Vanilagy/mp4-muxer",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2022 Vanilagy"],
+  "files": ["src/index.ts"],
+  "upstream_notice": false
+}

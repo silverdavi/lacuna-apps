@@ -1,0 +1,49 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.video-to-audio",
+  "name": "Audio Extractor",
+  "version": "0.1.0",
+  "summary": "Extract clean WAV audio tracks from local video files with mono mixdown and normalize.",
+  "description": "Drop a local MP4, WebM, or MOV video file or load a sample clip to decode its audio track with Web Audio API, mix down to mono or stereo, normalize peak loudness, preview playback, and download a WAV file offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "video", "audio", "extract", "wav"],
+  "icon": "meeting",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/video-to-audio", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:video->audio", "edit:video-to-audio"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "video-to-audio",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist audio extraction settings and recent extraction history across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["video-to-audio"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

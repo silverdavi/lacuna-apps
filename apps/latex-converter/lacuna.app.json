@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.latex-converter",
+  "name": "LaTeX Converter",
+  "version": "0.1.0",
+  "summary": "Convert BibTeX to CSL-JSON, RIS, or Markdown and LaTeX math to Unicode or SVG.",
+  "description": "Parse BibTeX bibliography entries into CSL-JSON, RIS, or APA-style Markdown citations, or convert LaTeX math expressions into Unicode symbols, MathML, or crisp SVG offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "latex", "bibtex", "citations", "math"],
+  "icon": "docs",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/latex-converter", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:bibtex->citations", "edit:latex-converter"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "latex-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active BibTeX or LaTeX math snippet and output target across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["latex-converter"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

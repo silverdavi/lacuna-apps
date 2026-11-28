@@ -1,0 +1,49 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.frame-extractor",
+  "name": "Video Frame Grabber",
+  "version": "0.1.0",
+  "summary": "Extract evenly spaced still frames from video into a contact sheet PNG or ZIP.",
+  "description": "Open a local video file or generate a test clip, choose how many frames to sample across the timeline, preview a tiled contact sheet, and download the contact sheet PNG or individual frames as a ZIP archive offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "video", "frames", "contact-sheet", "zip"],
+  "icon": "meeting",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/frame-extractor", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:video->frames", "edit:frame-extractor"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "frame-extractor",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist frame sampling count and grid column settings across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["frame-extractor"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "ORCID/bibtexParseJs",
+  "url": "https://github.com/ORCID/bibtexParseJs",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2014 ORCID"],
+  "files": ["bibtexParse.js"],
+  "upstream_notice": false
+}
