@@ -1,0 +1,11 @@
+{
+  "extends": "good",
+  "about": "Someone fixes an app they do not maintain and leaves its maintainer as it is. It passes; the maintainer approves at review.",
+  "expect": [],
+  "slug": "fixture-fixing",
+  "manifest": {
+    "maintainer": {
+      "github": "original-maker"
+    }
+  }
+}

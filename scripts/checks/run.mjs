@@ -161,8 +161,9 @@ export function summary(result) {
   lines.push('| Check | Result | Rules | What was found |', '|---|---|---|---|')
   for (const c of result.checks) {
     const word = c.status === 'fail' && !c.blocking ? 'Failed (advisory)' : WORD[c.status]
-    const first = c.findings.slice(0, 3).map((f) => esc(`${f.file ? `${f.file}${f.line ? `:${f.line}` : ''} ` : ''}${f.message}`)).join('<br>')
-    const more = c.findings.length > 3 ? `<br>and ${c.findings.length - 3} more` : ''
+    const items = [...c.findings, ...(c.notes ?? []).map((n) => ({ message: n }))]
+    const first = items.slice(0, 3).map((f) => esc(`${f.file ? `${f.file}${f.line ? `:${f.line}` : ''} ` : ''}${f.message}`)).join('<br>')
+    const more = items.length > 3 ? `<br>and ${items.length - 3} more` : ''
     lines.push(`| ${c.id} | ${word} | ${c.rules.join(', ')} | ${first}${more} |`)
   }
   const fixes = result.checks.filter((c) => c.status === 'fail').flatMap((c) => c.findings.filter((f) => f.fix).map((f) => `- ${c.id}: ${esc(f.fix)}`))

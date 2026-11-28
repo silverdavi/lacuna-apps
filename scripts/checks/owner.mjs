@@ -1,7 +1,8 @@
 // owner: a new app's manifest names its author. maintainer.github must equal the pull request's author,
 // which the workflow reads from the pull request event, never from the pull request's files.
 // First-party apps are opened only by the repository's code owners (CODEOWNERS on the base branch).
-// An existing app keeps its maintainer of record, and only that maintainer updates it.
+// An existing app keeps its maintainer of record. Anyone may propose a fix to it; the maintainer's
+// approval is recorded at review.
 import fs from 'node:fs'
 import path from 'node:path'
 import { root, skip, verdict } from './lib.mjs'
@@ -49,10 +50,8 @@ export async function run(ctx) {
   if (before.type !== now.type || before.github !== now.github) {
     findings.push({ file: `apps/${ctx.slug}/lacuna.app.json`, message: 'the maintainer of an existing app cannot change in a pull request', fix: 'Keep maintainer.type and maintainer.github as they are. Ask a maintainer to transfer an app.' })
   }
-  if (before.type === 'first-party') {
-    if (!owners.has(author)) findings.push({ message: `${ctx.slug} is first-party and ${ctx.author} is not a maintainer`, fix: 'Report a problem with a first-party app as an issue.' })
-  } else if (before.github !== author) {
-    findings.push({ message: `${ctx.slug} is maintained by ${ctx.baseManifest?.maintainer?.github ?? 'someone else'}`, fix: 'Only the maintainer of record updates an app. Ask them to open the pull request.' })
-  }
-  return verdict(findings, { measured: { author: ctx.author, maintainer: ctx.baseManifest?.maintainer?.github ?? null, newApp: false } })
+  // A fix to someone else's app is allowed; their approval is recorded at review, not by this check.
+  const ownerOfRecord = before.type === 'first-party' ? owners.has(author) : before.github === author
+  const notes = ownerOfRecord ? [] : [`${ctx.author} is not the maintainer of record of ${ctx.slug}; it is merged only after ${before.type === 'first-party' ? 'a maintainer' : ctx.baseManifest?.maintainer?.github} approves at review`]
+  return verdict(findings, { notes, measured: { author: ctx.author, maintainer: ctx.baseManifest?.maintainer?.github ?? null, newApp: false, maintainerOfRecord: ownerOfRecord } })
 }

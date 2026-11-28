@@ -1,0 +1,66 @@
+{
+  "manifestVersion": 1,
+  "id": "io.github.octo-maker.packing-list",
+  "name": "Packing list",
+  "version": "0.0.9",
+  "summary": "Keep a short list of things to pack for a trip.",
+  "description": "Add the things you need for a trip, remove them as they go in the bag, and start again for the next one. Nothing leaves this device.",
+  "category": "productivity",
+  "folder": "Track/Lists",
+  "tags": ["travel", "lists"],
+  "icon": "docs",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "third-party",
+    "name": "Octo Maker",
+    "github": "original-maker"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/fixture-fixing",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0"
+    }
+  },
+  "capabilities": ["edit:packing-list"],
+  "permissions": {
+    "records": [],
+    "platform": ["identity.profile.read"],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": ["any"]
+    }
+  },
+  "sharing": {
+    "owns": [],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
