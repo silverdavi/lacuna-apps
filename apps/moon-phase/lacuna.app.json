@@ -1,0 +1,72 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.moon-phase",
+  "name": "Moon phase",
+  "version": "0.1.0",
+  "summary": "See the moon phase, illumination and age for any date, plus the next new, quarter and full moons.",
+  "description": "Shows the moon phase for now or any date and time: phase name, illuminated percent, age in days, a drawn moon disc, a month calendar of phase icons and the next principal phases. Computed on this device from a short lunar series, with no network.",
+  "category": "personal",
+  "icon": "calendar",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/moon-phase"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/date-picker": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "view:moon-phase"
+  ],
+  "permissions": {
+    "records": [],
+    "platform": [],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

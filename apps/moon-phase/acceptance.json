@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "spec_sha256": "4dc0af88d85452a87f5211f2c68711ef1c015d43a2ef6f24f1b42abb6e689d06",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Moon phase\", the Illuminated and Age (days) values, and the accuracy note."
+    },
+    {
+      "id": "A2",
+      "text": "Setting the date to 2024-04-08 at 12:00 shows \"New Moon\" with illumination under 2%."
+    },
+    {
+      "id": "A3",
+      "text": "From 2024-04-15, the Upcoming tab lists a Full Moon on Apr 23, 2024."
+    },
+    {
+      "id": "A4",
+      "text": "The buttons +1 day and -1 day, and the ArrowRight key, move the selected date by one day."
+    },
+    {
+      "id": "A5",
+      "text": "The Month tab shows day cells and tapping a day selects it in the Today panel."
+    },
+    {
+      "id": "A6",
+      "text": "An empty time shows the inline error \"Enter a valid time\"; a year outside 1900 to 2100 shows an accuracy warning."
+    },
+    {
+      "id": "A7",
+      "text": "Hemisphere and 12 or 24 hour settings persist after reload."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "151ec3b5050eaecdaa581b24f9764b366a0fb9a90ed8fc1b35a0d5c2bbb2d3a3"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@lacuna/app-moon-phase",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5402",
+    "build": "vite build",
+    "check": "node ../../scripts/check-app.mjs && node --experimental-strip-types --test tests/moon.test.ts"
+  },
+  "dependencies": {
+    "@lacuna/date-picker": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "@lacuna/use-hotkeys": "workspace:0.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  }
+}
