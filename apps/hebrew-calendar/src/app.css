@@ -1,0 +1,330 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. */
+/* Tokens only: colors from var(--...), sizes from calc(Npx * var(--tf)) and calc(Npx * var(--sf)). */
+
+.hc-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf)) calc(16px * var(--sf));
+  margin-bottom: calc(16px * var(--sf));
+}
+
+.hc-he {
+  font-family: var(--serif);
+  unicode-bidi: isolate;
+}
+
+.hc-hero {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+.hc-hero-he {
+  align-self: flex-start;
+  font-size: calc(26px * var(--tf));
+  color: var(--accent);
+}
+
+.hc-hero-greg {
+  font-size: calc(15px * var(--tf));
+  font-family: var(--sans);
+  color: var(--ink);
+}
+
+.hc-hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(8px * var(--sf));
+}
+
+.hc-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(8px * var(--sf));
+  padding: calc(16px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--hair-strong, var(--ui-line2));
+  background: var(--paper-deep, transparent);
+}
+
+.hc-result-main {
+  font-family: var(--serif);
+  font-size: calc(18px * var(--tf));
+  color: var(--ink);
+}
+
+.hc-result-he {
+  font-size: calc(22px * var(--tf));
+  color: var(--ink);
+}
+
+.hc-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.hc-yearbar {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(8px * var(--sf));
+}
+
+.hc-facts {
+  margin: 0;
+  padding-left: calc(16px * var(--sf));
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  font-size: calc(13.5px * var(--tf));
+  color: var(--ink);
+}
+
+.hc-kind {
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+  color: var(--ink-60);
+}
+
+.hc-calbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf));
+}
+
+.hc-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-left: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.hc-dow {
+  padding: calc(4px * var(--sf));
+  text-align: center;
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+  color: var(--ink-60);
+  border-right: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+}
+
+.hc-cell {
+  min-height: calc(88px * var(--sf));
+  min-width: 0;
+  padding: calc(4px * var(--sf));
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--sf));
+  border-right: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+  overflow: hidden;
+}
+
+.hc-cell.shabbat {
+  background: var(--paper-deep, transparent);
+}
+
+.hc-cell.today {
+  box-shadow: inset 0 0 0 calc(2px * var(--sf)) var(--accent);
+}
+
+.hc-cell-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(4px * var(--sf));
+}
+
+.hc-num {
+  font-family: var(--sans);
+  font-size: calc(15px * var(--tf));
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.hc-num-he {
+  font-size: calc(12px * var(--tf));
+  color: var(--ink-60);
+}
+
+.hc-sub {
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+  color: var(--ink-60);
+}
+
+.hc-tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(4px * var(--sf));
+  min-width: 0;
+}
+
+.hc-tag {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.hc-tag > * {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hc-more {
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+  color: var(--ink-60);
+}
+
+.hc-dot {
+  display: none;
+  width: calc(8px * var(--sf));
+  height: calc(8px * var(--sf));
+  background: var(--accent);
+}
+
+.hc-list {
+  margin-top: calc(16px * var(--sf));
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--sf));
+}
+
+@media (max-width: 40em) {
+  .hc-cell {
+    min-height: calc(48px * var(--sf));
+    padding: calc(4px * var(--sf)) calc(2px * var(--sf));
+    gap: 0;
+  }
+
+  .hc-num {
+    font-size: calc(13.5px * var(--tf));
+  }
+
+  .hc-num-he,
+  .hc-tag,
+  .hc-more {
+    display: none;
+  }
+
+  .hc-cell-top {
+    justify-content: center;
+  }
+
+  .hc-sub {
+    text-align: center;
+    font-size: calc(9px * var(--tf));
+  }
+
+  .hc-tags {
+    align-items: center;
+  }
+
+  .hc-dot {
+    display: block;
+  }
+}
+
+/* The shared date picker puts its week rows in the seven-column grid itself; flatten them so the days line up. */
+.hc-picker [role='row'] {
+  display: contents;
+}
+
+.hc-picker [role='gridcell'],
+.hc-picker [role='columnheader'] {
+  min-width: 0;
+}
+
+.hc-picker button {
+  width: auto !important;
+  padding: 0 calc(8px * var(--sf)) !important;
+  font-size: calc(12px * var(--tf)) !important;
+}
+
+.hc-picker > div {
+  display: flex !important;
+  width: 100%;
+  max-width: calc(360px * var(--sf));
+  box-sizing: border-box;
+}
+
+/* Keep tables as tables on a phone: they scroll sideways inside their card instead of stacking into cards. */
+.hc-scroll .lc-table {
+  display: table;
+  width: 100%;
+  min-width: calc(480px * var(--sf));
+}
+
+.hc-scroll .lc-table thead {
+  display: table-header-group;
+}
+
+.hc-scroll .lc-table tbody {
+  display: table-row-group;
+}
+
+.hc-scroll .lc-table tr {
+  display: table-row;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hc-scroll .lc-table th,
+.hc-scroll .lc-table td {
+  display: table-cell;
+  width: auto;
+  padding: calc(8px * var(--sf)) calc(8px * var(--sf)) calc(8px * var(--sf)) 0;
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line);
+  white-space: nowrap;
+}
+
+.hc-scroll .lc-table td[data-label]::before {
+  display: none;
+}
+
+.hc-scroll .lc-table td.num {
+  text-align: right;
+}
+
+.hc-tabs {
+  display: flex;
+  gap: calc(16px * var(--sf));
+  border-bottom: calc(1px * var(--sf)) solid var(--ui-line2);
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.hc-tab {
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+  font-weight: 600;
+  color: var(--ink-60);
+  padding: 0 calc(2px * var(--sf)) calc(8px * var(--sf));
+  cursor: pointer;
+  border: none;
+  background: none;
+  white-space: nowrap;
+  border-bottom: calc(2px * var(--sf)) solid transparent;
+}
+
+.hc-tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.lk-main .lk-field-hint {
+  color: var(--ink-60);
+}
+
+.hc-row {
+  display: contents;
+}
