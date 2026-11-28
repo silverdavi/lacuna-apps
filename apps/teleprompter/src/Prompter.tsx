@@ -54,6 +54,9 @@ export function Prompter({
 
   const [idx, setIdx] = useState(() => Math.min(rec.pos, Math.max(0, last)))
   const [playing, setPlaying] = useState(false)
+  // Manual stepping (keys, clicker) also runs the clocks, without auto-advance.
+  const [manual, setManual] = useState(false)
+  const clockOn = playing || manual
   const [count, setCount] = useState<number | null>(null)
   const [ended, setEnded] = useState(false)
   const [clean, setClean] = useState(false)
@@ -89,6 +92,7 @@ export function Prompter({
 
   const finish = useCallback(() => {
     setPlaying(false)
+    setManual(false)
     setEnded(true)
   }, [])
 
@@ -163,7 +167,7 @@ export function Prompter({
 
   // Clocks run while playing.
   useEffect(() => {
-    if (!playing) return
+    if (!clockOn) return
     let prev = performance.now()
     const t = window.setInterval(() => {
       const now = performance.now()
@@ -173,7 +177,7 @@ export function Prompter({
       redraw((n) => n + 1)
     }, 200)
     return () => window.clearInterval(t)
-  }, [playing, steps])
+  }, [clockOn, steps])
 
   // 3-2-1 before play.
   useEffect(() => {
@@ -217,6 +221,7 @@ export function Prompter({
 
   const restart = () => {
     elapsed.current = []
+    setManual(false)
     setCount(null)
     go(0)
     redraw((n) => n + 1)
@@ -224,7 +229,10 @@ export function Prompter({
 
   const togglePlay = () => {
     if (last < 0) return
-    if (playing) setPlaying(false)
+    if (playing) {
+      setPlaying(false)
+      setManual(false)
+    }
     else if (count !== null) setCount(null)
     else if (ended) {
       restart()
@@ -235,13 +243,22 @@ export function Prompter({
 
   const next = () => {
     if (idx >= last) finish()
-    else go(idx + 1)
+    else {
+      setManual(true)
+      go(idx + 1)
+    }
   }
-  const back = () => go(idx - 1)
+  const back = () => {
+    if (idx > 0) setManual(true)
+    go(idx - 1)
+  }
   const section = steps[idx]?.section ?? 0
   const goSection = (s: number) => {
     const target = sections[Math.max(0, Math.min(sections.length - 1, s))]
-    if (target) go(target.start)
+    if (target) {
+      setManual(true)
+      go(target.start)
+    }
   }
   const setSize = (v: number) => onRec({ size: Math.round(Math.min(SIZE_MAX, Math.max(SIZE_MIN, v)) * 10) / 10 })
   const setMode = (m: Mode) => {
@@ -251,6 +268,7 @@ export function Prompter({
   }
   const resetClocks = () => {
     elapsed.current = []
+    setManual(false)
     redraw((n) => n + 1)
   }
   const toggleFullscreen = () => {
@@ -302,7 +320,14 @@ export function Prompter({
     const onKey = (e: KeyboardEvent) => {
       if (keysOpen || e.metaKey || e.ctrlKey || e.altKey) return
       const el = e.target instanceof HTMLElement ? e.target : null
-      if (el?.closest('input, textarea, select, [role="slider"]')) return
+      if (el?.closest('textarea, select, [role="slider"]')) return
+      const input = el?.closest('input')
+      if (input) {
+        // Text entry keeps every key; checkboxes and radios only keep Space (which toggles them).
+        const t = input.type
+        if (t !== 'checkbox' && t !== 'radio') return
+        if (e.key === ' ') return
+      }
       if (el?.closest('button') && (e.key === ' ' || e.key === 'Enter')) return
       const name = MAP[e.key.length === 1 ? e.key.toLowerCase() : e.key]
       if (!name) return
