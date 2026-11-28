@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "spec_sha256": "6abca5f0a25523e110c3a52018cafe5a113922419536f94810f0815dcdc3b1fc",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Pub trivia\" and a \"Start\" button."
+    },
+    {
+      "id": "A2",
+      "text": "After choosing only the Ancient World category and only the Easy tier (deselecting Medium and Hard), clicking \"Start\" shows \"Card 1 of 10\"."
+    },
+    {
+      "id": "A3",
+      "text": "Before revealing, the text \"Answer\" is not shown; clicking \"Reveal answer\" shows it."
+    },
+    {
+      "id": "A4",
+      "text": "After revealing, clicking \"Got it\" changes the score from \"Score 0\" to \"Score 1\" and shows \"Card 2 of 10\"."
+    },
+    {
+      "id": "A5",
+      "text": "Keyboard: Space reveals, G scores a got, Space then M scores a miss; the page then shows \"Card 3 of 10\" and \"Score 1\"."
+    },
+    {
+      "id": "A6",
+      "text": "Revealing and marking \"Missed it\" on all ten cards shows \"Deck finished\", a table named \"Per-category results\" and an enabled \"Retry missed\" button; clicking it starts a new deck at \"Card 1 of 10\"."
+    },
+    {
+      "id": "A7",
+      "text": "Clicking \"None\" for categories shows \"Choose at least one category and tier\"."
+    },
+    {
+      "id": "A8",
+      "text": "On the Rounds tab, clicking the first \"Play\" button starts a themed round showing \"Card 1 of 7\" or \"Card 1 of 8\"."
+    },
+    {
+      "id": "A9",
+      "text": "The Daily question is the same after reload; answering it shows \"Come back tomorrow\", which persists across reload together with a \"Day streak\" figure."
+    },
+    {
+      "id": "A10",
+      "text": "After scoring one card and reloading, the Stats tab table \"Accuracy by category\" lists \"Ancient World\"; \"Reset stats\" opens a confirmation dialog, and confirming shows \"Score some cards in Solo mode\"."
+    },
+    {
+      "id": "A11",
+      "text": "In Quizmaster mode with 2 teams, after revealing, clicking \"+1 Team 1\" sets it pressed (aria-pressed true) and no \"Got it\" button is present."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c826104bdd83a33eceb4cadc113b0e898196948f2d3be8a1f9f2b1c96073ef6c"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.pub-trivia",
+  "name": "Pub trivia",
+  "version": "0.1.0",
+  "summary": "A pub-quiz card game with 3,000 ready-made questions.",
+  "description": "Draw from 3,000 fact-checked questions across 42 categories and three difficulty tiers. Play solo, run a table as quizmaster with team scores, play themed rounds of eight, answer a question of the day, and keep stats. Everything is bundled, so it works with no network and no AI.",
+  "category": "personal",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/pub-trivia"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/dialog": "0.1.0",
+      "@lacuna/random": "0.1.0",
+      "@lacuna/use-hotkeys": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:game",
+    "edit:game"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "game",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store settings, seen questions, stats, daily streak and team names"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "game"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
