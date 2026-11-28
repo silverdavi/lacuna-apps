@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "checks": [
+    { "id": "A1", "text": "On first load the page shows the heading \"Totient explorer\" and the factorization 3 x 11 x 17 for 561." },
+    { "id": "A2", "text": "The example pill 85 shows 85 as 3-Lehmer." },
+    { "id": "A3", "text": "Input of 1, a 25-digit number and an empty box each show their own message." },
+    { "id": "A4", "text": "The Carmichael tab at 10^5 reports 16 Carmichael numbers." },
+    { "id": "A5", "text": "The chosen tab survives a reload." }
+  ]
+}
