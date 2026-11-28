@@ -8,7 +8,7 @@ Inside `template/`, `pnpm install && pnpm check` runs the manifest validator and
 
 Import UI from `@lacuna/ui` in `toolbox/`. Read color, type, spacing, radius, shadow, and motion from tokens. Do not call the network. Do not use `eval` or `new Function`.
 
-Bugs and feature requests use the issue forms. The feature form has a LaCoin cost field.
+Bugs and feature requests use the issue forms.
 
 Apps that contain `OWNERS.md` are first-party seeds. They do not count as community contributors.
 

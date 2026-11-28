@@ -2,69 +2,24 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   check:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Validate manifests
         run: node schema/validate.mjs
       - name: Build apps and the starter
         run: pnpm build
       - name: Reject network calls and runtime code generation
         run: node scripts/forbid-network.mjs
-
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Validate manifests
-        run: node schema/validate.mjs
-      - name: Build artifacts
-        run: pnpm build
-      - name: Reject network calls and runtime code generation
-        run: node scripts/forbid-network.mjs
-      - name: Rsync to apps.lacunaos.com
-        env:
-          LACUNA_SSH_KEY: ${{ secrets.LACUNA_SSH_KEY }}
-          LACUNA_HOST: ${{ secrets.LACUNA_HOST }}
-        run: |
-          if [ -z "$LACUNA_SSH_KEY" ] || [ -z "$LACUNA_HOST" ]; then
-            echo "Build finished. Deploy did not run."
-            echo "The founder must add repository secrets LACUNA_SSH_KEY and LACUNA_HOST."
-            echo "LACUNA_HOST is user@host. That account's home directory is the web root for apps.lacunaos.com. Each app is synced to <slug>/."
-            exit 0
-          fi
-          mkdir -p ~/.ssh
-          printf '%s\n' "$LACUNA_SSH_KEY" > ~/.ssh/lacuna_deploy
-          chmod 600 ~/.ssh/lacuna_deploy
-          for dir in apps/*; do
-            slug=$(basename "$dir")
-            if [ ! -d "$dir/dist" ]; then
-              echo "No dist/ for $slug"
-              exit 1
-            fi
-            rsync -az --delete \
-              -e "ssh -i ~/.ssh/lacuna_deploy -o StrictHostKeyChecking=accept-new" \
-              "$dir/dist/" "${LACUNA_HOST}:${slug}/"
-          done
