@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "spec_sha256": "7fcfeac0b54c45b5550525d1ff50c2b85344c1d5d7824b2a06019c87b18454ef",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Crossword\", the size, difficulty and category pills, a Generate button and a Daily button."
+    },
+    {
+      "id": "A2",
+      "text": "Generate on Medium opens a grid with a current-clue bar starting at \"1 across\" and Across and Down clue lists totalling 14 to 20 clues."
+    },
+    {
+      "id": "A3",
+      "text": "Typing a letter fills the active cell and advances to the next cell; Backspace erases and moves back."
+    },
+    {
+      "id": "A4",
+      "text": "Tab and Shift+Tab move to the next and previous clue; clicking a clue in the lists jumps to it."
+    },
+    {
+      "id": "A5",
+      "text": "Clicking the active cell toggles between Across and Down where both exist."
+    },
+    {
+      "id": "A6",
+      "text": "Check puzzle marks a wrong letter as wrong and announces it; Reveal letter marks the cell as revealed."
+    },
+    {
+      "id": "A7",
+      "text": "Reveal puzzle completes the grid and opens a dialog with Time, Letters revealed and Checks, and a New puzzle button."
+    },
+    {
+      "id": "A8",
+      "text": "Pause hides the grid; Resume shows it again."
+    },
+    {
+      "id": "A9",
+      "text": "The Daily puzzle has the same clues on every load of the same date."
+    },
+    {
+      "id": "A10",
+      "text": "A puzzle in progress is saved, listed under Saved with Resume, and resumes with its entries after a reload."
+    },
+    {
+      "id": "A11",
+      "text": "Custom with fewer than five valid words shows \"Add more words\" and names each bad line with the reason."
+    },
+    {
+      "id": "A12",
+      "text": "Custom builds a puzzle from the example list; it can be saved as a record, printed with an answer page, listed under Saved and played."
+    },
+    {
+      "id": "A13",
+      "text": "In print media the print view shows a blank grid with Across and Down clue lists and hides the screen UI."
+    },
+    {
+      "id": "A14",
+      "text": "A pool too narrow for the size shows \"Could not build a full puzzle\" with a Retry button."
+    },
+    {
+      "id": "A15",
+      "text": "At 390 px wide the grid fits the screen, clue lists sit in Across/Down tabs, and check and reveal sit under one menu button."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "4d1b261f1b8bbb882c1871ec2b80e2c7050ecf074a1aea5b11da33f4688d0118"
+    }
+  ]
+}

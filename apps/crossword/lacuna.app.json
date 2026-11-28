@@ -1,0 +1,86 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.crossword",
+  "name": "Crossword",
+  "version": "0.1.0",
+  "summary": "Fresh crosswords built on your device, a daily puzzle, and your own word lists.",
+  "description": "Generates a new crossword each time from a built-in bank of about 500 clues across eight subjects and three difficulty levels. Pick a size, a difficulty and the subjects you like, or play the daily puzzle that is the same for everyone that day. Paste your own list of words and clues to make a custom puzzle, save it, and print it with an optional answer page. Check or reveal a letter, a word or the whole grid, and keep your best time for each size. Everything runs on the device with no network.",
+  "category": "personal",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/crossword"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/dialog": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:crossword",
+    "edit:crossword",
+    "export:crossword"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "crossword",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store puzzles in progress, custom puzzles, best times and the daily result"
+      }
+    ],
+    "platform": [
+      "identity.profile.read"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "crossword"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}
