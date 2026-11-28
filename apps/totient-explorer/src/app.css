@@ -47,7 +47,7 @@
 }
 .te-arrow { font-family: var(--mono); font-size: calc(13.5px * var(--tf)); color: var(--accent); }
 .te-prose { max-width: 68ch; }
-@media (max-width: 720px) {
+@media (max-width: 45em) {
   .te-rung { grid-template-columns: calc(52px * var(--sf)) 1fr; }
   .te-rung-why { grid-column: 1 / -1; }
   .te-kpis .lc-kpirow { grid-template-columns: 1fr 1fr; }
