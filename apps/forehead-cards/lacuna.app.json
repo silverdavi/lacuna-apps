@@ -1,0 +1,88 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.forehead-cards",
+  "name": "Forehead Cards",
+  "version": "0.1.0",
+  "summary": "Hold the phone to your forehead and guess the name from your friends’ clues.",
+  "description": "A party guessing game. Hold the phone to your forehead, friends give clues, and you tap, swipe or tilt for Correct or Pass before the timer ends. Ships a large deck of names across twelve categories, custom decks you write yourself, team scoring, and a printable 3 by 6 card sheet for playing without a phone.",
+  "category": "personal",
+  "icon": "grid",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "builtin",
+    "route": "/app/forehead-cards"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/random": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:forehead-deck",
+    "edit:forehead-deck",
+    "export:forehead-deck"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "forehead-deck",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store custom decks of names you write yourself"
+      }
+    ],
+    "platform": [
+      "identity.profile.read",
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "personal"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "forehead-deck"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  }
+}

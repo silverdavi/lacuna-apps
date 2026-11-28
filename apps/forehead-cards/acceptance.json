@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "spec_sha256": "760f653d19901c104a28476fbe566c142d779e774268dd5d63dd4f523b91cfef",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Forehead Cards\", twelve category pills each with a count, and an enabled \"Start round\" button."
+    },
+    {
+      "id": "A2",
+      "text": "Choosing \"None\" disables \"Start round\" and shows \"Pick at least one category to start.\""
+    },
+    {
+      "id": "A3",
+      "text": "Start round shows a 3-2-1 countdown, then a card name, a category tag and a timer starting at the chosen round length."
+    },
+    {
+      "id": "A4",
+      "text": "During play, ArrowRight marks Correct, ArrowLeft marks Pass and Space pauses; End round shows the round summary listing each card."
+    },
+    {
+      "id": "A5",
+      "text": "In the summary, activating a card toggles it between Correct and Passed."
+    },
+    {
+      "id": "A6",
+      "text": "Tapping the right half of the play screen marks the card Correct."
+    },
+    {
+      "id": "A7",
+      "text": "Team mode offers \"Next team\" after a round and shows a team scoreboard with the entered team names."
+    },
+    {
+      "id": "A8",
+      "text": "A custom deck can be created from one entry per line (blank lines and repeats skipped), deleted, and restored with Undo."
+    },
+    {
+      "id": "A9",
+      "text": "The round length and selected categories survive a reload."
+    },
+    {
+      "id": "A10",
+      "text": "The Print tab lays out 18 cards on the first sheet and offers a Print button."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "bf831894b7481902a9aa13e250df9d2831b1aa04cdc2c3b410dbcf83ef25efbd"
+    }
+  ]
+}
