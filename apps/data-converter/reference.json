@@ -1,0 +1,14 @@
+{
+  "repo": "nodeca/js-yaml",
+  "url": "https://github.com/nodeca/js-yaml",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (C) 2011-2015 by Vitaly Puzrin"
+  ],
+  "files": [
+    "lib/dumper.js",
+    "lib/loader.js"
+  ],
+  "upstream_notice": false
+}

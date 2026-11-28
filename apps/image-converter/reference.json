@@ -1,0 +1,13 @@
+{
+  "repo": "phoboslab/qoi",
+  "url": "https://github.com/phoboslab/qoi",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2021 Dominic Szablewski"
+  ],
+  "files": [
+    "qoi.h"
+  ],
+  "upstream_notice": false
+}

@@ -1,0 +1,77 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.text-converter",
+  "name": "Text Transformer",
+  "version": "0.1.0",
+  "summary": "Chain case, line, encoding, and extraction transforms over text offline.",
+  "description": "Build reusable multi-step text pipelines offline: convert case styles, clean and sort lines, encode or decode Base64, URL, HTML entities, Hex, ROT13, and Morse, or extract emails, URLs, and numbers.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "text", "case", "encoding", "base64", "pipeline"],
+  "icon": "notes",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/text-converter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/codecs": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/text-stats": "0.1.0",
+      "@lacuna/text-transforms": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "convert:text->text",
+    "edit:text-converter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "text-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active text input and transform pipeline steps across reloads"
+      }
+    ],
+    "platform": ["files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": {
+    "owns": ["text-converter"],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

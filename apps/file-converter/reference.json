@@ -1,0 +1,13 @@
+{
+  "repo": "sindresorhus/file-type",
+  "url": "https://github.com/sindresorhus/file-type",
+  "spdx": "MIT",
+  "licence_path": "license",
+  "copyright": [
+    "Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)"
+  ],
+  "files": [
+    "core.js"
+  ],
+  "upstream_notice": false
+}

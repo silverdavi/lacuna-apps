@@ -1,0 +1,13 @@
+{
+  "repo": "blakeembrey/change-case",
+  "url": "https://github.com/blakeembrey/change-case",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2014 Blake Embrey (hello@blakeembrey.com)"
+  ],
+  "files": [
+    "packages/change-case/src/index.ts"
+  ],
+  "upstream_notice": false
+}

@@ -1,0 +1,77 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.data-converter",
+  "name": "Data Format Studio",
+  "version": "0.1.0",
+  "summary": "Convert structured data between JSON, YAML, TOML, XML, CSV, TSV, INI, ENV, and query strings.",
+  "description": "Paste or drop structured configuration or tabular data and convert live across nine formats offline: JSON, YAML, TOML, XML, CSV, TSV, INI, dotenv, and URL query strings, with key sorting, minification, and file export.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "json", "yaml", "toml", "xml", "csv", "ini"],
+  "icon": "database",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-working",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/data-converter",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "convert:json->yaml",
+    "convert:yaml->json",
+    "convert:json->xml",
+    "edit:data-converter"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "data-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active data input, selected formats, and formatting options across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": {
+    "owns": ["data-converter"],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

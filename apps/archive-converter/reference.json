@@ -1,0 +1,13 @@
+{
+  "repo": "ankitrohatgi/tarballjs",
+  "url": "https://github.com/ankitrohatgi/tarballjs",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2017 Ankit Rohatgi"
+  ],
+  "files": [
+    "tarball.js"
+  ],
+  "upstream_notice": false
+}
