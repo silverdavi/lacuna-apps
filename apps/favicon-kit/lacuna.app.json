@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.favicon-kit",
+  "name": "Icon Pack Converter",
+  "version": "0.1.0",
+  "summary": "Convert any image or monogram into a multi-size ICO, PWA icon bundle, and manifest ZIP.",
+  "description": "Drop a PNG or SVG logo or customize a clean monogram badge to generate a multi-resolution favicon.ico, Apple Touch Icon, Android 192 and 512 icons, site.webmanifest, and HTML head tags in one ZIP offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "favicon", "ico", "pwa", "icons"],
+  "icon": "design",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/favicon-kit", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:logo->icons", "edit:favicon-kit"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "favicon-kit",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist app name, monogram text, and icon style across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["favicon-kit"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

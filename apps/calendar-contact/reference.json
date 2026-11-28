@@ -1,0 +1,9 @@
+{
+  "repo": "mapbox/togeojson",
+  "url": "https://github.com/mapbox/togeojson",
+  "spdx": "BSD-2-Clause",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2013, MapBox"],
+  "files": ["togeojson.js"],
+  "upstream_notice": false
+}

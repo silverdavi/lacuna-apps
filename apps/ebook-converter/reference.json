@@ -1,0 +1,9 @@
+{
+  "repo": "futurepress/epub.js",
+  "url": "https://github.com/futurepress/epub.js",
+  "spdx": "BSD-2-Clause",
+  "licence_path": "license",
+  "copyright": ["Copyright (c) 2014, Futurepress"],
+  "files": ["src/packaging.js"],
+  "upstream_notice": false
+}

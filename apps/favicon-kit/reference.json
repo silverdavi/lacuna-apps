@@ -1,0 +1,9 @@
+{
+  "repo": "101arrowz/fflate",
+  "url": "https://github.com/101arrowz/fflate",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2020 Arjun Barrett"],
+  "files": ["src/index.ts"],
+  "upstream_notice": false
+}

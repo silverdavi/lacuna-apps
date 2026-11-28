@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.color-converter",
+  "name": "Color Format Studio",
+  "version": "0.1.0",
+  "summary": "Convert colors across HEX, RGB, HSL, HSV, CMYK, OKLCH, CSS tokens, and Tailwind JSON.",
+  "description": "Enter any HEX, RGB, or HSL color to convert instantaneously across HEX, RGB, HSL, HSV, CMYK, and OKLCH, inspect WCAG contrast ratios, save a color palette, and export CSS custom properties or Tailwind JSON offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "color", "oklch", "cmyk", "hsl", "palette"],
+  "icon": "paint",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/color-converter", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:color->tokens", "edit:color-converter"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "color-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active color and saved palette swatches across reloads"
+      }
+    ],
+    "platform": ["files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["color-converter"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

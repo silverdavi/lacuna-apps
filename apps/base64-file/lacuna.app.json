@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.base64-file",
+  "name": "Data URI Converter",
+  "version": "0.1.0",
+  "summary": "Encode files to Base64, Data URI, CSS url, Hex, or byte arrays and decode back.",
+  "description": "Drop any file to generate raw Base64, RFC 2397 Data URIs, CSS url() rules, hex dumps, or TypeScript Uint8Array literals with size-overhead metrics, or paste a Data URI or Base64 string to decode back into a downloadable file.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "base64", "data-uri", "hex", "binary"],
+  "icon": "files",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/base64-file", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:binary->base64", "edit:base64-file"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "base64-file",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active encoded snippet and output format across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["base64-file"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

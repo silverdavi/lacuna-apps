@@ -1,0 +1,9 @@
+{
+  "repo": "beatgammit/base64-js",
+  "url": "https://github.com/beatgammit/base64-js",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2014 Jameson Little"],
+  "files": ["index.js"],
+  "upstream_notice": false
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "exceljs/exceljs",
+  "url": "https://github.com/exceljs/exceljs",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2014-2019 Guyon Roche"],
+  "files": ["lib/xlsx/xform/sheet/worksheet-xform.js"],
+  "upstream_notice": false
+}

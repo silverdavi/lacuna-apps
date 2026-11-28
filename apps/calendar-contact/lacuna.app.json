@@ -1,0 +1,51 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.calendar-contact",
+  "name": "vCard & ICS Converter",
+  "version": "0.1.0",
+  "summary": "Convert vCard contacts, iCalendar events, and GPX/GeoJSON routes across CSV and JSON.",
+  "description": "Convert personal interchange files offline: vCard (.vcf) to CSV or JSON, iCalendar (.ics) to CSV, JSON, or Markdown agendas, and GeoJSON to GPX or coordinate CSV without uploading personal data.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "vcard", "ics", "gpx", "geojson", "csv"],
+  "icon": "calendar",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/calendar-contact", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:vcard->csv", "convert:ics->json", "edit:calendar-contact"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "calendar-contact",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active interchange mode and input text across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["calendar-contact"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}

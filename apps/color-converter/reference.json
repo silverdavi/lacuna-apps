@@ -1,0 +1,9 @@
+{
+  "repo": "Qix-/color-convert",
+  "url": "https://github.com/Qix-/color-convert",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": ["Copyright (c) 2011-2016 Heather Arthur <fayearthur@gmail.com>", "Copyright (c) 2016-2021 Josh Junon <josh@junon.me>"],
+  "files": ["conversions.js"],
+  "upstream_notice": false
+}

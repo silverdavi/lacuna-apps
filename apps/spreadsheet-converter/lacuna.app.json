@@ -1,0 +1,51 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.spreadsheet-converter",
+  "name": "Sheet Converter",
+  "version": "0.1.0",
+  "summary": "Convert tables across CSV, TSV, JSON, Markdown, HTML, SQL INSERT, and XLSX offline.",
+  "description": "Paste or open tabular CSV, TSV, or JSON data and export cleanly to Excel XLSX, CSV, TSV, JSON, Markdown tables, HTML tables, or SQL INSERT statements with custom table names completely offline.",
+  "category": "productivity",
+  "tags": ["converter", "conversion-suite", "xlsx", "csv", "sql", "spreadsheet", "table"],
+  "icon": "sheets",
+  "relationship": { "kind": "standalone" },
+  "maintainer": { "type": "first-party", "name": "Lacuna", "url": "https://lacunaos.com" },
+  "source": { "repository": "https://github.com/silverdavi/lacuna-apps", "license": "MIT" },
+  "pricing": { "model": "free", "inAppPurchases": false, "ads": false },
+  "maturity": "demo-working",
+  "entry": { "type": "bundle", "route": "/app/spreadsheet-converter", "bundle": "dist/index.html" },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "^0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/use-clipboard": "0.1.0",
+      "@lacuna/use-local-record": "0.1.0"
+    }
+  },
+  "capabilities": ["convert:table->sheet", "edit:spreadsheet-converter"],
+  "permissions": {
+    "records": [
+      {
+        "kind": "spreadsheet-converter",
+        "access": ["read", "write", "create"],
+        "purpose": "Persist active table input and output format settings across reloads"
+      }
+    ],
+    "platform": ["files.pick", "files.save", "clipboard.write"],
+    "network": { "origins": [] },
+    "dataClasses": [],
+    "availability": { "spaceTypes": ["any"] }
+  },
+  "sharing": { "owns": ["spreadsheet-converter"], "reads": [], "handoffs": [] },
+  "quality": {
+    "tests": ["tests/acceptance.spec.ts"],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  }
+}
