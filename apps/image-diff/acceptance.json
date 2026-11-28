@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "spec_sha256": "6d9b9f5b621131e52a4323bd56244cec5d009bd22cac80fc45cd940bd74afcf5",
+  "checks": [
+    {
+      "id": "A1",
+      "text": "On first load the page shows the heading \"Image Diff\", two drop zones for A and B, and a \"Try a sample\" button."
+    },
+    {
+      "id": "A2",
+      "text": "Pressing \"Try a sample\" shows the heatmap, the changed-pixel statistics and, under the Overlay tab, an overlay with a bounding box."
+    },
+    {
+      "id": "A3",
+      "text": "Two identical images show \"No pixels differ above the threshold\" and 0.00%."
+    },
+    {
+      "id": "A4",
+      "text": "When B has a different size, the notice \"B was resized from WxH to WxH to compare\" is shown and differing pixels are counted."
+    },
+    {
+      "id": "A5",
+      "text": "A file that is not a supported image shows an error that names the file and its type."
+    },
+    {
+      "id": "A6",
+      "text": "The last tab is remembered across reloads, and Clear returns to the empty state."
+    }
+  ],
+  "locked": [
+    {
+      "path": "tests/acceptance.spec.ts",
+      "sha256": "c358eeb964e1aa0a1d77e603be32b675d48a72221afb55fef432563306787781"
+    }
+  ]
+}
