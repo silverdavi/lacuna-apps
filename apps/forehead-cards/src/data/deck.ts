@@ -60,7 +60,7 @@ const RAW: Record<Category, string[]> = {
     'Pharaoh', 'Viking', 'Knight',
   ],
   Movies: [
-    'The Rock', 'Tom Hanks', 'Will Smith', 'Dwayne Johnson', 'Tom Cruise', 'Jackie Chan', 'Zendaya',
+    'Tom Hanks', 'Will Smith', 'Dwayne Johnson', 'Tom Cruise', 'Jackie Chan', 'Zendaya',
     'Robert Downey Jr.', 'Chris Hemsworth', 'Scarlett Johansson', 'Ryan Reynolds', 'Meryl Streep',
     'Harrison Ford', 'Samuel L. Jackson', 'Morgan Freeman', 'Emma Watson', 'Daniel Radcliffe',
     'Keanu Reeves', 'Julia Roberts', 'Leonardo DiCaprio', 'Jennifer Lawrence', 'Chris Pratt',
@@ -108,7 +108,7 @@ const RAW: Record<Category, string[]> = {
     'Pizza', 'Hamburger', 'Spaghetti', 'Tacos', 'Sushi', 'Ice Cream', 'Pancakes', 'Popcorn', 'Chocolate',
     'French Fries', 'Hot Dog', 'Watermelon', 'Pineapple', 'Banana', 'Strawberry', 'Avocado', 'Broccoli',
     'Carrot', 'Cheese', 'Donut', 'Cupcake', 'Pretzel', 'Burrito', 'Lasagna', 'Cereal', 'Sandwich',
-    'Waffle', 'Mac and Cheese', 'Apple Pie', 'Pumpkin', 'Coconut', 'Cookie', 'Pasta', 'Marshmallow',
+    'Waffle', 'Mac and Cheese', 'Apple Pie', 'Pumpkin', 'Coconut', 'Cookie', 'Nachos', 'Marshmallow',
   ],
 }
 
