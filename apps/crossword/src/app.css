@@ -1,0 +1,131 @@
+/* Crossword. Tokens only: colors, type and spacing come from var(--...) and calc(Npx * var(--tf|--sf)). */
+
+.cw-nav { margin-bottom: calc(4px * var(--sf)); }
+.cw-screen { display: flex; flex-direction: column; gap: calc(16px * var(--sf)); }
+.cw-field { display: flex; flex-direction: column; gap: calc(8px * var(--sf)); }
+.cw-hint { font-family: var(--mono); font-size: calc(10.5px * var(--tf)); color: var(--ink-60); }
+.cw-issues { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: calc(4px * var(--sf)); font-size: calc(12px * var(--tf)); color: var(--danger); }
+.cw-textarea textarea { font-family: var(--mono); font-size: calc(12px * var(--tf)); line-height: 1.5; }
+
+/* ---------------------------------------------------------------- play layout */
+.cw-play { display: flex; flex-wrap: wrap; gap: calc(16px * var(--sf)); align-items: flex-start; }
+.cw-board { flex: 0 1 auto; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: calc(12px * var(--sf)); }
+.cw-side { flex: 1 1 calc(260px * var(--sf)); min-width: 0; display: flex; flex-direction: column; gap: calc(12px * var(--sf)); }
+.cw-lists { display: grid; grid-template-columns: 1fr 1fr; gap: calc(12px * var(--sf)); }
+
+.cw-clue-bar {
+  position: sticky; top: 0; z-index: 3;
+  display: flex; align-items: center; gap: calc(8px * var(--sf));
+  min-height: calc(44px * var(--sf)); padding: calc(8px * var(--sf)) calc(12px * var(--sf));
+  background: var(--ui-card); border: calc(1px * var(--sf)) solid var(--hair-strong);
+  font-family: var(--serif); font-size: calc(15px * var(--tf)); line-height: 1.3; color: var(--ink);
+}
+.cw-clue-bar .cw-clue-text { flex: 1 1 auto; min-width: 0; }
+.cw-clue-bar .cw-clue-no { font-family: var(--mono); font-size: calc(10.5px * var(--tf)); color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+.cw-clue-bar .cw-step { flex: none; }
+
+.cw-tools { display: flex; flex-direction: column; gap: calc(8px * var(--sf)); }
+.cw-tool-row { display: flex; flex-wrap: wrap; align-items: center; gap: calc(8px * var(--sf)); }
+.cw-timer { font-family: var(--mono); font-size: calc(13.5px * var(--tf)); color: var(--ink); min-width: calc(48px * var(--sf)); font-variant-numeric: tabular-nums; }
+.cw-menu { display: flex; flex-direction: column; gap: calc(8px * var(--sf)); padding: calc(8px * var(--sf)); border: calc(1px * var(--sf)) solid var(--hair-strong); background: var(--ui-card); }
+.cw-menu .lc-btn { justify-content: flex-start; }
+.lk-shell .cw-menu .lc-btn + .lc-btn, .lk-shell .cw-tool-row .lc-btn + .lc-btn, .lk-shell .cw-clue-bar .lc-btn + .lc-btn { margin-left: 0; }
+.cw-status { margin: 0; min-height: calc(18px * var(--sf)); font-family: var(--mono); font-size: calc(10.5px * var(--tf)); color: var(--ink-60); }
+
+/* ---------------------------------------------------------------- grid */
+.cw-grid {
+  --cell: min(calc(calc(40px * var(--sf)) * var(--tf)), calc((100vw - calc(56px * var(--sf))) / var(--cols)));
+  display: grid; grid-template-columns: repeat(var(--cols), var(--cell)); grid-auto-rows: var(--cell);
+  width: max-content; max-width: 100%;
+  border: calc(1px * var(--sf)) solid var(--ink); background: var(--paper);
+}
+.cw-row { display: contents; }
+.cw-cell, .cw-block { width: var(--cell); height: var(--cell); box-sizing: border-box; }
+.cw-block { background: var(--ink); border: calc(1px * var(--sf)) solid var(--ink); }
+.cw-cell {
+  position: relative; background: var(--paper); color: var(--ink);
+  border: calc(1px * var(--sf)) solid var(--hair-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--sans); font-weight: 600; font-size: calc(18px * var(--tf)); line-height: 1;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+}
+.cw-cell.in-word { background: var(--accent-soft); }
+.cw-cell.active { border-color: var(--accent); box-shadow: inset 0 0 0 calc(1px * var(--sf)) var(--accent); }
+.cw-n { position: absolute; top: calc(1px * var(--sf)); left: calc(3px * var(--sf)); font-family: var(--mono); font-weight: 400; font-size: calc(8px * var(--tf)); line-height: 1; color: var(--ink-80); pointer-events: none; }
+.cw-letter { padding-top: calc(4px * var(--sf)); }
+.cw-cell.wrong .cw-letter { color: var(--danger); }
+.cw-cell.wrong::after {
+  content: ''; position: absolute; left: -20%; top: 50%; width: 140%;
+  border-top: calc(1px * var(--sf)) solid var(--danger); transform: rotate(-45deg); pointer-events: none;
+}
+.cw-cell.revealed::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 0; height: 0;
+  border-top: calc(9px * var(--sf)) solid var(--accent); border-left: calc(9px * var(--sf)) solid transparent;
+  pointer-events: none;
+}
+.cw-input {
+  position: absolute; width: calc(1px * var(--sf)); height: calc(1px * var(--sf)); opacity: 0; padding: 0; border: 0;
+  pointer-events: none; font-size: calc(15px * var(--tf));
+}
+.cw-sr { position: absolute; width: calc(1px * var(--sf)); height: calc(1px * var(--sf)); overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lk-shell .lc-tab { color: var(--ink-80); }
+.lk-shell .lc-tab.active { color: var(--ink); }
+.lk-main .lk-field-hint { color: var(--ink-60); }
+.cw-gridwrap { position: relative; max-width: 100%; }
+.cw-gridwrap:focus-within .cw-grid { outline: calc(2px * var(--sf)) solid var(--accent-soft); }
+
+/* ---------------------------------------------------------------- clue lists */
+.cw-clues { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; max-height: calc(440px * var(--sf)); overflow-y: auto; }
+.cw-clues li { margin: 0; }
+.cw-clue {
+  display: flex; gap: calc(8px * var(--sf)); width: 100%; text-align: left; cursor: pointer;
+  padding: calc(4px * var(--sf)) calc(8px * var(--sf)); border: 0; border-left: calc(2px * var(--sf)) solid transparent;
+  background: none; font-family: var(--sans); font-size: calc(13.5px * var(--tf)); line-height: 1.35; color: var(--ink);
+}
+.cw-clue .no { flex: none; min-width: calc(20px * var(--sf)); font-family: var(--mono); font-size: calc(10.5px * var(--tf)); color: var(--ink-60); padding-top: calc(2px * var(--sf)); }
+.cw-clue.on { background: var(--accent-soft); border-left-color: var(--accent); }
+.cw-clue.done { color: var(--ink-60); }
+.cw-clue:focus-visible { outline: calc(2px * var(--sf)) solid var(--accent); outline-offset: calc(calc(2px * var(--sf)) * -1); }
+.cw-clue-title { margin: 0 0 calc(4px * var(--sf)); }
+
+/* ---------------------------------------------------------------- saved */
+.cw-saved-actions { display: flex; flex-wrap: wrap; gap: calc(8px * var(--sf)); align-items: center; }
+.cw-stats { display: flex; flex-wrap: wrap; gap: calc(16px * var(--sf)); }
+
+/* ---------------------------------------------------------------- phone */
+@media (max-width: 45em) {
+  .cw-play { flex-direction: column; align-items: stretch; gap: calc(12px * var(--sf)); }
+  .cw-board { display: contents; }
+  .cw-side { flex: none; width: 100%; }
+  .cw-lists { grid-template-columns: 1fr; }
+  .cw-saved-actions { flex: 1 1 100%; }
+  .cw-clues { max-height: calc(320px * var(--sf)); }
+  .cw-gridwrap { align-self: center; }
+}
+
+/* ---------------------------------------------------------------- print: the puzzle on paper, black on white */
+.cw-print { display: none; }
+@media print {
+  .lk-top, .lc-app-bar, .lk-side, .lk-status, .cw-screen, .cw-nav { display: none !important; }
+  .lk-shell, .lc-desk, .lc-win, .lc-app, .lc-app-body, .lc-app-main, .lk-main {
+    display: block !important; position: static !important; height: auto !important; min-height: 0 !important;
+    overflow: visible !important; padding: 0 !important; margin: 0 !important; border: 0 !important;
+    box-shadow: none !important; background: white !important; background-image: none !important;
+  }
+  .cw-print { display: block; color: black; background: white; font-family: var(--sans); }
+  .cw-print .cw-grid { --cell: 9mm; border-color: black; background: white; break-inside: avoid; }
+  .cw-print .cw-block { background: black; border-color: black; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .cw-print .cw-cell { background: white; color: black; border-color: black; cursor: default; }
+  .cw-print .cw-n { color: black; }
+  .cw-print .cw-letter { color: black; }
+  .cw-print h2 { margin: 0 0 4mm; font-family: var(--serif); font-size: calc(22px * var(--tf)); color: black; }
+  .cw-print .cw-print-meta { margin: 0 0 6mm; font-family: var(--mono); font-size: calc(10.5px * var(--tf)); color: black; }
+  .cw-print .cw-print-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-top: 8mm; }
+  .cw-print h3 { margin: 0 0 2mm; font-family: var(--mono); font-size: calc(12px * var(--tf)); text-transform: uppercase; letter-spacing: 0.08em; color: black; }
+  .cw-print ol { margin: 0; padding: 0; list-style: none; }
+  .cw-print li { margin: 0 0 1.5mm; font-size: calc(12px * var(--tf)); line-height: 1.35; color: black; break-inside: avoid; }
+  .cw-print li b { display: inline-block; min-width: 7mm; font-family: var(--mono); font-weight: 600; }
+  .cw-print .cw-answers { break-before: page; }
+  .cw-print .cw-answers .cw-grid { --cell: 6mm; }
+  .cw-print .cw-answers .cw-letter { font-size: calc(12px * var(--tf)); }
+}
