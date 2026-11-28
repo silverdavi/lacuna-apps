@@ -1,3 +1,14 @@
-I got tired of vibe-coding the same app over and over. I built a shelf where apps share modules and one identity, and where people can combine their work.
+Lacuna is an app store for the small apps people build for themselves with AI tools.
 
-The apps and the toolbox in this repository are open. Free to use. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to add an app.
+Find it at [lacunaos.com](https://lacunaos.com).
+
+To add an app:
+
+1. Copy `template/` to `apps/<your-slug>/`.
+2. Build your app and fill in `lacuna.app.json`.
+3. Run `node schema/validate.mjs` from the repository root.
+4. Open a pull request with screenshots and a sign-off. [CONTRIBUTING.md](CONTRIBUTING.md) has the details.
+
+Pull requests from outside open by invitation first.
+
+The apps and the toolbox in this repository are open. Free to use.
