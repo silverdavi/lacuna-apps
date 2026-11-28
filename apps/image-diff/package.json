@@ -1,0 +1,27 @@
+{
+  "name": "@lacuna/app-image-diff",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5403",
+    "build": "vite build",
+    "test": "node --test src/diff.test.ts",
+    "check": "node ../../scripts/check-app.mjs"
+  },
+  "dependencies": {
+    "@lacuna/before-after": "workspace:0.1.0",
+    "@lacuna/file-save-open": "workspace:0.1.0",
+    "@lacuna/range-slider": "workspace:0.1.0",
+    "@lacuna/ui": "workspace:*",
+    "@lacuna/use-clipboard": "workspace:0.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  }
+}
