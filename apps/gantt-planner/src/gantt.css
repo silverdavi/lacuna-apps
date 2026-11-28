@@ -1,0 +1,170 @@
+/* SPDX-License-Identifier: MIT. Copyright (c) 2026 David H. Silver / Lacuna. */
+
+.gp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(8px * var(--sf));
+  margin-bottom: calc(10px * var(--sf));
+}
+
+.gp-toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(8px * var(--sf));
+}
+
+.gp-chart-scroll {
+  overflow-x: auto;
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  background: var(--paper);
+}
+
+.gp-svg {
+  display: block;
+}
+
+.gp-header-bg {
+  fill: var(--paper-deep);
+}
+
+.gp-header-text {
+  fill: var(--ink-60);
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+  font-weight: 600;
+}
+
+.gp-grid-line {
+  stroke: var(--ui-line);
+  stroke-width: calc(1px * var(--sf));
+}
+
+.gp-grid-strong {
+  stroke: var(--ui-line2);
+  stroke-width: calc(1px * var(--sf));
+}
+
+.gp-row-bg {
+  fill: var(--paper);
+}
+
+.gp-row-alt {
+  fill: var(--ui-bg);
+}
+
+.gp-row-selected {
+  fill: var(--accent-soft);
+}
+
+.gp-row-label {
+  fill: var(--ink);
+  font-family: var(--sans);
+  font-size: calc(12px * var(--tf));
+}
+
+.gp-row-label.critical {
+  font-weight: 700;
+}
+
+.gp-dep-path {
+  fill: none;
+  stroke: var(--ink-40);
+  stroke-width: calc(1.5px * var(--sf));
+}
+
+.gp-dep-path.critical {
+  stroke: var(--accent);
+}
+
+.gp-arrow-head {
+  fill: var(--ink-60);
+}
+
+.gp-bar-group {
+  cursor: pointer;
+}
+
+.gp-bar {
+  fill: var(--paper-deep);
+  stroke: var(--geo-cobalt);
+  stroke-width: calc(1.5px * var(--sf));
+}
+
+.gp-bar.critical {
+  stroke: var(--accent);
+}
+
+.gp-bar.selected {
+  stroke-width: calc(2.5px * var(--sf));
+}
+
+.gp-bar-prog {
+  fill: var(--geo-cobalt);
+  opacity: 0.35;
+}
+
+.gp-bar-prog.critical {
+  fill: var(--accent);
+  opacity: 0.4;
+}
+
+.gp-milestone {
+  fill: var(--geo-cobalt);
+  stroke: var(--ink);
+  stroke-width: calc(1.5px * var(--sf));
+}
+
+.gp-milestone.critical {
+  fill: var(--accent);
+}
+
+.gp-milestone.selected {
+  stroke-width: calc(2.5px * var(--sf));
+}
+
+.gp-bar-meta {
+  fill: var(--ink-60);
+  font-family: var(--mono);
+  font-size: calc(10.5px * var(--tf));
+}
+
+.gp-dep-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(6px * var(--sf));
+}
+
+.gp-dep-toggle {
+  padding: calc(3px * var(--sf)) calc(8px * var(--sf));
+  border: calc(1px * var(--sf)) solid var(--ui-line2);
+  border-radius: calc(2px * var(--sf));
+  background: var(--paper-deep);
+  color: var(--ink-80);
+  font-family: var(--mono);
+  font-size: calc(11px * var(--tf));
+  cursor: pointer;
+}
+
+.gp-dep-toggle[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.gp-rail-stack {
+  display: grid;
+  gap: calc(8px * var(--sf));
+}
+
+.gp-file-hidden {
+  position: absolute;
+  width: calc(1px * var(--sf));
+  height: calc(1px * var(--sf));
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

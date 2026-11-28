@@ -1,0 +1,15 @@
+{
+  "repo": "frappe/gantt",
+  "url": "https://github.com/frappe/gantt",
+  "spdx": "MIT",
+  "licence_path": "LICENSE",
+  "copyright": [
+    "Copyright (c) 2016 Frappe Technologies Pvt. Ltd."
+  ],
+  "files": [
+    "src/index.js",
+    "src/bar.js",
+    "src/arrow.js"
+  ],
+  "upstream_notice": false
+}

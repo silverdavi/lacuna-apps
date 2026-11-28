@@ -1,0 +1,99 @@
+{
+  "manifestVersion": 1,
+  "id": "lacuna.gantt-planner",
+  "name": "Project Gantt",
+  "version": "0.1.0",
+  "summary": "Plan project schedules with dependencies, critical path analysis, milestones, and interactive Gantt timelines.",
+  "description": "A project timeline and Gantt planner with Finish-to-Start dependencies, Critical Path Method (CPM) slack calculation, milestones, resource workload summaries, Day/Week/Month timeline zoom, undo and redo, project templates, and CSV, JSON, and ICS calendar export.",
+  "category": "productivity",
+  "icon": "projects",
+  "relationship": {
+    "kind": "standalone"
+  },
+  "maintainer": {
+    "type": "first-party",
+    "name": "Lacuna",
+    "url": "https://lacunaos.com"
+  },
+  "pricing": {
+    "model": "free",
+    "inAppPurchases": false,
+    "ads": false
+  },
+  "maturity": "demo-guided",
+  "entry": {
+    "type": "bundle",
+    "route": "/app/gantt-planner",
+    "bundle": "dist/index.html"
+  },
+  "requires": {
+    "hostApi": "^1.0.0",
+    "modules": {
+      "@lacuna/tokens": "^0.1.0",
+      "@lacuna/ui": "0.1.0",
+      "@lacuna/csv-parse": "0.1.0",
+      "@lacuna/file-save-open": "0.1.0",
+      "@lacuna/host-mock": "0.1.0",
+      "@lacuna/ics-calendar": "0.1.0",
+      "@lacuna/use-undo-stack": "0.1.0"
+    }
+  },
+  "capabilities": [
+    "create:project-plan",
+    "edit:project-plan",
+    "export:ics"
+  ],
+  "permissions": {
+    "records": [
+      {
+        "kind": "project-plan",
+        "access": [
+          "read",
+          "write",
+          "create"
+        ],
+        "purpose": "Store project tasks, dependencies, milestones, and schedule settings"
+      }
+    ],
+    "platform": [
+      "files.pick",
+      "files.save"
+    ],
+    "network": {
+      "origins": []
+    },
+    "dataClasses": [],
+    "availability": {
+      "spaceTypes": [
+        "any"
+      ]
+    }
+  },
+  "sharing": {
+    "owns": [
+      "project-plan"
+    ],
+    "reads": [],
+    "handoffs": []
+  },
+  "quality": {
+    "tests": [
+      "tests/acceptance.spec.ts"
+    ],
+    "themeMatrix": true,
+    "keyboardOnly": true,
+    "accessibilityScan": "axe",
+    "worksWithoutNetwork": true
+  },
+  "source": {
+    "repository": "https://github.com/silverdavi/lacuna-apps",
+    "license": "MIT"
+  },
+  "tags": [
+    "gantt",
+    "project",
+    "timeline",
+    "schedule",
+    "cpm"
+  ]
+}
