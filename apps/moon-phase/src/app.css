@@ -25,7 +25,8 @@
   font-family: var(--sans); font-size: calc(12px * var(--tf)); cursor: pointer; min-width: 0;
 }
 .mp-day:hover { background: var(--paper-deep); }
-.mp-day.sel { border-color: var(--accent); background: var(--accent-soft); }
+.mp-day { position: relative; }
+.mp-day.sel { border-color: var(--accent); border-width: calc(2px * var(--sf)); }
 .mp-day.today .mp-num { font-weight: 700; color: var(--accent); }
 .mp-day.blank { border-color: transparent; cursor: default; pointer-events: none; }
 .mp-day .mp-mini { width: min(calc(30px * var(--sf)), 70%); }
@@ -39,10 +40,5 @@
   .mp-ev .lc-tag { padding-left: 0; padding-right: 0; border: none; font-size: calc(9px * var(--tf)); }
 }
 
-.mp-tabs { display: flex; gap: calc(16px * var(--sf)); border-bottom: calc(1px * var(--sf)) solid var(--hair-strong); margin-bottom: calc(12px * var(--sf)); }
-.mp-tab {
-  font-family: var(--sans); font-size: calc(12.5px * var(--tf)); font-weight: 600; color: var(--ink-80);
-  padding: 0 calc(2px * var(--sf)) calc(11px * var(--sf)); cursor: pointer; border: none; background: none;
-  border-bottom: calc(2px * var(--sf)) solid transparent;
-}
-.mp-tab.on { color: var(--ink); border-bottom-color: var(--accent); }
+.mp-tabs { margin-bottom: calc(12px * var(--sf)); }
+.mp-sr { position: absolute; width: calc(1px * var(--sf)); height: calc(1px * var(--sf)); overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

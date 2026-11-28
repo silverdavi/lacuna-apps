@@ -225,17 +225,17 @@ export function App() {
       title={monthTitle}
       actions={
         <Actions>
-          <Button ariaLabel="Previous month" onClick={() => moveMonth(-1)}>Prev</Button>
-          <Button ariaLabel="Next month" onClick={() => moveMonth(1)}>Next</Button>
+          <Button onClick={() => moveMonth(-1)}>Previous month</Button>
+          <Button onClick={() => moveMonth(1)}>Next month</Button>
         </Actions>
       }
     >
-      <div className="mp-grid" role="grid" aria-label={monthTitle}>
+      <div className="mp-grid" role="group" aria-label={monthTitle}>
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-          <div key={d} className="mp-dow" role="columnheader">{d}</div>
+          <div key={d} className="mp-dow" aria-hidden>{d}</div>
         ))}
         {Array.from({ length: lead }, (_, i) => (
-          <div key={`b${i}`} className="mp-day blank" role="gridcell" aria-hidden />
+          <div key={`b${i}`} className="mp-day blank" aria-hidden />
         ))}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1
@@ -247,17 +247,16 @@ export function App() {
             <button
               key={key}
               type="button"
-              role="gridcell"
               className={cls}
-              aria-label={`${fmtDay(noon)}, ${phaseName(elongation(noon))}${evs.map((ev) => `, ${EVENT_NAMES[ev.kind]} at ${fmtTime(ev.ms, h12)}`).join('')}`}
-              aria-selected={key === selectedDay}
+              aria-current={key === selectedDay ? 'date' : undefined}
               onClick={() => pickDay(day)}
             >
               <span className="mp-num">{day}</span>
+              <span className="mp-sr">{`${fmtDay(noon)}, ${phaseName(elongation(noon))}`}</span>
               <MoonDisc e={elongation(noon)} south={south} className="mp-mini" />
               {evs.map((ev) => (
                 <span key={ev.ms} className="mp-ev" title={`${EVENT_NAMES[ev.kind]} ${fmtTime(ev.ms, h12)}`}>
-                  <Tag accent>
+                  <Tag>
                     <span className="mp-evk">{`${EVENT_SHORT[ev.kind]} `}</span>
                     {fmtTime(ev.ms, h12).replace(/\s?(AM|PM)$/i, (m) => m.trim().toLowerCase().slice(0, 1))}
                   </Tag>
@@ -332,12 +331,8 @@ export function App() {
         </Rail>
       }
     >
-      <div className="mp-tabs" role="tablist" aria-label="Views">
-        {TABS.map((t) => (
-          <button key={t} type="button" role="tab" aria-selected={tab === t} className={`mp-tab${tab === t ? ' on' : ''}`} onClick={() => setTab(t)}>
-            {t}
-          </button>
-        ))}
+      <div className="mp-tabs">
+        <Pills items={[...TABS]} active={tab} onSelect={(v) => setTab(v as Tab)} />
       </div>
       {tab === 'Today' ? today : tab === 'Month' ? month : tab === 'Upcoming' ? upcomingCard : settingsCard}
     </AppShell>

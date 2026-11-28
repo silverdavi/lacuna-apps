@@ -25,7 +25,7 @@ test('[A2] 2024-04-08 noon is a New Moon under 2 percent lit', async ({ page }) 
 
 test('[A3] the full moon of April 2024 appears in the upcoming list', async ({ page }) => {
   await setDateTime(page, '2024-04-15')
-  await page.getByRole('tab', { name: 'Upcoming' }).click()
+  await page.getByRole('button', { name: 'Upcoming' }).click()
   await expect(page.getByText('Full Moon').first()).toBeVisible()
   await expect(page.getByText(/Apr 23, 2024/).first()).toBeVisible()
 })
@@ -44,9 +44,9 @@ test('[A4] +1 day and -1 day move the date; arrow keys do too', async ({ page })
 
 test('[A5] the month view lists every day and tapping a day selects it', async ({ page }) => {
   await setDateTime(page, '2024-04-08')
-  await page.getByRole('tab', { name: 'Month' }).click()
-  await expect(page.getByRole('gridcell')).not.toHaveCount(0)
-  await page.getByRole('gridcell', { name: /Apr 23, 2024/ }).click()
+  await page.getByRole('button', { name: 'Month' }).click()
+  await expect(page.getByRole('group', { name: /April 2024/ }).getByRole('button')).toHaveCount(30)
+  await page.getByRole('button', { name: /Apr 23, 2024/ }).click()
   await expect(page.getByLabel('Date')).toHaveValue('2024-04-23')
 })
 
@@ -58,11 +58,11 @@ test('[A6] an invalid time shows an inline error and a far year shows the accura
 })
 
 test('[A7] the hemisphere and 12 or 24 hour settings persist across reload', async ({ page }) => {
-  await page.getByRole('tab', { name: 'Settings' }).click()
+  await page.getByRole('button', { name: 'Settings' }).click()
   await page.getByRole('button', { name: 'Southern' }).click()
   await page.getByRole('button', { name: '12-hour' }).click()
   await page.reload()
-  await page.getByRole('tab', { name: 'Settings' }).click()
+  await page.getByRole('button', { name: 'Settings' }).click()
   await expect(page.getByRole('button', { name: 'Southern' })).toHaveClass(/active/)
   await expect(page.getByRole('button', { name: '12-hour' })).toHaveClass(/active/)
 })
